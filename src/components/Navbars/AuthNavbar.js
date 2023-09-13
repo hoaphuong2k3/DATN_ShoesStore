@@ -15,70 +15,78 @@
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 */
-/*eslint-disable*/
-
+import { Link } from "react-router-dom";
 // reactstrap components
-import { NavItem, NavLink, Nav, Container, Row, Col } from "reactstrap";
+import {
+  UncontrolledCollapse,
+  NavbarBrand,
+  Navbar,
+  NavItem,
+  NavLink,
+  Nav,
+  Container,
+  Row,
+  Col,
+} from "reactstrap";
 
-const Login = () => {
+const AdminNavbar = () => {
   return (
     <>
-      <footer className="py-5">
-        <Container>
-          <Row className="align-items-center justify-content-xl-between">
-            <Col xl="6">
-              <div className="copyright text-center text-xl-left text-muted">
-                © {new Date().getFullYear()}{" "}
-                <a
-                  className="font-weight-bold ml-1"
-                  href="https://www.creative-tim.com?ref=adr-auth-footer"
-                  target="_blank"
-                >
-                  Creative Tim
-                </a>
-              </div>
-            </Col>
-            <Col xl="6">
-              <Nav className="nav-footer justify-content-center justify-content-xl-end">
-                <NavItem>
-                  <NavLink
-                    href="https://www.creative-tim.com?ref=adr-auth-footer"
-                    target="_blank"
-                  >
-                    Creative Tim
-                  </NavLink>
-                </NavItem>
-                <NavItem>
-                  <NavLink
-                    href="https://www.creative-tim.com/presentation?ref=adr-auth-footer"
-                    target="_blank"
-                  >
-                    About Us
-                  </NavLink>
-                </NavItem>
-                <NavItem>
-                  <NavLink
-                    href="http://blog.creative-tim.com?ref=adr-auth-footer"
-                    target="_blank"
-                  >
-                    Blog
-                  </NavLink>
-                </NavItem>
-                <NavItem>
-                  <NavLink
-                    href="https://github.com/creativetimofficial/argon-dashboard/blob/master/LICENSE.md?ref=adr-auth-footer"
-                    target="_blank"
-                  >
-                    MIT License
-                  </NavLink>
-                </NavItem>
-              </Nav>
-            </Col>
-          </Row>
+      <Navbar className="navbar-top navbar-horizontal navbar-dark" expand="md">
+        <Container className="px-4">
+          <NavbarBrand to="/" tag={Link}>
+            <img
+              alt="..."
+              src={require("../../assets/img/brand/argon-react-white.png")}
+            />
+          </NavbarBrand>
+          <button className="navbar-toggler" id="navbar-collapse-main">
+            <span className="navbar-toggler-icon" />
+          </button>
+          <UncontrolledCollapse navbar toggler="#navbar-collapse-main">
+            <div className="navbar-collapse-header d-md-none">
+              <Row>
+                <Col className="collapse-brand" xs="6">
+                  <Link to="/">
+                    <img
+                      alt="..."
+                      src={require("../../assets/img/brand/argon-react.png")}
+                    />
+                  </Link>
+                </Col>
+                <Col className="collapse-close" xs="6">
+                  <button className="navbar-toggler" id="navbar-collapse-main">
+                    <span />
+                    <span />
+                  </button>
+                </Col>
+              </Row>
+            </div>
+            <Nav className="ml-auto" navbar>
+              <NavItem>
+                <NavLink className="nav-link-icon" to="/" tag={Link}>
+                  <i className="ni ni-planet" />
+                  <span className="nav-link-inner--text">Dashboard</span>
+                </NavLink>
+              </NavItem>
+              <NavItem>
+                <NavLink className="nav-link-icon" to="/register" tag={Link}>
+                  <i className="ni ni-circle-08"/>
+                  <span className="nav-link-inner--text">Register</span>
+                </NavLink>
+              </NavItem>
+              <NavItem>
+                <NavLink className="nav-link-icon" to="/login" tag={Link}>
+                  <i className="ni ni-key-25" />
+                  <span className="nav-link-inner--text">Login</span>
+                </NavLink>
+              </NavItem>
+            </Nav>
+          </UncontrolledCollapse>
         </Container>
-      </footer>
+      </Navbar>
     </>
   );
 };
 
-export default Login;
+export default AdminNavbar;
