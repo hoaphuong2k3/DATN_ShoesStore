@@ -11,15 +11,18 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import AdminLayout from "layouts/Admin.js";
 import AuthLayout from "layouts/Auth.js";
 import UserLayout from "layouts/User.js";
+import DetailSP from "views/user/detailsp";
+
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
 root.render(
-  <BrowserRouter>
-    <Routes>
-      <Route path="/admin/*" element={<AdminLayout />} />
-      <Route path="/*" element={<AuthLayout />} />
-      <Route path="/shoes/*" element={<UserLayout />} />
-      <Route path="*" element={<Navigate to="/login" replace />} />
-    </Routes>
-  </BrowserRouter>
+  // <BrowserRouter>
+  //   <Routes>
+  //     <Route path="/admin/*" element={<AdminLayout />} />
+  //     <Route path="/*" element={<AuthLayout />} />
+  //     <Route path="/shoes/*" element={<UserLayout />} />
+  //     <Route path="*" element={<Navigate to="/login" replace />} />
+  //   </Routes>
+  // </BrowserRouter>
+  <DetailSP />
 );
