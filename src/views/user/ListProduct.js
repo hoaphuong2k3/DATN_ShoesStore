@@ -18,11 +18,11 @@ function Shop() {
   }, []);
 
   return (
-    <div>
+    <div className="container-fluid">
       {/* <!-- SẢN PHẨM HOT --> */}
       <div style={{ display: "table", margin: "auto" }}>
-        <img src="images/heading-hot.png" alt="" width="260" height="40" />
-        <hr color="orange" width="100px" />
+        <img src="https://laforce.vn/wp-content/uploads/2023/07/banner-danh-muc-giay-da-laforce.jpg" alt="" width="100%" height="100%" />
+        <hr color="orange" width="300px" />
         <br />
       </div>
       <div className="row">
@@ -49,33 +49,22 @@ function Shop() {
             </a>
             <br />
             <br />
-            <div style={{ fontSize: "large" }}>
-              <a href="" className="ml-5 text-dark text-decoration-none">{product.ten}</a>
-              <p className="ml-5 font-weight-bold" style={{ color: "rgba(0, 0, 0, 0.705)" }}>
+            <div style={{ fontSize: "large",backgroundColor: "rgb(207, 193, 193)"}} className="p-2">
+              <a href="" className=" text-dark text-decoration-none">{product.ten}</a>
+              <p className=" font-weight-bold" style={{ color: "rgba(0, 0, 0, 0.705)" }}>
                 {product.gia}đ&nbsp;
-                <a href="#" className="btnLoop view_product" data-toggle="tooltip" data-placement="left" title="Thêm giỏ hàng">
+                {/* <a href="#" className="btnLoop view_product" data-toggle="tooltip" data-placement="left" title="Thêm giỏ hàng">
                   <i className="fab fa-opencart ml-4" aria-hidden="true"></i>
                 </a>
                 <a href="javascript:void(0)" data-id={product.code} data-variantid={product.code} title="Mua Ngay">
                   <i className="fa fa-shopping-bag mr-5" aria-hidden="true"></i>
-                </a>
+                </a> */}
               </p>
             </div>
           </div>
         ))}
       </div>
     </div>
-    // <div className="container mt-5">
-    //   <h1 className="text-danger">Shop</h1>
-    //   {products.map((product) => (
-    //     <div key={product.code}>
-    //       <img src={product.anh} alt={product.ten} />
-    //       <h3>{product.ten}</h3>
-    //       <p>Code: {product.code}</p>
-    //       <p>Price: {product.gia}</p>
-    //     </div>
-    //   ))}
-    // </div>
   );
 }
 
