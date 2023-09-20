@@ -1,30 +1,51 @@
 import 'assets/scss/detailsp.scss';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+
 
 const DetailSP = () => {
+
+    const [productDetail, setProductDetail] = useState([]);
+
+    useEffect(() => {
+        getDetail();
+    }, []);
+
+    const getDetail = async () => {
+        let res = await axios.get(`https://datnshoes-default-rtdb.firebaseio.com/shoesdetails/-NekyJb9ShvpYazOtRYy.json`)
+        console.log(res.data);
+        if (res && res.data) {
+            setProductDetail(res.data);
+        }
+    }
+
+
     return (
         <>
             <div className='container khung'>
                 <div className='card-box'>
                     <div className='row'>
                         <div className='col-5'>
-                            <img alt="" src="https://down-vn.img.susercontent.com/file/sg-11134201-22110-49wxoj5hr7jva4" height={450} width={450} />
+                            <img alt="" src={productDetail.anh} height={450} width={450} />
 
                             <p>
-                                <img alt="" src="https://down-vn.img.susercontent.com/file/sg-11134201-22110-49wxoj5hr7jva4" height={90} width={90} />
-                                <img alt="" src="https://down-vn.img.susercontent.com/file/sg-11134201-22110-49wxoj5hr7jva4" height={90} width={90} />
-                                <img alt="" src="https://down-vn.img.susercontent.com/file/sg-11134201-22110-49wxoj5hr7jva4" height={90} width={90} />
-                                <img alt="" src="https://down-vn.img.susercontent.com/file/sg-11134201-22110-49wxoj5hr7jva4" height={90} width={90} />
-                                <img alt="" src="https://down-vn.img.susercontent.com/file/sg-11134201-22110-49wxoj5hr7jva4" height={90} width={90} />
+                                <img alt="" src="https://down-vn.img.susercontent.com/file/sg-11134201-22110-49wxoj5hr7jva4" height={88} width={88} />
+                                <img alt="" src="https://down-vn.img.susercontent.com/file/sg-11134201-22110-49wxoj5hr7jva4" height={88} width={88} />
+                                <img alt="" src="https://down-vn.img.susercontent.com/file/sg-11134201-22110-49wxoj5hr7jva4" height={88} width={88} />
+                                <img alt="" src="https://down-vn.img.susercontent.com/file/sg-11134201-22110-49wxoj5hr7jva4" height={88} width={88} />
+                                <img alt="" src="https://down-vn.img.susercontent.com/file/sg-11134201-22110-49wxoj5hr7jva4" height={88} width={88} />
 
                             </p>
                         </div>
                         <div className='col-7'>
                             <div className='tensp'>
                                 {/* Tên sản phẩm */}
-                                <span>Converse Run Star Motion White Low - 172986C</span>
+                                <span>{productDetail.ten}</span>
                             </div>
+                            <br />
                             {/* start Giá sản phảm */}
                             <div className='giasp'>
+
                                 <div className='giachuagiam' >
                                     {/* Giá chuwq giảm */}
                                     2.600.000 đ
@@ -34,26 +55,29 @@ const DetailSP = () => {
                                     <span className='giagiam'>2.392.000 đ</span>
                                     <span className='sokhuyenmai'> Giảm 8%</span>
                                 </div>
+
+
                             </div>
                             {/* end Giá sản phảm */}
+                            <br />
 
                             {/* Start thuộc tính */}
                             <div >
                                 <div className='tong' >
                                     <span className='tenthuoctinh'>Thương hiệu </span>
-                                    <span className='giatrithuoctinh'>Converse</span>
+                                    <span className='giatrithuoctinh'>{productDetail.thuonghieu}</span>
                                 </div>
                                 <div className='tong'>
                                     <span className='tenthuoctinh'>Loại SP </span>
-                                    <span className='giatrithuoctinh'>Giày thể thao</span>
+                                    <span className='giatrithuoctinh'>{productDetail.loaisp}</span>
                                 </div>
                                 <div className='tong'>
                                     <span className='tenthuoctinh'>Chất liệu </span>
-                                    <span className='giatrithuoctinh'>Canvas, Cao su</span>
+                                    <span className='giatrithuoctinh'>{productDetail.chatlieu}</span>
                                 </div>
                                 <div className='tong'>
                                     <span className='tenthuoctinh'>Màu Sắc </span>
-                                    <span className='giatrithuoctinh'>Trắng</span>
+                                    <span className='giatrithuoctinh'>{productDetail.mau}</span>
                                 </div>
                             </div>
                             {/* End thuộc tính */}
@@ -98,16 +122,12 @@ const DetailSP = () => {
                                         <button className='btntanggiam'>-</button>
                                         <input class="soluong " type="text" role="spinbutton" aria-live="assertive" aria-valuenow="1" value="1"></input>
                                         <button className='btntanggiam'>+</button>
-                                        <span> 41 sản phẩm có sẵn</span>
+                                        <span> {productDetail.soluong} sản phẩm có sẵn</span>
                                     </span>
                                 </div>
                             </div>
-                            <div>
-                                <span>
-
-                                    <button> Thêm vào giỏ hàng</button>
-                                </span>
-
+                            <div className='text-center btnInDetailSP'>
+                                <button > Thêm vào giỏ hàng</button>
                                 <button>Mua ngay</button>
                             </div>
                         </div>
