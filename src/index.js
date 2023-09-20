@@ -8,15 +8,17 @@ import "assets/scss/argon-dashboard-react.scss";
 
 import AdminLayout from "layouts/Admin.js";
 import AuthLayout from "layouts/Auth.js";
+import DetailSP from "views/user/detailsp";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
 root.render(
-  <BrowserRouter>
-    <Routes>
-      <Route path="/admin/*" element={<AdminLayout />} />
-      <Route path="/auth/*" element={<AuthLayout />} />
-      <Route path="*" element={<Navigate to="/auth/login" replace />} />
-    </Routes>
-  </BrowserRouter>
+  // <BrowserRouter>
+  //   <Routes>
+  //     <Route path="/admin/*" element={<AdminLayout />} />
+  //     <Route path="/auth/*" element={<AuthLayout />} />
+  //     <Route path="*" element={<Navigate to="/auth/login" replace />} />
+  //   </Routes>
+  // </BrowserRouter>
+  <DetailSP />
 );
