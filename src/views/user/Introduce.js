@@ -1,9 +1,9 @@
 
-import { Card, CardHeader, CardBody, Container, Row, } from "reactstrap";
+import {Card, CardHeader, CardBody, Container, Row,} from "reactstrap";
 // core components
-import Header from "components/Headers/ProductHeader.js";
+import Header from "components/Headers/UserHeader2.js";
 
-const Product = () => {
+const Introduce = () => {
     return (
         <>
             <Header />
@@ -26,4 +26,4 @@ const Product = () => {
     );
 };
 
-export default Product;
+export default Introduce;

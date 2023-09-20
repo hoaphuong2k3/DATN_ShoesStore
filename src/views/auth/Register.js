@@ -79,13 +79,13 @@ import {
                   <InputGroup className="input-group-alternative mb-3">
                     <InputGroupAddon addonType="prepend">
                       <InputGroupText>
-                        <i className="ni ni-email-83" />
+                      <i className="ni ni-single-02" />
                       </InputGroupText>
                     </InputGroupAddon>
                     <Input
-                      placeholder="Email"
-                      type="email"
-                      autoComplete="new-email"
+                      placeholder="Username"
+                      type="text"
+                      autoComplete="new-username"
                     />
                   </InputGroup>
                 </FormGroup>
@@ -124,7 +124,7 @@ import {
                         <span className="text-muted">
                           I agree with the{" "}
                           <a href="#pablo" onClick={(e) => e.preventDefault()}>
-                            Privacy Policy
+                            Shoes Store
                           </a>
                         </span>
                       </label>
@@ -133,7 +133,7 @@ import {
                 </Row>
                 <div className="text-center">
                   <Button className="mt-4" color="primary" type="button">
-                    Create account
+                    Đăng ký
                   </Button>
                 </div>
               </Form>

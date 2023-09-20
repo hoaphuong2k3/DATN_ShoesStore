@@ -1,19 +1,18 @@
 
-import { Card, CardHeader, CardBody, Container, Row, } from "reactstrap";
+import {Card, CardHeader, CardBody, Container, Row,} from "reactstrap";
 // core components
-import Header from "components/Headers/ProductHeader.js";
+import Header from "components/Headers/UserHeader3.js";
 
-const Product = () => {
+const Contacts = () => {
     return (
         <>
             <Header />
             <Container fluid>
-                {/* Table */}
                 <Row>
                     <div className="col">
                         <Card className="shadow">
                             <CardHeader className="bg-transparent">
-                                <h3 className="mb-0">Sản phẩm</h3>
+                                {/* <h3 className="mb-0"></h3> */}
                             </CardHeader>
                             <CardBody>
 
@@ -26,4 +25,4 @@ const Product = () => {
     );
 };
 
-export default Product;
+export default Contacts;
