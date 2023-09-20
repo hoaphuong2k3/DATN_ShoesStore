@@ -1,6 +1,6 @@
-
 import { Link } from "react-router-dom";
 // reactstrap components
+import "assets/css/navbar.css";
 import {
   UncontrolledCollapse,
   NavbarBrand,
@@ -20,15 +20,17 @@ import {
   InputGroup,
   InputGroupAddon,
   InputGroupText,
-  Form, FormGroup
+  Form, FormGroup,
+  Button
 } from "reactstrap";
 
 const UserNavbar = () => {
+
   return (
     <>
-      <Navbar className="navbar navbar-horizontal fixed-top navbar-dark" expand="md" color-on-scroll="300">
+      <Navbar className="navbar fixednavbar navbar-horizontal fixed-top navbar-dark" expand="md" color-on-scroll="300">
         <Container className="px-4">
-          <NavbarBrand to="/" tag={Link}>
+          <NavbarBrand to="/shoes/home" tag={Link}>
             <img
               alt="..."
               src={require("../../assets/img/brand/argon-react-white.png")}
@@ -58,28 +60,28 @@ const UserNavbar = () => {
             </div>
             <Nav className="navbar-nav-hover align-items-lg-center" navbar>
               <NavItem>
-                <NavLink className="nav-link-icon" to="/" tag={Link}>
-                  <span className="nav-link-inner--text">TRANG CHỦ</span>
+                <NavLink className="nav-link-icon" to="/shoes/home" tag={Link}>
+                  <span className="nav-link-inner-text">TRANG CHỦ</span>
                 </NavLink>
               </NavItem>
               <NavItem>
-                <NavLink className="nav-link-icon" to="/" tag={Link}>
-                  <span className="nav-link-inner--text">SẢN PHẨM</span>
+                <NavLink className="nav-link-icon" to="/shoes/product" tag={Link}>
+                  <span className="nav-link-inner-text">SẢN PHẨM</span>
                 </NavLink>
               </NavItem>
               <NavItem>
-                <NavLink className="nav-link-icon" to="/" tag={Link}>
-                  <span className="nav-link-inner--text">GIỚI THIỆU</span>
+                <NavLink className="nav-link-icon" to="/shoes/introduce" tag={Link}>
+                  <span className="nav-link-inner-text">GIỚI THIỆU</span>
                 </NavLink>
               </NavItem>
               <NavItem>
-                <NavLink className="nav-link-icon" to="/" tag={Link}>
-                  <span className="nav-link-inner--text">LIÊN HỆ</span>
+                <NavLink className="nav-link-icon" to="/shoes/contact" tag={Link}>
+                  <span className="nav-link-inner-text">LIÊN HỆ</span>
                 </NavLink>
               </NavItem>
               <NavItem>
-                <NavLink className="nav-link-icon" to="/" tag={Link}>
-                  <span className="nav-link-inner--text">TIN TỨC</span>
+                <NavLink className="nav-link-icon" to="/shoes/news" tag={Link}>
+                  <span className="nav-link-inner-text">TIN TỨC</span>
                 </NavLink>
               </NavItem>
             </Nav>
@@ -106,7 +108,7 @@ const UserNavbar = () => {
                     <span className="avatar avatar-sm rounded-circle">
                       <img
                         alt="..."
-                        src={require("../../assets/img/theme/team-4-800x800.jpg")}
+                        src={require("../../assets/img/theme/react.jpg")}
                       />
                     </span>
                   </Media>
@@ -115,23 +117,27 @@ const UserNavbar = () => {
                   <DropdownItem className="noti-title" header tag="div">
                     <h6 className="text-overflow m-0">Welcome!</h6>
                   </DropdownItem>
-                  <DropdownItem to="/" tag={Link}>
+                  <DropdownItem to="/shoes/account" tag={Link}>
                     <i className="ni ni-single-02" />
                     <span>Tài khoản</span>
                   </DropdownItem>
                   <DropdownItem to="/" tag={Link}>
-                    <i className="ni ni-settings-gear-65" />
+                    <i className="ni ni-favourite-28" />
                     <span>Yêu thích</span>
                   </DropdownItem>
                   <DropdownItem divider />
-                  <DropdownItem href="#pablo" onClick={(e) => e.preventDefault()}>
+                  <DropdownItem href="#" onClick={(e) => e.preventDefault()}>
                     <i className="ni ni-user-run" />
                     <span>Đăng xuất</span>
                   </DropdownItem>
                 </DropdownMenu>
               </UncontrolledDropdown>
+              
+              <Button className="button-cart" color="white" to="/shoes/cart" tag={Link} >
+                 <i className="ni ni-cart" />
+              </Button>
             </Nav>
-
+           
           </UncontrolledCollapse>
         </Container>
       </Navbar>

@@ -18076,8 +18076,9 @@ textarea[resize="horizontal"] {
 }
 
 .navbar-search .input-group {
+  
   border-radius: 2rem;
-  border: 2px solid;
+  border-bottom: 2px solid;
   background-color: transparent;
 }
 .navbar-search .input-group .input-group-text {

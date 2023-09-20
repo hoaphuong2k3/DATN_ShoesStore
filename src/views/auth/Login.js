@@ -68,13 +68,13 @@ import {
                   <InputGroup className="input-group-alternative">
                     <InputGroupAddon addonType="prepend">
                       <InputGroupText>
-                        <i className="ni ni-email-83" />
+                        <i className="ni ni-single-02" />
                       </InputGroupText>
                     </InputGroupAddon>
                     <Input
-                      placeholder="Email"
-                      type="email"
-                      autoComplete="new-email"
+                      placeholder="Username"
+                      type="text"
+                      autoComplete="new-username"
                     />
                   </InputGroup>
                 </FormGroup>
@@ -107,7 +107,7 @@ import {
                 </div>
                 <div className="text-center">
                   <Button className="my-4" color="primary" type="button">
-                    Sign in
+                    Đăng nhập
                   </Button>
                 </div>
               </Form>

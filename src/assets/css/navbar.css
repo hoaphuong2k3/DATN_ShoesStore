@@ -1,0 +1,23 @@
+.fixednavbar {
+    background: rgba(0, 0, 0, 0.4) !important;
+    height: 80px;
+}
+
+.nav-link-inner-text {
+    font-weight: 600;
+    font-size: 16px;
+}
+
+.nav-link-inner-text:hover {
+    color: firebrick;
+}
+
+.button-cart {
+    margin-left: 10px;
+    padding: 0px;
+    padding-top: 7px;
+    border-radius: 50%;
+    width: 40px;
+    height: 35px;
+    color: firebrick;
+}

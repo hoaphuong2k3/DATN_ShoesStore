@@ -1,4 +1,4 @@
-
+import { Link } from "react-router-dom";
 import { Button, Container, Row, Col } from "reactstrap";
 
 const UserHeader = () => {
@@ -27,8 +27,7 @@ const UserHeader = () => {
               </p>
               <Button
                 color="info"
-                href="#"
-                onClick={(e) => e.preventDefault()}
+                to="/shoes/product" tag={Link}
               >
                 Xem ngay
               </Button>

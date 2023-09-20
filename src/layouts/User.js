@@ -1,36 +1,48 @@
 import React from "react";
-import {Routes, Route, Navigate } from "react-router-dom";
+import { useLocation, Route, Routes, Navigate } from "react-router-dom";
 
-// components
+// core components
+import UserNavbar from "components/Navbars/UserNavbar";
+// import AuthFooter from "components/Footers/AuthFooter.js";
 
-import UserNavbar from "components/Navbars/UserNavbar.js";
-import UserFooter from "components/Footers/UserFooter.js";
+import routes from "routes-user.js";
 
-// views
+const User = (props) => {
+  const mainContent = React.useRef(null);
+  const location = useLocation();
 
-import Home from "views/user/Home.js";
-import Product from "views/user/ListProduct.js";
-import News from "views/user/News.js";
-import Introduce from "views/user/Introduce.js";
-import Contact from "views/user/Contact.js";
+  React.useEffect(() => {
+    document.documentElement.scrollTop = 0;
+    document.scrollingElement.scrollTop = 0;
+    mainContent.current.scrollTop = 0;
+  }, [location]);
 
-const User = () => {
+  const getRoutes = (routes) => {
+    return routes.map((prop, key) => {
+      if (prop.layout === "/shoes") {
+        return (
+          <Route path={prop.path} element={prop.component} key={key} exact />
+        );
+      } else {
+        return null;
+      }
+    });
+  };
+
   return (
     <>
-      
+      <div className="main-content" ref={mainContent}>
         <UserNavbar />
-          <Routes>
-            <Route path="/shoes/home" element={<Home />} />
-            <Route path="/shoes/introduce" element={<Introduce />} />
-            <Route path="/shoes/product" element={<Product />} />
-            <Route path="/shoes/news" element={<News />} />
-            <Route path="/shoes/contact" element={<Contact />} />
-            <Route path="/shoes" element={<Navigate to="/shoes/home" replace />} />
-          </Routes>
-          <UserFooter />
-      
-    
+               
+            <Routes>
+              {getRoutes(routes)}
+              <Route path="*" element={<Navigate to="/shoes/home" replace />} />
+            </Routes>
+           
+      </div>
+      {/* <AuthFooter /> */}
     </>
   );
-}
+};
+
 export default User;
