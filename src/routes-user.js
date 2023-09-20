@@ -52,7 +52,7 @@ var routes = [
     layout: "/shoes",
   },
   {
-    path: "/:id",
+    path: "/productdetail",
     name: "CHI TIẾT SẢN PHẨM",
     component: <ProductDetail />,
     layout: "/shoes",

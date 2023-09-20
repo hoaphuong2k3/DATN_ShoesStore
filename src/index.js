@@ -16,13 +16,13 @@ import DetailSP from "views/user/detailsp";
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
 root.render(
-  // <BrowserRouter>
-  //   <Routes>
-  //     <Route path="/admin/*" element={<AdminLayout />} />
-  //     <Route path="/*" element={<AuthLayout />} />
-  //     <Route path="/shoes/*" element={<UserLayout />} />
-  //     <Route path="*" element={<Navigate to="/login" replace />} />
-  //   </Routes>
-  // </BrowserRouter>
-  <DetailSP />
+  <BrowserRouter>
+    <Routes>
+      <Route path="/admin/*" element={<AdminLayout />} />
+      <Route path="/*" element={<AuthLayout />} />
+      <Route path="/shoes/*" element={<UserLayout />} />
+      <Route path="*" element={<Navigate to="/login" replace />} />
+    </Routes>
+  </BrowserRouter>
+  // <DetailSP />
 );
