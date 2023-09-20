@@ -54,7 +54,7 @@ const Product = () => {
           `}
                   </style>
                   {products.map((product) => (
-                    <div key={product.code} className="col-md-3">
+                    <div key={product.code} className="col-md-3 m-2">
                       <a href="">
                         <img src={product.anh} alt="" className="zoom" />
                       </a>
