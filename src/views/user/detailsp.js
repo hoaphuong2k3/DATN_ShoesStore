@@ -1,4 +1,5 @@
 import 'assets/scss/detailsp.scss';
+
 const DetailSP = () => {
     return (
         <>
