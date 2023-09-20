@@ -13,7 +13,7 @@ const Footer = () => {
               rel="noopener noreferrer"
               target="_blank"
             >
-            Shoes Final
+            Shoes Store
             </a>
           </div>
         </Col>

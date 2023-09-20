@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Container,Row,Card,CardHeader,CardBody } from "reactstrap";
+import { Container, Row, Card, CardHeader, CardBody } from "reactstrap";
 import { FormTextProps } from "reactstrap";
 import Header from "components/Headers/ProductHeader.js";
 
@@ -21,15 +21,15 @@ const Product = () => {
 
   return (
     <>
-      <Header/>
+      <Header />
       <Container fluid>
         {/* Table */}
         <Row>
           <div className="col">
             <Card className="shadow">
-              <CardHeader className="bg-transparent">
+              {/* <CardHeader className="bg-transparent">
                 <h3 className="mb-0">Sản phẩm</h3>
-              </CardHeader>
+              </CardHeader> */}
               <CardBody>
                 <div style={{ display: "table", margin: "auto" }}>
                   {/* <img src="https://laforce.vn/wp-content/uploads/2023/07/banner-danh-muc-giay-da-laforce.jpg" alt="" width="100%" height="100%" /> */}
@@ -60,8 +60,8 @@ const Product = () => {
                       </a>
                       <br />
                       <br />
-                      <div style={{ fontSize: "large"}} className="p-2">
-                        <a href="" className=" text-dark text-decoration-none">{product.ten}</a>
+                      <div style={{ fontSize: "large" }} className="p-2">
+                        <a href="" className="text-dark text-decoration-none">{product.ten}</a>
                         <p className=" font-weight-bold" style={{ color: "rgba(0, 0, 0, 0.705)" }}>
                           {product.gia}đ&nbsp;
                         </p>
