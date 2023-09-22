@@ -20,13 +20,12 @@ import {
           <Card className="bg-secondary shadow border-0">
             <CardHeader className="bg-transparent pb-5">
               <div className="text-muted text-center mt-2 mb-3">
-                <small>Sign in with</small>
+                <small>Đăng nhập với</small>
               </div>
               <div className="btn-wrapper text-center">
                 <Button
                   className="btn-neutral btn-icon"
                   color="default"
-                  href="#pablo"
                   onClick={(e) => e.preventDefault()}
                 >
                   <span className="btn-inner--icon">
@@ -61,7 +60,7 @@ import {
             </CardHeader>
             <CardBody className="px-lg-5 py-lg-5">
               <div className="text-center text-muted mb-4">
-                <small>Or sign in with credentials</small>
+                <small>Hoặc đăng nhập với thông tin người dùng</small>
               </div>
               <Form role="form">
                 <FormGroup className="mb-3">

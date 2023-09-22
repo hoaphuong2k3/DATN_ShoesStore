@@ -1,7 +1,7 @@
 import React from "react";
 
 // reactstrap components
-import { Card, CardHeader, CardBody, Container, Row, Col, Form, FormGroup, Input, Button, Table } from "reactstrap";
+import { Card, CardHeader, CardBody, Container, Row, Col, Form, FormGroup, Input, Button, Table, InputGroup, InputGroupAddon, InputGroupText } from "reactstrap";
 
 import Header from "components/Headers/Header.js";
 
@@ -268,22 +268,39 @@ const Staff = () => {
           </Col>
         </Row>
 
-        <Row style={{marginTop:"20px"}}>
-        <Col md="12">
+        <Row style={{ marginTop: "20px" }}>
+          <Col md="12">
             <Card className="shadow">
               <CardHeader className="border-0">
                 <Row className="align-items-center">
                   <div className="col">
                     <h3 className="mb-0">Danh sách</h3>
                   </div>
-                  <div className="col text-right">
+                  <div className="col text-right" style={{ display: "flex" }}>
+                    <Col>
+                      <Input id="search" type="text" placeholder="Search.." style={{ width: "250px" }} size="sm"/>
+                    </Col>
+
                     <Button
                       color="primary"
-                      href="#pablo"
                       onClick={(e) => e.preventDefault()}
                       size="sm"
                     >
-                      See all
+                      Export
+                    </Button>
+                    <Button
+                      color="primary"
+                      onClick={(e) => e.preventDefault()}
+                      size="sm"
+                    >
+                      Export
+                    </Button>
+                    <Button
+                      color="primary"
+                      onClick={(e) => e.preventDefault()}
+                      size="sm"
+                    >
+                      Export
                     </Button>
                   </div>
                 </Row>
@@ -305,30 +322,30 @@ const Staff = () => {
                   </tr>
                 </thead>
                 <tbody>
-                 <tr>
-                  <td>1</td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                 </tr>
-                 <tr>
-                  <td>2</td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                 </tr>
+                  <tr>
+                    <td>1</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                  </tr>
+                  <tr>
+                    <td>2</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                  </tr>
                 </tbody>
               </Table>
             </Card>
