@@ -3,7 +3,7 @@ import { useLocation, Route, Routes, Navigate } from "react-router-dom";
 
 // core components
 import UserNavbar from "components/Navbars/UserNavbar";
-// import AuthFooter from "components/Footers/AuthFooter.js";
+import UserFooter from "components/Footers/UserFooter.js";
 
 import routes from "routes-user.js";
 
@@ -40,7 +40,7 @@ const User = (props) => {
             </Routes>
            
       </div>
-      {/* <AuthFooter /> */}
+      <UserFooter />
     </>
   );
 };

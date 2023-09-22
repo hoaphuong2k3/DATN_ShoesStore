@@ -5,6 +5,7 @@ import Introduce from "views/user/Introduce.js";
 import Contact from "views/user/Contact.js";
 import Cart from "views/user/Cart.js";
 import Account from "views/user/Account.js";
+import ProductDetail from "views/user/ProductDetail.js";
 
 var routes = [
  
@@ -48,6 +49,12 @@ var routes = [
     path: "/account",
     name: "TÀI KHOẢN",
     component: <Account />,
+    layout: "/shoes",
+  },
+  {
+    path: "/productdetail",
+    name: "CHI TIẾT SẢN PHẨM",
+    component: <ProductDetail />,
     layout: "/shoes",
   },
 ];
