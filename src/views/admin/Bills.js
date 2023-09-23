@@ -49,11 +49,11 @@ const Bills = () => {
               <CardBody>
                 <Form>
                   <Row>
-                    <Col xl="4" >
-                      <Input className='mb-3' type="text" placeholder="Nhập từ khóa tìm kiếm..." />
+                    <Col xl="4" xs="6">
+                      <Input className='mb-3' type="text"  placeholder="Nhập từ khóa tìm kiếm..." />
                     </Col>
-                    <Col xl="2" >
-                      <DropdownButton title="Ngày tạo">
+                    <Col xl="2" xs="3" >
+                      <DropdownButton title="Ngày tạo" >
                         <div className="d-flex align-items-center m-2">
                           <Dropdown.Item className='card m-2'>Hôm nay</Dropdown.Item>
                           <Dropdown.Item className='card m-2'>Hôm qua</Dropdown.Item>
@@ -67,14 +67,14 @@ const Bills = () => {
                           <Dropdown.Item className='card m-2'>Tháng này</Dropdown.Item>
                         </div>
                         <div className="m-2 card">
-                          <Button size="sm">Tùy chọn</Button>
+                          <Button size="sm" >Tùy chọn</Button>
                         </div>
                         <div className="m-2 card">
                           <Button size="sm">Lọc</Button>
                         </div>
                       </DropdownButton>
                     </Col>
-                    <Col xl="2" >
+                    <Col xl="2" xs="3" >
                     <DropdownButton title="Trạng thái">
                         <div className="d-flex align-items-center m-2">
                           <Dropdown.Item className='card m-2'>Đặt hàng</Dropdown.Item>
@@ -90,7 +90,7 @@ const Bills = () => {
                     </Col>
                   </Row>
 
-                  <Table>
+                  <Table className="align-items-center table-flush" responsive>
                     <thead>
                       <tr>
                         <th>Mã đơn hàng</th>
