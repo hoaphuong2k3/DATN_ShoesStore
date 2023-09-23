@@ -46,10 +46,9 @@ const Auth = (props) => {
             <div className="header-body text-center mb-7">
               <Row className="justify-content-center">
                 <Col lg="5" md="6">
-                  <h1 className="text-white">Welcome!</h1>
+                  <h1 className="text-white">Xin chào!</h1>
                   <p className="text-lead text-light">
-                    Use these awesome forms to login or create new account in
-                    your project for free.
+                  Chúng tôi chân thành chào đón tất cả các bạn đã ghé thăm trang web của Shoes Store.
                   </p>
                 </Col>
               </Row>
