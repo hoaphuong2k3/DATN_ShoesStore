@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Card, CardHeader, CardBody, Container, Row, Form, Col, FormGroup, Input, Table } from "reactstrap";
-import { InputGroup, InputGroupAddon, Button } from 'reactstrap';
+import { Card, CardHeader, CardBody, Container, Row, Form, Col, Input, Table } from "reactstrap";
+import {  InputGroupAddon, Button } from 'reactstrap';
 
 // core components
-import Header from "components/Headers/Header.js";
+import Header from "components/Headers/BillHeader.js";
 
 
 
@@ -52,16 +52,15 @@ const Bills = () => {
                     Danh sách hóa đơn
                   </h6> */}
 
-                  <InputGroup>
+                  <Col className='col-md-6'>
                     <Input
                       type="text"
-                      
                       placeholder="Nhập từ khóa tìm kiếm..."
                     />
                     <InputGroupAddon addonType="append">
                       <Button color="primary" type="submit">Tìm kiếm</Button>
                     </InputGroupAddon>
-                  </InputGroup>
+                  </Col>
                   <Table>
                     <thead>
                       <tr>
