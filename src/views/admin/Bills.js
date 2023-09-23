@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Card, CardHeader, CardBody, Container, Row, Form, Col, Input, Table } from "reactstrap";
-import {  InputGroupAddon, Button } from 'reactstrap';
+import { Card, Button, CardHeader, CardBody, Container, Row, Form, Col, Input, Table } from "reactstrap";
+import { Dropdown, DropdownButton } from 'react-bootstrap';
 
 // core components
 import Header from "components/Headers/BillHeader.js";
@@ -44,27 +44,56 @@ const Bills = () => {
           <div className="col">
             <Card className="shadow">
               <CardHeader className="bg-transparent">
-                <h3 className="mb-0">Hóa đơn</h3>
+                <h3 className="mb-0">Danh sách đơn hàng</h3>
               </CardHeader>
               <CardBody>
                 <Form>
-                  {/* <h6 className="heading-small text-muted mb-4">
-                    Danh sách hóa đơn
-                  </h6> */}
+                  <Row>
+                    <Col xl="4" >
+                      <Input className='mb-3' type="text" placeholder="Nhập từ khóa tìm kiếm..." />
+                    </Col>
+                    <Col xl="2" >
+                      <DropdownButton title="Ngày tạo">
+                        <div className="d-flex align-items-center m-2">
+                          <Dropdown.Item className='card m-2'>Hôm nay</Dropdown.Item>
+                          <Dropdown.Item className='card m-2'>Hôm qua</Dropdown.Item>
+                        </div>
+                        <div className="d-flex align-items-center m-2">
+                          <Dropdown.Item className='card m-2'>Tuần trước</Dropdown.Item>
+                          <Dropdown.Item className='card m-2'>Tuần này</Dropdown.Item>
+                        </div>
+                        <div className="d-flex align-items-center m-2">
+                          <Dropdown.Item className='card m-2'>Tháng trước</Dropdown.Item>
+                          <Dropdown.Item className='card m-2'>Tháng này</Dropdown.Item>
+                        </div>
+                        <div className="m-2 card">
+                          <Button size="sm">Tùy chọn</Button>
+                        </div>
+                        <div className="m-2 card">
+                          <Button size="sm">Lọc</Button>
+                        </div>
+                      </DropdownButton>
+                    </Col>
+                    <Col xl="2" >
+                    <DropdownButton title="Trạng thái">
+                        <div className="d-flex align-items-center m-2">
+                          <Dropdown.Item className='card m-2'>Đặt hàng</Dropdown.Item>
+                          <Dropdown.Item className='card m-2'>Đã hủy</Dropdown.Item>
+                        </div>
+                        <div className="d-flex align-items-center m-2">
+                          <Dropdown.Item className='card m-2 text-center'>Hoàn thành</Dropdown.Item>
+                        </div>
+                        <div className="m-2 card">
+                          <Button size="sm">Lọc</Button>
+                        </div>
+                      </DropdownButton>
+                    </Col>
+                  </Row>
 
-                  <Col className='col-md-6'>
-                    <Input
-                      type="text"
-                      placeholder="Nhập từ khóa tìm kiếm..."
-                    />
-                    <InputGroupAddon addonType="append">
-                      <Button color="primary" type="submit">Tìm kiếm</Button>
-                    </InputGroupAddon>
-                  </Col>
                   <Table>
                     <thead>
                       <tr>
-                        <th>ID Hóa đơn</th>
+                        <th>Mã đơn hàng</th>
                         <th>Ngày thanh toán</th>
                         <th>Tên khách hàng</th>
                         <th>Tổng tiền</th>
