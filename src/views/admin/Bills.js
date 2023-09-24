@@ -9,7 +9,7 @@ import Header from "components/Headers/BillHeader.js";
 
 const Bills = () => {
   const [orders, setorders] = useState([]);
-
+  const [showDateOptions, setShowDateOptions] = useState(false);
   useEffect(() => {
     // fetch("https://datnshoes-default-rtdb.firebaseio.com/order.json")
     // .then((response) => response.json())
@@ -34,6 +34,11 @@ const Bills = () => {
     }
   };
 
+  const toggleDateOptions = () => {
+    setShowDateOptions(!showDateOptions);
+  };
+
+
   return (
     <>
       <Header />
@@ -50,7 +55,7 @@ const Bills = () => {
                 <Form>
                   <Row>
                     <Col xl="4" xs="6">
-                      <Input className='mb-3' type="text"  placeholder="Nhập từ khóa tìm kiếm..." />
+                      <Input className='mb-3' type="text" placeholder="Nhập từ khóa tìm kiếm..." />
                     </Col>
                     <Col xl="2" xs="3" >
                       <DropdownButton title="Ngày tạo" >
@@ -67,7 +72,15 @@ const Bills = () => {
                           <Dropdown.Item className='card m-2'>Tháng này</Dropdown.Item>
                         </div>
                         <div className="m-2 card">
-                          <Button size="sm" >Tùy chọn</Button>
+                          <Button size="sm" onClick={toggleDateOptions}>
+                            Tùy chọn
+                          </Button>
+                          {showDateOptions && (
+                            <div className="d-flex align-items-center mt-2">
+                              <input type="date" className="form-control form-control-sm me-2" />
+                              <input type="date" className="form-control form-control-sm" />
+                            </div>
+                          )}
                         </div>
                         <div className="m-2 card">
                           <Button size="sm">Lọc</Button>
@@ -75,7 +88,7 @@ const Bills = () => {
                       </DropdownButton>
                     </Col>
                     <Col xl="2" xs="3" >
-                    <DropdownButton title="Trạng thái">
+                      <DropdownButton title="Trạng thái">
                         <div className="d-flex align-items-center m-2">
                           <Dropdown.Item className='card m-2'>Đặt hàng</Dropdown.Item>
                           <Dropdown.Item className='card m-2'>Đã hủy</Dropdown.Item>
@@ -94,11 +107,11 @@ const Bills = () => {
                     <thead>
                       <tr>
                         <th>Mã đơn hàng</th>
-                        <th>Ngày thanh toán</th>
+                        <th>Ngày tạo đơn</th>
                         <th>Tên khách hàng</th>
-                        <th>Tổng tiền</th>
                         <th>Phương thức thanh toán</th>
-                        <th>Trạng thái</th>
+                        <th>Trạng thái đơn hàng</th>
+                        <th>Tổng tiền</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -107,9 +120,9 @@ const Bills = () => {
                           <td>{order.code}</td>
                           <td>{order.date_payment}</td>
                           <td>{order.ten_khach_hang}</td>
-                          <td>{order.total_money}</td>
                           <td>{order.payment_methods == 0 ? 'Chuyển khoản' : 'Tiền mặt'}</td>
                           <td>{order.status === 0 ? 'Chưa thanh toán' : 'Đã thanh toán'}</td>
+                          <td>{order.total_money}</td>
                         </tr>
                       ))}
                     </tbody>
