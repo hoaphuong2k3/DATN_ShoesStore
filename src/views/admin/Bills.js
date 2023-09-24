@@ -1,15 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { Card, Button, CardHeader, CardBody, Container, Row, Form, Col, Input, Table } from "reactstrap";
 import { Dropdown, DropdownButton } from 'react-bootstrap';
+import { Link, Route } from 'react-router-dom';
+
 
 // core components
 import Header from "components/Headers/BillHeader.js";
-
+import BillDetail from "views/admin/BillsDetail.js";
 
 
 const Bills = () => {
   const [orders, setorders] = useState([]);
   const [showDateOptions, setShowDateOptions] = useState(false);
+  const [selectedOrder, setSelectedOrder] = useState(null);
+
+
   useEffect(() => {
     // fetch("https://datnshoes-default-rtdb.firebaseio.com/order.json")
     // .then((response) => response.json())
@@ -38,6 +43,9 @@ const Bills = () => {
     setShowDateOptions(!showDateOptions);
   };
 
+  const handleOrderClick = (order) => {
+    setSelectedOrder(order);
+  };
 
   return (
     <>
@@ -117,7 +125,11 @@ const Bills = () => {
                     <tbody>
                       {orders.map((order) => (
                         <tr key={order.id}>
-                          <td>{order.code}</td>
+                          <td>
+                            {/* <Link to={`/BillsDetail/${order.id}`} onClick={() => handleOrderClick(order)}> */}
+                              {order.code}
+                            {/* </Link> */}
+                          </td>
                           <td>{order.date_payment}</td>
                           <td>{order.ten_khach_hang}</td>
                           <td>{order.payment_methods == 0 ? 'Chuyển khoản' : 'Tiền mặt'}</td>
