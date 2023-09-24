@@ -7,6 +7,7 @@ import Staff from "views/admin/Staff.js";
 import Partner from "views/admin/Partner.js";
 import Profile from "views/admin/Profile.js";
 import Statistical from "views/admin/Statistical.js";
+import BillDetail from "views/admin/BillDetail.js";
 
 var routes = [
   {
@@ -70,6 +71,12 @@ var routes = [
     name: "Thống kê",
     icon: "ni ni-money-coins text-green",
     component: <Statistical />,
+    layout: "/admin",
+  },
+
+  {
+    path: "/bill-details/:id",
+    component: <BillDetail />,
     layout: "/admin",
   },
 ];

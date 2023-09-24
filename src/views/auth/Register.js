@@ -29,7 +29,7 @@ const Register = () => {
 
   const [errors, setErrors] = useState({}); // State để lưu thông báo lỗi
 
-  const { fullname, phoneNumber, email, username, password, confirmPassword } = user;
+  // const { fullname, phoneNumber, email, username, password, confirmPassword } = user;
 
   const onInputChange = (e) => {
     setUser({ ...user, [e.target.name]: e.target.value });
@@ -94,7 +94,7 @@ const Register = () => {
             <div className="text-center text-muted mb-4">
               <small>Hoặc đăng kí bằng thông tin xác thực</small>
             </div>
-            <Form role="form" onSubmit={(e) => onSubmit(e)}>
+            <Form role="form" onSubmit={onSubmit}>
               <FormGroup>
                 <InputGroup className="input-group-alternative mb-3">
                   <InputGroupAddon addonType="prepend">
@@ -106,8 +106,7 @@ const Register = () => {
                     placeholder="Fullname"
                     type="text"
                     name="fullname"
-                    value={fullname}
-                    onChange={(e) => onInputChange(e)}
+                    onChange={onInputChange}
                   />
                 </InputGroup>
                 {errors.fullname && <div className="text-danger">{errors.fullname}</div>}
@@ -123,8 +122,7 @@ const Register = () => {
                     placeholder="Phone number"
                     type="tel"
                     name="phoneNumber"
-                    value={phoneNumber}
-                    onChange={(e) => onInputChange(e)}
+                    onChange={onInputChange}
                   />
                 </InputGroup>
                 {errors.phoneNumber && <div className="text-danger">{errors.phoneNumber}</div>}
@@ -140,8 +138,7 @@ const Register = () => {
                     placeholder="Email"
                     type="email"
                     name="email"
-                    value={email}
-                    onChange={(e) => onInputChange(e)}
+                    onChange={onInputChange}
                   />
                 </InputGroup>
                 {errors.email && <div className="text-danger">{errors.email}</div>}
@@ -158,8 +155,7 @@ const Register = () => {
                     type="text"
                     autoComplete="new-username"
                     name="username"
-                    value={username}
-                    onChange={(e) => onInputChange(e)}
+                    onChange={onInputChange}
                   />
                 </InputGroup>
                 {errors.username && <div className="text-danger">{errors.username}</div>}
@@ -176,8 +172,7 @@ const Register = () => {
                     type="password"
                     autoComplete="new-password"
                     name="password"
-                    value={password}
-                    onChange={(e) => onInputChange(e)}
+                    onChange={onInputChange}
                   />
                 </InputGroup>
                 {errors.password && <div className="text-danger">{errors.password}</div>}
@@ -194,8 +189,7 @@ const Register = () => {
                     type="password"
                     autoComplete="confirm-password"
                     name="confirmPassword"
-                    value={confirmPassword}
-                    onChange={(e) => onInputChange(e)}
+                    onChange={onInputChange}
                   />
                 </InputGroup>
                 {errors.confirmPassword && (
