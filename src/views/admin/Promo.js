@@ -1,5 +1,5 @@
 import React from "react";
-
+import { Link } from "react-router-dom";
 // reactstrap components
 import { Card, CardHeader, CardBody, Container, Row, Form, Col, FormGroup, Input } from "reactstrap";
 
@@ -16,7 +16,10 @@ const Promo = () => {
           <div className="col">
             <Card className="shadow">
               <CardHeader className="bg-transparent">
+                <Link to="/admin/khuyen-mai" tag={Link}>
                 <h3 className="mb-0">Khuyến mại</h3>
+                </Link>
+                
               </CardHeader>
               <CardBody>
                 <Form>
