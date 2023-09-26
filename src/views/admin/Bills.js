@@ -1,12 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Switch } from 'react';
 import { Card, Button, CardHeader, CardBody, Container, Row, Form, Col, Input, Table } from "reactstrap";
 import { Dropdown, DropdownButton } from 'react-bootstrap';
 import { Link, Route } from 'react-router-dom';
 
-
 // core components
 import Header from "components/Headers/BillHeader.js";
-import BillDetail from "views/admin/BillsDetail.js";
+import BillDetail from "views/admin/BillDetail.js";
 
 
 const Bills = () => {
@@ -51,6 +50,11 @@ const Bills = () => {
     <>
       <Header />
       {/* Page content */}
+      {selectedOrder && (
+        <Route path={`/bill-details/${selectedOrder.id}`}>
+          <BillDetail order={selectedOrder} />
+        </Route>
+      )}
       <Container className="mt--7" fluid>
         {/* Table */}
         <Row>
@@ -126,9 +130,9 @@ const Bills = () => {
                       {orders.map((order) => (
                         <tr key={order.id}>
                           <td>
-                            {/* <Link to={`/BillsDetail/${order.id}`} onClick={() => handleOrderClick(order)}> */}
+                            <Link to={`/bill-details/${order.id}`} onClick={() => handleOrderClick(order)}>
                               {order.code}
-                            {/* </Link> */}
+                            </Link>
                           </td>
                           <td>{order.date_payment}</td>
                           <td>{order.ten_khach_hang}</td>
@@ -144,6 +148,11 @@ const Bills = () => {
             </Card>
           </div>
         </Row>
+        {/* <Switch>
+          <Route path={`/bill-details/:id`}>
+            <BillDetail />
+          </Route>
+        </Switch> */}
       </Container>
     </>
   );
