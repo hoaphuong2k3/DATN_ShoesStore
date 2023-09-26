@@ -258,6 +258,7 @@ const ProductAttributes = () => {
                   <Col lg="6" xl="12" className="text-center">
                     <td>
                       <Button color="warning" onClick={toggle}>
+                        <i class="fa-solid fa-magnifying-glass" /> &nbsp;
                         Tìm kiếm
                       </Button>
                       <Button color="primary" onClick={toggle}>
@@ -300,7 +301,12 @@ const ProductAttributes = () => {
                       <th>STT</th>
                       <th>Mã</th>
                       <th>Tên</th>
-                      <th></th>
+                      <th className="text-center pb-4" >
+                        <FormGroup check>
+                          <Input type="checkbox" />
+                        </FormGroup>
+
+                      </th>
                       <th colSpan={2}>Thao tác</th>
                     </tr>
                   </thead>
@@ -317,15 +323,17 @@ const ProductAttributes = () => {
                             <th scope="row"> {index + 1}</th>
                             <td>{item.code}</td>
                             <td>{item.name}</td>
-                            <td><FormGroup check>
-                              <Input type="checkbox" />
-                            </FormGroup></td>
+                            <td className="text-center">
+                              <FormGroup check>
+                                <Input type="checkbox" />
+                              </FormGroup>
+                            </td>
                             <td>
-                              <Button color="warning" onClick={() => handleEditBrands(item)}>
-                                Sửa
+                              <Button color="danger" onClick={() => handleEditBrands(item)}>
+                                <i class="fa-solid fa-pen" />
                               </Button>
-                              <Button color="primary" onClick={() => handleDeleteBrands(item)}>
-                                Xóa
+                              <Button color="warning" onClick={() => handleDeleteBrands(item)}>
+                                <i class="fa-solid fa-trash" />
                               </Button>
                             </td>
                           </tr>
