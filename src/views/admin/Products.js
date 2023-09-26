@@ -189,6 +189,79 @@ const Products = () => {
 
                     </FormGroup>
                   </Col>
+
+                </Row>
+
+                <Row>
+                  <Col lg="6" xl="3">
+                    <FormGroup row>
+                      <Label for="find_code" xl={2}>
+                        Giày:
+                      </Label>
+                      <Col xl={2}>
+                        <Input id="btn_select_tt" name="select" type="select" >
+                          <option value="loaisp">
+                            sfdsfsf
+                          </option>
+                        </Input>
+                      </Col>
+                    </FormGroup>
+                  </Col>
+                  <Col lg="6" xl="6">
+                    <FormGroup row>
+                      <Label for="find_name" xl={3}>
+                        Tên:
+                      </Label>
+                      <Col xl={9}>
+                        <Input
+                          id="find_name"
+                          name="name"
+                          placeholder=""
+                        />
+                      </Col>
+                    </FormGroup>
+                  </Col>
+                  <Col lg="6" xl="6">
+                    <FormGroup row>
+                      <Label for="find_createdAt" xl={3}>
+                        Người tạo:
+                      </Label>
+                      <Col xl={9}>
+                        <Input
+                          id="find_createdAt"
+                          name="name"
+                          placeholder=""
+                        />
+                      </Col>
+                    </FormGroup>
+                  </Col>
+                  <Col lg="6" xl="6">
+                    <FormGroup row>
+                      <Label for="find_createdDate" xl={3}>
+                        Người tạo:
+                      </Label>
+                      <Col xl={4}>
+                        <Input
+                          id="find_createdDate"
+                          name="date"
+                          placeholder="date placeholder"
+                          type="date"
+                        />
+                      </Col>
+                      <Col xl={5}>
+                        <Input
+                          id="find_createdDate"
+                          name="date"
+                          placeholder="date placeholder"
+                          type="date"
+                        />
+                      </Col>
+
+                    </FormGroup>
+                  </Col>
+                </Row>
+
+                <Row>
                   <Col className="text-center" lg="6" xl="12" >
                     <td >
                       <Form>

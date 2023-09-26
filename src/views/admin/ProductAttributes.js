@@ -268,6 +268,8 @@ const ProductAttributes = () => {
                   </Col>
                 </Row>
 
+
+
                 {/* end row find  productAttrinutes*/}
               </CardBody>
             </Card>
