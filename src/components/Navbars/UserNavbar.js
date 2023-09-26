@@ -24,7 +24,21 @@ import {
   Button
 } from "reactstrap";
 
+// import React, { useState, Modal } from "react";
+import React, { useState} from "react";
+import { Modal } from "reactstrap";
+
 const UserNavbar = () => {
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const openModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
 
   return (
     <>
@@ -85,8 +99,6 @@ const UserNavbar = () => {
                 </NavLink>
               </NavItem>
             </Nav>
-
-
             <Nav className="align-items-lg-center ml-lg-auto" navbar>
 
               <Form className="navbar-search navbar-search-dark form-inline mr-3 d-none d-md-flex ml-lg-auto">
@@ -132,12 +144,32 @@ const UserNavbar = () => {
                   </DropdownItem>
                 </DropdownMenu>
               </UncontrolledDropdown>
-              
-              <Button className="button-cart" color="white" to="/shoes/cart" tag={Link} >
-                 <i className="ni ni-cart" />
-              </Button>
+              <div >
+                <Button className="button-cart" color="white" onClick={openModal}>
+                  <i className="ni ni-cart" />
+                </Button>
+                <Modal isOpen={isModalOpen} toggle={closeModal} className="cartModal">
+                  <h2>Thông tin giỏ hàng</h2>
+                  <Button to="/shoes/cart" tag={Link}>
+                    Xem giỏ hàng
+                  </Button>
+                </Modal>
+              </div>
+              <style>
+                {`
+                        .cartModal {
+                          position: fixed;
+                          top: 0;
+                          right: 0;
+                          bottom: 0;
+                          width: 400px;
+                          max-height: 9000px;
+                          margin-right: 0px;
+                        }
+                    `}
+              </style>
             </Nav>
-           
+
           </UncontrolledCollapse>
         </Container>
       </Navbar>

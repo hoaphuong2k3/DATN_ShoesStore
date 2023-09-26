@@ -13,6 +13,7 @@ const Cart = () => {
                     <div className="col">
                         <Card className="shadow">
                             <CardHeader className="bg-transparent">
+                             {/* <i class="fas fa-h3">Thêm giỏ hàng</i> */}
                              
                             </CardHeader>
                             <CardBody>

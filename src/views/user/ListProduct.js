@@ -34,19 +34,19 @@ const Product = () => {
                 <div className="row">
                   <style>
                     {`
-            .zoom {
-              padding: 0px;
-              transition: transform .3s;
-              width: 300px;
-              height: 300px;
-              margin: auto;
-            }
-            .zoom:hover {
-              -ms-transform: scale(1.0);
-              -webkit-transform: scale(1.0);
-              transform: scale(1.1);
-            }
-          `}
+                        .zoom {
+                          padding: 0px;
+                          transition: transform .3s;
+                          width: 300px;
+                          height: 300px;
+                          margin: auto;
+                        }
+                        .zoom:hover {
+                          -ms-transform: scale(1.0);
+                          -webkit-transform: scale(1.0);
+                          transform: scale(1.1);
+                        }
+                    `}
                   </style>
                   {products.map((product) => (
                     <div key={product.code} className="col-md-3">
