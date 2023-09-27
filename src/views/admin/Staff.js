@@ -112,8 +112,6 @@ const Staff = () => {
                               />Nữ
                             </div>
                           </div>
-
-
                         </FormGroup>
                       </Col>
                     </Row>
