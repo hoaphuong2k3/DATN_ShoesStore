@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 // reactstrap components
 import "assets/css/navbar.css";
+import "assets/css/cartModal.css";
 import {
   UncontrolledCollapse,
   NavbarBrand,
@@ -21,7 +22,7 @@ import {
   InputGroupAddon,
   InputGroupText,
   Form, FormGroup,
-  Button
+  Button, Card
 } from "reactstrap";
 
 // import React, { useState, Modal } from "react";
@@ -39,7 +40,6 @@ const UserNavbar = () => {
   const closeModal = () => {
     setIsModalOpen(false);
   };
-
   return (
     <>
       <Navbar className="navbar fixednavbar navbar-horizontal fixed-top navbar-dark" expand="md" color-on-scroll="300">
@@ -144,30 +144,26 @@ const UserNavbar = () => {
                   </DropdownItem>
                 </DropdownMenu>
               </UncontrolledDropdown>
-              <div >
+              <div>
                 <Button className="button-cart" color="white" onClick={openModal}>
                   <i className="ni ni-cart" />
                 </Button>
-                <Modal isOpen={isModalOpen} toggle={closeModal} className="cartModal">
-                  <h2>Thông tin giỏ hàng</h2>
-                  <Button to="/shoes/cart" tag={Link}>
+                <Modal isOpen={isModalOpen} toggle={closeModal} className="cartModal rounded">
+                <div className="modalNdung mt-3">
+                <span className="close" onClick={closeModal}>&times;</span>
+                  <h3 className="text-dark">GIỎ HÀNG <br/>
+                   </h3>
+                   <p className="text-dark border-bottom border-bottom-dotted">
+                   Bạn đang có 2 sản phẩm trong giỏ hàng
+                   </p>
+                    
+                  <Button to="/shoes/cart" tag={Link} className="viewCart">
                     Xem giỏ hàng
                   </Button>
+                </div>
+                
                 </Modal>
               </div>
-              <style>
-                {`
-                        .cartModal {
-                          position: fixed;
-                          top: 0;
-                          right: 0;
-                          bottom: 0;
-                          width: 400px;
-                          max-height: 9000px;
-                          margin-right: 0px;
-                        }
-                    `}
-              </style>
             </Nav>
 
           </UncontrolledCollapse>

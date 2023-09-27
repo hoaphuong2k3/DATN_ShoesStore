@@ -1,0 +1,38 @@
+.cartModal {
+    overflow: scroll;
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 600px;
+    height: 700px;
+    margin-top: 0px;
+    border: 1px solid #888;
+  }
+  .modalNdung{
+    background-color: #fefefe;
+    margin: auto;
+    padding: 30px;
+    height: 700px;
+    width: 100%;
+    /* font-size: smaller; */
+  }
+  .close {
+    color: #aaaaaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+  }
+  
+  .close:hover,
+  .close:focus {
+    color: #000;
+    text-decoration: none;
+    cursor: pointer;
+  }
+  /* .viewCart{
+    width: 60%;
+    margin-top: 70%;
+    float: right;
+  } */
+  
