@@ -14,7 +14,7 @@ import Header from "components/Headers/Header.js";
 
 
 const Products = () => {
-  const [value, setValue] = useState('yes');
+  const [value, setValue] = useState('no');
   return (
     <>
       <Header />
