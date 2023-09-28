@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 // reactstrap components
-import { Row, Form, Col, FormGroup, Input, Button, Table, Modal } from "reactstrap";
+import { Row, Form, Col, FormGroup, Input, Button, Table, Modal, Option } from "reactstrap";
 
 
 class Voucher extends Component {
@@ -74,13 +74,22 @@ class Voucher extends Component {
                                     >
                                         Loại KM
                                     </label>
-                                    <Button
-                                        color="primary"
+
+                                    <Button style={{marginLeft: "10px"}}
+                                        className="btn btn-outline-primary"
                                         size="sm"
                                         onClick={() => this.toggleModal("defaultModal")}
                                     >
                                         +
                                     </Button>
+
+                                    <Input
+                                        className="form-control-alternative"
+                                        id="category"
+                                        type="select">
+                                        <option>okela</option>
+                                        <option>okela</option>
+                                    </Input>
 
                                     <Modal
                                         className="modal-dialog-centered"
@@ -88,9 +97,9 @@ class Voucher extends Component {
                                         toggle={() => this.toggleModal("defaultModal")}
                                     >
                                         <div className="modal-header">
-                                            <h6 className="modal-title">
+                                            <h5 className="modal-title">
                                                 Loại khuyến mại
-                                            </h6>
+                                            </h5>
                                             <button
                                                 aria-label="Close"
                                                 className="close"
@@ -103,13 +112,84 @@ class Voucher extends Component {
                                         </div>
                                         <div className="modal-body">
                                             <Form>
-                                                
+                                                <Row>
+                                                    <Col lg="6">
+                                                        <FormGroup>
+                                                            <label
+                                                                className="form-control-label"
+                                                                htmlFor="code"
+                                                            >
+                                                                Mã Code
+                                                            </label>
+                                                            <Input
+                                                                className="form-control"
+                                                                placeholder="Code"
+                                                                id="code"
+                                                                type="text"
+                                                            />
+                                                        </FormGroup>
+                                                    </Col>
+                                                    <Col lg="6">
+                                                        <FormGroup>
+                                                            <label
+                                                                className="form-control-label"
+                                                                htmlFor="code"
+                                                            >
+                                                                Tên KM
+                                                            </label>
+                                                            <Input
+                                                                className="form-control"
+                                                                placeholder="Tên"
+                                                                id="ten"
+                                                                type="text"
+                                                            />
+                                                        </FormGroup>
+                                                    </Col>
+                                                    <Col>
+                                                        <FormGroup>
+                                                            <label
+                                                                className="form-control-label"
+                                                                htmlFor="description"
+                                                            >
+                                                                Mô tả
+                                                            </label>
+                                                            <Input
+                                                                className="form-control"
+                                                                placeholder="Khuyến mại ....."
+                                                                rows="2"
+                                                                type="textarea"
+                                                            />
+                                                        </FormGroup>
+                                                    </Col>
+                                                </Row>
                                             </Form>
+                                         
+                                            <Table className="align-items-center table-flush" responsive>
+                                                <thead className="thead-light">
+                                                    <tr>
+                                                        <th scope="col">Tên khuyến mại</th>
+                                                        <th scope="col">Mô tả</th>
+                                                        <th scope="col">Hành động</th>
+
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td></td>
+                                                        <td></td>
+                                                        <td></td>
+                                                    </tr>
+                                                </tbody>
+                                            </Table>
                                         </div>
                                         <div className="modal-footer">
-                                            <Button color="primary" type="button" size="sm">
-                                                Edit
+                                            <Button className="btn btn-outline-primary" size="sm">
+                                                Thêm
                                             </Button>
+                                            <Button className="btn btn-outline-primary" size="sm">
+                                                Sửa
+                                            </Button>
+                                          
                                             <Button
                                                 className="ml-auto"
                                                 color="link"
@@ -274,13 +354,7 @@ class Voucher extends Component {
                                 >
                                     Cập nhật
                                 </Button>
-                                <Button
-                                    className="btn btn-outline-primary"
-                                    onClick={(e) => e.preventDefault()}
-                                    size="sm"
-                                >
-                                    Xóa
-                                </Button>
+                               
                                 <Button
                                     className="btn btn-outline-primary"
                                     onClick={(e) => e.preventDefault()}
@@ -289,8 +363,6 @@ class Voucher extends Component {
                                     Reset
                                 </Button>
                             </Col>
-
-
                         </Row>
                     </div>
 
