@@ -20,7 +20,7 @@ const Login = () => {
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [rememberMe, setRememberMe] = useState(false);
+  const [rememberMe, setRememberMe] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
   const [userRole, setUserRole] = useState(""); 
@@ -33,10 +33,11 @@ const Login = () => {
       const response = await axios.post("http://localhost:33321/api/oauth/login", {
         username,
         password,
-        rememberMe
+        rememberMe: rememberMe === "on",
       });
 
       console.log(response.data);
+  
 
       // Lưu token vào localStorage
       const role = response.data.authorities.authority;
@@ -102,7 +103,7 @@ const Login = () => {
             </div>
           </CardHeader>
           <CardBody className="px-lg-5 py-lg-5">
-            <div className="text-center text-muted mb-4">
+<div className="text-center text-muted mb-4">
               <small>Hoặc đăng nhập với thông tin người dùng</small>
             </div>
             <Form role="form" onSubmit={handleLogin}>
@@ -180,7 +181,7 @@ const Login = () => {
               onClick={(e) => e.preventDefault()}
             >
               <small>Create new account</small>
-            </a>
+</a>
           </Col>
         </Row>
       </Col>
