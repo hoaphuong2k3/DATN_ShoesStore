@@ -20,9 +20,15 @@ const ProductAttributes = () => {
   const [modalEdit, setModalEdit] = useState(false);
   const toggleEdit = () => setModalEdit(!modalEdit);
   const [dataEdit, setDataEdit] = useState({});
-  const [selecttt, setSelecttt] = useState("loaisp");
-  const [code, setCode] = useState("")
-  const [name, setName] = useState("")
+  const [selecttt, setSelecttt] = useState('brand');
+  const [code, setCode] = useState("");
+  const [name, setName] = useState("");
+  const [status, setStatus] = useState(1);
+
+  const handleSelectChange = (event) => {
+    const selectedValue = event.target.value; // Lấy giá trị từ sự kiện onChange
+    setSelecttt({ selectedValue }); // Cập nhật state
+  }
 
 
   const [listCategory, setListCategory] = useState([]);
@@ -113,33 +119,32 @@ const ProductAttributes = () => {
                   </Col>
                   <Col lg="6" xl="6">
                     <FormGroup>
-                      <Input id="btn_select_tt" name="select" type="select" >
-                        <option value="loaisp">
-                          Loại Sản Phẩm
-                        </option>
-                        <option>
+                      <Input id="btn_select_tt" name="select" type="select"
+                        onChange={(event) => setSelecttt(event.target.value)} value={selecttt} >
+                        <option value="brand">
                           Hãng
                         </option>
-                        <option>
-                          Chất Liệu
+                        <option value="design_style">
+                          Thiết kế
                         </option>
-                        <option>
-                          Size
+                        <option value="skin_type">
+                          Loại da
                         </option>
-                        <option>
-                          Màu
-                        </option>
-                        <option>
+                        <option value="sole">
                           Đế giày
                         </option>
-                        <option>
+                        <option value="lining">
                           Lót giày
                         </option>
-                        <option>
-                          Loại da
+                        <option value="size">
+                          Size
+                        </option>
+                        <option value="color">
+                          Màu
                         </option>
                       </Input>
                     </FormGroup>
+                    <p>Giá trị đã chọn: {selecttt}</p>
                   </Col>
                   <Col lg="6" xl="3" className="text-center">
                     <Button color="primary" onClick={toggle}>
@@ -288,6 +293,7 @@ const ProductAttributes = () => {
                       <th>STT</th>
                       <th>Mã</th>
                       <th>Tên</th>
+                      {selecttt === 'brand' && <th>Ảnh</th>}
                       <th className="text-center pb-4" >
                         <FormGroup check>
                           <Input type="checkbox" />
@@ -310,6 +316,16 @@ const ProductAttributes = () => {
                             <th scope="row"> {index + 1}</th>
                             <td>{item.code}</td>
                             <td>{item.name}</td>
+                            {selecttt === 'brand' &&
+                              <td>
+                                <img
+                                  src="/path/to/your/image.jpg" // Đặt đường dẫn tới hình ảnh của bạn ở đây
+                                  alt="Mô tả hình ảnh"
+                                  width="300" // Tuỳ chỉnh kích thước nếu cần
+                                  height="200"
+                                />
+                              </td>
+                            }
                             <td className="text-center">
                               <FormGroup check>
                                 <Input type="checkbox" />
@@ -374,10 +390,10 @@ const ProductAttributes = () => {
           <Row>
             <Col lg="6" xl="12">
               <FormGroup row>
-                <Label for="find_code" xl={2}>
+                <Label for="find_code" xl={3}>
                   Mã:
                 </Label>
-                <Col xl={10}>
+                <Col xl={9}>
                   <Input
                     id="find_code"
                     name="code"
@@ -391,10 +407,10 @@ const ProductAttributes = () => {
             </Col>
             <Col lg="6" xl="12">
               <FormGroup row>
-                <Label for="find_name" xl={2}>
+                <Label for="find_name" xl={3}>
                   Tên:
                 </Label>
-                <Col xl={10}>
+                <Col xl={9}>
                   <Input
                     id="find_name"
                     name="name"
@@ -405,7 +421,46 @@ const ProductAttributes = () => {
                 </Col>
               </FormGroup>
             </Col>
+            <Col md="12">
+              <FormGroup>
+                <Row>
+                  <label xl={3}
+                    className="ml-3"
+                    htmlFor="input-address"
+                  >
+                    Trạng thái:
+                  </label>
+                  <FormGroup check >
+                    <span className="col-md-3 ml-4">
+                      <Input
+                        name="btnstatus"
+                        type="radio"
+                        value="1"
+
+                      />
+                      {' '}
+                      <Label check className="form-control-label ">
+                        Hoạt động
+                      </Label>
+                    </span>
+                    &emsp;&emsp;&emsp;
+                    <span xl={3} className="col-md-3">
+                      <Input
+                        name="btnstatus"
+                        type="radio"
+                        value="0"
+                      />
+                      {' '}
+                      <Label check className="form-control-label">
+                        Ngừng hoạt động
+                      </Label>
+                    </span>
+                  </FormGroup>
+                </Row>
+              </FormGroup>
+            </Col>
           </Row>
+
         </ModalBody>
         <ModalFooter>
           <div className="text-center">

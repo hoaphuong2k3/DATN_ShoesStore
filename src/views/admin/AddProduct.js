@@ -273,7 +273,6 @@ const AddProduct = () => {
                                                 </FormGroup>
                                             </Col>
                                         </Row>
-
                                     </div>
 
                                     <div className="text-center">

@@ -358,7 +358,6 @@ const Products = () => {
                             <Row>
                               <Col xl={5}>
                                 <Input
-
                                   id="find_code"
                                   name="code"
                                   placeholder=" "
@@ -369,7 +368,6 @@ const Products = () => {
                               </Label>
                               <Col xl={5}>
                                 <Input
-
                                   id="find_code"
                                   name="code"
                                   placeholder=" "
@@ -378,8 +376,6 @@ const Products = () => {
                             </Row>
                           </FormGroup>
                         </Col>
-
-
                       </Row>
                     }
                   </div>
