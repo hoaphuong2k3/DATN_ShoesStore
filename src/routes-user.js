@@ -6,6 +6,7 @@ import Contact from "views/user/Contact.js";
 import Cart from "views/user/Cart.js";
 import Account from "views/user/Account.js";
 import ProductDetail from "views/user/ProductDetail.js";
+import CheckOut from "views/user/CheckOut.js";
 
 var routes = [
  
@@ -55,6 +56,12 @@ var routes = [
     path: "/productdetail",
     name: "CHI TIẾT SẢN PHẨM",
     component: <ProductDetail />,
+    layout: "/shoes",
+  },
+  {
+    path: "/checkout",
+    name: "THANH TOÁN",
+    component: <CheckOut />,
     layout: "/shoes",
   },
 ];
