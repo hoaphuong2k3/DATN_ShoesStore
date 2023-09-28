@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const instance = axios.create({
-    baseURL: 'https://datnshoes-default-rtdb.firebaseio.com'
+    baseURL: 'https://6400520c9f844910298dfcbb.mockapi.io'
     // timeout: 1000,
     // headers: {'X-Custom-Header': 'foobar'}
 });
