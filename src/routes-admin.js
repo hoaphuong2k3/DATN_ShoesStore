@@ -2,12 +2,13 @@ import Index from "views/admin/Index.js";
 import Bills from "views/admin/Bills.js";
 import Products from "views/admin/Products.js";
 import ProductAttributes from "views/admin/ProductAttributes.js";
-import Promo from "views/admin/Promo.js";
+import Promo from "views/admin/KM/Promotion.js";
 import Staff from "views/admin/Staff.js";
 import Partner from "views/admin/Partner.js";
 import Profile from "views/admin/Profile.js";
 import Statistical from "views/admin/Statistical.js";
 import BillDetail from "views/admin/BillDetail.js";
+
 
 var routes = [
   {
@@ -18,14 +19,14 @@ var routes = [
     layout: "/admin",
   },
   {
-    path: "/hoa-don",
+    path: "/bills",
     name: "Hóa đơn",
     icon: "ni ni-cart text-blue",
     component: <Bills />,
     layout: "/admin",
   },
   {
-    path: "/san-pham",
+    path: "/products",
     name: "Danh sách sản phẩm",
     icon: "ni ni-planet text-orange",
     component: <Products />,
@@ -39,21 +40,21 @@ var routes = [
     layout: "/admin",
   },
   {
-    path: "/khuyen-mai",
+    path: "/promotion",
     name: "Khuyến mại",
     icon: "ni ni-tag text-red",
     component: <Promo />,
     layout: "/admin",
   },
   {
-    path: "/nhan-vien",
+    path: "/staff",
     name: "Nhân viên",
     icon: "ni ni-books text-info",
     component: <Staff />,
     layout: "/admin",
   },
   {
-    path: "/doi-tac",
+    path: "/partner",
     name: "Đối tác",
     icon: "ni ni-circle-08 text-pink",
     component: <Partner />,
@@ -67,17 +68,16 @@ var routes = [
     layout: "/admin",
   },
   {
-    path: "/thong-ke",
+    path: "/statistics",
     name: "Thống kê",
     icon: "ni ni-money-coins text-green",
     component: <Statistical />,
     layout: "/admin",
   },
-
   {
     path: "/bill-details/:id",
     component: <BillDetail />,
     layout: "/admin",
-  },
+  }
 ];
 export default routes;

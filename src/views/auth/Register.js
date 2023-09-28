@@ -42,21 +42,15 @@ const Register = () => {
       navigate("/");
       console.log(response.data);
     } catch (error) {
-      if (error.response) {
-        if (error.response.data.errors) {
-          // Nếu phản hồi chứa thông tin lỗi chi tiết cho từng trường
-          setErrors(error.response.data.errors); // Lưu thông báo lỗi vào state errors
-        } else {
-          setErrors({}); // Nếu không có thông báo lỗi chi tiết, đặt state errors là trống
-        }
-        console.error("Lỗi từ máy chủ:", error.response.data);
+      if (error.response && error.response.data && error.response.data.errors) {
+        // Nếu phản hồi chứa thông tin lỗi chi tiết cho từng trường
+        setErrors(error.response.data); // Lưu thông báo lỗi vào state errors
       } else {
-        setErrors({}); // Đặt state errors là trống trong trường hợp lỗi không xác định
-        console.error("Lỗi không xác định:", error.message);
+        setErrors({}); // Nếu không có thông báo lỗi chi tiết, đặt state errors là trống
       }
+      console.error("Lỗi từ máy chủ:", error.response ? error.response.data : error.message);
     }
   };
-
   return (
     <>
       <Col lg="6" md="8">
