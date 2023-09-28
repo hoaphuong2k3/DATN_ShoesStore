@@ -142,6 +142,19 @@ const Checkout = () => {
                                     <Input type="text" className="w-75 ml-2 mr-2" placeholder="Mã giảm giá"/>
                                     <Button className="btn h-25">Sử dụng</Button>
                                 </div>
+                                <hr></hr>
+                                <div className="inner row">
+                                    
+                                <p className="text-dark ml-2 col-md-7">Tạm tính</p>
+                                <p className="text-dark  col-md-4">3,600,000₫</p> 
+                                <p className="text-dark ml-2 col-md-7">Phí ship</p>
+                                <p className="text-dark  col-md-4">Miễn Phí</p> 
+                                </div>
+                                <hr></hr>
+                                <div className="inner row">
+                                    <h3 className="text-dark col-md-7 ml-2">Tổng Tiền</h3>
+                                    <h3 className="text-dark col-md-4">VND 3,600,000₫</h3> 
+                                </div>
                             </CardBody>
                         </Card>
                     </div>

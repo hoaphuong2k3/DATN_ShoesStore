@@ -145,10 +145,13 @@ const UserNavbar = () => {
                 </DropdownMenu>
               </UncontrolledDropdown>
               <div>
-                <Button className="button-cart" color="white" onClick={openModal}>
+                {/* <Button className="button-cart" color="white" onClick={openModal}>
+                  <i className="ni ni-cart" />
+                </Button> */}
+                <Button className="button-cart" to="/shoes/cart" tag={Link} color="white">
                   <i className="ni ni-cart" />
                 </Button>
-                <Modal isOpen={isModalOpen} toggle={closeModal} className="cartModal rounded">
+                {/* <Modal isOpen={isModalOpen} toggle={closeModal} className="cartModal rounded">
                 <div className="modalNdung mt-3">
                 <span className="close" onClick={closeModal}>&times;</span>
                   <h3 className="text-dark">GIỎ HÀNG <br/>
@@ -162,7 +165,7 @@ const UserNavbar = () => {
                   </Button>
                 </div>
                 
-                </Modal>
+                </Modal> */}
               </div>
             </Nav>
 
