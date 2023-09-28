@@ -20,6 +20,7 @@ const Login = () => {
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState("");
   const navigate = useNavigate();
   const [userRole, setUserRole] = useState(""); 
@@ -32,7 +33,10 @@ const Login = () => {
       const response = await axios.post("http://localhost:33321/api/oauth/login", {
         username,
         password,
+        rememberMe
       });
+
+      console.log(response.data);
 
       // Lưu token vào localStorage
       const role = response.data.authorities.authority;
@@ -141,6 +145,7 @@ const Login = () => {
                   className="custom-control-input"
                   id=" customCheckLogin"
                   type="checkbox"
+                  onChange={(e) => setRememberMe(e.target.value)}
                 />
                 <label
                   className="custom-control-label"
