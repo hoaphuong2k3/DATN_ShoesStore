@@ -23,7 +23,6 @@ const Login = () => {
   const [rememberMe, setRememberMe] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
-  const [userRole, setUserRole] = useState(""); 
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -37,17 +36,15 @@ const Login = () => {
       });
 
       console.log(response.data);
-  
 
-      // Lưu token vào localStorage
-      const role = response.data.authorities.authority;
-      setUserRole(role);
+      const token = response.data.token;
+      localStorage.setItem("token", token);
 
-      localStorage.setItem("token", response.data.token);
-      
-      if (userRole === "ROLE_ADMIN") {
+      const authorities = response.data.authorities;
+      if (authorities.some((authority) => authority.authority === "ROLE_ADMIN")
+        && authorities.some((authority) => authority.authority === "ROLE_SUPPER_ADMIN")) {
         navigate("/admin/index");
-      } else if (userRole === "ROLE_USER") {
+      } else if (authorities.some((authority) => authority.authority === "ROLE_USER")) {
         navigate("/shoes/home");
       } else {
         navigate("/");
@@ -103,7 +100,7 @@ const Login = () => {
             </div>
           </CardHeader>
           <CardBody className="px-lg-5 py-lg-5">
-<div className="text-center text-muted mb-4">
+            <div className="text-center text-muted mb-4">
               <small>Hoặc đăng nhập với thông tin người dùng</small>
             </div>
             <Form role="form" onSubmit={handleLogin}>
@@ -181,7 +178,7 @@ const Login = () => {
               onClick={(e) => e.preventDefault()}
             >
               <small>Create new account</small>
-</a>
+            </a>
           </Col>
         </Row>
       </Col>
