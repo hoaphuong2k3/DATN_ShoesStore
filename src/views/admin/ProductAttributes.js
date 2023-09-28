@@ -89,19 +89,6 @@ const ProductAttributes = () => {
     if (res && res.data) {
       setListCategory(res.data);
     }
-    // fetch("https://datnshoes-default-rtdb.firebaseio.com/brand.json")
-    //   .then((response) => response.json())
-    //   .then((data) => {
-    //     const productsArray = Object.values(data);
-    //     setListCategory(productsArray);
-    //     console.log(productsArray);
-    //   })
-    //   .catch((error) => console.log(error));
-    // let res = await axios.get(`https://datnshoes-default-rtdb.firebaseio.com/brand.json`)
-    // console.log(res.data);
-    // if (res && res.data) {
-    //   setListCategory(res.data);
-    // }
   }
 
   return (
@@ -256,15 +243,13 @@ const ProductAttributes = () => {
                     </FormGroup>
                   </Col>
                   <Col lg="6" xl="12" className="text-center">
-                    <td>
-                      <Button color="warning" onClick={toggle}>
-                        <i class="fa-solid fa-magnifying-glass" /> &nbsp;
-                        Tìm kiếm
-                      </Button>
-                      <Button color="primary" onClick={toggle}>
-                        Làm mới bộ lọc
-                      </Button>
-                    </td>
+                    <Button color="warning" onClick={toggle}>
+                      <i class="fa-solid fa-magnifying-glass" /> &nbsp;
+                      Tìm kiếm
+                    </Button>
+                    <Button color="primary" onClick={toggle}>
+                      Làm mới bộ lọc
+                    </Button>
                   </Col>
                 </Row>
 

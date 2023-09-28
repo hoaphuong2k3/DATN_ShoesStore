@@ -7,6 +7,8 @@ import Staff from "views/admin/Staff.js";
 import Partner from "views/admin/Partner.js";
 import Profile from "views/admin/Profile.js";
 import Statistical from "views/admin/Statistical.js";
+import AddProduct from "views/admin/AddProduct.js";
+import EditProduct from "views/admin/EditProduct";
 
 var routes = [
   {
@@ -24,7 +26,7 @@ var routes = [
     layout: "/admin",
   },
   {
-    path: "/san-pham",
+    path: "/product",
     name: "Danh sách sản phẩm",
     icon: "ni ni-planet text-orange",
     component: <Products />,
@@ -70,6 +72,18 @@ var routes = [
     name: "Thống kê",
     icon: "ni ni-money-coins text-green",
     component: <Statistical />,
+    layout: "/admin",
+  },
+  {
+    path: "/product/add",
+    icon: "ni ni-money-coins text-green",
+    component: <AddProduct />,
+    layout: "/admin",
+  },
+  {
+    path: "/product/edit/:id",
+    icon: "ni ni-money-coins text-green",
+    component: <EditProduct />,
     layout: "/admin",
   },
 ];

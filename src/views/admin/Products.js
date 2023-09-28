@@ -1,4 +1,4 @@
-import { React, useState } from "react";
+import { React, useState, Link } from "react";
 
 // reactstrap components
 import {
@@ -30,6 +30,9 @@ const Products = () => {
               <CardBody>
                 <Row className="text-center">
                   <Col lg="6" xl="2">
+                    {/* <Link className="btn btn-primary my-2" to={"/admin/product/add"}>
+                      Thêm
+                    </Link> */}
                     <Button color="primary" >
                       Thêm
                     </Button>
@@ -85,8 +88,9 @@ const Products = () => {
                     </div>
                   </Col>
                 </Row>
+
                 {/* start row find  productAttrinutes*/}
-                <Row className="text-center mb-4">
+                <Row className="text-center mb-1">
                   <Col lg="6" xl="12">
                     <FormGroup tag="fieldset">
                       <Row>
@@ -96,25 +100,26 @@ const Products = () => {
                               name="radio1"
                               type="radio"
                             />
-                            {' '}Tất cả
+                            {' '}<span className="form-control-label mr--9">Tất cả</span>
                           </FormGroup>
                         </Col>
-                        <Col lg="6" xl="4">
+                        <Col lg="6" xl="3">
                           <FormGroup check>
                             <Input
                               name="radio1"
                               type="radio"
                             />
-                            {' '}Hoạt động
+                            {' '}
+                            <span className="form-control-label">Hoạt động</span>
                           </FormGroup>
                         </Col>
-                        <Col lg="6" xl="4">
+                        <Col lg="6" xl="3">
                           <FormGroup check>
                             <Input
                               name="radio1"
                               type="radio"
                             />
-                            {' '}Ngừng hoạt động
+                            {' '}<span className="form-control-label">Ngừng hoạt động</span>
                           </FormGroup>
                         </Col>
                       </Row>
@@ -122,245 +127,265 @@ const Products = () => {
                     </FormGroup>
                   </Col>
                 </Row>
-
-                <Row>
-                  <Col lg="6" xl="6">
-                    <FormGroup row>
-                      <Label for="find_code" xl={3}>
-                        Mã:
-                      </Label>
-                      <Col xl={9}>
-                        <Input
-                          id="find_code"
-                          name="code"
-                          placeholder=" "
-                        />
-                      </Col>
-
-                    </FormGroup>
-                  </Col>
-                  <Col lg="6" xl="6">
-                    <FormGroup row>
-                      <Label for="find_name" xl={3}>
-                        Tên SP:
-                      </Label>
-                      <Col xl={9}>
-                        <Input
-                          id="find_name"
-                          name="name"
-                          placeholder=""
-                        />
-                      </Col>
-                    </FormGroup>
-                  </Col>
-                  <Col lg="6" xl="6">
-                    <FormGroup row>
-                      <Label for="find_createdAt" xl={3}>
-                        Người tạo:
-                      </Label>
-                      <Col xl={9}>
-                        <Input
-                          id="find_createdAt"
-                          name="name"
-                          placeholder=""
-                        />
-                      </Col>
-                    </FormGroup>
-                  </Col>
-                  <Col lg="6" xl="6">
-                    <FormGroup row>
-                      <Label for="find_createdDate" xl={3}>
-                        Người tạo:
-                      </Label>
-                      <Col xl={4}>
-                        <Input
-                          id="find_createdDate"
-                          name="date"
-                          placeholder="date placeholder"
-                          type="date"
-                        />
-                      </Col>
-                      <Col xl={5}>
-                        <Input
-                          id="find_createdDate"
-                          name="date"
-                          placeholder="date placeholder"
-                          type="date"
-                        />
-                      </Col>
-
-                    </FormGroup>
-                  </Col>
-
-                </Row>
-                {value === 'yes' &&
-                  <Row>
-                    <Col lg="6" xl="3">
-                      <FormGroup row>
-                        <Label for="find_code" xl={4}>
-                          Giày:
-                        </Label>
-                        <Col xl={8}>
-                          <Input id="btn_select_tt" name="select" type="select" >
-                            <option value="loaisp">
-                              sfdsfsf
-                            </option>
-                          </Input>
-                        </Col>
-                      </FormGroup>
-                    </Col>
-                    <Col lg="6" xl="3">
-                      <FormGroup row>
-                        <Label for="find_code" xl={4}>
-                          Hãng:
-                        </Label>
-                        <Col xl={8}>
-                          <Input id="btn_select_tt" name="select" type="select" >
-                            <option value="loaisp">
-                              sfdsfsf
-                            </option>
-                          </Input>
-                        </Col>
-                      </FormGroup>
-                    </Col>
-                    <Col lg="6" xl="3">
-                      <FormGroup row>
-                        <Label for="find_code" xl={5}>
-                          Thiết kế:
-                        </Label>
-                        <Col xl={7}>
-                          <Input id="btn_select_tt" name="select" type="select" >
-                            <option value="loaisp">
-                              sfdsfsf
-                            </option>
-                          </Input>
-                        </Col>
-                      </FormGroup>
-                    </Col>
-                    <Col lg="6" xl="3">
-                      <FormGroup row>
-                        <Label for="find_code" xl={5}>
-                          Loại da:
-                        </Label>
-                        <Col xl={7}>
-                          <Input id="btn_select_tt" name="select" type="select" >
-                            <option value="loaisp">
-                              sfdsfsf
-                            </option>
-                          </Input>
-                        </Col>
-                      </FormGroup>
-                    </Col>
-                    <Col lg="6" xl="3">
-                      <FormGroup row>
-                        <Label for="find_code" xl={4}>
-                          Đế :
-                        </Label>
-                        <Col xl={8}>
-                          <Input id="btn_select_tt" name="select" type="select" >
-                            <option value="loaisp">
-                              sfdsfsf
-                            </option>
-                          </Input>
-                        </Col>
-                      </FormGroup>
-                    </Col>
-                    <Col lg="6" xl="3">
-                      <FormGroup row>
-                        <Label for="find_code" xl={4}>
-                          Lót :
-                        </Label>
-                        <Col xl={8}>
-                          <Input id="btn_select_tt" name="select" type="select" >
-                            <option value="loaisp">
-                              sfdsfsf
-                            </option>
-                          </Input>
-                        </Col>
-                      </FormGroup>
-                    </Col>
-                    <Col lg="6" xl="3">
-                      <FormGroup row>
-                        <Label for="find_code" xl={5}>
-                          Size:
-                        </Label>
-                        <Col xl={7}>
-                          <Input id="btn_select_tt" name="select" type="select" >
-                            <option value="loaisp">
-                              sfdsfsf
-                            </option>
-                          </Input>
-                        </Col>
-                      </FormGroup>
-                    </Col>
-                    <Col lg="6" xl="3">
-                      <FormGroup row>
-                        <Label for="find_code" xl={5}>
-                          Màu:
-                        </Label>
-                        <Col xl={7}>
-                          <Input id="btn_select_tt" name="select" type="select" >
-                            <option value="loaisp">
-                              sfdsfsf
-                            </option>
-                          </Input>
-                        </Col>
-                      </FormGroup>
-                    </Col>
-
-
-                    <Col lg="6" xl="6">
-                      <FormGroup row>
-                        <Label for="find_code" xl={3}>
-                          Số lượng:
-                        </Label>
-                        <Col xl={4}>
+                <Form>
+                  <div className="pl-lg-4">
+                    <Row>
+                      <Col lg="6">
+                        <FormGroup>
+                          <label
+                            className="form-control-label"
+                            htmlFor="input-username"
+                          >
+                            Mã
+                          </label>
                           <Input
-                            id="find_code"
-                            name="code"
-                            placeholder=" "
+                            className="form-control-alternative"
+                            defaultValue="lucky.jesse"
+                            id="input-username"
+                            placeholder="Username"
+                            type="text"
                           />
-                        </Col>
-                        <Label for="find_code" xl={1}>
-                          <i class="fa-solid fa-arrow-right"></i>
-                        </Label>
-                        <Col xl={4}>
+                        </FormGroup>
+                      </Col>
+                      <Col lg="6">
+                        <FormGroup>
+                          <label
+                            className="form-control-label"
+                            htmlFor="input-email"
+                          >
+                            Tên
+                          </label>
                           <Input
-                            id="find_code"
-                            name="code"
-                            placeholder=" "
+                            className="form-control-alternative"
+                            id="input-email"
+                            placeholder="jesse@example.com"
+                            type="email"
                           />
-                        </Col>
-                      </FormGroup>
-                    </Col>
-                    <Col lg="6" xl="6">
-                      <FormGroup row>
-                        <Label for="find_code" xl={3}>
-                          Giá:
-                        </Label>
-                        <Col xl={4}>
+                        </FormGroup>
+                      </Col>
+                    </Row>
+                    <Row>
+                      <Col lg="6">
+                        <FormGroup>
+                          <label
+                            className="form-control-label"
+                            htmlFor="input-username"
+                          >
+                            Người tạo
+                          </label>
                           <Input
-                            id="find_code"
-                            name="code"
-                            placeholder=" "
+                            className="form-control-alternative"
+                            id="find_createdAt"
+                            name="name"
+                            placeholder=""
                           />
+
+                        </FormGroup>
+                      </Col>
+                      <Col lg="6" xl="6">
+                        <FormGroup>
+                          <Label for="find_createdDate" className="form-control-label">
+                            Ngày tạo:
+                          </Label>
+                          <Row>
+                            <Col xl={6}>
+                              <Input
+                                className="form-control-alternative"
+                                id="find_createdDate"
+                                name="date"
+                                placeholder="date placeholder"
+                                type="date"
+                              />
+                            </Col>
+                            <Col xl={6}>
+                              <Input
+                                className="form-control-alternative"
+                                id="find_createdDate"
+                                name="date"
+                                placeholder="date placeholder"
+                                type="date"
+                              />
+
+                            </Col>
+                          </Row>
+
+                        </FormGroup>
+                      </Col>
+                    </Row>
+                    {value === 'yes' &&
+                      <Row>
+                        <Col lg="4">
+                          <FormGroup>
+                            <label
+                              className="form-control-label"
+                              htmlFor="input-city"
+                            >
+                              Hãng
+                            </label>
+                            <Input id="btn_select_tt"
+                              name="select" type="select" >
+                              <option value="loaisp">
+                                sfdsfsf
+                              </option>
+                            </Input>
+                          </FormGroup>
                         </Col>
-                        <Label for="find_code" xl={1}>
-                          <i class="fa-solid fa-arrow-right"></i>
-                        </Label>
-                        <Col xl={4}>
-                          <Input
-                            id="find_code"
-                            name="code"
-                            placeholder=" "
-                          />
+                        <Col lg="4">
+                          <FormGroup>
+                            <label
+                              className="form-control-label"
+                              htmlFor="input-country"
+                            >
+                              Thiết kế
+                            </label>
+                            <Input id="btn_select_tt" name="select" type="select" >
+                              <option value="loaisp">
+                                sfdsfsf
+                              </option>
+                            </Input>
+                          </FormGroup>
                         </Col>
-                      </FormGroup>
-                    </Col>
+                        <Col lg="4">
+                          <FormGroup>
+                            <label
+                              className="form-control-label"
+                              htmlFor="input-country"
+                            >
+                              Loại da
+                            </label>
+                            <Input id="btn_select_tt" name="select" type="select" >
+                              <option value="loaisp">
+                                sfdsfsf
+                              </option>
+                            </Input>
+                          </FormGroup>
+                        </Col>
+
+                        <Col lg="4">
+                          <FormGroup>
+                            <label
+                              className="form-control-label"
+                              htmlFor="input-first-name"
+                            >
+                              Đế giày
+                            </label>
+                            <Input id="btn_select_tt" name="select" type="select" >
+                              <option value="loaisp">
+                                sfdsfsf
+                              </option>
+                            </Input>
+                          </FormGroup>
+                        </Col>
+                        <Col lg="4">
+                          <FormGroup>
+                            <label
+                              className="form-control-label"
+                              htmlFor="input-last-name"
+                            >
+                              Lót giày
+                            </label>
+                            <Input id="btn_select_tt" name="select" type="select" >
+                              <option value="loaisp">
+                                sfdsfsf
+                              </option>
+                            </Input>
+                          </FormGroup>
+                        </Col>
+                        <Col lg="2">
+                          <FormGroup>
+                            <label
+                              className="form-control-label"
+                              htmlFor="input-last-name"
+                            >
+                              Size
+                            </label>
+                            <Input id="btn_select_tt" name="select" type="select">
+                              <option value="loaisp">
+                                sfdsfsf
+                              </option>
+                            </Input>
+                          </FormGroup>
+                        </Col>
+                        <Col lg="2">
+                          <FormGroup>
+                            <label
+                              className="form-control-label"
+                              htmlFor="input-last-name"
+                            >
+                              Màu
+                            </label>
+                            <Input id="btn_select_tt" name="select" type="select"  >
+                              <option value="loaisp">
+                                sfdsfsf
+                              </option>
+                            </Input>
+                          </FormGroup>
+                        </Col>
+                        <Col lg="6" xl="6">
+                          <FormGroup>
+                            <Label for="find_code" className="form-control-label">
+                              Số lượng:
+                            </Label>
+                            <Row>
+                              <Col xl={5}>
+                                <Input
+
+                                  id="find_code"
+                                  name="code"
+                                  placeholder=" "
+                                />
+                              </Col>
+                              <Label for="find_code" xl={1} className="form-control-label">
+                                <i class="fa-solid fa-arrow-right"></i>
+                              </Label>
+                              <Col xl={5}>
+                                <Input
+
+                                  id="find_code"
+                                  name="code"
+                                  placeholder=" "
+                                />
+                              </Col>
+                            </Row>
+                          </FormGroup>
+                        </Col>
+                        <Col lg="6" xl="6">
+                          <FormGroup>
+                            <Label for="find_code" className="form-control-label">
+                              Giá:
+                            </Label>
+                            <Row>
+                              <Col xl={5}>
+                                <Input
+
+                                  id="find_code"
+                                  name="code"
+                                  placeholder=" "
+                                />
+                              </Col>
+                              <Label for="find_code" xl={2} className="form-control-label text-center">
+                                <i class="fa-solid fa-arrow-right"></i>
+                              </Label>
+                              <Col xl={5}>
+                                <Input
+
+                                  id="find_code"
+                                  name="code"
+                                  placeholder=" "
+                                />
+                              </Col>
+                            </Row>
+                          </FormGroup>
+                        </Col>
 
 
-                  </Row>
-                }
+                      </Row>
+                    }
+                  </div>
+                </Form>
+
+
+
 
                 <Row className="mt-2">
                   <Col lg="6" xl="4" >
