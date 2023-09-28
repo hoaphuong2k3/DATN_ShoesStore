@@ -27,19 +27,11 @@ import {
 
 // import React, { useState, Modal } from "react";
 import React, { useState} from "react";
-import { Modal } from "reactstrap";
+
 
 const UserNavbar = () => {
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
-  const openModal = () => {
-    setIsModalOpen(true);
-  };
-
-  const closeModal = () => {
-    setIsModalOpen(false);
-  };
+  
   return (
     <>
       <Navbar className="navbar fixednavbar navbar-horizontal fixed-top navbar-dark" expand="md" color-on-scroll="300">
@@ -145,27 +137,11 @@ const UserNavbar = () => {
                 </DropdownMenu>
               </UncontrolledDropdown>
               <div>
-                {/* <Button className="button-cart" color="white" onClick={openModal}>
-                  <i className="ni ni-cart" />
-                </Button> */}
+                
                 <Button className="button-cart" to="/shoes/cart" tag={Link} color="white">
                   <i className="ni ni-cart" />
                 </Button>
-                {/* <Modal isOpen={isModalOpen} toggle={closeModal} className="cartModal rounded">
-                <div className="modalNdung mt-3">
-                <span className="close" onClick={closeModal}>&times;</span>
-                  <h3 className="text-dark">GIỎ HÀNG <br/>
-                   </h3>
-                   <p className="text-dark border-bottom border-bottom-dotted">
-                   Bạn đang có 2 sản phẩm trong giỏ hàng
-                   </p>
-                    
-                  <Button to="/shoes/cart" tag={Link} className="viewCart">
-                    Xem giỏ hàng
-                  </Button>
-                </div>
                 
-                </Modal> */}
               </div>
             </Nav>
 

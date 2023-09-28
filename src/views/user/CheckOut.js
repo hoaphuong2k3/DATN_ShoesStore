@@ -49,7 +49,7 @@ const Checkout = () => {
 
     return (
         <>
-            {/* <Header /> */}
+            <Header />
             <Container className="mt-5">
                 <Row>
                     <div className="col-md-6">
@@ -116,12 +116,11 @@ const Checkout = () => {
                                                     isDisabled={!selectedProvince}
                                                 />
                                             </div>
-                                        </div>
-                                        
+                                        </div>                                      
                                         <Button className="btn btn-info">Phương thức thanh toán</Button>
                                     </form>
                                 </div>
-                            </CardBody>
+                            </CardBody> 
                         </Card>
                     </div>
                     <div className="col-md-6">
@@ -134,17 +133,14 @@ const Checkout = () => {
                                     </div>
                                     <p className="text-dark small col-md-6 ml-5">Giày da nam kiểu dáng Oxford GNLAAZ01-1-D</p>
                                     <p className="text-dark small col-md-2">3,600,000₫</p>                                   
-
                                 </div>
                                 <hr></hr>
-                                <div className="inner row">
-                                    
+                                <div className="inner row">                                   
                                     <Input type="text" className="w-75 ml-2 mr-2" placeholder="Mã giảm giá"/>
                                     <Button className="btn h-25">Sử dụng</Button>
                                 </div>
                                 <hr></hr>
                                 <div className="inner row">
-                                    
                                 <p className="text-dark ml-2 col-md-7">Tạm tính</p>
                                 <p className="text-dark  col-md-4">3,600,000₫</p> 
                                 <p className="text-dark ml-2 col-md-7">Phí ship</p>
