@@ -76,13 +76,11 @@ var routes = [
   },
   {
     path: "/product/add",
-    icon: "ni ni-money-coins text-green",
     component: <AddProduct />,
     layout: "/admin",
   },
   {
     path: "/product/edit/:id",
-    icon: "ni ni-money-coins text-green",
     component: <EditProduct />,
     layout: "/admin",
   },

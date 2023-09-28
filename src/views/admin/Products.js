@@ -1,4 +1,5 @@
-import { React, useState, Link } from "react";
+import { React, useState } from "react";
+import { Link } from "react-router-dom";
 
 // reactstrap components
 import {
@@ -33,7 +34,7 @@ const Products = () => {
                     {/* <Link className="btn btn-primary my-2" to={"/admin/product/add"}>
                       Thêm
                     </Link> */}
-                    <Button color="primary" >
+                    <Button color="primary" to="/admin/product/add" tag={Link}>
                       Thêm
                     </Button>
                   </Col>
