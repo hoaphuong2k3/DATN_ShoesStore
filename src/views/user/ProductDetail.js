@@ -1,8 +1,9 @@
-
+import 'assets/scss/detailsp.scss';
 import { Container, Row, Card, CardBody } from "reactstrap";
 import Header from "components/Headers/ProductHeader.js";
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+
 
 
 const DetailProduct = () => {
@@ -104,10 +105,9 @@ const DetailProduct = () => {
                           {/* end mã giảm giá */}
 
                           {/* start size */}
-                          <div>
-                            <div className='tong'>
-                              <span className='tenthuoctinh'>Size </span>
-                              <span className='giatrithuoctinh'>
+                            <div className='tong row'>
+                              <span className='tenthuoctinh col-2 ml--3'>Size </span>
+                              <span className='giatrithuoctinh col-9 ml-3'>
                                 <button class="product-variation" aria-label="35" aria-disabled="false">35</button>
                                 <button class="product-variation" aria-label="35" aria-disabled="false">36</button>
                                 <button class="product-variation" aria-label="35" aria-disabled="false">37</button>
@@ -120,7 +120,7 @@ const DetailProduct = () => {
                                 <button class="product-variation" aria-label="35" aria-disabled="false">42.5</button>
                               </span>
                             </div>
-                          </div>
+                          
                           {/* end size */}
 
                           <div>
@@ -135,8 +135,8 @@ const DetailProduct = () => {
                             </div>
                           </div>
                           <div className='text-center btnInDetailSP'>
-                            <button > Thêm vào giỏ hàng</button>
-                            <button>Mua ngay</button>
+                            <button className='btn btn-primary'> Thêm vào giỏ hàng</button>
+                            <button className='btn btn-warning'>Mua ngay</button>
                           </div>
                         </div>
 
