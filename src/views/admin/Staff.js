@@ -207,37 +207,34 @@ const Staff = () => {
                       </Col>
                     </Row>
                     <Row>
-                      <Col lg="4">
+                    <Col lg="4">
                         <FormGroup>
                           <label
                             className="form-control-label"
-                            htmlFor="input-city"
+                            htmlFor="city"
                           >
-                            Xã
+                            Thành phố
                           </label>
                           <Input
                             className="form-control-alternative"
-                            defaultValue="Mễ Trì"
-                            id="input-comune"
-                            placeholder="Comune"
-                            type="text"
+                            id="city"
+                            type="select"
                           />
                         </FormGroup>
                       </Col>
+                      
                       <Col lg="4">
                         <FormGroup>
                           <label
                             className="form-control-label"
-                            htmlFor="input-district"
+                            htmlFor="district"
                           >
                             Quận, Huyện
                           </label>
                           <Input
                             className="form-control-alternative"
-                            defaultValue="Nam Từ Liêm"
-                            id="input-district"
-                            placeholder="District"
-                            type="text"
+                            id="district"
+                            type="select"
                           />
                         </FormGroup>
                       </Col>
@@ -245,16 +242,14 @@ const Staff = () => {
                         <FormGroup>
                           <label
                             className="form-control-label"
-                            htmlFor="input-city"
+                            htmlFor="comune"
                           >
-                            Tỉnh, Thành phố
+                            Xã
                           </label>
                           <Input
                             className="form-control-alternative"
-                            defaultValue="Hà Nội"
-                            id="input-city"
-                            placeholder="City"
-                            type="text"
+                            id="comune"
+                            type="select"
                           />
                         </FormGroup>
                       </Col>

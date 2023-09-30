@@ -1,20 +1,18 @@
-import React, { Component } from "react";
+import React, { useState } from "react";
 // reactstrap components
 import { Row, Form, Col, FormGroup, Input, Button, Table, Modal } from "reactstrap";
 
 
 
 
-class Promo extends Component {
+const Promo = () => {
 
-  state = {};
-  toggleModal = (state) => {
-    this.setState({
-      [state]: !this.state[state],
-    });
-  };
+  
+    const [defaultModal, setDefaultModal] = useState(false);
 
-  render() {
+    const toggleModal = () => {
+        setDefaultModal(!defaultModal);
+    };
     return (
       <>
 
@@ -67,7 +65,7 @@ class Promo extends Component {
                                     <Button style={{marginLeft: "10px"}}
                                         className="btn btn-outline-primary"
                                         size="sm"
-                                        onClick={() => this.toggleModal("defaultModal")}
+                                        onClick={toggleModal}
                                     >
                                         +
                                     </Button>
@@ -81,9 +79,9 @@ class Promo extends Component {
                                     </Input>
 
                                     <Modal
-                                        className="modal-dialog-centered"
-                                        isOpen={this.state.defaultModal}
-                                        toggle={() => this.toggleModal("defaultModal")}
+                                         className="modal-dialog-centered"
+                                         isOpen={defaultModal}
+                                         toggle={toggleModal}
                                     >
                                         <div className="modal-header">
                                             <h5 className="modal-title">
@@ -94,7 +92,7 @@ class Promo extends Component {
                                                 className="close"
                                                 data-dismiss="modal"
                                                 type="button"
-                                                onClick={() => this.toggleModal("defaultModal")}
+                                                onClick={toggleModal}
                                             >
                                                 <span aria-hidden={true}>×</span>
                                             </button>
@@ -184,7 +182,7 @@ class Promo extends Component {
                                                 color="link"
                                                 data-dismiss="modal"
                                                 type="button"
-                                                onClick={() => this.toggleModal("defaultModal")}
+                                                onClick={toggleModal}
                                             >
                                                 Close
                                             </Button>
@@ -331,5 +329,4 @@ class Promo extends Component {
       </>
     );
   }
-}
 export default Promo;

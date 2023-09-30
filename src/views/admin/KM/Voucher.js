@@ -1,409 +1,435 @@
-import React, { Component } from "react";
+import React, { useState, useEffect } from "react";
+import axios from 'axios'
+
 // reactstrap components
-import { Row, Form, Col, FormGroup, Input, Button, Table, Modal, Option } from "reactstrap";
+import { Row, Form, Col, FormGroup, Input, Button, Table, Modal } from "reactstrap";
 
 
-class Voucher extends Component {
+const Voucher = () => {
 
-    constructor() {
-        super();
-        this.state = {
-            selectedOption: null,
-        };
-    }
+    const [category, setCategory] = useState([]);
+    
+    const [selectedOption, setSelectedOption] = useState(null);
+    const [defaultModal, setDefaultModal] = useState(false);
 
-    handleRadioChange = (event) => {
-        this.setState({
-            selectedOption: event.target.value
-        });
+    const handleRadioChange = (event) => {
+        setSelectedOption(event.target.value);
     };
 
-    state = {};
-    toggleModal = (state) => {
-        this.setState({
-            [state]: !this.state[state],
-        });
+    const toggleModal = () => {
+        setDefaultModal(!defaultModal);
     };
+    
+    // useEffect(() => {
+    //     const fetchData = async () => {
+    //         try {
+    //             const response = await axios.get("https://datnshoes-default-rtdb.firebaseio.com/vouchertype.json");
+    //             setCategory(response.data);
+    //         } catch (error) {
+    //             console.error("Lỗi khi gọi API:", error);
+    //         }
+    //     };
 
-    render() {
-        return (
-            <>
-                <Form>
-                    <h6 className="heading-small text-muted mb-4">
-                        Thông tin
-                    </h6>
-                    <div className="pl-lg-4">
-                        <Row>
-                            <Col lg="4">
-                                <FormGroup>
-                                    <label
-                                        className="form-control-label"
-                                        htmlFor="code"
-                                    >
-                                        Mã KM
-                                    </label>
-                                    <Input
-                                        className="form-control-alternative"
-                                        placeholder="Code"
-                                        id="code"
-                                        type="text"
-                                    />
-                                </FormGroup>
-                            </Col>
-                            <Col lg="4">
-                                <FormGroup>
-                                    <label
-                                        className="form-control-label"
-                                        htmlFor="name"
-                                    >
-                                        Tên KM
-                                    </label>
-                                    <Input
-                                        className="form-control-alternative"
-                                        id="name"
-                                        placeholder="Tên khuyến mại"
-                                        type="text"
-                                    />
-                                </FormGroup>
-                            </Col>
-                            <Col lg="4">
-                                <FormGroup>
-                                    <label
-                                        className="form-control-label"
-                                        htmlFor="category"
-                                    >
-                                        Loại KM
-                                    </label>
+    //     fetchData();
+    // }, []);
 
-                                    <Button style={{marginLeft: "10px"}}
-                                        className="btn btn-outline-primary"
-                                        size="sm"
-                                        onClick={() => this.toggleModal("defaultModal")}
-                                    >
-                                        +
-                                    </Button>
+    useEffect(() => {
+        fetch("https://datnshoes-default-rtdb.firebaseio.com/vouchertype.json")
+            .then((response) => response.json())
+            .then((data) => {
+                const productsArray = Object.values(data);
+                setCategory(productsArray);
+                console.log(productsArray);
+            })
+            .catch((error) => console.log(error));
+    }, []);
 
-                                    <Input
-                                        className="form-control-alternative"
-                                        id="category"
-                                        type="select">
-                                        <option>okela</option>
-                                        <option>okela</option>
-                                    </Input>
+    return (
+        <>
+            <Form>
+                <h6 className="heading-small text-muted mb-4">
+                    Thông tin
+                </h6>
+                <div className="pl-lg-4">
+                    <Row>
+                        <Col lg="4">
+                            <FormGroup>
+                                <label
+                                    className="form-control-label"
+                                    htmlFor="code"
+                                >
+                                    Mã KM
+                                </label>
+                                <Input
+                                    className="form-control-alternative"
+                                    placeholder="Code"
+                                    id="code"
+                                    type="text"
+                                />
+                            </FormGroup>
+                        </Col>
+                        <Col lg="4">
+                            <FormGroup>
+                                <label
+                                    className="form-control-label"
+                                    htmlFor="name"
+                                >
+                                    Tên KM
+                                </label>
+                                <Input
+                                    className="form-control-alternative"
+                                    id="name"
+                                    placeholder="Tên khuyến mại"
+                                    type="text"
+                                />
+                            </FormGroup>
+                        </Col>
+                        <Col lg="4">
+                            <FormGroup>
+                                <label
+                                    className="form-control-label"
+                                    htmlFor="category"
+                                >
+                                    Loại KM
+                                </label>
 
-                                    <Modal
-                                        className="modal-dialog-centered"
-                                        isOpen={this.state.defaultModal}
-                                        toggle={() => this.toggleModal("defaultModal")}
-                                    >
-                                        <div className="modal-header">
-                                            <h5 className="modal-title">
-                                                Loại khuyến mại
-                                            </h5>
-                                            <button
-                                                aria-label="Close"
-                                                className="close"
-                                                data-dismiss="modal"
-                                                type="button"
-                                                onClick={() => this.toggleModal("defaultModal")}
-                                            >
-                                                <span aria-hidden={true}>×</span>
-                                            </button>
-                                        </div>
-                                        <div className="modal-body">
-                                            <Form>
-                                                <Row>
-                                                    <Col lg="6">
-                                                        <FormGroup>
-                                                            <label
-                                                                className="form-control-label"
-                                                                htmlFor="code"
-                                                            >
-                                                                Mã Code
-                                                            </label>
-                                                            <Input
-                                                                className="form-control"
-                                                                placeholder="Code"
-                                                                id="code"
-                                                                type="text"
-                                                            />
-                                                        </FormGroup>
-                                                    </Col>
-                                                    <Col lg="6">
-                                                        <FormGroup>
-                                                            <label
-                                                                className="form-control-label"
-                                                                htmlFor="code"
-                                                            >
-                                                                Tên KM
-                                                            </label>
-                                                            <Input
-                                                                className="form-control"
-                                                                placeholder="Tên"
-                                                                id="ten"
-                                                                type="text"
-                                                            />
-                                                        </FormGroup>
-                                                    </Col>
-                                                    <Col>
-                                                        <FormGroup>
-                                                            <label
-                                                                className="form-control-label"
-                                                                htmlFor="description"
-                                                            >
-                                                                Mô tả
-                                                            </label>
-                                                            <Input
-                                                                className="form-control"
-                                                                placeholder="Khuyến mại ....."
-                                                                rows="2"
-                                                                type="textarea"
-                                                            />
-                                                        </FormGroup>
-                                                    </Col>
-                                                </Row>
-                                            </Form>
-                                         
-                                            <Table className="align-items-center table-flush" responsive>
-                                                <thead className="thead-light">
-                                                    <tr>
-                                                        <th scope="col">Tên khuyến mại</th>
-                                                        <th scope="col">Mô tả</th>
-                                                        <th scope="col">Hành động</th>
+                                <Button style={{ marginLeft: "10px" }}
+                                    className="btn btn-outline-primary"
+                                    size="sm"
+                                    onClick={toggleModal}
+                                >
+                                    +
+                                </Button>
 
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <tr>
-                                                        <td></td>
-                                                        <td></td>
-                                                        <td></td>
-                                                    </tr>
-                                                </tbody>
-                                            </Table>
-                                        </div>
-                                        <div className="modal-footer">
-                                            <Button className="btn btn-outline-primary" size="sm">
-                                                Thêm
-                                            </Button>
-                                            <Button className="btn btn-outline-primary" size="sm">
-                                                Sửa
-                                            </Button>
-                                          
-                                            <Button
-                                                className="ml-auto"
-                                                color="link"
-                                                data-dismiss="modal"
-                                                type="button"
-                                                onClick={() => this.toggleModal("defaultModal")}
-                                            >
-                                                Close
-                                            </Button>
-                                        </div>
-                                    </Modal>
+                                <Input
+                                    className="form-control-alternative"
+                                    id="category"
+                                    type="select">
+                                    <option>okela</option>
+                                    <option>okela</option>
+                                </Input>
 
-                                </FormGroup>
-                            </Col>
-
-                            <Col lg="4">
-                                <FormGroup>
-                                    <label
-                                        className="form-control-label"
-                                        htmlFor="input-price">
-                                        Hình thức giảm
-                                    </label>
-                                    <div style={{ display: "flex" }}>
-                                        <div className="custom-control custom-radio">
-                                            <Input
-                                                className="custom-control-alternative"
-                                                name="price"
-                                                type="radio"
-                                                value="persent"
-                                                onChange={this.handleRadioChange}
-                                            />Phần trăm (%)
-                                        </div>
-                                        <div className="custom-control custom-radio">
-                                            <Input
-                                                className="custom-control-alternative"
-                                                name="price"
-                                                type="radio"
-                                                value="money"
-                                                onChange={this.handleRadioChange}
-                                            />Tiền
-                                        </div>
+                                <Modal
+                                    className="modal-dialog-centered"
+                                    isOpen={defaultModal}
+                                    toggle={toggleModal}
+                                >
+                                    <div className="modal-header">
+                                        <h5 className="modal-title">
+                                            Loại khuyến mại
+                                        </h5>
+                                        <button
+                                            aria-label="Close"
+                                            className="close"
+                                            data-dismiss="modal"
+                                            type="button"
+                                            onClick={toggleModal}
+                                        >
+                                            <span aria-hidden={true}>×</span>
+                                        </button>
                                     </div>
-                                </FormGroup>
-                            </Col>
+                                    <div className="modal-body">
+                                        <Form>
+                                            <Row>
+                                                <Col lg="6">
+                                                    <FormGroup>
+                                                        <label
+                                                            className="form-control-label"
+                                                            htmlFor="ma"
+                                                        >
+                                                            Mã Code
+                                                        </label>
+                                                        <Input
+                                                            className="form-control"
+                                                            placeholder="Code"
+                                                            id="ma"
+                                                            name="ma"
+                                                            type="text"
+                                                        />
+                                                    </FormGroup>
+                                                </Col>
+                                                <Col lg="6">
+                                                    <FormGroup>
+                                                        <label
+                                                            className="form-control-label"
+                                                            htmlFor="code"
+                                                        >
+                                                            Tên KM
+                                                        </label>
+                                                        <Input
+                                                            className="form-control"
+                                                            placeholder="Tên"
+                                                            id="ten"
+                                                            type="text"
+                                                        />
+                                                    </FormGroup>
+                                                </Col>
+                                                <Col>
+                                                    <FormGroup>
+                                                        <label
+                                                            className="form-control-label"
+                                                            htmlFor="mota"
+                                                        >
+                                                            Mô tả
+                                                        </label>
+                                                        <Input
+                                                            className="form-control"
+                                                            placeholder="Khuyến mại ....."
+                                                            rows="2"
+                                                            type="textarea"
+                                                        />
+                                                    </FormGroup>
+                                                </Col>
+                                            </Row>
+                                        </Form>
 
-                            {this.state.selectedOption === "persent" && (
-                                <Col lg="4">
-                                    <FormGroup>
-                                        <label
-                                            className="form-control-label"
-                                            htmlFor="startDate"
+                                        <Table className="align-items-center table-flush" responsive>
+                                            <thead className="thead-light">
+                                                <tr>
+                                                    <th scope="col">Mã</th>
+                                                    <th scope="col">Tên khuyến mại</th>
+                                                    <th scope="col">Mô tả</th>
+                                                    <th scope="col">Hành động</th>
+
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                            {category.map((item, index) => (
+                                                <tr key={index}>
+                                                    <td>{item.code}</td>
+                                                    <td>{item.name}</td>
+                                                    <td>{item.description}</td>
+                                                    <td></td>
+                                                </tr>))}
+                                            </tbody>
+                                        </Table>
+                                    </div>
+                                    <div className="modal-footer">
+                                        <Button className="btn btn-outline-primary" size="sm">
+                                            Thêm
+                                        </Button>
+                                        <Button className="btn btn-outline-primary" size="sm">
+                                            Sửa
+                                        </Button>
+
+                                        <Button
+                                            className="ml-auto"
+                                            color="link"
+                                            data-dismiss="modal"
+                                            type="button"
+                                            onClick={toggleModal}
                                         >
-                                            Giảm giá:
-                                        </label>
+                                            Close
+                                        </Button>
+                                    </div>
+                                </Modal>
+
+
+
+                            </FormGroup>
+                        </Col>
+
+                        <Col lg="4">
+                            <FormGroup>
+                                <label
+                                    className="form-control-label"
+                                    htmlFor="input-price">
+                                    Hình thức giảm
+                                </label>
+                                <div style={{ display: "flex" }}>
+                                    <div className="custom-control custom-radio">
                                         <Input
-                                            className="form-control-alternative"
-                                            id="persent"
-                                            type="number"
-                                            placeholder="eg. 10%"
-                                        />
-                                    </FormGroup>
-                                </Col>
-                            )}
-
-                            {this.state.selectedOption === "money" && (
-                                <Col lg="8" style={{ display: "flex" }}>
-                                    <FormGroup className="col" lg="6">
-                                        <label
-                                            className="form-control-label"
-                                            htmlFor="startDate"
-                                        >
-                                            Giảm giá từ:
-                                        </label>
+                                            className="custom-control-alternative"
+                                            name="price"
+                                            type="radio"
+                                            value="persent"
+                                            checked={selectedOption === "persent"}
+                                            onChange={handleRadioChange}
+                                        />Phần trăm (%)
+                                    </div>
+                                    <div className="custom-control custom-radio">
                                         <Input
-                                            className="form-control-alternative"
-                                            id="min"
-                                            type="number"
-                                            placeholder="10000"
-                                        />
-                                    </FormGroup>
-                                    <FormGroup className="col" lg="6">
-                                        <label
-                                            className="form-control-label"
-                                            htmlFor="startDate"
-                                        >
-                                            Giảm giá đến:
-                                        </label>
-                                        <Input
-                                            className="form-control-alternative"
-                                            id="max"
-                                            type="number"
-                                            placeholder="100000"
-                                        />
-                                    </FormGroup>
-                                </Col>
+                                            className="custom-control-alternative"
+                                            name="price"
+                                            type="radio"
+                                            value="money"
+                                            checked={selectedOption === "money"}
+                                            onChange={handleRadioChange}
+                                        />Tiền
+                                    </div>
+                                </div>
+                            </FormGroup>
+                        </Col>
 
-
-
-                            )}
-
-
+                        {selectedOption === "persent" && (
                             <Col lg="4">
                                 <FormGroup>
                                     <label
                                         className="form-control-label"
                                         htmlFor="startDate"
                                     >
-                                        Ngày bắt đầu
+                                        Giảm giá:
                                     </label>
                                     <Input
                                         className="form-control-alternative"
-                                        id="startDate"
-                                        type="date"
+                                        id="persent"
+                                        type="number"
+                                        placeholder="eg. 10%"
                                     />
                                 </FormGroup>
                             </Col>
-                            <Col lg="4">
-                                <FormGroup>
+                        )}
+
+                        {selectedOption === "money" && (
+                            <Col lg="8" style={{ display: "flex" }}>
+                                <FormGroup className="col" lg="6">
                                     <label
                                         className="form-control-label"
-                                        htmlFor="endDate"
+                                        htmlFor="startDate"
                                     >
-                                        Ngày kết thúc
+                                        Giảm giá từ:
                                     </label>
                                     <Input
                                         className="form-control-alternative"
-                                        id="endDate"
-                                        type="date"
+                                        id="min"
+                                        type="number"
+                                        placeholder="10000"
                                     />
                                 </FormGroup>
-                            </Col>
-                            <Col className="pl-lg-4">
-                                <FormGroup>
+                                <FormGroup className="col" lg="6">
                                     <label
                                         className="form-control-label"
-                                        htmlFor="description"
+                                        htmlFor="startDate"
                                     >
-                                        Mô tả
+                                        Giảm giá đến:
                                     </label>
                                     <Input
                                         className="form-control-alternative"
-                                        placeholder="Sản phẩm ....."
-                                        rows="4"
-                                        type="textarea"
+                                        id="max"
+                                        type="number"
+                                        placeholder="100000"
                                     />
                                 </FormGroup>
                             </Col>
-                        </Row>
-                        <Row>
-                            <Col className="text-center">
-                                <Button
-                                    className="btn btn-outline-primary"
-                                    onClick={(e) => e.preventDefault()}
-                                    size="sm"
-                                >
-                                    Thêm mới
-                                </Button>
-                                <Button
-                                    className="btn btn-outline-primary"
-                                    onClick={(e) => e.preventDefault()}
-                                    size="sm"
-                                >
-                                    Cập nhật
-                                </Button>
-                               
-                                <Button
-                                    className="btn btn-outline-primary"
-                                    onClick={(e) => e.preventDefault()}
-                                    size="sm"
-                                >
-                                    Reset
-                                </Button>
-                            </Col>
-                        </Row>
-                    </div>
 
 
-                </Form>
-                {/* Description */}
-                <hr className="my-4" />
-                <h6 className="heading-small text-muted mb-4">Danh sách</h6>
-                <Table className="align-items-center table-flush" responsive>
-                    <thead className="thead-light">
-                        <tr>
-                            <th scope="col">STT</th>
-                            <th scope="col">Tên khuyến mại</th>
-                            <th scope="col">Loại khuyến mại</th>
-                            <th scope="col">Mô tả</th>
-                            <th scope="col">Phần trăm (%)</th>
-                            <th scope="col">Tiền</th>
-                            <th scope="col">Ngày bắt đầu</th>
-                            <th scope="col">Ngày kết thúc</th>
-                            <th scope="col">Trạng thái</th>
-                            <th scope="col">Hành động</th>
 
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>1</td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-                    </tbody>
-                </Table>
-            </>
-        );
-    }
+                        )}
+
+
+                        <Col lg="4">
+                            <FormGroup>
+                                <label
+                                    className="form-control-label"
+                                    htmlFor="startDate"
+                                >
+                                    Ngày bắt đầu
+                                </label>
+                                <Input
+                                    className="form-control-alternative"
+                                    id="startDate"
+                                    type="date"
+                                />
+                            </FormGroup>
+                        </Col>
+                        <Col lg="4">
+                            <FormGroup>
+                                <label
+                                    className="form-control-label"
+                                    htmlFor="endDate"
+                                >
+                                    Ngày kết thúc
+                                </label>
+                                <Input
+                                    className="form-control-alternative"
+                                    id="endDate"
+                                    type="date"
+                                />
+                            </FormGroup>
+                        </Col>
+                        <Col className="pl-lg-4">
+                            <FormGroup>
+                                <label
+                                    className="form-control-label"
+                                    htmlFor="description"
+                                >
+                                    Mô tả
+                                </label>
+                                <Input
+                                    className="form-control-alternative"
+                                    placeholder="Sản phẩm ....."
+                                    rows="4"
+                                    type="textarea"
+                                />
+                            </FormGroup>
+                        </Col>
+                    </Row>
+                    <Row>
+                        <Col className="text-center">
+                            <Button
+                                className="btn btn-outline-primary"
+                                onClick={(e) => e.preventDefault()}
+                                size="sm"
+                            >
+                                Thêm mới
+                            </Button>
+                            <Button
+                                className="btn btn-outline-primary"
+                                onClick={(e) => e.preventDefault()}
+                                size="sm"
+                            >
+                                Cập nhật
+                            </Button>
+
+                            <Button
+                                className="btn btn-outline-primary"
+                                onClick={(e) => e.preventDefault()}
+                                size="sm"
+                            >
+                                Reset
+                            </Button>
+                        </Col>
+                    </Row>
+                </div>
+
+
+            </Form>
+            {/* Description */}
+            <hr className="my-4" />
+            <h6 className="heading-small text-muted mb-4">Danh sách</h6>
+            <Table className="align-items-center table-flush" responsive>
+                <thead className="thead-light">
+                    <tr>
+                        <th scope="col">STT</th>
+                        <th scope="col">Tên khuyến mại</th>
+                        <th scope="col">Loại khuyến mại</th>
+                        <th scope="col">Mô tả</th>
+                        <th scope="col">Phần trăm (%)</th>
+                        <th scope="col">Tiền</th>
+                        <th scope="col">Ngày bắt đầu</th>
+                        <th scope="col">Ngày kết thúc</th>
+                        <th scope="col">Trạng thái</th>
+                        <th scope="col">Hành động</th>
+
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                </tbody>
+            </Table>
+        </>
+    );
 }
+
 export default Voucher;

@@ -20,9 +20,9 @@ const Login = () => {
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [rememberMe, setRememberMe] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
-  const [userRole, setUserRole] = useState(""); 
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -32,17 +32,19 @@ const Login = () => {
       const response = await axios.post("http://localhost:33321/api/oauth/login", {
         username,
         password,
+        rememberMe: rememberMe === "on",
       });
 
-      // Lưu token vào localStorage
-      const role = response.data.authorities.authority;
-      setUserRole(role);
+      console.log(response.data);
 
-      localStorage.setItem("token", response.data.token);
-      
-      if (userRole === "ROLE_ADMIN") {
+      const token = response.data.token;
+      localStorage.setItem("token", token);
+
+      const authorities = response.data.authorities;
+      if (authorities.some((authority) => authority.authority === "ROLE_ADMIN")
+        && authorities.some((authority) => authority.authority === "ROLE_SUPPER_ADMIN")) {
         navigate("/admin/index");
-      } else if (userRole === "ROLE_USER") {
+      } else if (authorities.some((authority) => authority.authority === "ROLE_USER")) {
         navigate("/shoes/home");
       } else {
         navigate("/");
@@ -141,6 +143,7 @@ const Login = () => {
                   className="custom-control-input"
                   id=" customCheckLogin"
                   type="checkbox"
+                  onChange={(e) => setRememberMe(e.target.value)}
                 />
                 <label
                   className="custom-control-label"
