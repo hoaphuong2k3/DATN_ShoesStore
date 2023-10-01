@@ -436,6 +436,7 @@ const ProductAttributes = () => {
                         name="btnstatus"
                         type="radio"
                         value="1"
+                        checked
 
                       />
                       {' '}
