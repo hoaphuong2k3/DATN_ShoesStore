@@ -8,7 +8,7 @@ const Product = () => {
   const [products, setProducts] = useState([]);
 
   useEffect(() => {
-    fetch("https://datnshoes-default-rtdb.firebaseio.com/shoes.json")
+    fetch("https://63c1265d376b9b2e64743c4f.mockapi.io/shoes")
       .then((response) => response.json())
       .then((data) => {
         const productsArray = Object.values(data);

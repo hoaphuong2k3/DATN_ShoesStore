@@ -22,7 +22,7 @@ const DetailProduct = () => {
 
   const getDetail = async () => {
     try {
-      const res = await axios.get(`https://datnshoes-default-rtdb.firebaseio.com/shoesdetails/${id}.json`);
+      const res = await axios.get(`https://63c1265d376b9b2e64743c4f.mockapi.io/shoesdetails/${id}`);
       console.log(res.data);
       if (res && res.data) {
         setProductDetail(res.data);
@@ -119,7 +119,7 @@ const DetailProduct = () => {
                             </div>
                             <div className='tong'>
                               <span className='tenthuoctinh'>Chất liệu </span>
-                              <span className='giatrithuoctinh'>{productDetail.chatlieu}</span>
+                              <span className='giatrithuoctinh'>{productDetail.chatLieu}</span>
                             </div>
                             <div className='tong'>
                               <span className='tenthuoctinh'>Màu Sắc </span>
