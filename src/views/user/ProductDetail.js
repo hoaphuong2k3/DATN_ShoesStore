@@ -3,24 +3,61 @@ import { Container, Row, Card, CardBody } from "reactstrap";
 import Header from "components/Headers/ProductHeader.js";
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import cartjs from 'views/user/Cart.js';
+import { useParams } from 'react-router-dom';
+
 
 
 
 const DetailProduct = () => {
 
   const [productDetail, setProductDetail] = useState([]);
+  const [cartItems, setCartItems] = useState([]);
+  const { id } = useParams();
+  // const navigate = useNavigate();
 
   useEffect(() => {
     getDetail();
   }, []);
 
   const getDetail = async () => {
-    let res = await axios.get(`https://datnshoes-default-rtdb.firebaseio.com/shoesdetails/-NekyJb9ShvpYazOtRYy.json`)
-    console.log(res.data);
-    if (res && res.data) {
-      setProductDetail(res.data);
+    try {
+      const res = await axios.get(`https://datnshoes-default-rtdb.firebaseio.com/shoesdetails/${id}.json`);
+      console.log(res.data);
+      if (res && res.data) {
+        setProductDetail(res.data);
+      }
+    } catch (error) {
+      console.error(error);
     }
   }
+
+
+  const addToCart = () => {
+    const newItem = {
+      id: productDetail.id,
+      name: productDetail.ten,
+      price: parseInt(productDetail.gia),
+      quantity: 1 
+    };
+    const existingItem = cartItems.find(item => item.id === newItem.id);
+  
+    if (existingItem) {
+      const updatedCart = cartItems.map(item => {
+        if (item.id === newItem.id) {
+          return { ...item, quantity: item.quantity + 1 };
+        }
+        return item;
+      });
+      setCartItems(updatedCart);
+    } else {
+      setCartItems([...cartItems, newItem]);
+    }
+    // Chuyển hướng đến trang giỏ hàng
+    // navigate('/cart');
+  };
+  console.log(cartItems);
+   
   return (
     <>
       <Header />
@@ -74,7 +111,7 @@ const DetailProduct = () => {
                           <div >
                             <div className='tong' >
                               <span className='tenthuoctinh'>Thương hiệu </span>
-                              <span className='giatrithuoctinh'>{productDetail.thuonghieu}</span>
+                              <span className='giatrithuoctinh'>{productDetail.hang}</span>
                             </div>
                             <div className='tong'>
                               <span className='tenthuoctinh'>Loại SP </span>
@@ -135,7 +172,7 @@ const DetailProduct = () => {
                             </div>
                           </div>
                           <div className='text-center btnInDetailSP'>
-                            <button className='btn btn-primary'> Thêm vào giỏ hàng</button>
+                          <button onClick={addToCart} className='btn btn-primary'>Thêm vào giỏ hàng</button>
                             <button className='btn btn-warning'>Mua ngay</button>
                           </div>
                         </div>

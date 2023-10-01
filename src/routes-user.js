@@ -53,7 +53,7 @@ var routes = [
     layout: "/shoes",
   },
   {
-    path: "/productdetail",
+    path: "/productdetail/:id",
     name: "CHI TIẾT SẢN PHẨM",
     component: <ProductDetail />,
     layout: "/shoes",

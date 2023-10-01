@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { Container, Row, Card, CardBody } from "reactstrap";
 import Header from "components/Headers/ProductHeader.js";
+import { Link } from 'react-router-dom';
 
 
 const Product = () => {
   const [products, setProducts] = useState([]);
 
   useEffect(() => {
-    fetch("https://datnshoes-default-rtdb.firebaseio.com/shoesdetails.json")
+    fetch("https://datnshoes-default-rtdb.firebaseio.com/shoes.json")
       .then((response) => response.json())
       .then((data) => {
         const productsArray = Object.values(data);
@@ -49,14 +50,16 @@ const Product = () => {
                     `}
                   </style>
                   {products.map((product) => (
-                    <div key={product.code} className="col-md-3">
-                      <a href="">
+                    <div key={product.id} className="col-md-3">
+                      <Link to={`/productdetail/${product.id}`}>
                         <img src={product.anh} alt="" className="zoom" />
-                      </a>
+                      </Link>
                       <br />
                       <br />
                       <div style={{ fontSize: "large" }} className="p-2">
-                        <a href="" className="text-dark text-decoration-none">{product.ten}</a>
+                        <Link to={`/productdetail/${product.id}`} className="text-dark text-decoration-none">
+                          {product.ten}
+                        </Link>
                         <p className=" font-weight-bold" style={{ color: "rgba(0, 0, 0, 0.705)" }}>
                           {product.gia}đ&nbsp;
                         </p>
