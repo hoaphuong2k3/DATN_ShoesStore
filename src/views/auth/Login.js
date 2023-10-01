@@ -43,9 +43,9 @@ const Login = () => {
       const authorities = response.data.authorities;
       if (authorities.some((authority) => authority.authority === "ROLE_ADMIN")
         && authorities.some((authority) => authority.authority === "ROLE_SUPPER_ADMIN")) {
-        navigate("/admin/index");
+        navigate("/admin");
       } else if (authorities.some((authority) => authority.authority === "ROLE_USER")) {
-        navigate("/shoes/home");
+        navigate("/shoes");
       } else {
         navigate("/");
       }
