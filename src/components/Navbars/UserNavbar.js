@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import classes from "assets/css/header.css";
 // reactstrap components
 import "assets/css/navbar.css";
 import "assets/css/cartModal.css";
@@ -26,12 +27,12 @@ import {
 } from "reactstrap";
 
 // import React, { useState, Modal } from "react";
-import React, { useState} from "react";
+import React, { useState } from "react";
 
 
 const UserNavbar = () => {
 
-  
+
   return (
     <>
       <Navbar className="navbar fixednavbar navbar-horizontal fixed-top navbar-dark" expand="md" color-on-scroll="300">
@@ -137,11 +138,12 @@ const UserNavbar = () => {
                 </DropdownMenu>
               </UncontrolledDropdown>
               <div>
-                
+
                 <Button className="button-cart" to="/shoes/cart" tag={Link} color="white">
                   <i className="ni ni-cart" />
+                  
                 </Button>
-                
+
               </div>
             </Nav>
 

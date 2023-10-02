@@ -14,22 +14,21 @@ import Header from "components/Headers/ProductHeader";
 
 const Cart = () => {
   const [cartItems, setCartItems] = useState([]);
+  const [cartItemCount, setCartItemCount] = useState(0);
+
 
   // Các hàm xử lý sự kiện
-  const handleAddToCart = (product) => {
-    setCartItems([...cartItems, product]);
-
-  };
+  
 
   const handleQuantityChange = (index, newQuantity) => {
     const updatedItems = [...cartItems];
-    updatedItems[index].sl = newQuantity;
+    updatedItems[index] = { ...updatedItems[index], quantity: newQuantity };
     setCartItems(updatedItems);
   };
   const totalPrice = cartItems.reduce((total, item) => total + item.sl * item.gia, 0);
   return (
     <>
-      <Header />
+      <Header cartItemCount={cartItemCount} />
       <Container fluid className="mt-3">
         <Row>
           <div className="col">
@@ -91,7 +90,7 @@ const Cart = () => {
                                 <Input
                                   type="number"
                                   className="form-control"
-                                  value={item.sl}
+                                  value={item.quantity}
                                   min="1"
                                   data-id=""
                                   aria-label="quantity"

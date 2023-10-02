@@ -3,14 +3,9 @@ import { Container, Row, Card, CardBody } from "reactstrap";
 import Header from "components/Headers/ProductHeader.js";
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import cartjs from 'views/user/Cart.js';
-import { useParams } from 'react-router-dom';
-
-
-
+import { useParams, useNavigate } from 'react-router-dom';
 
 const DetailProduct = () => {
-
   const [productDetail, setProductDetail] = useState([]);
   const [cartItems, setCartItems] = useState([]);
   const { id } = useParams();
@@ -31,7 +26,7 @@ const DetailProduct = () => {
       console.error(error);
     }
   }
-
+  
 
   const addToCart = () => {
     const newItem = {
@@ -53,11 +48,15 @@ const DetailProduct = () => {
     } else {
       setCartItems([...cartItems, newItem]);
     }
-    // Chuyển hướng đến trang giỏ hàng
     // navigate('/cart');
   };
+
   console.log(cartItems);
-   
+
+
+
+
+
   return (
     <>
       <Header />
@@ -129,34 +128,11 @@ const DetailProduct = () => {
                           {/* End thuộc tính */}
 
                           {/* Start mã giảm giá */}
-                          <div>
-                            <div className='tong' >
-                              <span className='tenthuoctinh'>Mã giảm giá </span>
-                              <span className='giatrithuoctinh'>
-                                <span className='voucher'> Giảm 10%</span>
-                                <span className='voucher'> Giảm 20%</span>
-                                <spam> Xem tất cả</spam>
-                              </span>
-                            </div>
-                          </div>
+                          {/* ======================= */}
                           {/* end mã giảm giá */}
 
                           {/* start size */}
-                            <div className='tong row'>
-                              <span className='tenthuoctinh col-2 ml--3'>Size </span>
-                              <span className='giatrithuoctinh col-9 ml-3'>
-                                <button class="product-variation" aria-label="35" aria-disabled="false">35</button>
-                                <button class="product-variation" aria-label="35" aria-disabled="false">36</button>
-                                <button class="product-variation" aria-label="35" aria-disabled="false">37</button>
-                                <button class="product-variation" aria-label="35" aria-disabled="false">38</button>
-                                <button class="product-variation" aria-label="35" aria-disabled="false">39</button>
-                                <button class="product-variation" aria-label="35" aria-disabled="false">40</button>
-                                <button class="product-variation" aria-label="35" aria-disabled="false">41</button>
-                                <button class="product-variation" aria-label="35" aria-disabled="false">42</button>
-                                <button class="product-variation" aria-label="35" aria-disabled="false">43</button>
-                                <button class="product-variation" aria-label="35" aria-disabled="false">42.5</button>
-                              </span>
-                            </div>
+                            {/* ===================== */}
                           
                           {/* end size */}
 
@@ -180,37 +156,7 @@ const DetailProduct = () => {
                       </div>
                     </div>
 
-                    <div className='card-box'>
-                      <div className='row'>
-                        <div className='col-10'>
-                          <div>
-                            <div>
-                              MÔ TẢ SẢN PHẨM
-                            </div>
-                            <div>
-                              <div class="f7AU53">
-                                <p class="irIKAp">Chuck Taylor Run Star Motion Create Next Comfort với Thiết kế đôi phá mới,Phản ánh năng lượng của đường phố thành phố, các đường nét vui tươi và méo mó của Run Star Motion được xây dựng cho chuyển động trong tương lai.&nbsp;Được tái tạo từ trong ra ngoài, thế đứng nâng cao và đế giữa bằng bọt CX giúp mang lại cảm giác thoải mái cấp độ tiếp theo cho mỗi sải chân.&nbsp;Phần trên vẫn đúng với bản gốc, được đặt cạnh nhau bởi các chi tiết thiết kế tương lai để thể hiện bản thân một cách táo bạo.&nbsp;Một bệ phóng đại, gợn sóng và các vấu kéo điêu khắc nâng bạn lên và giữ cho bạn vững vàng với lực kéo vượt trội,</p>
-                                <p class="irIKAp">+ Đế Xốp CX và đế giữa phylon nhẹ giúp hỗ trợ va đạp bảo vệ hiệu qua bàn chân suốt ngày dài</p>
-                                <p class="irIKAp">+ Bàn chân trước và gót chân có vấu biểu cảm để tạo lực kéo vượt trội</p>
-                                <p class="irIKAp">Chế độ bảo hành: Bảo hành chính hãng Converse 1 tháng&nbsp;(trừ hàng giảm giá từ 30% trở lên)</p>
-                                <p class="irIKAp">. Phụ kiện đi kèm:&nbsp;</p>
-                                <p class="irIKAp">&nbsp; + Giày</p>
-                                <p class="irIKAp">&nbsp; + Túi Converse</p><p class="irIKAp">
-                                  &nbsp; + Phiếu bảo hành chính hãng&nbsp;(trừ hàng giảm giá từ 30% trở lên)</p>
-                              </div>
-                            </div>
-
-                          </div>
-                        </div>
-                        <div className='col-2'>
-                          <div>
-                            <div>
-                              Danh sách vouchers
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
+                    {/* ===========================cart box */}
                     <div>
                       <div>
                         CÁC SẢN PHẨM LIÊN QUAN

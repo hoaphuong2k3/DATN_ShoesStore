@@ -51,13 +51,13 @@ const Product = () => {
                   </style>
                   {products.map((product) => (
                     <div key={product.id} className="col-md-3">
-                      <Link to={`/productdetail/${product.id}`}>
+                      <Link to={`/shoes/productdetail/${product.id}`}>
                         <img src={product.anh} alt="" className="zoom" />
                       </Link>
                       <br />
                       <br />
                       <div style={{ fontSize: "large" }} className="p-2">
-                        <Link to={`/productdetail/${product.id}`} className="text-dark text-decoration-none">
+                        <Link to={`/shoes/productdetail/${product.id}`} className="text-dark text-decoration-none">
                           {product.ten}
                         </Link>
                         <p className=" font-weight-bold" style={{ color: "rgba(0, 0, 0, 0.705)" }}>
