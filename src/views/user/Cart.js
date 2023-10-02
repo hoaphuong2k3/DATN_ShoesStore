@@ -87,15 +87,10 @@ const Cart = () => {
                                 >
                                   -
                                 </Button>
-                                <Input
-                                  type="number"
-                                  className="form-control"
-                                  value={item.quantity}
+                                <Input type="number" className="form-control" value={item.quantity}
                                   min="1"
-                                  data-id=""
                                   aria-label="quantity"
                                   pattern="[0-9]*"
-                                  name="updates[]"
                                   id={`updates_${index}`}
                                   onChange={(e) => handleQuantityChange(index, parseInt(e.target.value))}
                                 />

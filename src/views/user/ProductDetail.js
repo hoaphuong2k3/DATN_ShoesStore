@@ -26,7 +26,6 @@ const DetailProduct = () => {
       console.error(error);
     }
   }
-  
 
   const addToCart = () => {
     const newItem = {
