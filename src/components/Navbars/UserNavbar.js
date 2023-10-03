@@ -23,7 +23,7 @@ import {
   InputGroupAddon,
   InputGroupText,
   Form, FormGroup,
-  Button, Card
+  Button
 } from "reactstrap";
 
 // import React, { useState, Modal } from "react";
@@ -31,7 +31,6 @@ import React, { useState } from "react";
 import { CartContext } from "contexts/Cart.js";
 
 const UserNavbar = () => {
-
 
   return (
     <>
@@ -131,23 +130,23 @@ const UserNavbar = () => {
                     <span>Yêu thích</span>
                   </DropdownItem>
                   <DropdownItem divider />
-                  <DropdownItem href="#" onClick={(e) => e.preventDefault()}>
+                  <DropdownItem>
                     <i className="ni ni-user-run" />
                     <span>Đăng xuất</span>
                   </DropdownItem>
                 </DropdownMenu>
               </UncontrolledDropdown>
               <div>
-              <CartContext.Consumer>
-                {({ cartItems }) => (
-                  <Button className="button-cart" to="/shoes/cart" tag={Link} color="white">
-                    <i className="ni ni-cart"/>
-                    <span className="cart-item-count">
-                    ({cartItems.length})
-                    </span>
-                    
-                  </Button>
-                )}
+                <CartContext.Consumer>
+                  {({ cartItems }) => (
+                    <Button className="button-cart" to="/shoes/cart" tag={Link} color="white">
+                      <i className="ni ni-cart" />
+                      <span className="cart-item-count">
+                        ({cartItems.length})
+                      </span>
+
+                    </Button>
+                  )}
                 </CartContext.Consumer>
               </div>
             </Nav>

@@ -1,4 +1,5 @@
-
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import {
   Button,
   Card,
@@ -15,6 +16,33 @@ import {
 import ProfileHeader from "components/Headers/ProfileHeader";
 
 const Profile = () => {
+
+  const [userData, setUserData] = useState(null);
+
+  useEffect(() => {
+    // Lấy userId từ localStorage
+    const userId = localStorage.getItem("userId");
+
+    const fetchUserData = async () => {
+      try {
+        const response = await axios.get(`http://localhost:33321/api/users/${userId}`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        });
+
+        setUserData(response.data);
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+      }
+    };
+
+    if (userId) {
+      fetchUserData();
+    }
+  }, []);
+
+
   return (
     <>
       <ProfileHeader />
@@ -98,6 +126,7 @@ const Profile = () => {
                             className="form-control-alternative"
                             id="fullname"
                             type="text"
+                            value={userData.fullname}
                           />
                         </FormGroup>
                       </Col>
@@ -113,6 +142,7 @@ const Profile = () => {
                             className="form-control-alternative"
                             id="email"
                             type="email"
+                            value={userData.email}
                           />
                         </FormGroup>
                       </Col>
@@ -130,6 +160,7 @@ const Profile = () => {
                             className="form-control-alternative"
                             id="birthday"
                             type="date"
+                            value={userData.dateOfBirth}
                           />
                         </FormGroup>
                       </Col>
@@ -145,6 +176,7 @@ const Profile = () => {
                             className="form-control-alternative"
                             id="phoneNumber"
                             type="tel"
+                            value={userData.phoneNumber}
                           />
                         </FormGroup>
                       </Col>
@@ -169,6 +201,7 @@ const Profile = () => {
                             className="form-control-alternative"
                             id="address"
                             type="text"
+                            value={userData.address}
                           />
                         </FormGroup>
                       </Col>

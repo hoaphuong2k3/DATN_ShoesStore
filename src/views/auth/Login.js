@@ -38,8 +38,10 @@ const Login = () => {
 
       console.log(response.data);
 
+      const userId = response.data.id;
       const token = response.data.token;
       localStorage.setItem("token", token);
+      localStorage.setItem("userId", userId);
 
       toast.success("Đăng nhập thành công!");
 
@@ -48,7 +50,7 @@ const Login = () => {
         && authorities.some((authority) => authority.authority === "ROLE_SUPPER_ADMIN")) {
         navigate("/admin");
       } else if (authorities.some((authority) => authority.authority === "ROLE_USER")) {
-        
+
         navigate("/shoes");
       } else {
         navigate("/");
