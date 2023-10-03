@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import {
   Button,
   Card,
@@ -21,7 +23,6 @@ const Login = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState("");
-  const [error, setError] = useState("");
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
@@ -40,17 +41,20 @@ const Login = () => {
       const token = response.data.token;
       localStorage.setItem("token", token);
 
+      toast.success("Đăng nhập thành công!");
+
       const authorities = response.data.authorities;
       if (authorities.some((authority) => authority.authority === "ROLE_ADMIN")
         && authorities.some((authority) => authority.authority === "ROLE_SUPPER_ADMIN")) {
-        navigate("/admin/index");
+        navigate("/admin");
       } else if (authorities.some((authority) => authority.authority === "ROLE_USER")) {
-        navigate("/shoes/home");
+        
+        navigate("/shoes");
       } else {
         navigate("/");
       }
     } catch (err) {
-      setError("Đăng nhập thất bại. Vui lòng kiểm tra tên đăng nhập và mật khẩu.");
+      toast.error("Đăng nhập thất bại.");
     }
   };
 
@@ -157,7 +161,6 @@ const Login = () => {
                   Đăng nhập
                 </Button>
               </div>
-              {error && <p className="text-danger">{error}</p>}
             </Form>
           </CardBody>
         </Card>
@@ -182,6 +185,7 @@ const Login = () => {
           </Col>
         </Row>
       </Col>
+      <ToastContainer />
     </>
   );
 };
