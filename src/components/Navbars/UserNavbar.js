@@ -28,7 +28,7 @@ import {
 
 // import React, { useState, Modal } from "react";
 import React, { useState } from "react";
-
+import { CartContext } from "contexts/Cart.js";
 
 const UserNavbar = () => {
 
@@ -138,15 +138,40 @@ const UserNavbar = () => {
                 </DropdownMenu>
               </UncontrolledDropdown>
               <div>
-
-                <Button className="button-cart" to="/shoes/cart" tag={Link} color="white">
-                  <i className="ni ni-cart" />
-                  
-                </Button>
-
+              <CartContext.Consumer>
+                {({ cartItems }) => (
+                  <Button className="button-cart" to="/shoes/cart" tag={Link} color="white">
+                    <i className="ni ni-cart"/>
+                    <span className="cart-item-count">
+                    ({cartItems.length})
+                    </span>
+                    
+                  </Button>
+                )}
+                </CartContext.Consumer>
               </div>
             </Nav>
-
+            <style>
+              {
+                `
+                .button-cart {
+                  position: relative;
+                }
+                
+                .cart-item-count {
+                  position: absolute;
+                  top: -5px;
+                  right: -5px;
+                  transform: translate(50%, -50%);
+                  background-color: red;
+                  color: white;
+                  border-radius: 50%;
+                  padding: 3px;
+                  font-size: 11px;
+                }
+                `
+              }
+            </style>
           </UncontrolledCollapse>
         </Container>
       </Navbar>
