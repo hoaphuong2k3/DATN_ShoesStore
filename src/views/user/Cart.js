@@ -14,12 +14,24 @@ import Header from "components/Headers/ProductHeader";
 import { CartContext } from "contexts/Cart.js";
 
 const Cart = () => {
+
   const { cartItems, handleQuantityChange } = useContext(CartContext);
 
   const totalPrice = cartItems.reduce(
     (total, item) => total + item.sl * item.gia,
     0
   );
+
+  const handleQuantityInputChange = (itemId, newQuantity) => {
+    const updatedCartItems = cartItems.map((item) => {
+      if (item.id === itemId) {
+        return { ...item, sl: newQuantity };
+      }
+      return item;
+    });
+
+    handleQuantityChange(updatedCartItems);
+  };
 
   return (
     <>
@@ -58,15 +70,15 @@ const Cart = () => {
                               key={index}
                             >
                               <td data-label="Sản phẩm">
-                                <a href="#" className="cart__image small col-md-3">
-                                  <img src={item.anh} alt={item.ten} width={'200px'} height={'200px'}/>
+                                <a href="/shoes/product" className="cart__image small col-md-3">
+                                  <img src={item.anh} alt={item.ten} width={'200px'} height={'200px'} />
                                 </a>
                               </td>
                               <td
                                 className="cart-product-title"
                                 data-label="Sản phẩm"
                               >
-                                <a href="#" className="h4">
+                                <a href="/shoes/product" className="h4">
                                   {item.ten}
                                 </a>
                                 <p>Hãng: {item.hang}</p>
@@ -88,9 +100,7 @@ const Cart = () => {
                                 className="cart-quantity"
                               >
                                 <div className="input-group">
-                                  <Button
-                                    className="input-group-text"
-                                    color="primary"
+                                  <Button className="input-group-text" color="primary"
                                     onClick={() =>
                                       handleQuantityChange(
                                         item.id,
@@ -104,15 +114,8 @@ const Cart = () => {
                                     type="number"
                                     className="form-control"
                                     value={item.sl}
-                                    min="1"
-                                    aria-label="quantity"
-                                    pattern="[0-9]*"
-                                    id={`updates_${index}`}
                                     onChange={(e) =>
-                                      handleQuantityChange(
-                                        item.id,
-                                        parseInt(e.target.value)
-                                      )
+                                      handleQuantityInputChange(item.id, parseInt(e.target.value))
                                     }
                                   />
                                   <Button
@@ -150,37 +153,37 @@ const Cart = () => {
                             name="note"
                             className="w-100 h-75 border border-light"
                           ></textarea>
-                                             </div>
-                      <div className="text-right one-third small--one-whole col-md-6">
-                        <p>
-                          <span className="cart__subtotal-title">
-                            Tổng tiền
-                          </span>
-                          <span className="h3 cart__subtotal">
-                            {totalPrice}
-                          </span>
-                        </p>
-                        <Button
-                          to="/shoes/checkout"
-                          tag={Link}
-                          type="submit"
-                          name="checkout"
-                          className="btnCart"
-                        >
-                          Tiến hành đặt hàng
-                        </Button>
+                        </div>
+                        <div className="text-right one-third small--one-whole col-md-6">
+                          <p>
+                            <span className="cart__subtotal-title">
+                              Tổng tiền
+                            </span>
+                            <span className="h3 cart__subtotal">
+                              {totalPrice}
+                            </span>
+                          </p>
+                          <Button
+                            to="/shoes/checkout"
+                            tag={Link}
+                            type="submit"
+                            name="checkout"
+                            className="btnCart"
+                          >
+                            Tiến hành đặt hàng
+                          </Button>
+                        </div>
                       </div>
-                    </div>
-                  </form>
-                )}
-              </div>
-            </CardBody>
-          </Card>
-        </div>
-      </Row>
-    </Container>
-  </>
-);
+                    </form>
+                  )}
+                </div>
+              </CardBody>
+            </Card>
+          </div>
+        </Row>
+      </Container>
+    </>
+  );
 };
 
 export default Cart;
