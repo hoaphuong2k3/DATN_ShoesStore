@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
-import classes from "assets/css/header.css";
+import { useAuth } from "services/AuthContext.js";
+import { useNavigate } from 'react-router-dom';
 // reactstrap components
 import "assets/css/navbar.css";
 import "assets/css/cartModal.css";
@@ -27,11 +28,17 @@ import {
 } from "reactstrap";
 
 // import React, { useState, Modal } from "react";
-import React, { useState } from "react";
+import React from "react";
 import { CartContext } from "contexts/Cart.js";
 
 const UserNavbar = () => {
+  const { logout } = useAuth();
+  const navigate = useNavigate();
 
+  const handleLogout = () => {
+    logout();
+    navigate('/');
+  };
   return (
     <>
       <Navbar className="navbar fixednavbar navbar-horizontal fixed-top navbar-dark" expand="md" color-on-scroll="300">
@@ -131,7 +138,7 @@ const UserNavbar = () => {
                   </DropdownItem>
                   <DropdownItem divider />
                   <DropdownItem>
-                    <i className="ni ni-user-run" />
+                    <i className="ni ni-user-run" onClick={handleLogout} />
                     <span>Đăng xuất</span>
                   </DropdownItem>
                 </DropdownMenu>

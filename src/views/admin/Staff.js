@@ -1,12 +1,18 @@
-import React from "react";
 
+import React, { useState } from "react";
 // reactstrap components
 import { Card, CardHeader, CardBody, Container, Row, Col, Form, FormGroup, Input, Button, Table, InputGroup, InputGroupAddon, InputGroupText } from "reactstrap";
-
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 import Header from "components/Headers/Header.js";
 
 
 const Staff = () => {
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+
+  const toggleShowPassword = () => {
+    setShowPassword(!showPassword);
+  };
   return (
     <>
       <Header />
@@ -78,12 +84,21 @@ const Staff = () => {
                           >
                             Mật khẩu
                           </label>
-                          <Input
-                            className="form-control-alternative"
-                            id="input-password"
-                            placeholder="Password"
-                            type="password"
-                          />
+                          <InputGroup className="form-control-alternative">
+                            <Input
+
+                              id="input-password"
+                              placeholder="Password"
+                              type={showPassword ? "text" : "password"}
+                              value={password}
+                              onChange={(e) => setPassword(e.target.value)}
+                            />
+                            <InputGroupAddon addonType="append">
+                              <InputGroupText style={{ cursor: "pointer" }} onClick={toggleShowPassword}>
+                                {showPassword ? <FaEye /> : <FaEyeSlash />}
+                              </InputGroupText>
+                            </InputGroupAddon>
+                          </InputGroup>
                         </FormGroup>
                       </Col>
 
@@ -207,7 +222,7 @@ const Staff = () => {
                       </Col>
                     </Row>
                     <Row>
-                    <Col lg="4">
+                      <Col lg="4">
                         <FormGroup>
                           <label
                             className="form-control-label"
@@ -222,7 +237,7 @@ const Staff = () => {
                           />
                         </FormGroup>
                       </Col>
-                      
+
                       <Col lg="4">
                         <FormGroup>
                           <label
@@ -271,7 +286,7 @@ const Staff = () => {
                   </div>
                   <div className="col text-right" style={{ display: "flex" }}>
                     <Col>
-                      <Input id="search" type="text" placeholder="Search.." style={{ width: "250px" }} size="sm"/>
+                      <Input id="search" type="text" placeholder="Search.." style={{ width: "250px" }} size="sm" />
                     </Col>
 
                     <Button
@@ -344,7 +359,7 @@ const Staff = () => {
             </Card>
           </Col>
         </Row>
-      </Container>
+      </Container >
     </>
   );
 };

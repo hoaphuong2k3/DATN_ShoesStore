@@ -14,21 +14,22 @@ import AuthLayout from "layouts/Auth.js";
 import UserLayout from "layouts/User.js";
 import "react-toastify/dist/ReactToastify.css";
 import { CartProvider } from "./contexts/Cart";
-
+import { AuthProvider } from 'services/AuthContext.js';
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
 root.render(
   <>
     <BrowserRouter>
-    <CartProvider>
-    <Routes>
-        <Route path="/admin/*" element={<AdminLayout />} />
-        <Route path="/*" element={<AuthLayout />} />
-        <Route path="/shoes/*" element={<UserLayout />} />
-        <Route path="*" element={<Navigate to="/login" replace />} />
-      </Routes>
-    </CartProvider>
-      
+    <AuthProvider>
+      <CartProvider>
+        <Routes>
+          <Route path="/admin/*" element={<AdminLayout />} />
+          <Route path="/*" element={<AuthLayout />} />
+          <Route path="/shoes/*" element={<UserLayout />} />
+          <Route path="*" element={<Navigate to="/login" replace />} />
+        </Routes>
+      </CartProvider>
+      </AuthProvider>
     </BrowserRouter>
     {/* // <DetailSP /> */}
     <ToastContainer
