@@ -84,9 +84,9 @@ const Staff = () => {
                           >
                             Mật khẩu
                           </label>
-                          <InputGroup className="form-control-alternative">
+                          <InputGroup >
                             <Input
-
+                               
                               id="input-password"
                               placeholder="Password"
                               type={showPassword ? "text" : "password"}
