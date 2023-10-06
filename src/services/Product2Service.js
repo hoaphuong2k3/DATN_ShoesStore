@@ -5,7 +5,11 @@ const getAllShoes = (page, size, search) => {
 }
 
 const postNewShoes = (shoes) => {
-    return axios.post('/admin/shoes', shoes)
+    return axios.post('/admin/shoes', shoes,{
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      })
 }
 
 const updateBrand = (id, code, name) => {

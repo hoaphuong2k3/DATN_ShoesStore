@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import ReactPaginate from 'react-paginate';
 import axios from "axios";
+import { postNewShoes } from "services/Product2Service";
 import { getAllBrand, getAllOrigin, getAllDesignStyle, getAllSkinType, getAllToe, getAllSole, getAllLining, getAllCushion } from "services/ProductAttributeService";
 // reactstrap components
 import {
@@ -14,6 +16,7 @@ import { toast } from 'react-toastify';
 import Header from "components/Headers/Header.js";
 
 const AddProduct2 = () => {
+    let navigate = useNavigate();
     const [listBrand, setListBrand] = useState([]);
     const [listorigin, setListOrigin] = useState([]);
     const [listDesignStyle, setListDesignStyle] = useState([]);
@@ -22,18 +25,7 @@ const AddProduct2 = () => {
     const [listSole, setListSole] = useState([]);
     const [listLining, setListLining] = useState([]);
     const [listCushion, setListCushion] = useState([]);
-    //Biến
-    const [name, setName] = useState("");
-    const [brandId, setBrandId] = useState(null);
-    const [originId, setOriginId] = useState(null);
-    const [designStyleId, setDesignStyleId] = useState(null);
-    const [skinTypeId, setSkinTypeId] = useState(null);
-    const [soleId, setsoleId] = useState(null);
-    const [liningId, setliningId] = useState(null);
-    const [toeId, settoeId] = useState(null);
-    const [cushionId, setcushionId] = useState(null);
-    const [description, setdescription] = useState("");
-    //Biến
+
     const [shoes, setShoes] = useState({
         name: "",
         brandId: null,
@@ -47,9 +39,28 @@ const AddProduct2 = () => {
         description: ""
     });
 
+    const formData = new FormData();
     const onInputChange = (e) => {
         setShoes({ ...shoes, [e.target.name]: e.target.value });
+        formData.append( e.target.name, e.target.value );
         console.log(shoes);
+    };
+
+    const onSubmit = async (e) => {
+        console.log("checkshoes:", shoes);
+        e.preventDefault();
+        try {
+            const response = await postNewShoes(formData);
+            navigate("/");
+            console.log(response.data);
+        } catch (error) {
+            //   if (error.response && error.response.data && error.response.data.errors) {
+            //     setErrors(error.response.data.errors);
+            //   } else {
+            //     console.error("Lỗi từ máy chủ:", error.response ? error.response.data : error.message);
+            //   }
+            toast.error("Đăng ký thất bại.");
+        }
     };
     //Img
     const [selectedImage, setSelectedImage] = useState(null);
@@ -57,18 +68,10 @@ const AddProduct2 = () => {
     const handleImageChange = (e) => {
         const file = e.target.files[0];
         setSelectedImage(file);
+        formData.append( 'file',file);
+        console.log(file);
     };
-    const fileInputRef = useRef(null);
-    const handleFileSelect = () => {
-        fileInputRef.current.click();
-    };
-    const handleFileChange = (e) => {
-        const selectedFile = e.target.files[0];
-        if (selectedFile) {
-            console.log(`Selected File: ${selectedFile.name}`);
-            // You can perform further actions with the selected file here.
-        }
-    };
+
 
     useEffect(() => {
         getlistBrand();
@@ -197,7 +200,7 @@ const AddProduct2 = () => {
                                 <h3 className="mb-0">Sản phẩm </h3>
                             </CardHeader>
                             <CardBody>
-                                <Form>
+                                <Form onSubmit={onSubmit}>
                                     <h6 className="heading-small text-muted mb-4">
                                         Thêm sản phẩm
                                     </h6>
@@ -217,7 +220,6 @@ const AddProduct2 = () => {
                                                         id="input-name"
                                                         placeholder="Nhập tên sản phẩm "
                                                         name="name"
-                                                        value={name}
                                                         onChange={(e) => onInputChange(e)}
 
                                                     />
@@ -233,7 +235,8 @@ const AddProduct2 = () => {
                                                     >
                                                         Hãng
                                                     </label>
-                                                    <Input id="btn_select_tt" name="select" type="select" >
+                                                    <Input id="btn_select_tt" type="select" name="brandId"
+                                                        onChange={(e) => onInputChange(e)}>
                                                         <option value="" > -- Chọn --  </option>
                                                         {listBrand && listBrand.length > 0 &&
                                                             listBrand.map((item, index) => {
@@ -256,7 +259,8 @@ const AddProduct2 = () => {
                                                     >
                                                         Xuất xứ
                                                     </label>
-                                                    <Input id="btn_select_tt" name="select" type="select" >
+                                                    <Input id="btn_select_tt" name="originId" type="select"
+                                                        onChange={(e) => onInputChange(e)}>
                                                         <option value="" > -- Chọn --  </option>
                                                         {listorigin && listorigin.length > 0 &&
                                                             listorigin.map((item, index) => {
@@ -279,7 +283,8 @@ const AddProduct2 = () => {
                                                     >
                                                         Thiết kế
                                                     </label>
-                                                    <Input id="btn_select_tt" name="select" type="select" >
+                                                    <Input id="btn_select_tt" name="designStyleId" type="select"
+                                                        onChange={(e) => onInputChange(e)} >
                                                         <option value="" > -- Chọn --  </option>
                                                         {listDesignStyle && listDesignStyle.length > 0 &&
                                                             listDesignStyle.map((item, index) => {
@@ -304,7 +309,8 @@ const AddProduct2 = () => {
                                                     >
                                                         Loại da
                                                     </label>
-                                                    <Input id="btn_select_tt" name="select" type="select" >
+                                                    <Input id="btn_select_tt" name="skinTypeId" type="select"
+                                                        onChange={(e) => onInputChange(e)} >
                                                         <option value="" > -- Chọn --  </option>
                                                         {listSkinStype && listSkinStype.length > 0 &&
                                                             listSkinStype.map((item, index) => {
@@ -327,20 +333,19 @@ const AddProduct2 = () => {
                                                     >
                                                         Mũi giày
                                                     </label>
-                                                    <Input id="btn_select_tt" name="select" type="select" >
+                                                    <Input id="btn_select_tt" name="toeId" type="select"
+                                                        onChange={(e) => onInputChange(e)} >
                                                         <option value="" > -- Chọn --  </option>
-                                                        <option value="loaisp">
-                                                            {listToe && listToe.length > 0 &&
-                                                                listToe.map((item, index) => {
-                                                                    return (
-                                                                        <option value={item.id} key={item.id}>
-                                                                            {item.name}
-                                                                        </option>
-                                                                    )
+                                                        {listToe && listToe.length > 0 &&
+                                                            listToe.map((item, index) => {
+                                                                return (
+                                                                    <option value={item.id} key={item.id}>
+                                                                        {item.name}
+                                                                    </option>
+                                                                )
 
-                                                                })
-                                                            }
-                                                        </option>
+                                                            })
+                                                        }
                                                     </Input>
                                                 </FormGroup>
                                             </Col>
@@ -352,7 +357,8 @@ const AddProduct2 = () => {
                                                     >
                                                         Đế giày
                                                     </label>
-                                                    <Input id="btn_select_tt" name="select" type="select" >
+                                                    <Input id="btn_select_tt" name="soleId" type="select"
+                                                        onChange={(e) => onInputChange(e)} >
                                                         <option value="" > -- Chọn --  </option>
                                                         {listSole && listSole.length > 0 &&
                                                             listSole.map((item, index) => {
@@ -382,7 +388,8 @@ const AddProduct2 = () => {
                                                             >
                                                                 Lót giày
                                                             </label>
-                                                            <Input id="btn_select_tt" name="select" type="select" >
+                                                            <Input id="btn_select_tt" name="liningId" type="select"
+                                                                onChange={(e) => onInputChange(e)} >
                                                                 <option value="" > -- Chọn --  </option>
                                                                 {listLining && listLining.length > 0 &&
                                                                     listLining.map((item, index) => {
@@ -406,7 +413,8 @@ const AddProduct2 = () => {
                                                             >
                                                                 Đệm giày
                                                             </label>
-                                                            <Input id="btn_select_tt" name="select" type="select" >
+                                                            <Input id="btn_select_tt" name="cushionId" type="select"
+                                                                onChange={(e) => onInputChange(e)} >
                                                                 <option value="" > -- Chọn --  </option>
                                                                 {listCushion && listCushion.length > 0 &&
                                                                     listCushion.map((item, index) => {
@@ -428,11 +436,11 @@ const AddProduct2 = () => {
                                                             <label className="form-control-label">Mô tả</label>
                                                             <Input
                                                                 className="form-control-alternative"
-                                                                placeholder="A few words about you ..."
-                                                                rows="4"
-                                                                defaultValue="A beautiful Dashboard for Bootstrap 4. It is Free and
-                          Open Source."
+                                                                placeholder="Mô tả sản phẩm ...."
+                                                                rows="5"
                                                                 type="textarea"
+                                                                name="description"
+                                                                onChange={(e) => onInputChange(e)}
                                                             />
                                                         </FormGroup>
                                                     </Col>
@@ -452,33 +460,6 @@ const AddProduct2 = () => {
                                                         </div>
                                                     )}
                                                 </div>
-
-                                                <div className="input-group">
-                                                    <input
-                                                        type="text"
-                                                        className="form-control"
-                                                        readOnly
-                                                        onClick={handleFileSelect}
-                                                        placeholder="Select a file..."
-                                                    />
-                                                    <input
-                                                        type="file"
-                                                        className="form-control-file"
-                                                        ref={fileInputRef}
-                                                        onChange={handleFileChange}
-                                                        style={{ display: 'none' }}
-                                                    />
-                                                    <div className="input-group-append">
-                                                        <button
-                                                            className="btn btn-outline-secondary"
-                                                            type="button"
-                                                            onClick={handleFileSelect}
-                                                        >
-                                                            Browse
-                                                        </button>
-                                                    </div>
-                                                </div>
-
                                             </Col>
                                         </Row>
                                     </div>
