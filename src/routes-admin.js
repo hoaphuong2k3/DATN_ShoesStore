@@ -9,6 +9,8 @@ import Profile from "views/admin/Profile.js";
 import Statistical from "views/admin/Statistical.js";
 import AddProduct from "views/admin/AddProduct.js";
 import EditProduct from "views/admin/EditProduct";
+import Products2 from "views/admin/Products2.js";
+import AddProduct2 from "views/admin/AddProduct2.js";
 
 var routes = [
   {
@@ -72,6 +74,18 @@ var routes = [
     name: "Thống kê",
     icon: "ni ni-money-coins text-green",
     component: <Statistical />,
+    layout: "/admin",
+  },
+  {
+    path: "/product2",
+    name: "Sản phẩm 2",
+    icon: "ni ni-money-coins text-green",
+    component: <Products2 />,
+    layout: "/admin",
+  },
+  {
+    path: "/product2/add",
+    component: <AddProduct2 />,
     layout: "/admin",
   },
   {

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import ReactPaginate from 'react-paginate';
 import axios from "axios";
-import { postCreateBrands, getAll, updateBrand, deleteBrand } from "services/BrandService";
+import { postCreateBrands, getAll, updateBrand, deleteBrand } from "services/ProductAttributeService";
 // reactstrap components
 import {
     Card, CardHeader, CardBody, Container, Row, Col, FormGroup, Label, Input, Button, Table, CardTitle,

@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import ReactPaginate from 'react-paginate';
-import axios from "axios";
-import { postCreateBrands, getAll, updateBrand, deleteBrand } from "services/BrandService";
+import { postCreateBrands, getAllBrand, updateBrand, deleteBrand } from "services/ProductAttributeService";
 // reactstrap components
 import {
   Card, CardHeader, CardBody, Container, Row, Col, FormGroup, Label, Input, Button, Table, CardTitle,
@@ -91,9 +90,17 @@ const ProductAttributes = () => {
   }, []);
 
   const getCategory = async () => {
-    let res = await getAll();
-    if (res && res.data) {
-      setListCategory(res.data);
+    let res = await getAllBrand(); 
+    if (res && res.data) {    
+      const data = res.data;
+      const ordersList = Object.keys(data).map((key) => ({
+
+        id: data[key].id,
+        code: data[key].code,
+        name: data[key].name,
+      }));
+      setListCategory(ordersList);
+      console.log("checkk:",ordersList);
     }
   }
 
