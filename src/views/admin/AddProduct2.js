@@ -16,6 +16,9 @@ import { toast } from 'react-toastify';
 import Header from "components/Headers/Header.js";
 
 const AddProduct2 = () => {
+
+    const formData = new FormData();
+
     let navigate = useNavigate();
     const [listBrand, setListBrand] = useState([]);
     const [listorigin, setListOrigin] = useState([]);
@@ -39,39 +42,46 @@ const AddProduct2 = () => {
         description: ""
     });
 
-    const formData = new FormData();
     const onInputChange = (e) => {
+
         setShoes({ ...shoes, [e.target.name]: e.target.value });
-        formData.append( e.target.name, e.target.value );
-        console.log(shoes);
+
     };
 
-    const onSubmit = async (e) => {
-        console.log("checkshoes:", shoes);
-        e.preventDefault();
-        try {
-            const response = await postNewShoes(formData);
-            navigate("/");
-            console.log(response.data);
-        } catch (error) {
-            //   if (error.response && error.response.data && error.response.data.errors) {
-            //     setErrors(error.response.data.errors);
-            //   } else {
-            //     console.error("Lỗi từ máy chủ:", error.response ? error.response.data : error.message);
-            //   }
-            toast.error("Đăng ký thất bại.");
-        }
-    };
     //Img
     const [selectedImage, setSelectedImage] = useState(null);
 
     const handleImageChange = (e) => {
         const file = e.target.files[0];
         setSelectedImage(file);
-        formData.append( 'file',file);
-        console.log(file);
+        formData.append('file', file);
     };
 
+    const onSubmit = async (e) => {
+
+        e.preventDefault();
+
+        const shoesDataJson = JSON.stringify(shoes);
+
+        formData.append('file', selectedImage);
+        formData.append('data', shoesDataJson);
+
+        // JSON.parse(formData.get('data'))
+
+        try {
+
+            const response = await postNewShoes(formData);
+
+            navigate("/");
+        } catch (error) {
+            let errorMessage = "Lỗi từ máy chủ";
+
+            if (error.response && error.response.data && error.response.data.message) {
+                errorMessage = error.response.data.message;
+            }
+            toast.error(errorMessage);
+        }
+    };
 
     useEffect(() => {
         getlistBrand();
@@ -463,6 +473,7 @@ const AddProduct2 = () => {
                                             </Col>
                                         </Row>
                                     </div>
+
                                     <div className="text-center">
                                         <Button color="warning" >
                                             Thêm
@@ -476,11 +487,10 @@ const AddProduct2 = () => {
                     </div >
                 </Row >
 
-
             </Container >
         </>
     );
 };
 
-
 export default AddProduct2;
+
