@@ -14,7 +14,7 @@ import { toast } from 'react-toastify';
 import Header from "components/Headers/Header.js";
 
 
-const AddProduct = () => {
+const EditProduct = () => {
 
     return (
         <>
@@ -232,6 +232,47 @@ const AddProduct = () => {
 
                                     </div>
 
+                                    <div className="pl-lg-4">
+                                        <Row>
+                                            <Col lg="6">
+                                                <FormGroup>
+                                                    <label
+                                                        className="form-control-label"
+                                                        htmlFor="input-username"
+                                                    >
+                                                        Người tạo
+                                                    </label>
+                                                    <Input
+                                                        className="form-control-alternative"
+                                                        defaultValue="lucky.jesse"
+                                                        id="input-username"
+                                                        placeholder="Username"
+                                                        type="text"
+                                                        disabled
+                                                    />
+                                                </FormGroup>
+                                            </Col>
+                                            <Col lg="6">
+                                                <FormGroup>
+                                                    <label
+                                                        className="form-control-label"
+                                                        htmlFor="input-email"
+                                                    >
+                                                        Ngày tạo
+                                                    </label>
+                                                    <Input
+                                                        className="form-control-alternative"
+                                                        id="input-email"
+                                                        placeholder="jesse@example.com"
+                                                        type="email"
+                                                        disabled
+                                                    />
+                                                </FormGroup>
+                                            </Col>
+                                        </Row>
+
+                                    </div>
+
 
 
                                     <div className="pl-lg-4 mt-3">
@@ -273,12 +314,13 @@ const AddProduct = () => {
                                                 </FormGroup>
                                             </Col>
                                         </Row>
+
                                     </div>
 
                                     <div className="text-center">
                                         <Button color="warning" >
                                             <i class="fa-solid fa-magnifying-glass" /> &nbsp;
-                                            Thêm
+                                            Sửa
                                         </Button>
                                     </div>
                                     <hr className="my-4" />
@@ -296,4 +338,4 @@ const AddProduct = () => {
 };
 
 
-export default AddProduct;
+export default EditProduct;

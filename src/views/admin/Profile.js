@@ -64,18 +64,56 @@ const Profile = () => {
                   </div>
                 </Col>
               </Row>
-
-              <CardBody className="pt-0 pt-md-4">
-
-                <div className="col">
-                  <div className="card-profile-stats d-flex justify-content-center mt-md-7">
-                    <h3>
-                      HoaPhuong
-                    </h3>
-                  </div>
+              <CardHeader className="text-center border-0 pt-8 pt-md-4 pb-0 pb-md-4">
+                <div className="d-flex justify-content-between">
+                  <Button
+                    className="mr-4"
+                    color="info"
+                    href="#pablo"
+                    onClick={(e) => e.preventDefault()}
+                    size="sm"
+                  >
+                    Connect
+                  </Button>
+                  <Button
+                    className="float-right"
+                    color="default"
+                    href="#pablo"
+                    onClick={(e) => e.preventDefault()}
+                    size="sm"
+                  >
+                    Message
+                  </Button>
                 </div>
-
+              </CardHeader>
+              <CardBody className="pt-0 pt-md-4">
+                <Row>
+                  <div className="col">
+                    <div className="card-profile-stats d-flex justify-content-center mt-md-5">
+                      <div>
+                        <span className="heading">22</span>
+                        <span className="description">Friends</span>
+                      </div>
+                      <div>
+                        <span className="heading">10</span>
+                        <span className="description">Photos</span>
+                      </div>
+                      <div>
+                        <span className="heading">89</span>
+                        <span className="description">Comments</span>
+                      </div>
+                    </div>
+                  </div>
+                </Row>
                 <div className="text-center">
+                  <h3>
+                    Jessica Jones
+                    <span className="font-weight-light">, 27</span>
+                  </h3>
+                  <div className="h5 font-weight-300">
+                    <i className="ni location_pin mr-2" />
+                    Bucharest, Romania
+                  </div>
                   <div className="h5 mt-4">
                     <i className="ni business_briefcase-24 mr-2" />
                     Solution Manager - Creative Tim Officer
@@ -85,6 +123,14 @@ const Profile = () => {
                     University of Computer Science
                   </div>
                   <hr className="my-4" />
+                  <p>
+                    Ryan — the name taken by Melbourne-raised, Brooklyn-based
+                    Nick Murphy — writes, performs and records all of his own
+                    music.
+                  </p>
+                  <a href="#pablo" onClick={(e) => e.preventDefault()}>
+                    Show more
+                  </a>
                 </div>
               </CardBody>
             </Card>
@@ -94,15 +140,16 @@ const Profile = () => {
               <CardHeader className="bg-white border-0">
                 <Row className="align-items-center">
                   <Col xs="8">
-                    <h3 className="mb-0">Hồ sơ</h3>
+                    <h3 className="mb-0">My account</h3>
                   </Col>
                   <Col className="text-right" xs="4">
                     <Button
                       color="primary"
+                      href="#pablo"
                       onClick={(e) => e.preventDefault()}
                       size="sm"
                     >
-                      Cập nhật
+                      Settings
                     </Button>
                   </Col>
                 </Row>
@@ -110,7 +157,7 @@ const Profile = () => {
               <CardBody>
                 <Form>
                   <h6 className="heading-small text-muted mb-4">
-                    Thông tin cá nhân
+                    User information
                   </h6>
                   <div className="pl-lg-4">
                     <Row>
@@ -118,13 +165,15 @@ const Profile = () => {
                         <FormGroup>
                           <label
                             className="form-control-label"
-                            htmlFor="fullname"
+                            htmlFor="input-username"
                           >
-                            Họ tên
+                            Username
                           </label>
                           <Input
                             className="form-control-alternative"
-                            id="fullname"
+                            defaultValue="lucky.jesse"
+                            id="input-username"
+                            placeholder="Username"
                             type="text"
                             value={userData.fullname}
                           />
@@ -134,13 +183,14 @@ const Profile = () => {
                         <FormGroup>
                           <label
                             className="form-control-label"
-                            htmlFor="email"
+                            htmlFor="input-email"
                           >
-                            Email
+                            Email address
                           </label>
                           <Input
                             className="form-control-alternative"
-                            id="email"
+                            id="input-email"
+                            placeholder="jesse@example.com"
                             type="email"
                             value={userData.email}
                           />
@@ -152,15 +202,16 @@ const Profile = () => {
                         <FormGroup>
                           <label
                             className="form-control-label"
-                            htmlFor="birthday"
+                            htmlFor="input-first-name"
                           >
-                            Sinh nhật
+                            First name
                           </label>
                           <Input
                             className="form-control-alternative"
-                            id="birthday"
-                            type="date"
-                            value={userData.dateOfBirth}
+                            defaultValue="Lucky"
+                            id="input-first-name"
+                            placeholder="First name"
+                            type="text"
                           />
                         </FormGroup>
                       </Col>
@@ -168,15 +219,16 @@ const Profile = () => {
                         <FormGroup>
                           <label
                             className="form-control-label"
-                            htmlFor="phoneNumber"
+                            htmlFor="input-last-name"
                           >
-                            Số điện thoại
+                            Last name
                           </label>
                           <Input
                             className="form-control-alternative"
-                            id="phoneNumber"
-                            type="tel"
-                            value={userData.phoneNumber}
+                            defaultValue="Jesse"
+                            id="input-last-name"
+                            placeholder="Last name"
+                            type="text"
                           />
                         </FormGroup>
                       </Col>
@@ -185,7 +237,7 @@ const Profile = () => {
                   <hr className="my-4" />
                   {/* Address */}
                   <h6 className="heading-small text-muted mb-4">
-                    Thông tin liên lạc
+                    Contact information
                   </h6>
                   <div className="pl-lg-4">
                     <Row>
@@ -195,11 +247,13 @@ const Profile = () => {
                             className="form-control-label"
                             htmlFor="input-address"
                           >
-                            Địa chỉ
+                            Address
                           </label>
                           <Input
                             className="form-control-alternative"
-                            id="address"
+                            defaultValue="Bld Mihail Kogalniceanu, nr. 8 Bl 1, Sc 1, Ap 09"
+                            id="input-address"
+                            placeholder="Home Address"
                             type="text"
                             value={userData.address}
                           />
@@ -213,12 +267,14 @@ const Profile = () => {
                             className="form-control-label"
                             htmlFor="input-city"
                           >
-                            Thành phố
+                            City
                           </label>
                           <Input
                             className="form-control-alternative"
-                            id="city"
-                            type="select"
+                            defaultValue="New York"
+                            id="input-city"
+                            placeholder="City"
+                            type="text"
                           />
                         </FormGroup>
                       </Col>
@@ -228,12 +284,14 @@ const Profile = () => {
                             className="form-control-label"
                             htmlFor="input-country"
                           >
-                            Quận, Huyện
+                            Country
                           </label>
                           <Input
                             className="form-control-alternative"
-                            id="country"
-                            type="select"
+                            defaultValue="United States"
+                            id="input-country"
+                            placeholder="Country"
+                            type="text"
                           />
                         </FormGroup>
                       </Col>
@@ -243,19 +301,34 @@ const Profile = () => {
                             className="form-control-label"
                             htmlFor="input-country"
                           >
-                            Xã
+                            Postal code
                           </label>
                           <Input
                             className="form-control-alternative"
-                            id="postal"
-                            type="select"
+                            id="input-postal-code"
+                            placeholder="Postal code"
+                            type="number"
                           />
                         </FormGroup>
                       </Col>
                     </Row>
                   </div>
                   <hr className="my-4" />
-
+                  {/* Description */}
+                  <h6 className="heading-small text-muted mb-4">About me</h6>
+                  <div className="pl-lg-4">
+                    <FormGroup>
+                      <label>About Me</label>
+                      <Input
+                        className="form-control-alternative"
+                        placeholder="A few words about you ..."
+                        rows="4"
+                        defaultValue="A beautiful Dashboard for Bootstrap 4. It is Free and
+                          Open Source."
+                        type="textarea"
+                      />
+                    </FormGroup>
+                  </div>
                 </Form>
               </CardBody>
             </Card>
