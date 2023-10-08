@@ -639,7 +639,13 @@ const Products2 = () => {
 
                   </CardTitle>
 
-                  <div className="col-10 text-right">
+                  <div className="col text-right" style={{ display: "flex" }}>
+                  <Col>
+                      <Input type="select" name="status"  style={{ width: "150px" }} size="sm" onChange={(e) => onInputChange(e)} >
+                        <option value=" ">Tất cả</option>
+                        <option value=" ">Tất cả</option>
+                      </Input>
+                    </Col>
                     <Button
                       className="btn btn-outline-primary"
                       size="sm"
@@ -679,13 +685,7 @@ const Products2 = () => {
                     >
                       Báo cáo
                     </Button>
-                    <Col>
-                      <Input type="select" name="status" className="btn btn-outline-primary col-2" size="sm" onChange={(e) => onInputChange(e)} >
-                        <option value=" ">Tất cả</option>
-                        <option value=" "></option>
-                        <option value=" ">Tất cả</option>
-                      </Input>
-                    </Col>
+                   
 
                   </div>
                 </Row>

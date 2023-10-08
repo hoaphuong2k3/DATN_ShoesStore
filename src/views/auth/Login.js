@@ -39,7 +39,7 @@ const Login = () => {
 
       const { id, token, authorities } = response.data;
 
-      login({ id, token, authorities }); // Lưu ID, token và vai trò người dùng vào Context
+      login({ id, token, authorities, username }); // Lưu ID, token và vai trò người dùng vào Context
 
       toast.success("Đăng nhập thành công!");
 

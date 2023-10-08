@@ -8,10 +8,13 @@ export const AuthProvider = ({ children }) => {
 
   const login = (userData) => {
     
-    const { id, token } = userData;
-    setUser({ id, ...userData }); 
-    setToken(token);
-    localStorage.setItem('token', token);
+    const login = (userData) => {
+      const { id, token, username } = userData;
+      setUser({ id, ...userData, username });
+      setToken(token);
+      localStorage.setItem('token', token);
+      localStorage.setItem('username', username); // Lưu username vào localStorage hoặc cookie (nếu cần)
+    };
   };
 
   const logout = () => {
