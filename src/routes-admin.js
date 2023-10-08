@@ -13,6 +13,7 @@ import Products2 from "views/admin/Products2.js";
 import AddProduct2 from "views/admin/AddProduct2.js";
 import EditProduct2 from "views/admin/EditProduct2.js";
 import DetailProduct from "views/admin/DetailProduct.js";
+import BillDetail from "views/admin/BillDetail.js"
 
 var routes = [
   {
@@ -110,5 +111,10 @@ var routes = [
     component: <DetailProduct />,
     layout: "/admin",
   },
+  {
+    path: "/bill-details/:id",
+    component: <BillDetail />,
+    layout: "/admin",
+  }
 ];
 export default routes;
