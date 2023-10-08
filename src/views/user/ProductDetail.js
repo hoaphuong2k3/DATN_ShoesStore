@@ -1,25 +1,62 @@
-
-import { Container, Row, Card, CardBody } from "reactstrap";
+import 'assets/scss/detailsp.scss';
+import { Container, Row, Card, CardBody,Button } from "reactstrap";
 import Header from "components/Headers/ProductHeader.js";
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-
+import { useParams, useNavigate } from 'react-router-dom';
+import { CartContext } from "contexts/Cart.js";
 
 const DetailProduct = () => {
-
   const [productDetail, setProductDetail] = useState([]);
+  const [cartItems, setCartItems] = useState([]);
+  const { id } = useParams();
+  // const navigate = useNavigate();
 
   useEffect(() => {
     getDetail();
   }, []);
 
   const getDetail = async () => {
-    let res = await axios.get(`https://datnshoes-default-rtdb.firebaseio.com/shoesdetails/-NekyJb9ShvpYazOtRYy.json`)
-    console.log(res.data);
-    if (res && res.data) {
-      setProductDetail(res.data);
+    try {
+      const res = await axios.get(`https://63c1265d376b9b2e64743c4f.mockapi.io/shoesdetails/${id}`);
+      console.log(res.data);
+      if (res && res.data) {
+        setProductDetail(res.data);
+      }
+    } catch (error) {
+      console.error(error);
     }
   }
+
+  // const addToCart = () => {
+  //   const newItem = {
+  //     id: productDetail.id,
+  //     name: productDetail.ten,
+  //     price: parseInt(productDetail.gia),
+  //     quantity: 1
+  //   };
+  //   const existingItem = cartItems.find(item => item.id === newItem.id);
+
+  //   if (existingItem) {
+  //     const updatedCart = cartItems.map(item => {
+  //       if (item.id === newItem.id) {
+  //         return { ...item, quantity: item.quantity + 1 };
+  //       }
+  //       return item;
+  //     });
+  //     setCartItems(updatedCart);
+  //   } else {
+  //     setCartItems([...cartItems, newItem]);
+  //   }
+  //   // navigate('/cart');
+  // };
+
+  // console.log(cartItems);
+
+
+
+
+
   return (
     <>
       <Header />
@@ -73,7 +110,7 @@ const DetailProduct = () => {
                           <div >
                             <div className='tong' >
                               <span className='tenthuoctinh'>Thương hiệu </span>
-                              <span className='giatrithuoctinh'>{productDetail.thuonghieu}</span>
+                              <span className='giatrithuoctinh'>{productDetail.hang}</span>
                             </div>
                             <div className='tong'>
                               <span className='tenthuoctinh'>Loại SP </span>
@@ -81,7 +118,7 @@ const DetailProduct = () => {
                             </div>
                             <div className='tong'>
                               <span className='tenthuoctinh'>Chất liệu </span>
-                              <span className='giatrithuoctinh'>{productDetail.chatlieu}</span>
+                              <span className='giatrithuoctinh'>{productDetail.chatLieu}</span>
                             </div>
                             <div className='tong'>
                               <span className='tenthuoctinh'>Màu Sắc </span>
@@ -91,6 +128,7 @@ const DetailProduct = () => {
                           {/* End thuộc tính */}
 
                           {/* Start mã giảm giá */}
+                          {/* ======================= */}
                           <div>
                             <div className='tong' >
                               <span className='tenthuoctinh'>Mã giảm giá </span>
@@ -104,23 +142,18 @@ const DetailProduct = () => {
                           {/* end mã giảm giá */}
 
                           {/* start size */}
-                          <div>
-                            <div className='tong'>
-                              <span className='tenthuoctinh'>Size </span>
-                              <span className='giatrithuoctinh'>
-                                <button class="product-variation" aria-label="35" aria-disabled="false">35</button>
-                                <button class="product-variation" aria-label="35" aria-disabled="false">36</button>
-                                <button class="product-variation" aria-label="35" aria-disabled="false">37</button>
-                                <button class="product-variation" aria-label="35" aria-disabled="false">38</button>
-                                <button class="product-variation" aria-label="35" aria-disabled="false">39</button>
-                                <button class="product-variation" aria-label="35" aria-disabled="false">40</button>
-                                <button class="product-variation" aria-label="35" aria-disabled="false">41</button>
-                                <button class="product-variation" aria-label="35" aria-disabled="false">42</button>
-                                <button class="product-variation" aria-label="35" aria-disabled="false">43</button>
-                                <button class="product-variation" aria-label="35" aria-disabled="false">42.5</button>
-                              </span>
-                            </div>
-                          </div>
+                          {/* ===================== */}
+                          <div className='tong row'><span className='tenthuoctinh col-2 ml--3'>Size </span>
+                            <span className='giatrithuoctinh col-9 ml-3'><button class="product-variation" aria-label="35" aria-disabled="false">35
+                            </button><button class="product-variation" aria-label="35" aria-disabled="false">36</button><button class="product-variation" aria-label="35" aria-disabled="false">37</button>
+                              <button class="product-variation" aria-label="35" aria-disabled="false">38</button>
+                              <button class="product-variation" aria-label="35" aria-disabled="false">39</button>
+                              <button class="product-variation" aria-label="35" aria-disabled="false">40</button>
+                              <button class="product-variation" aria-label="35" aria-disabled="false">41</button>
+                              <button class="product-variation" aria-label="35" aria-disabled="false">42</button>
+                              <button class="product-variation" aria-label="35" aria-disabled="false">43</button>
+                              <button class="product-variation" aria-label="35" aria-disabled="false">42.5</button></span></div> */
+
                           {/* end size */}
 
                           <div>
@@ -135,14 +168,22 @@ const DetailProduct = () => {
                             </div>
                           </div>
                           <div className='text-center btnInDetailSP'>
-                            <button > Thêm vào giỏ hàng</button>
-                            <button>Mua ngay</button>
+                            {/* <button onClick={addToCart} className='btn btn-primary'>Thêm vào giỏ hàng</button> */}
+                            <CartContext.Consumer>
+                              {({ addToCart }) => (
+                                <button className='btn btn-primary' onClick={() => addToCart(productDetail)}>
+                                  Thêm vào giỏ hàng
+                                </button>
+                              )}
+                            </CartContext.Consumer>
+                            <button className='btn btn-warning'>Mua ngay</button>
                           </div>
                         </div>
 
                       </div>
                     </div>
 
+                    {/* ===========================cart box */}
                     <div className='card-box'>
                       <div className='row'>
                         <div className='col-10'>

@@ -1,6 +1,8 @@
 import { Link } from "react-router-dom";
+import classes from "assets/css/header.css";
 // reactstrap components
 import "assets/css/navbar.css";
+import "assets/css/cartModal.css";
 import {
   UncontrolledCollapse,
   NavbarBrand,
@@ -21,10 +23,15 @@ import {
   InputGroupAddon,
   InputGroupText,
   Form, FormGroup,
-  Button
+  Button, Card
 } from "reactstrap";
 
+// import React, { useState, Modal } from "react";
+import React, { useState } from "react";
+import { CartContext } from "contexts/Cart.js";
+
 const UserNavbar = () => {
+
 
   return (
     <>
@@ -85,8 +92,6 @@ const UserNavbar = () => {
                 </NavLink>
               </NavItem>
             </Nav>
-
-
             <Nav className="align-items-lg-center ml-lg-auto" navbar>
 
               <Form className="navbar-search navbar-search-dark form-inline mr-3 d-none d-md-flex ml-lg-auto">
@@ -132,12 +137,41 @@ const UserNavbar = () => {
                   </DropdownItem>
                 </DropdownMenu>
               </UncontrolledDropdown>
-              
-              <Button className="button-cart" color="white" to="/shoes/cart" tag={Link} >
-                 <i className="ni ni-cart" />
-              </Button>
+              <div>
+              <CartContext.Consumer>
+                {({ cartItems }) => (
+                  <Button className="button-cart" to="/shoes/cart" tag={Link} color="white">
+                    <i className="ni ni-cart"/>
+                    <span className="cart-item-count">
+                    ({cartItems.length})
+                    </span>
+                    
+                  </Button>
+                )}
+                </CartContext.Consumer>
+              </div>
             </Nav>
-           
+            <style>
+              {
+                `
+                .button-cart {
+                  position: relative;
+                }
+                
+                .cart-item-count {
+                  position: absolute;
+                  top: -5px;
+                  right: -5px;
+                  transform: translate(50%, -50%);
+                  background-color: red;
+                  color: white;
+                  border-radius: 50%;
+                  padding: 3px;
+                  font-size: 11px;
+                }
+                `
+              }
+            </style>
           </UncontrolledCollapse>
         </Container>
       </Navbar>

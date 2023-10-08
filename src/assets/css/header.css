@@ -1,0 +1,25 @@
+.cart {
+    flex-grow: 1;
+    text-align: right;
+    padding-right: 10px;
+}
+
+/* .cart i {
+    font-size: 22pt;
+  } */
+.cartamount sup {
+    text-align: right;
+    color: white;
+    background-color: red;
+    border-radius: 5px;
+    padding: 0 5px;
+    position: relative;
+    top: -5px;
+}
+
+
+
+
+
+
+/*  */

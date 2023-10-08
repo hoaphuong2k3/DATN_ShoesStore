@@ -1,7 +1,10 @@
 
-import {Container, Row, Col } from "reactstrap";
+import { Container, Row, Col } from "reactstrap";
 
 const ProductHeader = () => {
+
+
+  
   return (
     <>
       <div
@@ -14,7 +17,7 @@ const ProductHeader = () => {
           backgroundPosition: "center top",
         }}
       >
-       
+
         {/* Header container */}
         <Container className="d-flex align-items-center">
           <Row >

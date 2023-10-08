@@ -43,25 +43,32 @@ const Sidebar = (props) => {
     setCollapseOpen(false);
   };
 
+
   // creates the links that appear in the left menu / Sidebar
   const createLinks = (routes) => {
     return routes.map((prop, key) => {
-      return (
-        <NavItem key={key}>
-          <NavLink
-            to={prop.layout + prop.path}
-            tag={NavLinkRRD}
-            onClick={closeCollapse}
-          >
-            <i className={prop.icon} />
-            {prop.name}
-          </NavLink>
-        </NavItem>
-      );
+      if (prop.name) {
+        return (
+          <NavItem key={key}>
+            <NavLink
+              to={prop.layout + prop.path}
+              tag={NavLinkRRD}
+              onClick={closeCollapse}
+            >
+              <i className={prop.icon} />
+              {prop.name}
+            </NavLink>
+          </NavItem>
+        );
+      } else {
+        return null;
+      }
+
+
     });
   };
 
-  const {routes, logo } = props;
+  const { routes, logo } = props;
   let navbarBrandProps;
   if (logo && logo.innerLink) {
     navbarBrandProps = {
@@ -98,12 +105,12 @@ const Sidebar = (props) => {
               className="navbar-brand-img"
               src={logo.imgSrc}
             />
-            
+
           </NavbarBrand>
         ) : null}
         {/* User */}
         <Nav className="align-items-center d-md-none">
-          
+
           <UncontrolledDropdown nav>
             <DropdownToggle nav>
               <Media className="align-items-center">
@@ -189,11 +196,11 @@ const Sidebar = (props) => {
               </InputGroupAddon>
             </InputGroup>
           </Form>
-          
+
           {/* Navigation */}
           <Nav navbar>
             {createLinks(routes)}
-            </Nav>
+          </Nav>
           {/* Divider */}
           <hr className="my-3" />
           {/* Heading */}
@@ -209,7 +216,7 @@ const Sidebar = (props) => {
             <NavItem>
               <NavLink href="#">
                 <i className="ni ni-palette" />
-               Tài liệu đặc tả
+                Tài liệu đặc tả
               </NavLink>
             </NavItem>
           </Nav>
