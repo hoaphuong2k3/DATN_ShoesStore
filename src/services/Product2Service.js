@@ -12,10 +12,18 @@ const postNewShoes = (shoes) => {
       })
 }
 
-const updateBrand = (id, code, name) => {
-    return axios.put(`/brand/${id}`, { code, name })
+const findShoes = (id) => {
+    return axios.get(`/admin/shoes/${id}`)
 }
-const deleteBrand = (id) => {
-    return axios.delete(`/brand/${id}`)
+
+const updateShoes = (id,shoes) => {
+    return axios.put(`/admin/shoes/${id}`, shoes,{
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      })
 }
-export { getAllShoes, postNewShoes, updateBrand, deleteBrand };
+const deleteShoes = (id) => {
+    return axios.delete('/admin/shoes',id)
+}
+export { getAllShoes, postNewShoes,findShoes, updateShoes, deleteShoes };

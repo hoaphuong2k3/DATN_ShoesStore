@@ -1,6 +1,6 @@
 import { React, useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { getAllShoes } from "services/Product2Service";
+import { getAllShoes, deleteShoes } from "services/Product2Service";
 import { getAllBrand, getAllOrigin, getAllDesignStyle, getAllSkinType, getAllToe, getAllSole, getAllLining, getAllCushion } from "services/ProductAttributeService";
 // reactstrap components
 import {
@@ -46,6 +46,28 @@ const Products2 = () => {
     toDateStr: "",
     createdBy: ""
   });
+  const resetSearch = () => {
+    setSearch({
+      code: "",
+      name: "",
+      brandId: "",
+      originId: "",
+      designStyleId: "",
+      skinTypeId: "",
+      soleId: "",
+      liningId: "",
+      toeId: "",
+      cushionId: "",
+      fromPrice: "",
+      toPrice: "",
+      fromQuantity: "",
+      toQuantity: "",
+      fromDateStr: "",
+      toDateStr: "",
+      createdBy: ""
+    })
+    console.log(search);
+  };
   const onInputChange = async (e) => {
     console.log({ [e.target.name]: e.target.value });
     const res = await setSearch({ ...search, [e.target.name]: e.target.value });
@@ -68,105 +90,51 @@ const Products2 = () => {
 
   const getlistBrand = async () => {
     let res = await getAllBrand();
+    console.log(res);
     if (res && res.data) {
-      const data = res.data;
-      const list = Object.keys(data).map((key) => ({
-        id: data[key].id,
-        code: data[key].code,
-        name: data[key].name,
-      }));
-      setListBrand(list);
+      setListBrand(res.data);
     }
   }
   const getListOrigin = async () => {
     let res = await getAllOrigin();
     if (res && res.data) {
-      const data = res.data;
-      const list = Object.keys(data).map((key) => ({
-
-        id: data[key].id,
-        code: data[key].code,
-        name: data[key].name,
-      }));
-      setListOrigin(list);
+      setListOrigin(res.data);
     }
   }
   const getListDesignStyle = async () => {
     let res = await getAllDesignStyle();
     if (res && res.data) {
-      const data = res.data;
-      const list = Object.keys(data).map((key) => ({
-
-        id: data[key].id,
-        code: data[key].code,
-        name: data[key].name,
-      }));
-      setListDesignStyle(list);
+      setListDesignStyle(res.data);
     }
   }
   const getListSkinType = async () => {
     let res = await getAllSkinType();
     if (res && res.data) {
-      const data = res.data;
-      const list = Object.keys(data).map((key) => ({
-
-        id: data[key].id,
-        code: data[key].code,
-        name: data[key].name,
-      }));
-      setListSkinType(list);
+      setListSkinType(res.data);
     }
   }
   const getListToe = async () => {
     let res = await getAllToe();
     if (res && res.data) {
-      const data = res.data;
-      const list = Object.keys(data).map((key) => ({
-
-        id: data[key].id,
-        code: data[key].code,
-        name: data[key].name,
-      }));
-      setListToe(list);
+      setListToe(res.data);
     }
   }
   const getListSole = async () => {
     let res = await getAllSole();
     if (res && res.data) {
-      const data = res.data;
-      const list = Object.keys(data).map((key) => ({
-
-        id: data[key].id,
-        code: data[key].code,
-        name: data[key].name,
-      }));
-      setListSole(list);
+      setListSole(res.data);
     }
   }
   const getListLining = async () => {
     let res = await getAllLining();
     if (res && res.data) {
-      const data = res.data;
-      const list = Object.keys(data).map((key) => ({
-
-        id: data[key].id,
-        code: data[key].code,
-        name: data[key].name,
-      }));
-      setListLining(list);
+      setListLining(res.data);
     }
   }
   const getListCushion = async () => {
     let res = await getAllCushion();
     if (res && res.data) {
-      const data = res.data;
-      const list = Object.keys(data).map((key) => ({
-
-        id: data[key].id,
-        code: data[key].code,
-        name: data[key].name,
-      }));
-      setListCushion(list);
+      setListCushion(res.data);
     }
   }
 
@@ -189,16 +157,36 @@ const Products2 = () => {
       toast.error(errorMessage);
       setListShoes([]);
     }
-    // let res = await getAllShoes(page, size, search);
-    // if (res && res.data && res.data.content) {
-    //   setListShoes(res.data.content);
-    //   // setListShoes
-    //   // setTotalUsers(res.total);
-    //   // setTotalPages(res.total_pages);
-    //   // setlistUsers(res.data);
-    // }
-    // console.log(">>> check res: ", listShoes);
   }
+  //Start Delete
+  const [deleteshoes, setDeleteShoes] = useState([]);
+  const [iddeleteshoes, setIdDeleteShoes] = useState([]);
+  const [modalConfirmDelete, setModalConfirmDelete] = useState(false);
+  const toggle = () => setModalConfirmDelete(!modalConfirmDelete);
+  const handleConfirmDelete = (shoes) => {
+    setDeleteShoes(shoes);
+    setIdDeleteShoes([...iddeleteshoes, shoes.id])
+    toggle();
+  }
+  const handleDelete = async () => {
+    try {
+      console.log(iddeleteshoes);
+      await deleteShoes(iddeleteshoes);
+      getAll();
+      setIdDeleteShoes([]);
+      toggle();
+      toast.success("Xóa thành công ");
+    } catch (error) {
+      setIdDeleteShoes([]);
+      toggle();
+      let errorMessage = "Lỗi từ máy chủ";
+      if (error.response && error.response.data && error.response.data.message) {
+        errorMessage = error.response.data.message;
+      }
+      toast.error(errorMessage);
+    }
+  }
+  //End Delete
 
 
   return (
@@ -334,10 +322,12 @@ const Products2 = () => {
                           </label>
                           <Input
                             className="form-control-alternative"
-                            defaultValue="lucky.jesse"
                             id="input-username"
-                            placeholder="Username"
+                            placeholder="Nhập mã"
                             type="text"
+                            name="code"
+                            value={search.code}
+                            onChange={(e) => onInputChange(e)}
                           />
                         </FormGroup>
                       </Col>
@@ -352,8 +342,11 @@ const Products2 = () => {
                           <Input
                             className="form-control-alternative"
                             id="input-email"
-                            placeholder="jesse@example.com"
-                            type="email"
+                            placeholder="Nhập tên"
+                            type="text"
+                            name="name"
+                            value={search.name}
+                            onChange={(e) => onInputChange(e)}
                           />
                         </FormGroup>
                       </Col>
@@ -370,8 +363,11 @@ const Products2 = () => {
                           <Input
                             className="form-control-alternative"
                             id="find_createdAt"
-                            name="name"
-                            placeholder=""
+                            name="createdBy"
+                            value={search.createdBy}
+                            onChange={(e) => onInputChange(e)}
+                            placeholder="Nhập người tạo"
+
                           />
 
                         </FormGroup>
@@ -386,18 +382,18 @@ const Products2 = () => {
                               <Input
                                 className="form-control-alternative"
                                 id="find_createdDate"
-                                name="date"
-                                placeholder="date placeholder"
-                                type="date"
+                                name="fromDateStr"
+                                value={search.fromDateStr}
+                                onChange={(e) => onInputChange(e)}
                               />
                             </Col>
                             <Col xl={6}>
                               <Input
                                 className="form-control-alternative"
                                 id="find_createdDate"
-                                name="date"
-                                placeholder="date placeholder"
-                                type="date"
+                                name="toDateStr"
+                                value={search.toDateStr}
+                                onChange={(e) => onInputChange(e)}
                               />
 
                             </Col>
@@ -417,13 +413,13 @@ const Products2 = () => {
                             >
                               Hãng
                             </label>
-                            <Input id="btn_select_tt" type="select" name="brandId"
+                            <Input id="btn_select_tt" type="select" name="brandId" value={search.brandId}
                               onChange={(e) => onInputChange(e)}>
                               <option value=" "> -- Chọn --  </option>
                               {listBrand && listBrand.length > 0 &&
                                 listBrand.map((item, index) => {
                                   return (
-                                    <option value={item.id} key={item.id}>
+                                    <option value={item.id} key={item.id} >
                                       {item.name}
                                     </option>
                                   )
@@ -441,7 +437,7 @@ const Products2 = () => {
                             >
                               Xuất xứ
                             </label>
-                            <Input id="btn_select_tt" name="originId" type="select"
+                            <Input id="btn_select_tt" name="originId" type="select" value={search.originId}
                               onChange={(e) => onInputChange(e)}>
                               <option value="" > -- Chọn --  </option>
                               {listorigin && listorigin.length > 0 &&
@@ -465,7 +461,7 @@ const Products2 = () => {
                             >
                               Thiết kế
                             </label>
-                            <Input id="btn_select_tt" name="designStyleId" type="select"
+                            <Input id="btn_select_tt" name="designStyleId" type="select" value={search.designStyleId}
                               onChange={(e) => onInputChange(e)} >
                               <option value="" > -- Chọn --  </option>
                               {listDesignStyle && listDesignStyle.length > 0 &&
@@ -490,7 +486,7 @@ const Products2 = () => {
                             >
                               Loại da
                             </label>
-                            <Input id="btn_select_tt" name="skinTypeId" type="select"
+                            <Input id="btn_select_tt" name="skinTypeId" type="select" value={search.skinTypeId}
                               onChange={(e) => onInputChange(e)} >
                               <option value="" > -- Chọn --  </option>
                               {listSkinStype && listSkinStype.length > 0 &&
@@ -514,7 +510,7 @@ const Products2 = () => {
                             >
                               Mũi giày
                             </label>
-                            <Input id="btn_select_tt" name="toeId" type="select"
+                            <Input id="btn_select_tt" name="toeId" type="select" value={search.toeId}
                               onChange={(e) => onInputChange(e)} >
                               <option value="" > -- Chọn --  </option>
                               {listToe && listToe.length > 0 &&
@@ -538,7 +534,7 @@ const Products2 = () => {
                             >
                               Đế giày
                             </label>
-                            <Input id="btn_select_tt" name="soleId" type="select"
+                            <Input id="btn_select_tt" name="soleId" type="select" value={search.soleId}
                               onChange={(e) => onInputChange(e)} >
                               <option value="" > -- Chọn --  </option>
                               {listSole && listSole.length > 0 &&
@@ -562,7 +558,7 @@ const Products2 = () => {
                             >
                               Lót giày
                             </label>
-                            <Input id="btn_select_tt" name="liningId" type="select"
+                            <Input id="btn_select_tt" name="liningId" type="select" value={search.liningId}
                               onChange={(e) => onInputChange(e)} >
                               <option value="" > -- Chọn --  </option>
                               {listLining && listLining.length > 0 &&
@@ -587,21 +583,19 @@ const Products2 = () => {
                             >
                               Đệm giày
                             </label>
-                            <Input id="btn_select_tt" name="select" type="select" >
-                              <Input id="btn_select_tt" name="cushionId" type="select"
-                                onChange={(e) => onInputChange(e)} >
-                                <option value=" "> -- Chọn --  </option>
-                                {listCushion && listCushion.length > 0 &&
-                                  listCushion.map((item, index) => {
-                                    return (
-                                      <option value={item.id} key={item.id}>
-                                        {item.name}
-                                      </option>
-                                    )
+                            <Input id="btn_select_tt" name="cushionId" type="select" value={search.cushionId}
+                              onChange={(e) => onInputChange(e)} >
+                              <option value=" "> -- Chọn --  </option>
+                              {listCushion && listCushion.length > 0 &&
+                                listCushion.map((item, index) => {
+                                  return (
+                                    <option value={item.id} key={item.id}>
+                                      {item.name}
+                                    </option>
+                                  )
 
-                                  })
-                                }
-                              </Input>
+                                })
+                              }
                             </Input>
                           </FormGroup>
                         </Col>
@@ -616,8 +610,10 @@ const Products2 = () => {
                                 <Input
 
                                   id="find_code"
-                                  name="code"
-                                  placeholder=" "
+                                  name="fromQuantity"
+                                  placeholder="Nhập số lượng"
+                                  value={search.fromQuantity}
+                                  onChange={(e) => onInputChange(e)}
                                 />
                               </Col>
                               <Label for="find_code" xl={1} className="form-control-label text-center">
@@ -627,8 +623,10 @@ const Products2 = () => {
                                 <Input
 
                                   id="find_code"
-                                  name="code"
-                                  placeholder=" "
+                                  name="toQuantity"
+                                  placeholder="Nhập số lượng"
+                                  value={search.toQuantity}
+                                  onChange={(e) => onInputChange(e)}
                                 />
                               </Col>
                             </Row>
@@ -643,8 +641,10 @@ const Products2 = () => {
                               <Col xl={5}>
                                 <Input
                                   id="find_code"
-                                  name="code"
-                                  placeholder=" "
+                                  name="fromPrice"
+                                  placeholder="Nhập giá"
+                                  value={search.fromPrice}
+                                  onChange={(e) => onInputChange(e)}
                                 />
                               </Col>
                               <Label for="find_code" xl={2} className="form-control-label text-center">
@@ -653,8 +653,10 @@ const Products2 = () => {
                               <Col xl={5}>
                                 <Input
                                   id="find_code"
-                                  name="code"
-                                  placeholder=" "
+                                  name="toPrice"
+                                  placeholder="Nhập giá"
+                                  value={search.toPrice}
+                                  onChange={(e) => onInputChange(e)}
                                 />
                               </Col>
                             </Row>
@@ -685,7 +687,7 @@ const Products2 = () => {
                       <i class="fa-solid fa-magnifying-glass" /> &nbsp;
                       Tìm kiếm
                     </Button>
-                    <Button color="primary" >
+                    <Button color="primary" onClick={resetSearch}>
                       Làm mới bộ lọc
                     </Button>
                   </Col>
@@ -778,10 +780,13 @@ const Products2 = () => {
                             <td>{item.totalQuantity}</td>
                             <td>{item.totalRecord}</td>
                             <td>
-                              <Button color="danger" >
+                              <Button color="danger" to={`/admin/product/detail/${item.id}`} tag={Link} size="sm">
+                                <i class="fa-solid fa-eye"></i>
+                              </Button>
+                              <Button color="danger" to={`/admin/product2/edit/${item.id}`} tag={Link} size="sm">
                                 <i class="fa-solid fa-pen" />
                               </Button>
-                              <Button color="warning" >
+                              <Button color="warning" size="sm" onClick={() => handleConfirmDelete(item)}>
                                 <i class="fa-solid fa-trash" />
                               </Button>
                             </td>
@@ -801,6 +806,29 @@ const Products2 = () => {
           </Col>
         </Row>
       </Container >
+      <Modal
+        isOpen={modalConfirmDelete}
+        toggle={toggle}
+        backdrop={'static'}
+        keyboard={false}
+      >
+        <ModalHeader>
+          Thông báo
+        </ModalHeader>
+        <ModalBody>
+          <h3>Bạn có muốn xóa giày mã {deleteshoes.code} giày này không ?</h3>
+        </ModalBody>
+        <ModalFooter>
+          <div className="text-center">
+            <Button color="danger" onClick={() => handleDelete()}>
+              Sửa
+            </Button>{' '}
+            <Button color="danger" onClick={toggle}>
+              Không
+            </Button>{' '}
+          </div>
+        </ModalFooter>
+      </Modal>
     </>
   );
 };

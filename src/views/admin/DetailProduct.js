@@ -1,21 +1,18 @@
-import React, { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
-import ReactPaginate from 'react-paginate';
-import axios from "axios";
-import { postNewShoes } from "services/Product2Service";
+import React, { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { updateShoes, findShoes } from "services/Product2Service";
 import { getAllBrand, getAllOrigin, getAllDesignStyle, getAllSkinType, getAllToe, getAllSole, getAllLining, getAllCushion } from "services/ProductAttributeService";
 // reactstrap components
 import {
-    Card, CardHeader, CardBody, Container, Row, Col, FormGroup, Label, Input, Button, Table, CardTitle,
-    Modal,
-    ModalHeader,
-    ModalBody,
-    ModalFooter, Form
+    Card, CardHeader, CardBody, Container, Row, Col, FormGroup, Input, Button, Form
 } from "reactstrap";
 import { toast } from 'react-toastify';
 import Header from "components/Headers/Header.js";
 
 const AddProduct2 = () => {
+
+    const { id } = useParams();
+
 
     const formData = new FormData();
 
@@ -29,6 +26,34 @@ const AddProduct2 = () => {
     const [listLining, setListLining] = useState([]);
     const [listCushion, setListCushion] = useState([]);
 
+    const [dataEdit, setDataEdit] = useState([])
+    //getData
+    const getData = async () => {
+        try {
+            let res = await findShoes(id);
+            if (res && res.data) {
+                setDataEdit(res.data);
+            }
+        } catch (error) {
+            let errorMessage = "Lỗi từ máy chủ";
+            if (error.response && error.response.data && error.response.data.message) {
+                errorMessage = error.response.data.message;
+            }
+            toast.error(errorMessage);
+            navigate("/admin/product2");
+        }
+    }
+    useEffect(() => {
+        getlistBrand();
+        getListOrigin();
+        getListDesignStyle();
+        getListSkinType();
+        getListToe();
+        getListSole();
+        getListLining();
+        getListCushion();
+        getData();
+    }, []);
     const [shoes, setShoes] = useState({
         name: "",
         brandId: null,
@@ -44,7 +69,21 @@ const AddProduct2 = () => {
 
     const onInputChange = (e) => {
 
-        setShoes({ ...shoes, [e.target.name]: e.target.value });
+        setDataEdit({ ...dataEdit, [e.target.name]: e.target.value });
+        setShoes({
+            name: dataEdit.name,
+            brandId: dataEdit.brandId,
+            originId: dataEdit.originId,
+            designStyleId: dataEdit.designStyleId,
+            skinTypeId: dataEdit.skinTypeId,
+            soleId: dataEdit.soleId,
+            liningId: dataEdit.liningId,
+            toeId: dataEdit.toeId,
+            cushionId: dataEdit.cushionId,
+            description: dataEdit.description
+        }
+        );
+        console.log(shoes);
 
     };
 
@@ -54,7 +93,6 @@ const AddProduct2 = () => {
     const handleImageChange = (e) => {
         const file = e.target.files[0];
         setSelectedImage(file);
-        formData.append('file', file);
     };
 
     const onSubmit = async (e) => {
@@ -67,7 +105,7 @@ const AddProduct2 = () => {
         formData.append('data', shoesDataJson);
 
         try {
-            const response = await postNewShoes(formData);
+            await updateShoes(id, formData);
             navigate("/admin/product2");
         } catch (error) {
             let errorMessage = "Lỗi từ máy chủ";
@@ -78,20 +116,10 @@ const AddProduct2 = () => {
         }
     };
 
-    useEffect(() => {
-        getlistBrand();
-        getListOrigin();
-        getListDesignStyle();
-        getListSkinType();
-        getListToe();
-        getListSole();
-        getListLining();
-        getListCushion();
-    }, []);
 
+    //Hiển thị combobox
     const getlistBrand = async () => {
         let res = await getAllBrand();
-        console.log(res);
         if (res && res.data) {
             setListBrand(res.data);
         }
@@ -138,6 +166,7 @@ const AddProduct2 = () => {
             setListCushion(res.data);
         }
     }
+    //End Hiển Thi Combobox
     return (
         <>
             <Header />
@@ -152,11 +181,29 @@ const AddProduct2 = () => {
                             <CardBody>
                                 <Form onSubmit={onSubmit}>
                                     <h6 className="heading-small text-muted mb-4">
-                                        Thêm sản phẩm
+                                        Sửa sản phẩm
                                     </h6>
                                     <div className="pl-lg-4">
                                         <Row>
-                                            <Col lg="12">
+                                            <Col lg="6">
+                                                <FormGroup>
+                                                    <label
+                                                        className="form-control-label"
+                                                        htmlFor="input-name"
+                                                    >
+                                                        Mã
+                                                    </label>
+                                                    <Input
+                                                        type={"text"}
+                                                        className="form-control-alternative"
+                                                        id="input-name"
+                                                        name="code"
+                                                        value={dataEdit.code}
+                                                        disabled
+                                                    />
+                                                </FormGroup>
+                                            </Col>
+                                            <Col lg="6">
                                                 <FormGroup>
                                                     <label
                                                         className="form-control-label"
@@ -171,7 +218,7 @@ const AddProduct2 = () => {
                                                         placeholder="Nhập tên sản phẩm "
                                                         name="name"
                                                         onChange={(e) => onInputChange(e)}
-
+                                                        value={dataEdit.name}
                                                     />
                                                 </FormGroup>
                                             </Col>
@@ -185,7 +232,7 @@ const AddProduct2 = () => {
                                                     >
                                                         Hãng
                                                     </label>
-                                                    <Input id="btn_select_tt" type="select" name="brandId"
+                                                    <Input id="btn_select_tt" type="select" name="brandId" value={dataEdit.brandId}
                                                         onChange={(e) => onInputChange(e)}>
                                                         <option value="" > -- Chọn --  </option>
                                                         {listBrand && listBrand.length > 0 &&
@@ -209,7 +256,7 @@ const AddProduct2 = () => {
                                                     >
                                                         Xuất xứ
                                                     </label>
-                                                    <Input id="btn_select_tt" name="originId" type="select"
+                                                    <Input id="btn_select_tt" name="originId" type="select" value={dataEdit.originId}
                                                         onChange={(e) => onInputChange(e)}>
                                                         <option value="" > -- Chọn --  </option>
                                                         {listorigin && listorigin.length > 0 &&
@@ -233,7 +280,7 @@ const AddProduct2 = () => {
                                                     >
                                                         Thiết kế
                                                     </label>
-                                                    <Input id="btn_select_tt" name="designStyleId" type="select"
+                                                    <Input id="btn_select_tt" name="designStyleId" type="select" value={dataEdit.designStyleId}
                                                         onChange={(e) => onInputChange(e)} >
                                                         <option value="" > -- Chọn --  </option>
                                                         {listDesignStyle && listDesignStyle.length > 0 &&
@@ -259,7 +306,7 @@ const AddProduct2 = () => {
                                                     >
                                                         Loại da
                                                     </label>
-                                                    <Input id="btn_select_tt" name="skinTypeId" type="select"
+                                                    <Input id="btn_select_tt" name="skinTypeId" type="select" value={dataEdit.skinTypeId}
                                                         onChange={(e) => onInputChange(e)} >
                                                         <option value="" > -- Chọn --  </option>
                                                         {listSkinStype && listSkinStype.length > 0 &&
@@ -283,7 +330,7 @@ const AddProduct2 = () => {
                                                     >
                                                         Mũi giày
                                                     </label>
-                                                    <Input id="btn_select_tt" name="toeId" type="select"
+                                                    <Input id="btn_select_tt" name="toeId" type="select" value={dataEdit.toeId}
                                                         onChange={(e) => onInputChange(e)} >
                                                         <option value="" > -- Chọn --  </option>
                                                         {listToe && listToe.length > 0 &&
@@ -307,7 +354,7 @@ const AddProduct2 = () => {
                                                     >
                                                         Đế giày
                                                     </label>
-                                                    <Input id="btn_select_tt" name="soleId" type="select"
+                                                    <Input id="btn_select_tt" name="soleId" type="select" value={dataEdit.soleId}
                                                         onChange={(e) => onInputChange(e)} >
                                                         <option value="" > -- Chọn --  </option>
                                                         {listSole && listSole.length > 0 &&
@@ -338,7 +385,7 @@ const AddProduct2 = () => {
                                                             >
                                                                 Lót giày
                                                             </label>
-                                                            <Input id="btn_select_tt" name="liningId" type="select"
+                                                            <Input id="btn_select_tt" name="liningId" type="select" value={dataEdit.liningId}
                                                                 onChange={(e) => onInputChange(e)} >
                                                                 <option value="" > -- Chọn --  </option>
                                                                 {listLining && listLining.length > 0 &&
@@ -363,7 +410,7 @@ const AddProduct2 = () => {
                                                             >
                                                                 Đệm giày
                                                             </label>
-                                                            <Input id="btn_select_tt" name="cushionId" type="select"
+                                                            <Input id="btn_select_tt" name="cushionId" type="select" value={dataEdit.cushionId}
                                                                 onChange={(e) => onInputChange(e)} >
                                                                 <option value="" > -- Chọn --  </option>
                                                                 {listCushion && listCushion.length > 0 &&
@@ -390,6 +437,7 @@ const AddProduct2 = () => {
                                                                 rows="5"
                                                                 type="textarea"
                                                                 name="description"
+                                                                value={dataEdit.description}
                                                                 onChange={(e) => onInputChange(e)}
                                                             />
                                                         </FormGroup>
@@ -399,7 +447,7 @@ const AddProduct2 = () => {
                                             <Col lg="4">
                                                 <label className="form-control-label">Thêm ảnh</label>
                                                 <div className="box-image">
-                                                    <img src={''} />
+                                                    {/* <img src={''} /> */}
                                                 </div>
                                                 <div >
                                                     <input type="file" accept="image/*" onChange={handleImageChange} />
@@ -413,10 +461,47 @@ const AddProduct2 = () => {
                                             </Col>
                                         </Row>
                                     </div>
+                                    <div className="pl-lg-4">
+                                        <Row>
+                                            <Col lg="6">
+                                                <FormGroup>
+                                                    <label
+                                                        className="form-control-label"
+                                                        htmlFor="input-username"
+                                                    >
+                                                        Người tạo
+                                                    </label>
+                                                    <Input
+                                                        className="form-control-alternative"
+                                                        type="text"
+                                                        value={dataEdit.createdBy}
+                                                        disabled
+                                                    />
+                                                </FormGroup>
+                                            </Col>
+                                            <Col lg="6">
+                                                <FormGroup>
+                                                    <label
+                                                        className="form-control-label"
+                                                        htmlFor="input-email"
+                                                    >
+                                                        Ngày tạo
+                                                    </label>
+                                                    <Input
+                                                        className="form-control-alternative"
+                                                        type="text"
+                                                        disabled
+                                                        value={dataEdit.createdTime}
+                                                    />
+                                                </FormGroup>
+                                            </Col>
+                                        </Row>
+
+                                    </div>
 
                                     <div className="text-center">
                                         <Button color="warning" >
-                                            Thêm
+                                            Sửa
                                         </Button>
                                     </div>
                                     <hr className="my-4" />
