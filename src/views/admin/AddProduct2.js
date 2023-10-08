@@ -66,16 +66,11 @@ const AddProduct2 = () => {
         formData.append('file', selectedImage);
         formData.append('data', shoesDataJson);
 
-        // JSON.parse(formData.get('data'))
-
         try {
-
             const response = await postNewShoes(formData);
-
-            navigate("/");
+            navigate("/admin/product2");
         } catch (error) {
             let errorMessage = "Lỗi từ máy chủ";
-
             if (error.response && error.response.data && error.response.data.message) {
                 errorMessage = error.response.data.message;
             }
@@ -398,20 +393,20 @@ const AddProduct2 = () => {
                                                             >
                                                                 Lót giày
                                                             </label>
-                                                            <Input id="btn_select_tt" name="liningId" type="select"
-                                                                onChange={(e) => onInputChange(e)} >
-                                                                <option value="" > -- Chọn --  </option>
-                                                                {listLining && listLining.length > 0 &&
-                                                                    listLining.map((item, index) => {
-                                                                        return (
-                                                                            <option value={item.id} key={item.id}>
-                                                                                {item.name}
-                                                                            </option>
-                                                                        )
+                                                            <Input id="btn_select_tt" name="soleId" type="select"
+                                                        onChange={(e) => onInputChange(e)} >
+                                                        <option value="" > -- Chọn --  </option>
+                                                        {listSole && listSole.length > 0 &&
+                                                            listSole.map((item, index) => {
+                                                                return (
+                                                                    <option value={item.id} key={item.id}>
+                                                                        {item.name}
+                                                                    </option>
+                                                                )
 
-                                                                    })
-                                                                }
-                                                            </Input>
+                                                            })
+                                                        }
+                                                    </Input>
                                                         </FormGroup>
                                                     </Col>
 

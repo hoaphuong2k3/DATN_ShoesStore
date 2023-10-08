@@ -1,6 +1,7 @@
 import { React, useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { getAllShoes } from "services/Product2Service";
+import { getAllBrand, getAllOrigin, getAllDesignStyle, getAllSkinType, getAllToe, getAllSole, getAllLining, getAllCushion } from "services/ProductAttributeService";
 // reactstrap components
 import {
   Card, CardHeader, CardBody, Container, Row,
@@ -10,15 +11,22 @@ import {
   ModalBody,
   ModalFooter, Form
 } from "reactstrap";
+import { toast } from 'react-toastify';
 import Switch from 'react-input-switch';
 import Header from "components/Headers/Header.js";
 
 
 const Products2 = () => {
-  //btn Tìm kiếm nâng cao
   const [value, setValue] = useState('no');
   const [listShoes, setListShoes] = useState([]);
-  const [listBrand,setListBrand] = useState([]);
+  const [listBrand, setListBrand] = useState([]);
+  const [listorigin, setListOrigin] = useState([]);
+  const [listDesignStyle, setListDesignStyle] = useState([]);
+  const [listSkinStype, setListSkinType] = useState([]);
+  const [listToe, setListToe] = useState([]);
+  const [listSole, setListSole] = useState([]);
+  const [listLining, setListLining] = useState([]);
+  const [listCushion, setListCushion] = useState([]);
   const [search, setSearch] = useState({
     code: "",
     name: "",
@@ -38,15 +46,41 @@ const Products2 = () => {
     toDateStr: "",
     createdBy: ""
   });
+  const onInputChange = async (e) => {
+    console.log({ [e.target.name]: e.target.value });
+    const res = await setSearch({ ...search, [e.target.name]: e.target.value });
+    console.log(res);
+    console.log("check", { ...search, [e.target.name]: e.target.value });
+    getAll(0, 10);
+  };
 
   useEffect(() => {
     getAll(0, 10);
-    getBrand();
+    getlistBrand();
+    getListOrigin();
+    getListDesignStyle();
+    getListSkinType();
+    getListToe();
+    getListSole();
+    getListLining();
+    getListCushion();
   }, []);
 
-  const getBrand = async () => {
-    let res = await getAll(); 
-    if (res && res.data) {    
+  const getlistBrand = async () => {
+    let res = await getAllBrand();
+    if (res && res.data) {
+      const data = res.data;
+      const list = Object.keys(data).map((key) => ({
+        id: data[key].id,
+        code: data[key].code,
+        name: data[key].name,
+      }));
+      setListBrand(list);
+    }
+  }
+  const getListOrigin = async () => {
+    let res = await getAllOrigin();
+    if (res && res.data) {
       const data = res.data;
       const list = Object.keys(data).map((key) => ({
 
@@ -54,22 +88,116 @@ const Products2 = () => {
         code: data[key].code,
         name: data[key].name,
       }));
-      setListBrand(list);
-      console.log("checkk:",listBrand);
+      setListOrigin(list);
+    }
+  }
+  const getListDesignStyle = async () => {
+    let res = await getAllDesignStyle();
+    if (res && res.data) {
+      const data = res.data;
+      const list = Object.keys(data).map((key) => ({
+
+        id: data[key].id,
+        code: data[key].code,
+        name: data[key].name,
+      }));
+      setListDesignStyle(list);
+    }
+  }
+  const getListSkinType = async () => {
+    let res = await getAllSkinType();
+    if (res && res.data) {
+      const data = res.data;
+      const list = Object.keys(data).map((key) => ({
+
+        id: data[key].id,
+        code: data[key].code,
+        name: data[key].name,
+      }));
+      setListSkinType(list);
+    }
+  }
+  const getListToe = async () => {
+    let res = await getAllToe();
+    if (res && res.data) {
+      const data = res.data;
+      const list = Object.keys(data).map((key) => ({
+
+        id: data[key].id,
+        code: data[key].code,
+        name: data[key].name,
+      }));
+      setListToe(list);
+    }
+  }
+  const getListSole = async () => {
+    let res = await getAllSole();
+    if (res && res.data) {
+      const data = res.data;
+      const list = Object.keys(data).map((key) => ({
+
+        id: data[key].id,
+        code: data[key].code,
+        name: data[key].name,
+      }));
+      setListSole(list);
+    }
+  }
+  const getListLining = async () => {
+    let res = await getAllLining();
+    if (res && res.data) {
+      const data = res.data;
+      const list = Object.keys(data).map((key) => ({
+
+        id: data[key].id,
+        code: data[key].code,
+        name: data[key].name,
+      }));
+      setListLining(list);
+    }
+  }
+  const getListCushion = async () => {
+    let res = await getAllCushion();
+    if (res && res.data) {
+      const data = res.data;
+      const list = Object.keys(data).map((key) => ({
+
+        id: data[key].id,
+        code: data[key].code,
+        name: data[key].name,
+      }));
+      setListCushion(list);
     }
   }
 
   //getAll
   const getAll = async (page, size) => {
-    let res = await getAllShoes(page, size, search);
-    if (res && res.data && res.data.content) {
-      setListShoes(res.data.content);
-      // setListShoes
-      // setTotalUsers(res.total);
-      // setTotalPages(res.total_pages);
-      // setlistUsers(res.data);
+    try {
+      let res = await getAllShoes(page, size, search);
+      if (res && res.data && res.data.content) {
+        setListShoes(res.data.content);
+        // setListShoes
+        // setTotalUsers(res.total);
+        // setTotalPages(res.total_pages);
+        // setlistUsers(res.data);
+      }
+    } catch (error) {
+      let errorMessage = "Lỗi từ máy chủ";
+      if (error.response && error.response.data && error.response.data.message) {
+        errorMessage = error.response.data.message;
+      }
+      toast.error(errorMessage);
+      setListShoes([]);
     }
-    console.log(">>> check res: ", listShoes);
+    // let res = await getAllShoes(page, size, search);
+    // if (res && res.data && res.data.content) {
+    //   setListShoes(res.data.content);
+    //   // setListShoes
+    //   // setTotalUsers(res.total);
+    //   // setTotalPages(res.total_pages);
+    //   // setlistUsers(res.data);
+    // }
+    // console.log(">>> check res: ", listShoes);
   }
 
 
@@ -289,10 +417,19 @@ const Products2 = () => {
                             >
                               Hãng
                             </label>
-                            <Input id="btn_select_tt" name="select" type="select" >
-                              <option value="loaisp">
-                                sfdsfsf
-                              </option>
+                            <Input id="btn_select_tt" type="select" name="brandId"
+                              onChange={(e) => onInputChange(e)}>
+                              <option value=" "> -- Chọn --  </option>
+                              {listBrand && listBrand.length > 0 &&
+                                listBrand.map((item, index) => {
+                                  return (
+                                    <option value={item.id} key={item.id}>
+                                      {item.name}
+                                    </option>
+                                  )
+
+                                })
+                              }
                             </Input>
                           </FormGroup>
                         </Col>
@@ -304,10 +441,19 @@ const Products2 = () => {
                             >
                               Xuất xứ
                             </label>
-                            <Input id="btn_select_tt" name="select" type="select" >
-                              <option value="loaisp">
-                                sfdsfsf
-                              </option>
+                            <Input id="btn_select_tt" name="originId" type="select"
+                              onChange={(e) => onInputChange(e)}>
+                              <option value="" > -- Chọn --  </option>
+                              {listorigin && listorigin.length > 0 &&
+                                listorigin.map((item, index) => {
+                                  return (
+                                    <option value={item.id} key={item.id}>
+                                      {item.name}
+                                    </option>
+                                  )
+
+                                })
+                              }
                             </Input>
                           </FormGroup>
                         </Col>
@@ -319,10 +465,19 @@ const Products2 = () => {
                             >
                               Thiết kế
                             </label>
-                            <Input id="btn_select_tt" name="select" type="select" >
-                              <option value="loaisp">
-                                sfdsfsf
-                              </option>
+                            <Input id="btn_select_tt" name="designStyleId" type="select"
+                              onChange={(e) => onInputChange(e)} >
+                              <option value="" > -- Chọn --  </option>
+                              {listDesignStyle && listDesignStyle.length > 0 &&
+                                listDesignStyle.map((item, index) => {
+                                  return (
+                                    <option value={item.id} key={item.id}>
+                                      {item.name}
+                                    </option>
+                                  )
+
+                                })
+                              }
                             </Input>
                           </FormGroup>
                         </Col>
@@ -335,10 +490,19 @@ const Products2 = () => {
                             >
                               Loại da
                             </label>
-                            <Input id="btn_select_tt" name="select" type="select" >
-                              <option value="loaisp">
-                                sfdsfsf
-                              </option>
+                            <Input id="btn_select_tt" name="skinTypeId" type="select"
+                              onChange={(e) => onInputChange(e)} >
+                              <option value="" > -- Chọn --  </option>
+                              {listSkinStype && listSkinStype.length > 0 &&
+                                listSkinStype.map((item, index) => {
+                                  return (
+                                    <option value={item.id} key={item.id}>
+                                      {item.name}
+                                    </option>
+                                  )
+
+                                })
+                              }
                             </Input>
                           </FormGroup>
                         </Col>
@@ -350,10 +514,19 @@ const Products2 = () => {
                             >
                               Mũi giày
                             </label>
-                            <Input id="btn_select_tt" name="select" type="select" >
-                              <option value="loaisp">
-                                sfdsfsf
-                              </option>
+                            <Input id="btn_select_tt" name="toeId" type="select"
+                              onChange={(e) => onInputChange(e)} >
+                              <option value="" > -- Chọn --  </option>
+                              {listToe && listToe.length > 0 &&
+                                listToe.map((item, index) => {
+                                  return (
+                                    <option value={item.id} key={item.id}>
+                                      {item.name}
+                                    </option>
+                                  )
+
+                                })
+                              }
                             </Input>
                           </FormGroup>
                         </Col>
@@ -365,10 +538,19 @@ const Products2 = () => {
                             >
                               Đế giày
                             </label>
-                            <Input id="btn_select_tt" name="select" type="select" >
-                              <option value="loaisp">
-                                sfdsfsf
-                              </option>
+                            <Input id="btn_select_tt" name="soleId" type="select"
+                              onChange={(e) => onInputChange(e)} >
+                              <option value="" > -- Chọn --  </option>
+                              {listSole && listSole.length > 0 &&
+                                listSole.map((item, index) => {
+                                  return (
+                                    <option value={item.id} key={item.id}>
+                                      {item.name}
+                                    </option>
+                                  )
+
+                                })
+                              }
                             </Input>
                           </FormGroup>
                         </Col>
@@ -380,10 +562,19 @@ const Products2 = () => {
                             >
                               Lót giày
                             </label>
-                            <Input id="btn_select_tt" name="select" type="select" >
-                              <option value="loaisp">
-                                sfdsfsf
-                              </option>
+                            <Input id="btn_select_tt" name="liningId" type="select"
+                              onChange={(e) => onInputChange(e)} >
+                              <option value="" > -- Chọn --  </option>
+                              {listLining && listLining.length > 0 &&
+                                listLining.map((item, index) => {
+                                  return (
+                                    <option value={item.id} key={item.id}>
+                                      {item.name}
+                                    </option>
+                                  )
+
+                                })
+                              }
                             </Input>
                           </FormGroup>
                         </Col>
@@ -397,9 +588,20 @@ const Products2 = () => {
                               Đệm giày
                             </label>
                             <Input id="btn_select_tt" name="select" type="select" >
-                              <option value="loaisp">
-                                sfdsfsf
-                              </option>
+                              <Input id="btn_select_tt" name="cushionId" type="select"
+                                onChange={(e) => onInputChange(e)} >
+                                <option value=" "> -- Chọn --  </option>
+                                {listCushion && listCushion.length > 0 &&
+                                  listCushion.map((item, index) => {
+                                    return (
+                                      <option value={item.id} key={item.id}>
+                                        {item.name}
+                                      </option>
+                                    )
+
+                                  })
+                                }
+                              </Input>
                             </Input>
                           </FormGroup>
                         </Col>
