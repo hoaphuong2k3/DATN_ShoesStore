@@ -8,7 +8,7 @@ const Product = () => {
   const [products, setProducts] = useState([]);
 
   useEffect(() => {
-    fetch("https://63c1265d376b9b2e64743c4f.mockapi.io/shoes")
+    fetch("http://localhost:33321/api/user/shoes/search?page=0&size=10")
       .then((response) => response.json())
       .then((data) => {
         const productsArray = Object.values(data);
@@ -21,7 +21,7 @@ const Product = () => {
 
   return (
     <>
-      <Header />
+      <Header/>
       <Container fluid>
         {/* Table */}
         <Row>
@@ -30,7 +30,7 @@ const Product = () => {
               <CardBody>
                 <div style={{ display: "table", margin: "auto" }}>
                   <hr color="orange" width="300px" />
-                  <br />
+                  <br/>
                 </div>
                 <div className="row">
                   <style>
@@ -52,16 +52,16 @@ const Product = () => {
                   {products.map((product) => (
                     <div key={product.id} className="col-md-3">
                       <Link to={`/shoes/productdetail/${product.id}`}>
-                        <img src={product.anh} alt="" className="zoom" />
+                        <img src={product.anh} alt="" className="zoom"/>
                       </Link>
-                      <br />
-                      <br />
+                      <br/>
+                      <br/>
                       <div style={{ fontSize: "large" }} className="p-2">
                         <Link to={`/shoes/productdetail/${product.id}`} className="text-dark text-decoration-none">
-                          {product.ten}
+                          {product.name}
                         </Link>
                         <p className=" font-weight-bold" style={{ color: "rgba(0, 0, 0, 0.705)" }}>
-                          {product.gia}đ&nbsp;
+                          {product.priceMin}đ&nbsp;
                         </p>
                       </div>
                     </div>
