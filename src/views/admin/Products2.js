@@ -793,7 +793,7 @@ const Products2 = () => {
         <ModalFooter>
           <div className="text-center">
             <Button color="danger" onClick={() => handleDelete()}>
-              Sửa
+              Xóa
             </Button>{' '}
             <Button color="danger" onClick={toggle}>
               Không
