@@ -20,13 +20,14 @@ const Promotion = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const [discountsData, productsData] = await Promise.all([
-                    axiosInstance.get('https://651d650344e393af2d59b053.mockapi.io/discounts'),
-                    axiosInstance.get('https://651d650344e393af2d59b053.mockapi.io/product')
-                ]);
+                const discountsData = await
+                    axiosInstance.get('http://localhost:33321/api/vouchers/getAll');
+                    // axiosInstance.get('https://651d650344e393af2d59b053.mockapi.io/product')
+            
 
-                setDiscounts(discountsData.data);
-                setProducts(productsData.data);
+                setDiscounts(discountsData.data.data);
+                console.log(discountsData.data);
+                // setProducts(productsData.data);
             } catch (error) {
                 console.error('Error fetching data:', error);
             }
@@ -35,6 +36,21 @@ const Promotion = () => {
         fetchData();
     }, []);
 
+    // const fetchData = async () => {
+    //     try {
+    //       const provincesResponse = await axios.get("https://provinces.open-api.vn/api/?depth=3");
+    //       setProvinces(provincesResponse.data);
+    
+    //       const adminsResponse = await axios.get("http://localhost:33321/api/account/admin");
+    //       setAdmins(adminsResponse.data.content);
+    //     } catch (error) {
+    //       console.error("Error fetching data: ", error);
+    //     }
+    //   };
+    
+    //   useEffect(() => {
+    //     fetchData();
+    //   }, []);
 
     const [formData, setFormData] = useState({
         code: "",
@@ -131,9 +147,9 @@ const Promotion = () => {
             }
             return d;
         });
-    
+
         setDiscounts(updatedDiscounts);
-        
+
         axiosInstance.put(`https://651d650344e393af2d59b053.mockapi.io/discounts/${discount.id}`, { status: discount.status === 0 ? 1 : 0 })
             .then(response => {
                 console.log("Cập nhật trạng thái thành công!");
@@ -142,7 +158,7 @@ const Promotion = () => {
                 console.error('Lỗi khi cập nhật trạng thái:', error);
             });
     };
-    
+
 
     //delete
     const confirmDelete = () => {
@@ -455,7 +471,25 @@ const Promotion = () => {
                                     </Form>
                                     {/* Description */}
                                     <hr className="my-4" />
-                                    <h6 className="heading-small text-muted mb-4">Danh sách</h6>
+                                    <Col style={{display: "flex"}}>
+                                        <h6 className="heading-small text-muted mb-4">Danh sách</h6>
+                                        <div className="col-2">
+                                            <Input type="select" size="sm">
+                                                <option>Tất cả</option>
+                                                <option>Hóa đơn</option>
+                                                <option>Sản phẩm</option>
+                                            </Input>
+                                        </div>
+                                        <div className="col-2">
+                                            <Input type="select" size="sm">
+                                                <option>Tất cả</option>
+                                                <option>Chờ hoạt động</option>
+                                                <option>Đang hoạt động</option>
+                                                <option>Hết hạn</option>
+                                            </Input>
+                                        </div>
+                                    </Col>
+
                                     <Table className="align-items-center table-flush" responsive>
                                         <thead className="thead-light">
                                             <tr>
@@ -474,21 +508,21 @@ const Promotion = () => {
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {discounts.map((discount, index) => (
+                                            {Array.isArray(discounts) && discounts.map((discount, index) => (
                                                 <tr key={index}>
                                                     <td>{index + 1}</td>
                                                     <td>{discount.code}</td>
                                                     <td>{discount.discounts_type === 0 ? "Hóa đơn" : "Sản phẩm"}</td>
                                                     <td>{discount.name}</td>
                                                     <td>{discount.description}</td>
-                                                    <td>{discount.sale_percent}</td>
-                                                    <td>{discount.min_price} - {discount.sale_price}</td>
-                                                    <td>{discount.start_date}</td>
-                                                    <td>{discount.end_date}</td>
+                                                    <td>{discount.salePercent}</td>
+                                                    <td>{discount.minPrice} - {discount.salePrice}</td>
+                                                    <td>{discount.startDate}</td>
+                                                    <td>{discount.endDate}</td>
                                                     <td>
                                                         <label className="custom-toggle">
                                                             <input
-                                                                checked={discount.status === 0}
+                                                                checked={discount.status === 1}
                                                                 type="checkbox"
                                                                 onChange={() => handleStatusChange(discount)}
                                                             />
