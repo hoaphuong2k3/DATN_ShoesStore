@@ -9,7 +9,7 @@ import {
 import { toast } from 'react-toastify';
 import Header from "components/Headers/Header.js";
 
-const AddProduct2 = () => {
+const ListShoesDetail = () => {
 
     const { id } = useParams();
 
@@ -178,13 +178,21 @@ const AddProduct2 = () => {
                 <Row className="mb-4">
                     <div className="col">
                         <Card className="shadow">
-                            <CardHeader className="bg-transparent">
-                                <h3 className="mb-0">Sản phẩm </h3>
-                            </CardHeader>
+                            <Card className="shadow m-4">
+                                <CardBody>
+                                    <h6 className="heading-small text-muted mb-4">
+                                        Danh sách sản phẩm
+                                    </h6>
+                                    <Row>
+                                        <Col>
+                                        </Col>
+                                    </Row>
+                                </CardBody>
+                            </Card>
                             <CardBody>
                                 <Form onSubmit={onSubmit}>
                                     <h6 className="heading-small text-muted mb-4">
-                                        Sửa sản phẩm
+                                        Danh sách sản phẩm
                                     </h6>
                                     <div className="pl-lg-4">
                                         <Row>
@@ -520,5 +528,5 @@ const AddProduct2 = () => {
     );
 };
 
-export default AddProduct2;
+export default ListShoesDetail;
 

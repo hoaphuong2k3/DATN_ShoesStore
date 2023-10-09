@@ -66,15 +66,22 @@ const Products2 = () => {
       toDateStr: "",
       createdBy: ""
     })
-    console.log(search);
   };
   const onInputChange = async (e) => {
+    // setSearch({ ...search, [e.target.name]: e.target.value }, () => {
+    //   // console.log(search); // Log giá trị sau khi state đã được cập nhật
+    // });
+
     console.log({ [e.target.name]: e.target.value });
     const res = await setSearch({ ...search, [e.target.name]: e.target.value });
     console.log(res);
     console.log("check", { ...search, [e.target.name]: e.target.value });
     getAll(0, 10);
   };
+  useEffect(() => {
+    console.log(search);
+    getAll(0, 10);
+  }, [search]);
 
   useEffect(() => {
     getAll(0, 10);
@@ -171,7 +178,7 @@ const Products2 = () => {
   const handleDelete = async () => {
     try {
       console.log(iddeleteshoes);
-      await deleteShoes(iddeleteshoes);
+      await deleteShoes({ data: iddeleteshoes });
       getAll();
       setIdDeleteShoes([]);
       toggle();
@@ -192,7 +199,7 @@ const Products2 = () => {
   return (
     <>
       {/* Page content */}
-      <Container className="mt-7" fluid>
+      <Container fluid>
         <Row className="mb-4">
           <div className="col">
             <Card className="shadow">

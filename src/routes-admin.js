@@ -14,7 +14,7 @@ import AddProduct2 from "views/admin/AddProduct2.js";
 import EditProduct2 from "views/admin/EditProduct2.js";
 import DetailProduct from "views/admin/DetailProduct.js";
 import BillDetail from "views/admin/BillDetail.js"
-
+import ListShoesDetail from "views/admin/ListShoesDetail.js"
 var routes = [
   {
     path: "/index",
@@ -114,6 +114,11 @@ var routes = [
   {
     path: "/bill-details/:id",
     component: <BillDetail />,
+    layout: "/admin",
+  },
+  {
+    path: "/shoesdetail/:id",
+    component: <ListShoesDetail />,
     layout: "/admin",
   }
 ];
