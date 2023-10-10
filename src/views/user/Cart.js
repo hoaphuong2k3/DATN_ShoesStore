@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import {
   Card,
   CardHeader,
@@ -14,28 +14,71 @@ import Header from "components/Headers/ProductHeader";
 import { CartContext } from "contexts/Cart.js";
 
 const Cart = () => {
+  const { fetchData } = useContext(CartContext);
+  const [cartData, setCartData] = useState(null);
 
-  const { cartItems, handleQuantityChange } = useContext(CartContext);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch('http://localhost:33321/api/cart/1');
+        const data = await response.json();
+        setCartData(data.content);
 
-  const totalPrice = cartItems.reduce(
-    (total, item) => total + item.sl * item.gia,
-    0
-  );
-
-  const handleQuantityInputChange = (itemId, newQuantity) => {
-    const updatedCartItems = cartItems.map((item) => {
-      if (item.id === itemId) {
-        return { ...item, sl: newQuantity };
+      } catch (error) {
+        console.error('Error fetching data:', error);
       }
-      return item;
-    });
+    };
 
-    handleQuantityChange(updatedCartItems);
+    fetchData();
+  }, [fetchData]);
+
+
+  const handleRemoveItem = async (idAccount, idShoes) => {
+    try {
+      const response = await fetch(`http://localhost:33321/api/cart/delete/` + idAccount + `/` + idShoes, {
+        method: 'DELETE',
+      });
+      if (response.ok) {
+        setCartData(prevCartData => prevCartData.filter(item => item.id !== idShoes));
+
+      }
+    } catch (error) {
+      console.error('Lỗi khi gọi API xóa:', error);
+    }
   };
+  const handleQuantityChange = async (idAccount, idShoes, quantity) => {
+    try {
+      const response = await fetch(`http://localhost:33321/api/cart/update`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          key: idAccount,
+          id: idShoes,
+          quantity: quantity,
+        }),
+      });
+      console.log(response);
+      if (response.ok) {
+        setCartData(prevCartData => {
+          // Tạo mảng mới với số lượng được cập nhật cho mục có idShoes
+          return prevCartData.map(item => {
+            if (item.id === idShoes) {
+              return { ...item, quantity: quantity, totalPrice: item.price * quantity };
+            }
+            return item;
+          });
+        });
+      }
+    } catch (error) {
+
+    }
+  }
 
   return (
     <>
-      <Header cartItemCount={cartItems.length} />
+      <Header cartItemCount={cartData ? cartData.length : 0} />
       <Container fluid className="mt-3">
         <Row>
           <div className="col">
@@ -43,7 +86,7 @@ const Cart = () => {
               <CardBody>
                 <div className="inner">
                   <h1>Giỏ hàng</h1>
-                  {cartItems.length === 0 ? (
+                  {cartData && Array.isArray(cartData) && cartData.length === 0 ? (
                     <p>Giỏ hàng trống</p>
                   ) : (
                     <form
@@ -64,14 +107,14 @@ const Cart = () => {
                           </tr>
                         </thead>
                         <tbody>
-                          {cartItems.map((item, index) => (
+                          {(cartData || []).map((item, index) => (
                             <tr
                               className="cart__row table__section"
                               key={index}
                             >
                               <td data-label="Sản phẩm">
                                 <a href="/shoes/product" className="cart__image small col-md-3">
-                                  <img src={item.anh} alt={item.ten} width={'200px'} height={'200px'} />
+                                  <img src={item.anh} alt={item.name} width={'200px'} height={'200px'} />
                                 </a>
                               </td>
                               <td
@@ -79,54 +122,39 @@ const Cart = () => {
                                 data-label="Sản phẩm"
                               >
                                 <a href="/shoes/product" className="h4">
-                                  {item.ten}
+                                  {item.name}
                                 </a>
-                                <p>Hãng: {item.hang}</p>
-                                <a
-                                  href={`/cart/change?line=${index + 1}&quantity=0`}
-                                  className="cart__remove"
-                                >
-                                  <small>Xóa</small>
-                                </a>
+                                <p>Size: {item.size}</p>
+                                <p>Màu: {item.color}</p>
                               </td>
                               <td
                                 className="cart-product-price"
                                 data-label="Đơn giá"
                               >
-                                <span className="h3">{item.gia}</span>
+                                <span className="h3">{item.price}</span>
                               </td>
                               <td
                                 data-label="Số lượng"
                                 className="cart-quantity"
                               >
                                 <div className="input-group">
-                                  <Button className="input-group-text" color="primary"
-                                    onClick={() =>
-                                      handleQuantityChange(
-                                        item.id,
-                                        item.sl - 1
-                                      )
-                                    }
-                                  >
-                                    -
-                                  </Button>
-                                  <Input
-                                    type="number"
-                                    className="form-control"
-                                    value={item.sl}
-                                    onChange={(e) =>
-                                      handleQuantityInputChange(item.id, parseInt(e.target.value))
-                                    }
-                                  />
                                   <Button
                                     className="input-group-text"
                                     color="primary"
                                     onClick={() =>
-                                      handleQuantityChange(
-                                        item.id,
-                                        item.quantity + 1
-                                      )
-                                    }
+                                      handleQuantityChange(1, item.id, item.quantity - 1)}
+                                  >
+                                    -
+                                  </Button>
+                                  <Input
+                                    type="text"
+                                    className="form-control"
+                                    value={item.quantity} />
+                                  <Button
+                                    className="input-group-text"
+                                    color="primary"
+                                    onClick={() =>
+                                      handleQuantityChange(1, item.id, item.quantity + 1)}
                                   >
                                     +
                                   </Button>
@@ -137,38 +165,27 @@ const Cart = () => {
                                 data-label="Tổng giá"
                               >
                                 <span className="h3">
-                                  {item.sl * item.gia}
+                                  {item.totalPrice}
                                 </span>
+                              </td>
+                              <td>
+                                <Button className="input-group-text" color="primary" onClick={() => handleRemoveItem(1, item.id)}>
+                                  Xóa
+                                </Button>
                               </td>
                             </tr>
                           ))}
                         </tbody>
                       </Table>
                       <div className="row">
-                        <div className="col-md-6">
-                          <label className="text-dark small">
-                            Chú thích cho cửa hàng
-                          </label>
-                          <textarea
-                            name="note"
-                            className="w-100 h-75 border border-light"
-                          ></textarea>
-                        </div>
-                        <div className="text-right one-third small--one-whole col-md-6">
-                          <p>
-                            <span className="cart__subtotal-title">
-                              Tổng tiền
-                            </span>
-                            <span className="h3 cart__subtotal">
-                              {totalPrice}
-                            </span>
-                          </p>
+
+                        <div className="text-right one-third small--one-whole col-md-12">
                           <Button
                             to="/shoes/checkout"
                             tag={Link}
                             type="submit"
                             name="checkout"
-                            className="btnCart"
+                            className="ml-auto btnCart"
                           >
                             Tiến hành đặt hàng
                           </Button>

@@ -49,7 +49,7 @@ const Login = () => {
         navigate("/admin");
       } else if (authorities.some((authority) => authority.authority === "ROLE_USER")) {
         
-        navigate("/shoes");
+        navigate("/shoes/home");
       } else {
         navigate("/");
       }
