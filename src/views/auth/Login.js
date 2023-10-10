@@ -47,7 +47,8 @@ const Login = () => {
       if (authorities.some((authority) => authority.authority === "ROLE_ADMIN")) {
         navigate("/admin");
       } else if (authorities.some((authority) => authority.authority === "ROLE_USER")) {
-        navigate("/shoes");
+        
+        navigate("/shoes/home");
       } else {
         // Xử lý cho các vai trò khác (nếu cần)
         navigate("/");
