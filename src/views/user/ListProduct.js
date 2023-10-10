@@ -36,8 +36,8 @@ const Product = () => {
     try {
       const res = await axios.post(`http://localhost:33321/api/user/shoes/search?page=${page}&size=${size}`, search);
       
-      if (res && res.data && res.data.content) {
-        setProducts(res.data.content);
+      if (res && res.data) {
+        setProducts(res.data.data.content);
       }
       console.log(res.data);
     } catch (error) {
@@ -78,7 +78,7 @@ const Product = () => {
                     products.map((product) => (
                       <div key={product.id} className="col-md-3">
                         <Link to={`/shoes/productdetail/${product.id}`}>
-                          <img src={product.anh} alt="" className="zoom" />
+                          <img src={`https://s3-ap-southeast-1.amazonaws.com/imageshoestore/${product.imgURI}`} alt="" className="zoom" />
                         </Link>
                         <br />
                         <br />
