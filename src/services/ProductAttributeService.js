@@ -51,6 +51,28 @@ const getAllLining = () => {
 const getAllCushion = () => {
     return axios.get(`/admin/cushion/get-all`)
 }
+
+//Get size có id shoes
+const getAllSizeId = (id) => {
+    return axios.get(`/user/shoes/get-all-size/${id}`)
+}
+
+//Get Coler có id shoes
+
+const getAllColorId = (id) => {
+    return axios.get(`/user/shoes/get-all-color/${id}`)
+}
+
+//Get size 
+const getAllSize = () => {
+    return axios.get(`/admin/size/get-all`)
+}
+
+//Get Coler
+
+const getAllColor = () => {
+    return axios.get(`/admin/color/get-all`)
+}
 export { getAllBrand, postCreateBrands, updateBrand, deleteBrand ,
     getAllOrigin,
     getAllDesignStyle,
@@ -58,5 +80,9 @@ export { getAllBrand, postCreateBrands, updateBrand, deleteBrand ,
     getAllToe,
     getAllSole,
     getAllLining,
-    getAllCushion
+    getAllCushion,
+    getAllSizeId,
+    getAllColorId,
+    getAllSize,
+    getAllColor
 };

@@ -1,41 +1,66 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { updateShoes, findShoes } from "services/Product2Service";
-import { getAllBrand, getAllOrigin, getAllDesignStyle, getAllSkinType, getAllToe, getAllSole, getAllLining, getAllCushion } from "services/ProductAttributeService";
+import { findShoes } from "services/Product2Service";
+import { getAllShoesDetail } from "services/ShoesDetailService.js";
+import { Link } from "react-router-dom";
+import { getAllColorId, getAllSizeId, getAllColor, getAllSize } from "services/ProductAttributeService";
 // reactstrap components
 import {
-    Card, CardHeader, CardBody, Container, Row, Col, FormGroup, Input, Button, Form
+    Card, CardBody, Container, Row, Col, FormGroup, Input, Button, Form, CardTitle, Label, Table
 } from "reactstrap";
 import { toast } from 'react-toastify';
 import Header from "components/Headers/Header.js";
+import Switch from 'react-input-switch';
 
 const ListShoesDetail = () => {
-
+    const [value, setValue] = useState('no');
     const { id } = useParams();
 
-
-    const formData = new FormData();
-
     let navigate = useNavigate();
-    const [listBrand, setListBrand] = useState([]);
-    const [listorigin, setListOrigin] = useState([]);
-    const [listDesignStyle, setListDesignStyle] = useState([]);
-    const [listSkinStype, setListSkinType] = useState([]);
-    const [listToe, setListToe] = useState([]);
-    const [listSole, setListSole] = useState([]);
-    const [listLining, setListLining] = useState([]);
-    const [listCushion, setListCushion] = useState([]);
-
-    const [dataEdit, setDataEdit] = useState([])
+    const [ListShoesDetail, setListShoesDetail] = useState([]);
+    const [listSizeById, setListSizeById] = useState([]);
+    const [listColorById, setListColorById] = useState([]);
+    const [listSize, setListSize] = useState([]);
+    const [listColor, setListColor] = useState([]);
+    const [dataShoesById, setDataShoesById] = useState([])
     //getData
+    const [search, setSearch] = useState({
+        code: "",
+        sizeId: null,
+        colorId: null,
+        fromQuantity: null,
+        toQuantity: null,
+        fromPrice: null,
+        toPrice: null,
+        status: null,
+        fromDateStr: "",
+        toDateStr: "",
+        createdBy: "",
+        fromDate: "",
+        toDate: ""
+    });
+    const resetSearch = () => {
+        setSearch({
+            code: "",
+            sizeId: "",
+            colorId: "",
+            fromQuantity: "",
+            toQuantity: "",
+            fromPrice: "",
+            toPrice: "",
+            status: "",
+            fromDateStr: "",
+            toDateStr: "",
+            createdBy: "",
+            fromDate: "",
+            toDate: ""
+        })
+    };
     const getData = async () => {
         try {
             let res = await findShoes(id);
             if (res && res.data) {
-                setDataEdit(res.data);
-                setSelectedImage(res.data.imgURI);
-                console.log(res.data.imgURI);
-                console.log(dataEdit.imgURI);
+                setDataShoesById(res.data);
             }
         } catch (error) {
             let errorMessage = "Lỗi từ máy chủ";
@@ -44,131 +69,73 @@ const ListShoesDetail = () => {
             }
             toast.error(errorMessage);
             navigate("/admin/product2");
+        }
+    }
+    //getAll
+    const getAll = async () => {
+        try {
+            let res = await getAllShoesDetail(id, search);
+            if (res && res.data && res.data.content) {
+                setListShoesDetail(res.data.content);
+                // setListShoes
+                // setTotalUsers(res.total);
+                // setTotalPages(res.total_pages);
+                // setlistUsers(res.data);
+            }
+        } catch (error) {
+            let errorMessage = "Lỗi từ máy chủ";
+            if (error.response && error.response.data && error.response.data.message) {
+                errorMessage = error.response.data.message;
+            }
+            toast.error(errorMessage);
+            setListShoesDetail([]);
         }
     }
     useEffect(() => {
-        getlistBrand();
-        getListOrigin();
-        getListDesignStyle();
-        getListSkinType();
-        getListToe();
-        getListSole();
-        getListLining();
-        getListCushion();
+        console.log(search);
+        getAll();
+    }, [search]);
+
+    useEffect(() => {
+        getlistColorById();
+        getlistSizeById();
+        getlistColor();
+        getlistSize();
         getData();
+        getAll();
     }, []);
-    const [shoes, setShoes] = useState({
-        name: "",
-        brandId: null,
-        originId: null,
-        designStyleId: null,
-        skinTypeId: null,
-        soleId: null,
-        liningId: null,
-        toeId: null,
-        cushionId: null,
-        description: ""
-    });
 
-    const onInputChange = (e) => {
 
-        setDataEdit({ ...dataEdit, [e.target.name]: e.target.value });
-        setShoes({
-            name: dataEdit.name,
-            brandId: dataEdit.brandId,
-            originId: dataEdit.originId,
-            designStyleId: dataEdit.designStyleId,
-            skinTypeId: dataEdit.skinTypeId,
-            soleId: dataEdit.soleId,
-            liningId: dataEdit.liningId,
-            toeId: dataEdit.toeId,
-            cushionId: dataEdit.cushionId,
-            description: dataEdit.description
-        }
-        );
-        console.log(shoes);
-
+    const onInputChange = async (e) => {
+        await setSearch({ ...search, [e.target.name]: e.target.value });
     };
-
-    //Img
-    const [selectedImage, setSelectedImage] = useState(null);
-
-    const handleImageChange = (e) => {
-        const file = e.target.files[0];
-        setSelectedImage(file);
-    };
-
-    const onSubmit = async (e) => {
-
-        e.preventDefault();
-
-        const shoesDataJson = JSON.stringify(shoes);
-
-        formData.append('file', selectedImage);
-        formData.append('data', shoesDataJson);
-
-        try {
-            await updateShoes(id, formData);
-            navigate("/admin/product2");
-        } catch (error) {
-            let errorMessage = "Lỗi từ máy chủ";
-            if (error.response && error.response.data && error.response.data.message) {
-                errorMessage = error.response.data.message;
-            }
-            toast.error(errorMessage);
-        }
-    };
-
 
     //Hiển thị combobox
-    const getlistBrand = async () => {
-        let res = await getAllBrand();
+    const getlistColorById = async () => {
+        let res = await getAllColorId(id);
         if (res && res.data) {
-            setListBrand(res.data);
+            setListColorById(res.data);
         }
     }
-    const getListOrigin = async () => {
-        let res = await getAllOrigin();
+    const getlistSizeById = async () => {
+        let res = await getAllSizeId(id);
         if (res && res.data) {
-            setListOrigin(res.data);
+            setListSizeById(res.data);
         }
     }
-    const getListDesignStyle = async () => {
-        let res = await getAllDesignStyle();
+    const getlistColor = async () => {
+        let res = await getAllColor();
         if (res && res.data) {
-            setListDesignStyle(res.data);
+            setListColor(res.data);
         }
     }
-    const getListSkinType = async () => {
-        let res = await getAllSkinType();
+    const getlistSize = async () => {
+        let res = await getAllSize();
         if (res && res.data) {
-            setListSkinType(res.data);
+            setListSize(res.data);
         }
     }
-    const getListToe = async () => {
-        let res = await getAllToe();
-        if (res && res.data) {
-            setListToe(res.data);
-        }
-    }
-    const getListSole = async () => {
-        let res = await getAllSole();
-        if (res && res.data) {
-            setListSole(res.data);
-        }
-    }
-    const getListLining = async () => {
-        let res = await getAllLining();
-        if (res && res.data) {
-            setListLining(res.data);
-        }
-    }
-    const getListCushion = async () => {
-        let res = await getAllCushion();
-        if (res && res.data) {
-            setListCushion(res.data);
-        }
-    }
+
     //End Hiển Thi Combobox
     return (
         <>
@@ -178,347 +145,575 @@ const ListShoesDetail = () => {
                 <Row className="mb-4">
                     <div className="col">
                         <Card className="shadow">
-                            <Card className="shadow m-4">
+                            <Card className="shadow m-4" disabled>
                                 <CardBody>
                                     <h6 className="heading-small text-muted mb-4">
-                                        Danh sách sản phẩm
+                                        Thông tin sản phẩm
                                     </h6>
+                                    <div className="pl-lg-4">
+                                        <Row className="m-1">
+                                            <Col lg="12" className="text-center">
+                                                <img src={`https://s3-ap-southeast-1.amazonaws.com/imageshoestore/${dataShoesById.imgURI}`} alt="Ảnh mô tả" />
+                                            </Col>
+                                        </Row>
+                                        <Row >
+                                            <Col lg="12" className="text-center">
+                                                <label className="form-control-label">Mã -   </label>
+                                                <label className="form-control-label">{dataShoesById.code}</label>
+                                            </Col>
+                                        </Row>
+                                        <Row className="mb-4">
+                                            <Col lg="12" className="text-center">
+                                                <label className="form-control-label">Tên -  </label>
+                                                <label className="form-control-label">{dataShoesById.name}</label>
+                                            </Col>
+                                        </Row>
+
+                                        <Row>
+                                            <Col lg="2">
+                                                <label className="form-control-label">Hãng:  </label>
+                                            </Col>
+                                            <Col lg="2">
+                                                <label>{dataShoesById.brandId}</label>
+                                            </Col>
+                                            <Col lg="2">
+                                                <label className="form-control-label">Xuất xứ:   </label>
+                                            </Col>
+                                            <Col lg="2">
+                                                <label>{dataShoesById.originId}</label>
+                                            </Col>
+                                            <Col lg="2">
+                                                <label className="form-control-label">Thiết kế:  </label>
+                                            </Col>
+                                            <Col lg="2">
+                                                <label>{dataShoesById.designStyleId}</label>
+                                            </Col>
+                                        </Row>
+                                        <Row>
+                                            <Col lg="2">
+                                                <label className="form-control-label">Loại da:  </label>
+                                            </Col>
+                                            <Col lg="2">
+                                                <label>{dataShoesById.skinTypeId}</label>
+                                            </Col>
+                                            <Col lg="2">
+                                                <label className="form-control-label">Mũi giày:   </label>
+                                            </Col>
+                                            <Col lg="2">
+                                                <label>{dataShoesById.toeId}</label>
+                                            </Col>
+                                            <Col lg="2">
+                                                <label className="form-control-label">Đế giày:  </label>
+                                            </Col>
+                                            <Col lg="2">
+                                                <label>{dataShoesById.soleId}</label>
+                                            </Col>
+                                        </Row>
+                                        <Row>
+                                            <Col lg="2">
+                                                <label className="form-control-label">Lót giày:  </label>
+                                            </Col>
+                                            <Col lg="2">
+                                                <label>{dataShoesById.liningId}</label>
+                                            </Col>
+                                            <Col lg="2">
+                                                <label className="form-control-label">Đệm giày:   </label>
+                                            </Col>
+                                            <Col lg="2">
+                                                <label>{dataShoesById.cushionId}</label>
+                                            </Col>
+                                        </Row>
+                                        <Row>
+                                            <Col lg="2">
+                                                <label className="form-control-label">Mô tả:  </label>
+                                            </Col>
+                                            <Col lg="10">
+                                                <label>{dataShoesById.description}</label>
+                                            </Col>
+                                        </Row>
+                                    </div>
+                                </CardBody>
+                            </Card>
+                            <Card className="shadow m-4 mt--2">
+                                <CardBody>
+
                                     <Row>
-                                        <Col>
+                                        <div className="col">
+                                            <CardTitle
+                                                tag="h5"
+                                                className="text-uppercase text-muted mb-0"
+                                            >
+                                                <h3>Tìm kiếm</h3>
+                                            </CardTitle>
+
+                                        </div>
+                                        <Col className="col-auto">
+                                            <div className="icon icon-shape bg-danger text-white rounded-circle shadow">
+                                                <i className="fas fa-chart-bar" />
+                                            </div>
+                                        </Col>
+                                    </Row>
+                                    <Form>
+                                        <div className="pl-lg-4">
+                                            <Row>
+                                                <Col lg="6">
+                                                    <FormGroup>
+                                                        <label
+                                                            className="form-control-label"
+                                                            htmlFor="input-username"
+                                                        >
+                                                            Mã
+                                                        </label>
+                                                        <Input
+                                                            className="form-control-alternative"
+                                                            id="input-username"
+                                                            placeholder="Nhập mã"
+                                                            type="text"
+                                                            name="code"
+                                                            value={search.code}
+                                                            onChange={(e) => onInputChange(e)}
+                                                        />
+                                                    </FormGroup>
+                                                </Col>
+                                                <Col lg="3">
+                                                    <FormGroup>
+                                                        <label
+                                                            className="form-control-label"
+                                                            htmlFor="input-email"
+                                                        >
+                                                            Size
+                                                        </label>
+                                                        <Input id="btn_select_tt" type="select" name="sizeId" value={search.sizeId}
+                                                            onChange={(e) => onInputChange(e)}>
+                                                            <option value=" "> -- Chọn --  </option>
+                                                            {listSizeById && listSizeById.length > 0 &&
+                                                                listSizeById.map((item, index) => {
+                                                                    return (
+                                                                        <option value={item.id} key={item.id} >
+                                                                            {item.name}
+                                                                        </option>
+                                                                    )
+
+                                                                })
+                                                            }
+                                                        </Input>
+                                                    </FormGroup>
+                                                </Col>
+                                                <Col lg="3">
+                                                    <FormGroup>
+                                                        <label
+                                                            className="form-control-label"
+                                                            htmlFor="input-email"
+                                                        >
+                                                            Color
+                                                        </label>
+                                                        <Input id="btn_select_tt" type="select" name="colorId" value={search.colorId}
+                                                            onChange={(e) => onInputChange(e)}>
+                                                            <option value=" "> -- Chọn --  </option>
+                                                            {listColorById && listColorById.length > 0 &&
+                                                                listColorById.map((item, index) => {
+                                                                    return (
+                                                                        <option value={item.id} key={item.id} >
+                                                                            {item.name}
+                                                                        </option>
+                                                                    )
+
+                                                                })
+                                                            }
+                                                        </Input>
+                                                    </FormGroup>
+                                                </Col>
+                                            </Row>
+
+                                            {value === 'yes' &&
+                                                <Row>
+                                                    <Col lg="6">
+                                                        <FormGroup>
+                                                            <label
+                                                                className="form-control-label"
+                                                                htmlFor="input-username"
+                                                            >
+                                                                Người tạo
+                                                            </label>
+                                                            <Input
+                                                                className="form-control-alternative"
+                                                                id="find_createdAt"
+                                                                name="createdBy"
+                                                                value={search.createdBy}
+                                                                onChange={(e) => onInputChange(e)}
+                                                                placeholder="Nhập người tạo"
+
+                                                            />
+
+                                                        </FormGroup>
+                                                    </Col>
+                                                    <Col lg="6" xl="6">
+                                                        <FormGroup>
+                                                            <Label for="find_createdDate" className="form-control-label">
+                                                                Ngày tạo:
+                                                            </Label>
+                                                            <Row>
+                                                                <Col xl={6}>
+                                                                    <Input
+                                                                        type="date"
+                                                                        className="form-control-alternative"
+                                                                        id="find_createdDate"
+                                                                        name="fromDateStr"
+                                                                        value={search.fromDateStr}
+                                                                        onChange={(e) => onInputChange(e)}
+                                                                    />
+                                                                </Col>
+                                                                <Col xl={6}>
+                                                                    <Input
+                                                                        type="date"
+                                                                        className="form-control-alternative"
+                                                                        id="find_createdDate"
+                                                                        name="toDateStr"
+                                                                        value={search.toDateStr}
+                                                                        onChange={(e) => onInputChange(e)}
+                                                                    />
+
+                                                                </Col>
+                                                            </Row>
+
+                                                        </FormGroup>
+                                                    </Col>
+                                                    <Col lg="6" xl="6">
+                                                        <FormGroup>
+                                                            <Label for="find_code" className="form-control-label">
+                                                                Số lượng:
+                                                            </Label>
+                                                            <Row>
+                                                                <Col xl={5}>
+                                                                    <Input
+
+                                                                        id="find_code"
+                                                                        name="fromQuantity"
+                                                                        placeholder="Nhập số lượng"
+                                                                        value={search.fromQuantity}
+                                                                        onChange={(e) => onInputChange(e)}
+                                                                    />
+                                                                </Col>
+                                                                <Label for="find_code" xl={1} className="form-control-label text-center">
+                                                                    <i class="fa-solid fa-arrow-right"></i>
+                                                                </Label>
+                                                                <Col xl={5}>
+                                                                    <Input
+
+                                                                        id="find_code"
+                                                                        name="toQuantity"
+                                                                        placeholder="Nhập số lượng"
+                                                                        value={search.toQuantity}
+                                                                        onChange={(e) => onInputChange(e)}
+                                                                    />
+                                                                </Col>
+                                                            </Row>
+                                                        </FormGroup>
+                                                    </Col>
+                                                    <Col lg="6" xl="6">
+                                                        <FormGroup>
+                                                            <Label for="find_code" className="form-control-label">
+                                                                Giá:
+                                                            </Label>
+                                                            <Row>
+                                                                <Col xl={5}>
+                                                                    <Input
+                                                                        id="find_code"
+                                                                        name="fromPrice"
+                                                                        placeholder="Nhập giá"
+                                                                        value={search.fromPrice}
+                                                                        onChange={(e) => onInputChange(e)}
+                                                                    />
+                                                                </Col>
+                                                                <Label for="find_code" xl={2} className="form-control-label text-center">
+                                                                    <i class="fa-solid fa-arrow-right"></i>
+                                                                </Label>
+                                                                <Col xl={5}>
+                                                                    <Input
+                                                                        id="find_code"
+                                                                        name="toPrice"
+                                                                        placeholder="Nhập giá"
+                                                                        value={search.toPrice}
+                                                                        onChange={(e) => onInputChange(e)}
+                                                                    />
+                                                                </Col>
+                                                            </Row>
+                                                        </FormGroup>
+                                                    </Col>
+                                                </Row>
+                                            }
+                                        </div>
+                                    </Form>
+                                    <Row className="mt-2">
+                                        <Col lg="6" xl="4" >
+                                            <span>
+                                                <Switch on="yes" off="no" value={value} onChange={setValue} />
+
+                                                <span>
+                                                    &nbsp;&nbsp;
+                                                    Tìm kiếm nâng cao
+                                                    &nbsp;&nbsp;
+                                                </span>
+                                            </span>
+                                        </Col>
+                                        <Col lg="6" xl="8">
+                                            <Button color="warning" >
+                                                <i class="fa-solid fa-magnifying-glass" /> &nbsp;
+                                                Tìm kiếm
+                                            </Button>
+                                            <Button color="primary" onClick={resetSearch}>
+                                                Làm mới bộ lọc
+                                            </Button>
                                         </Col>
                                     </Row>
                                 </CardBody>
                             </Card>
-                            <CardBody>
-                                <Form onSubmit={onSubmit}>
-                                    <h6 className="heading-small text-muted mb-4">
-                                        Danh sách sản phẩm
-                                    </h6>
-                                    <div className="pl-lg-4">
-                                        <Row>
-                                            <Col lg="6">
-                                                <FormGroup>
-                                                    <label
-                                                        className="form-control-label"
-                                                        htmlFor="input-name"
-                                                    >
-                                                        Mã
-                                                    </label>
-                                                    <Input
-                                                        type={"text"}
-                                                        className="form-control-alternative"
-                                                        id="input-name"
-                                                        name="code"
-                                                        value={dataEdit.code}
-                                                        disabled
-                                                    />
-                                                </FormGroup>
-                                            </Col>
-                                            <Col lg="6">
-                                                <FormGroup>
-                                                    <label
-                                                        className="form-control-label"
-                                                        htmlFor="input-name"
-                                                    >
-                                                        Tên
-                                                    </label>
-                                                    <Input
-                                                        type={"text"}
-                                                        className="form-control-alternative"
-                                                        id="input-name"
-                                                        placeholder="Nhập tên sản phẩm "
-                                                        name="name"
-                                                        onChange={(e) => onInputChange(e)}
-                                                        value={dataEdit.name}
-                                                    />
-                                                </FormGroup>
-                                            </Col>
-                                        </Row>
-                                        <Row>
-                                            <Col lg="4">
-                                                <FormGroup>
-                                                    <label
-                                                        className="form-control-label"
-                                                        htmlFor="input-city"
-                                                    >
-                                                        Hãng
-                                                    </label>
-                                                    <Input id="btn_select_tt" type="select" name="brandId" value={dataEdit.brandId}
-                                                        onChange={(e) => onInputChange(e)}>
-                                                        <option value="" > -- Chọn --  </option>
-                                                        {listBrand && listBrand.length > 0 &&
-                                                            listBrand.map((item, index) => {
-                                                                return (
-                                                                    <option value={item.id} key={item.id}>
-                                                                        {item.name}
-                                                                    </option>
-                                                                )
+                            <Card className="card-stats m-4 mb-xl-0">
+                                <CardBody>
+                                    <Row className="align-items-center mb-2">
 
-                                                            })
-                                                        }
-                                                    </Input>
-                                                </FormGroup>
-                                            </Col>
-                                            <Col lg="4">
-                                                <FormGroup>
-                                                    <label
-                                                        className="form-control-label"
-                                                        htmlFor="input-country"
-                                                    >
-                                                        Xuất xứ
-                                                    </label>
-                                                    <Input id="btn_select_tt" name="originId" type="select" value={dataEdit.originId}
-                                                        onChange={(e) => onInputChange(e)}>
-                                                        <option value="" > -- Chọn --  </option>
-                                                        {listorigin && listorigin.length > 0 &&
-                                                            listorigin.map((item, index) => {
-                                                                return (
-                                                                    <option value={item.id} key={item.id}>
-                                                                        {item.name}
-                                                                    </option>
-                                                                )
+                                        <CardTitle
+                                            tag="h5"
+                                            className=" col-2 text-uppercase text-muted mb-0">
+                                            <h3> DANH SÁCH</h3>
+                                        </CardTitle>
 
-                                                            })
-                                                        }
-                                                    </Input>
-                                                </FormGroup>
-                                            </Col>
-                                            <Col lg="4">
-                                                <FormGroup>
-                                                    <label
-                                                        className="form-control-label"
-                                                        htmlFor="input-country"
-                                                    >
-                                                        Thiết kế
-                                                    </label>
-                                                    <Input id="btn_select_tt" name="designStyleId" type="select" value={dataEdit.designStyleId}
-                                                        onChange={(e) => onInputChange(e)} >
-                                                        <option value="" > -- Chọn --  </option>
-                                                        {listDesignStyle && listDesignStyle.length > 0 &&
-                                                            listDesignStyle.map((item, index) => {
-                                                                return (
-                                                                    <option value={item.id} key={item.id}>
-                                                                        {item.name}
-                                                                    </option>
-                                                                )
+                                        <div className="col-10 text-right">
+                                            <Button
+                                                className="btn btn-outline-primary"
+                                                size="sm"
+                                                to="/admin/product2/add" tag={Link}>
+                                                Thêm mới
+                                            </Button>
+                                            <Button
+                                                className="btn btn-outline-primary"
+                                                onClick={(e) => e.preventDefault()}
+                                                size="sm"
+                                            >
+                                                Tải mẫu
+                                            </Button>
 
-                                                            })
-                                                        }
-                                                    </Input>
-                                                </FormGroup>
-                                            </Col>
-                                        </Row>
-                                        <Row>
-                                            <Col lg="4">
-                                                <FormGroup>
-                                                    <label
-                                                        className="form-control-label"
-                                                        htmlFor="input-first-name"
-                                                    >
-                                                        Loại da
-                                                    </label>
-                                                    <Input id="btn_select_tt" name="skinTypeId" type="select" value={dataEdit.skinTypeId}
-                                                        onChange={(e) => onInputChange(e)} >
-                                                        <option value="" > -- Chọn --  </option>
-                                                        {listSkinStype && listSkinStype.length > 0 &&
-                                                            listSkinStype.map((item, index) => {
-                                                                return (
-                                                                    <option value={item.id} key={item.id}>
-                                                                        {item.name}
-                                                                    </option>
-                                                                )
+                                            <Button
+                                                className="btn btn-outline-primary"
+                                                size="sm"
+                                            >
+                                                Nhập Excel
+                                            </Button>
+                                            <Button
+                                                className="btn btn-outline-primary"
+                                                size="sm"
+                                            >
+                                                Xuất Excel
+                                            </Button>
+                                            <Button
+                                                className="btn btn-outline-primary"
+                                                size="sm"
+                                            >
+                                                Xuất PDF
+                                            </Button>
+                                            <Input type="select" name="status" value={search.status} size="sm" onChange={(e) => onInputChange(e)} >
+                                                <option value=" ">Tất cả</option>
+                                                <option value=" "></option>
+                                                <option value=" ">Tất cả</option>
+                                            </Input>
 
-                                                            })
-                                                        }
-                                                    </Input>
-                                                </FormGroup>
-                                            </Col>
-                                            <Col lg="4">
-                                                <FormGroup>
-                                                    <label
-                                                        className="form-control-label"
-                                                        htmlFor="input-last-name"
-                                                    >
-                                                        Mũi giày
-                                                    </label>
-                                                    <Input id="btn_select_tt" name="toeId" type="select" value={dataEdit.toeId}
-                                                        onChange={(e) => onInputChange(e)} >
-                                                        <option value="" > -- Chọn --  </option>
-                                                        {listToe && listToe.length > 0 &&
-                                                            listToe.map((item, index) => {
-                                                                return (
-                                                                    <option value={item.id} key={item.id}>
-                                                                        {item.name}
-                                                                    </option>
-                                                                )
 
-                                                            })
-                                                        }
-                                                    </Input>
-                                                </FormGroup>
-                                            </Col>
-                                            <Col lg="4">
-                                                <FormGroup>
-                                                    <label
-                                                        className="form-control-label"
-                                                        htmlFor="input-last-name"
-                                                    >
-                                                        Đế giày
-                                                    </label>
-                                                    <Input id="btn_select_tt" name="soleId" type="select" value={dataEdit.soleId}
-                                                        onChange={(e) => onInputChange(e)} >
-                                                        <option value="" > -- Chọn --  </option>
-                                                        {listSole && listSole.length > 0 &&
-                                                            listSole.map((item, index) => {
-                                                                return (
-                                                                    <option value={item.id} key={item.id}>
-                                                                        {item.name}
-                                                                    </option>
-                                                                )
-
-                                                            })
-                                                        }
-                                                    </Input>
-                                                </FormGroup>
-                                            </Col>
-                                        </Row>
-                                    </div>
-
-                                    <div className="pl-lg-4">
-                                        <Row>
-                                            <Col lg="8">
-                                                <Row>
-                                                    <Col lg="6">
-                                                        <FormGroup>
-                                                            <label
-                                                                className="form-control-label"
-                                                                htmlFor="input-last-name"
-                                                            >
-                                                                Lót giày
-                                                            </label>
-                                                            <Input id="btn_select_tt" name="liningId" type="select" value={dataEdit.liningId}
-                                                                onChange={(e) => onInputChange(e)} >
-                                                                <option value="" > -- Chọn --  </option>
-                                                                {listLining && listLining.length > 0 &&
-                                                                    listLining.map((item, index) => {
-                                                                        return (
-                                                                            <option value={item.id} key={item.id}>
-                                                                                {item.name}
-                                                                            </option>
-                                                                        )
-
-                                                                    })
-                                                                }
-                                                            </Input>
+                                        </div>
+                                    </Row>
+                                    {/*  */}
+                                    <Row>
+                                        <Table bordered dark hover responsive striped>
+                                            <thead>
+                                                <tr>
+                                                    <th className="text-center pb-4" >
+                                                        <FormGroup check>
+                                                            <Input type="checkbox" />
                                                         </FormGroup>
-                                                    </Col>
 
-                                                    <Col lg="6">
-                                                        <FormGroup>
-                                                            <label
-                                                                className="form-control-label"
-                                                                htmlFor="input-last-name"
-                                                            >
-                                                                Đệm giày
-                                                            </label>
-                                                            <Input id="btn_select_tt" name="cushionId" type="select" value={dataEdit.cushionId}
-                                                                onChange={(e) => onInputChange(e)} >
-                                                                <option value="" > -- Chọn --  </option>
-                                                                {listCushion && listCushion.length > 0 &&
-                                                                    listCushion.map((item, index) => {
-                                                                        return (
-                                                                            <option value={item.id} key={item.id}>
-                                                                                {item.name}
-                                                                            </option>
-                                                                        )
+                                                    </th>
+                                                    <th>STT</th>
+                                                    <th>Mã</th>
+                                                    <th>Màu</th>
+                                                    <th>Size</th>
+                                                    <th>Số lượng</th>
+                                                    <th>Giá</th>
 
-                                                                    })
-                                                                }
-                                                            </Input>
-                                                        </FormGroup>
-                                                    </Col>
-                                                </Row>
-                                                <Row>
-                                                    <Col lg="12">
-                                                        <FormGroup>
-                                                            <label className="form-control-label">Mô tả</label>
-                                                            <Input
-                                                                className="form-control-alternative"
-                                                                placeholder="Mô tả sản phẩm ...."
-                                                                rows="5"
-                                                                type="textarea"
-                                                                name="description"
-                                                                value={dataEdit.description}
-                                                                onChange={(e) => onInputChange(e)}
-                                                            />
-                                                        </FormGroup>
-                                                    </Col>
-                                                </Row>
-                                            </Col>
-                                            <Col lg="4">
-                                                <label className="form-control-label">Thêm ảnh</label>
-                                                <div className="box-image">
-                                                    {/* <img src={''} /> */}
-                                                </div>
-                                                <div >
-                                                    <input type="file" accept="image/*" onChange={handleImageChange} />
-                                                    {selectedImage && (
-                                                        <div>
-                                                            <p>Selected Image:</p>
-                                                            <img src={`https://s3-ap-southeast-1.amazonaws.com/imageshoestore/${selectedImage}`} alt="Ảnh mô tả" />
+                                                    <th colSpan={2}>Thao tác</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {ListShoesDetail.length <= 0 &&
+                                                    <th className="text-center" colSpan={17}>
+                                                        Không có dữ liệu
+                                                    </th>
+                                                }
+
+                                                {ListShoesDetail && ListShoesDetail.length > 0 &&
+                                                    ListShoesDetail.map((item, index) => {
+                                                        return (
+                                                            <tr key={item.id} >
+                                                                <td className="text-center">
+                                                                    <FormGroup check>
+                                                                        <Input type="checkbox" />
+                                                                    </FormGroup>
+                                                                </td>
+                                                                <th scope="row"> {index + 1}</th>
+                                                                <td>{item.code}</td>
+                                                                <td>{item.color}</td>
+                                                                <td>{item.size}</td>
+                                                                <td>{item.quantity}</td>
+                                                                <td>{item.price}</td>
+                                                                <td>
+                                                                    <Button color="danger" to={`/admin/product/detail/${item.id}`} tag={Link} size="sm">
+                                                                        <i class="fa-solid fa-eye"></i>
+                                                                    </Button>
+                                                                    <Button color="danger" to={`/admin/product2/edit/${item.id}`} tag={Link} size="sm">
+                                                                        <i class="fa-solid fa-pen" />
+                                                                    </Button>
+                                                                    <Button color="warning" size="sm" >
+                                                                        <i class="fa-solid fa-trash" />
+                                                                    </Button>
+                                                                </td>
+                                                            </tr>
+                                                        )
+
+                                                    })
+                                                }
+
+                                            </tbody>
+                                        </Table>
+                                    </Row>
+
+
+                                    {/*  */}
+                                </CardBody>
+                            </Card>
+                            <Card className="card-stats m-4 mb-xl-0">
+                                <CardBody >
+                                    <Row className="align-items-center mb-2">
+                                        <Col lg="6">
+                                            <Card className="shadow m-4">
+
+                                                <CardBody>
+                                                    <CardTitle
+                                                        tag="h5"
+                                                        className="text-uppercase text-muted mb-0"
+                                                    >
+                                                        <h3>Màu</h3>
+                                                    </CardTitle>
+                                                    <FormGroup check>
+                                                        <div className="mb-2">
+                                                            <Input type="checkbox" />Tất cả
                                                         </div>
-                                                    )}
-                                                </div>
-                                            </Col>
-                                        </Row>
-                                    </div>
-                                    <div className="pl-lg-4">
-                                        <Row>
-                                            <Col lg="6">
-                                                <FormGroup>
-                                                    <label
-                                                        className="form-control-label"
-                                                        htmlFor="input-username"
+                                                        <Row>
+                                                            <Col lg={2}></Col>
+                                                            <Col lg={10}>
+                                                                <Row>
+
+                                                                    {
+                                                                        listColor && listColor.length &&
+                                                                        listColor.map((item, index) => {
+                                                                            return (
+                                                                                <Col lg={6}>
+                                                                                    <div>
+                                                                                        <Input type="checkbox" value={item.id} key={item.id} />{item.name}
+                                                                                    </div>
+                                                                                </Col>
+
+                                                                            )
+                                                                        })
+                                                                    }
+
+                                                                </Row>
+                                                            </Col>
+                                                        </Row>
+                                                    </FormGroup>
+                                                </CardBody>
+                                            </Card>
+
+                                        </Col>
+                                        <Col lg="6">
+                                            <Card className="shadow m-4">
+
+                                                <CardBody>
+                                                    <CardTitle
+                                                        tag="h5"
+                                                        className="text-uppercase text-muted mb-0"
                                                     >
-                                                        Người tạo
-                                                    </label>
-                                                    <Input
-                                                        className="form-control-alternative"
-                                                        type="text"
-                                                        value={dataEdit.createdBy}
-                                                        disabled
-                                                    />
-                                                </FormGroup>
-                                            </Col>
-                                            <Col lg="6">
-                                                <FormGroup>
-                                                    <label
-                                                        className="form-control-label"
-                                                        htmlFor="input-email"
-                                                    >
-                                                        Ngày tạo
-                                                    </label>
-                                                    <Input
-                                                        className="form-control-alternative"
-                                                        type="text"
-                                                        disabled
-                                                        value={dataEdit.createdTime}
-                                                    />
-                                                </FormGroup>
-                                            </Col>
-                                        </Row>
+                                                        <h3>Size</h3>
+                                                    </CardTitle>
+                                                    <FormGroup check>
+                                                        <div className="mb-2">
+                                                            <Input type="checkbox" />Tất cả
+                                                        </div>
+                                                        <Row>
+                                                            <Col lg={2}></Col>
+                                                            <Col lg={10}>
+                                                                <Row>
 
-                                    </div>
+                                                                    {
+                                                                        listSize && listSize.length &&
+                                                                        listSize.map((item, index) => {
+                                                                            return (
+                                                                                <Col lg={6}>
+                                                                                    <div>
+                                                                                        <Input type="checkbox" value={item.id} key={item.id} />{item.name}
+                                                                                    </div>
+                                                                                </Col>
 
-                                    <div className="text-center">
-                                        <Button color="warning" >
-                                            Sửa
-                                        </Button>
-                                    </div>
-                                    <hr className="my-4" />
+                                                                            )
+                                                                        })
+                                                                    }
 
-                                </Form>
-                            </CardBody>
+                                                                </Row>
+                                                            </Col>
+                                                        </Row>
+                                                    </FormGroup>
+                                                </CardBody>
+                                            </Card>
+
+                                        </Col>
+                                    </Row>
+                                    {/*  */}
+                                    <Row className="m-4">
+                                        <Table bordered dark hover responsive striped >
+                                            <thead>
+                                                <tr>
+                                                    <th >Size</th>
+                                                    <th>Giá</th>
+                                                    <th>Số lượng</th>
+                                                    <th>Trạng Thái</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {ListShoesDetail.length <= 0 &&
+                                                    <th className="text-center" colSpan={17}>
+                                                        Không có dữ liệu
+                                                    </th>
+                                                }
+
+                                                {ListShoesDetail && ListShoesDetail.length > 0 &&
+                                                    ListShoesDetail.map((item, index) => {
+                                                        return (
+                                                            <tr key={item.id} >
+                                                                <td>{item.code}</td>
+                                                                <td>{item.color}</td>
+                                                                <td>{item.size}</td>
+                                                                <td>{item.quantity}</td>
+                                                            </tr>
+                                                        )
+
+                                                    })
+                                                }
+
+                                            </tbody>
+                                        </Table>
+                                    </Row>
+
+
+                                    {/*  */}
+                                </CardBody>
+                            </Card>
                         </Card >
                     </div >
                 </Row >

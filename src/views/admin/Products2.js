@@ -68,18 +68,10 @@ const Products2 = () => {
     })
   };
   const onInputChange = async (e) => {
-    // setSearch({ ...search, [e.target.name]: e.target.value }, () => {
-    //   // console.log(search); // Log giá trị sau khi state đã được cập nhật
-    // });
-
-    console.log({ [e.target.name]: e.target.value });
-    const res = await setSearch({ ...search, [e.target.name]: e.target.value });
-    console.log(res);
-    console.log("check", { ...search, [e.target.name]: e.target.value });
+    await setSearch({ ...search, [e.target.name]: e.target.value });
     getAll(0, 10);
   };
   useEffect(() => {
-    console.log(search);
     getAll(0, 10);
   }, [search]);
 
