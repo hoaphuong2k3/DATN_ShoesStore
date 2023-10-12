@@ -27,7 +27,7 @@ const Promotion = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const discountsData = await axiosInstance.get("/vouchers/getAllVoucher");
+                const discountsData = await axiosInstance.get("/vouchers/getAll");
                 setDiscounts(discountsData.data);
             } catch (error) {
                 console.error("Error fetching data:", error);
@@ -306,8 +306,8 @@ return (
                                                                 className="custom-control-alternative"
                                                                 name="type"
                                                                 type="radio"
-                                                                checked={selectedValueType2 === 2}
-                                                                onChange={() => setSelectedValueType2(2)}
+                                                                checked={selectedValueType2 === 1}
+                                                                onChange={() => setSelectedValueType2(1)}
                                                             />Hóa đơn
                                                         </div>
                                                         <div className="custom-control custom-radio">
@@ -315,14 +315,14 @@ return (
                                                                 className="custom-control-alternative"
                                                                 name="type"
                                                                 type="radio"
-                                                                checked={selectedValueType2 === 1}
-                                                                onChange={() => setSelectedValueType2(1)}
+                                                                checked={selectedValueType2 === 2}
+                                                                onChange={() => setSelectedValueType2(2)}
                                                             />Sản phẩm
                                                         </div>
                                                     </div>
                                                 </FormGroup>
                                             </Col>
-                                            {selectedValueType2 === 2 && (
+                                            {selectedValueType2 === 1 && (
                                                 <Col lg="3">
                                                     <FormGroup>
                                                         <label
@@ -502,7 +502,7 @@ return (
                                                 </FormGroup>
                                             </Col>
 
-                                            {selectedValueType2 === 1 && (
+                                            {selectedValueType2 === 2 && (
                                                 <Col lg="12">
                                                     <h6 className="heading-small text-muted mb-4">
                                                         Sản phẩm áp dụng
@@ -607,7 +607,7 @@ return (
                                                 <tr key={index}>
                                                     <td>{index + 1}</td>
                                                     <td>{discount.code}</td>
-                                                    <td>{discount.discountType === 2 ? "Hóa đơn" : "Sản phẩm"}</td>
+                                                    <td>{discount.discountType === 1 ? "Hóa đơn" : "Sản phẩm"}</td>
                                                     <td>{discount.name}</td>
                                                     <td>{discount.description}</td>
                                                     <td>{discount.minPrice}</td>

@@ -14,7 +14,7 @@ import AddProduct2 from "views/admin/AddProduct2.js";
 import EditProduct2 from "views/admin/EditProduct2.js";
 import DetailProduct from "views/admin/DetailProduct.js";
 import BillDetail from "views/admin/BillDetail.js"
-
+import Discount from "views/admin/discount/Discount.js";
 var routes = [
   {
     path: "/index",
@@ -115,6 +115,13 @@ var routes = [
     path: "/bill-details/:id",
     component: <BillDetail />,
     layout: "/admin",
-  }
+  },
+  {
+    path: "/discount",
+    name: "Sale",
+    icon: "ni ni-circle-08 text-pink",
+    component: <Discount />,
+    layout: "/admin",
+  },
 ];
 export default routes;
