@@ -18,7 +18,7 @@ import {
 
 import Header from "components/Headers/Header.js";
 import SalePromo from "views/admin/discount/SalePromo.js";
-
+import SaleProduct from "views/admin/discount/SaleProduct.js";
 class Discount extends React.Component {
     state = {
         iconTabs: 1,
@@ -94,12 +94,7 @@ class Discount extends React.Component {
                                                         <SalePromo />
                                                     </TabPane>
                                                     <TabPane tabId="iconTabs2">
-                                                        <p className="description">
-                                                            Cosby sweater eu banh mi, qui irure terry richardson ex
-                                                            squid. Aliquip placeat salvia cillum iphone. Seitan
-                                                            aliquip quis cardigan american apparel, butcher voluptate
-                                                            nisi qui.
-                                                        </p>
+                                                        <SaleProduct />
                                                     </TabPane>
 
                                                 </TabContent>

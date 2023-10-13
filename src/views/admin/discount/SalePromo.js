@@ -66,8 +66,6 @@ const Promotion = () => {
         endDate: ""
     });
 
-
-
     const handleRowClick = (discount) => {
         if (discount.salePercent !== null) {
             setFormData({
