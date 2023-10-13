@@ -201,7 +201,7 @@ const Cart = () => {
                                       background-color: #e9ecef;
                                       color: black;
                                       width: 30px;
-                                      height: 29px;
+                                      height: 30px;
                                       display: flex;
                                       align-items: center;
                                       justify-content: center;
@@ -270,7 +270,7 @@ const Cart = () => {
                             name="checkout"
                             className="ml-auto btnCart"
                           >
-                            Tiến hành đặt hàng
+                            Mua Hàng
                           </Button>
                         </div>
                       </div>
