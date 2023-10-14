@@ -750,6 +750,9 @@ const Products2 = () => {
                               <td>{item.totalQuantity}</td>
                               <td>{item.totalRecord}</td>
                               <td>
+                                <Button color="danger" to={`/admin/shoesdetail/${item.id}`} tag={Link} size="sm">
+                                  <i class="fa-solid fa-eye" />&nbsp;CTSP
+                                </Button>
                                 <Button color="danger" to={`/admin/product/detail/${item.id}`} tag={Link} size="sm">
                                   <i class="fa-solid fa-eye"></i>
                                 </Button>
