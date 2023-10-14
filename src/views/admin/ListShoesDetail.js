@@ -225,6 +225,7 @@ const ListShoesDetail = () => {
 
     //End Cbb selected color
     const [valueSelectedColor, setValueSelectedColor] = useState(+'');
+    const [valueSize, setValueSize] = useState(+'');
     const [listvalueSelectedColor, setListValuesSelectedColor] = useState([]);
     const onInputChangeSelectedColor = (value) => {
         setValueSelectedColor(+value);
@@ -271,6 +272,7 @@ const ListShoesDetail = () => {
     const [listshoes, setListShoes] = useState([]);
     const onClickSize = (value) => {
         console.log("value:", value);
+        setValueSize(value);
     }
     const onInputChangeAdd = async (e) => {
         await setShoesDetail({ ...shoesdetail, [e.target.name]: e.target.value });
@@ -704,15 +706,25 @@ const ListShoesDetail = () => {
                                                                 <td>{item.quantity}</td>
                                                                 <td>{item.price}</td>
                                                                 <td>
-                                                                    <Button color="danger" to={`/admin/product/detail/${item.id}`} tag={Link} size="sm">
+                                                                    <Button color="danger" to={`/admin/product/detail/${item.id}`} tag={Link} size="sm" disabled={item.status === 0 ? true : false}>
                                                                         <i class="fa-solid fa-eye"></i>
                                                                     </Button>
-                                                                    <Button color="danger" to={`/admin/product2/edit/${item.id}`} tag={Link} size="sm">
+                                                                    <Button color="danger" to={`/admin/product2/edit/${item.id}`} tag={Link} size="sm" disabled={item.status === 0 ? true : false}>
                                                                         <i class="fa-solid fa-pen" />
                                                                     </Button>
-                                                                    <Button color="warning" size="sm" >
+                                                                    <Button color="danger" size="sm" disabled={item.status === 0 ? true : false}>
                                                                         <i class="fa-solid fa-trash" />
                                                                     </Button>
+                                                                    {item.status === 0 &&
+                                                                        <Button color="danger" size="sm">
+                                                                            <i class="fa-solid fa-lock-open fa-flip-horizontal"></i>
+                                                                        </Button>
+                                                                    }
+                                                                    {item.status === 1 &&
+                                                                        <Button color="danger" size="sm" >
+                                                                            <i class="fa-solid fa-lock"></i>
+                                                                        </Button>
+                                                                    }
                                                                 </td>
                                                             </tr>
                                                         )
