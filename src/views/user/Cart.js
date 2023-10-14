@@ -98,7 +98,8 @@ const Cart = () => {
                   <hr color="orange" width="300px" className="mb-5"/>
                   
                   {cartData && Array.isArray(cartData) && cartData.length === 0 ? (
-                    <p>Giỏ hàng trống</p>
+                    <p>Bạn không có sản phẩm nào trong giỏ hàng của bạn.<br/>Bấm vào <a href="/shoes/product">đây</a> để tiếp tục mua sắm </p>
+
                   ) : (
 
                     <form
