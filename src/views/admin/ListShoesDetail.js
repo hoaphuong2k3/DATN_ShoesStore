@@ -11,6 +11,7 @@ import {
 import { toast } from 'react-toastify';
 import Header from "components/Headers/Header.js";
 import Switch from 'react-input-switch';
+import axios from "axios";
 
 const ListShoesDetail = () => {
     const [value, setValue] = useState('no');
@@ -277,7 +278,15 @@ const ListShoesDetail = () => {
     const onInputChangeAdd = async (e) => {
         await setShoesDetail({ ...shoesdetail, [e.target.name]: e.target.value });
     };
-
+    //Khóa
+    const lock = async (id) => {
+        await axios.put(`http://localhost:33321/api/admin/shoesdetail/stop-business/${id}`);
+        getAll();
+    };
+    const openlock = async (id) => {
+        await axios.put(`http://localhost:33321/api/admin/shoesdetail/on-business/${id}`);
+        getAll();
+    };
     //End Hiển Thi Combobox
     return (
         <>
@@ -716,12 +725,12 @@ const ListShoesDetail = () => {
                                                                         <i class="fa-solid fa-trash" />
                                                                     </Button>
                                                                     {item.status === 0 &&
-                                                                        <Button color="danger" size="sm">
+                                                                        <Button color="danger" size="sm" onClick={() => openlock(item.id)}>
                                                                             <i class="fa-solid fa-lock-open fa-flip-horizontal"></i>
                                                                         </Button>
                                                                     }
                                                                     {item.status === 1 &&
-                                                                        <Button color="danger" size="sm" >
+                                                                        <Button color="danger" size="sm" onClick={() => lock(item.id)} >
                                                                             <i class="fa-solid fa-lock"></i>
                                                                         </Button>
                                                                     }
