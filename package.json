@@ -43,7 +43,9 @@
     "not op_mini all"
   ],
   "dependencies": {
-    "@fortawesome/fontawesome-free": "6.4.0",
+    "@fortawesome/fontawesome-svg-core": "^6.4.2",
+    "@fortawesome/free-solid-svg-icons": "^6.4.2",
+    "@fortawesome/react-fontawesome": "^0.2.0",
     "axios": "^0.26.1",
     "bootstrap": "^4.6.2",
     "chart.js": "2.9.4",
@@ -74,5 +76,8 @@
     "svgo": "3.0.2",
     "fsevents": "2.3.2",
     "chokidar": "3.5.3"
+  },
+  "devDependencies": {
+    "@fortawesome/fontawesome-free": "^6.4.2"
   }
 }

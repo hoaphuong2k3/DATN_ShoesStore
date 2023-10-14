@@ -90,7 +90,13 @@ const Cart = () => {
             <Card className="shadow">
               <CardBody>
                 <div className="inner">
-                  <h1>Giỏ hàng</h1>
+                
+                  <h1 className="text-dark mb-3 text-center">
+                    <img src="https://cdn-icons-png.flaticon.com/128/711/711897.png" width={"30px"} height={'35px'} className="mr-3"/>
+                      Giỏ hàng
+                  </h1>
+                  <hr color="orange" width="300px" className="mb-5"/>
+                  
                   {cartData && Array.isArray(cartData) && cartData.length === 0 ? (
                     <p>Giỏ hàng trống</p>
                   ) : (
