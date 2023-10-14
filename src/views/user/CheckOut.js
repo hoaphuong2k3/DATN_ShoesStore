@@ -114,7 +114,7 @@ const Checkout = () => {
                                     </div>
                                     <div className="mt-5">
                                         <div className="inner">
-                                            <h3 className="text-dark"><i class="fa fa-map-marker" style={{marginRight:"5px;"}}  aria-hidden="true"></i>
+                                            <h3 className="text-dark"><i class="fa fa-map-marker" style={{ marginRight: "5px;" }} aria-hidden="true"></i>
                                                 Thông tin giao hàng
                                             </h3>
                                             <form action="/checkout" method="post" noValidate className="checkout table-wrap medium--hide small--hide">
@@ -265,14 +265,20 @@ const Checkout = () => {
                 <ModalBody>
                     <Card>
                         <CardBody>
-                            <div>Mã giảm giá 1</div>
+                            <div>
+                                <div>
+                                    <span className="mr-5">Mã giảm giá 1</span>
+                                    <Input name="voucher_1" style={{ float: "right" }} type="radio" />
+                                </div>
+                            </div>
                         </CardBody>
                     </Card>
                 </ModalBody>
                 <ModalFooter>
-                    <a color="secondary" onClick={handleCloseVoucherModal} style={{cursor: "pointer"}}>
+                    <a color="secondary" onClick={handleCloseVoucherModal} style={{ cursor: "pointer" }}>
                         Đóng
                     </a>
+                    <Button className="btn btn-info small d-flex justify-content-center ml-3 text-dark">Áp dụng</Button>
                 </ModalFooter>
             </Modal>
         </>
