@@ -109,7 +109,6 @@ const ListShoesDetail = () => {
     const onInputChange = async (e) => {
         await setSearch({ ...search, [e.target.name]: e.target.value });
     };
-
     //Hiển thị combobox
     const getlistColorById = async () => {
         let res = await getAllColorId(id);
@@ -135,6 +134,147 @@ const ListShoesDetail = () => {
             setListSize(res.data);
         }
     }
+
+    //Cbb selected
+    const [selectAllSize, setSelectAllSize] = useState(false);
+    const [checkboxesSize, setCheckboxesSize] = useState([]);
+    const [selectedValuesSize, setSelectedValuesSize] = useState([]);
+    const initializeCheckboxesSize = () => {
+        const initialCheckboxesSize = listSize.map((item) => ({
+            id: item.id,
+            label: item.name,
+            checked: false,
+        }));
+        setCheckboxesSize(initialCheckboxesSize);
+    };
+
+    function handleSelectAllSize() {
+        const updatedCheckboxesSize = checkboxesSize.map((checkbox) => ({
+            ...checkbox,
+            checked: !selectAllSize,
+        }));
+        setCheckboxesSize(updatedCheckboxesSize);
+        setSelectAllSize(!selectAllSize);
+        // Cập nhật selectedValuesSize dựa trên checkboxes đã chọn
+        const selectedValuesSize = updatedCheckboxesSize
+            .filter((checkbox) => checkbox.checked)
+            .map((checkbox) => ({ id: checkbox.id, name: checkbox.label }));
+        setSelectedValuesSize(selectedValuesSize);
+    }
+
+    function handleCheckboxSizeChange(checkboxId) {
+        const updatedCheckboxesSize = checkboxesSize.map((checkbox) =>
+            checkbox.id === checkboxId ? { ...checkbox, checked: !checkbox.checked } : checkbox
+        );
+        setCheckboxesSize(updatedCheckboxesSize);
+
+        // Cập nhật selectedValuesSize dựa trên checkboxes đã chọn
+        const selectedValuesSize = updatedCheckboxesSize
+            .filter((checkbox) => checkbox.checked)
+            .map((checkbox) => ({ id: checkbox.id, name: checkbox.label }));
+        setSelectedValuesSize(selectedValuesSize);
+    }
+    useEffect(() => {
+        initializeCheckboxesSize();
+    }, [listSize]);
+    //End Cbb selected
+
+    //Cbb selected color
+    const [selectAllColor, setSelectAllColor] = useState(false);
+    const [checkboxesColor, setCheckboxesColor] = useState([]);
+    const [selectedValuesColor, setSelectedValuesColor] = useState([]);
+    const initializeCheckboxesColor = () => {
+        const initialCheckboxesColor = listColor.map((item) => ({
+            id: item.id,
+            label: item.name,
+            checked: false,
+        }));
+        setCheckboxesColor(initialCheckboxesColor);
+    };
+
+    function handleSelectAllColor() {
+        const updatedCheckboxesColor = checkboxesColor.map((checkbox) => ({
+            ...checkbox,
+            checked: !selectAllColor,
+        }));
+        setCheckboxesColor(updatedCheckboxesColor);
+        setSelectAllColor(!selectAllColor);
+
+        // Cập nhật selectedValuesSize dựa trên checkboxes đã chọn
+        const selectedValuesColor = updatedCheckboxesColor
+            .filter((checkbox) => checkbox.checked)
+            .map((checkbox) => ({ id: checkbox.id, name: checkbox.label }));
+        setSelectedValuesColor(selectedValuesColor);
+    }
+
+    function handleCheckboxColorChange(checkboxId) {
+        const updatedCheckboxesColor = checkboxesColor.map((checkbox) =>
+            checkbox.id === checkboxId ? { ...checkbox, checked: !checkbox.checked } : checkbox
+        );
+        setCheckboxesColor(updatedCheckboxesColor);
+
+        // Cập nhật selectedValuesSize dựa trên checkboxes đã chọn
+        const selectedValuesColor = updatedCheckboxesColor
+            .filter((checkbox) => checkbox.checked)
+            .map((checkbox) => ({ id: checkbox.id, name: checkbox.label }));
+        setSelectedValuesColor(selectedValuesColor);
+    }
+    useEffect(() => {
+        initializeCheckboxesColor();
+    }, [listColor]);
+
+    //End Cbb selected color
+    const [valueSelectedColor, setValueSelectedColor] = useState(+'');
+    const [listvalueSelectedColor, setListValuesSelectedColor] = useState([]);
+    const onInputChangeSelectedColor = (value) => {
+        setValueSelectedColor(+value);
+    }
+    useEffect(() => {
+    }, [listvalueSelectedColor]);
+    useEffect(() => {
+        let count = 0;
+        if (listvalueSelectedColor.length > 0) {
+            listvalueSelectedColor.map((item) => {
+                if (item === valueSelectedColor) {
+                    count++;
+                }
+            });
+            if (count === 0) {
+                setListValuesSelectedColor([...listvalueSelectedColor, valueSelectedColor]);
+            }
+        }
+    }, [valueSelectedColor]);
+
+    useEffect(() => {
+        console.log(listvalueSelectedColor);
+    }, [listvalueSelectedColor]);
+
+    useEffect(() => {
+        if (listvalueSelectedColor.length === 0) {
+            if (selectedValuesColor.length > 0) {
+                setValueSelectedColor(selectedValuesColor[0].id);
+                setListValuesSelectedColor([...listvalueSelectedColor, selectedValuesColor[0].id]);
+            }
+        } else {
+            const set1 = new Set(selectedValuesColor.map((item) => item.id));
+            const commonValues = listvalueSelectedColor.filter(value => set1.has(value));
+            setListValuesSelectedColor(commonValues);
+        }
+    }, [selectedValuesColor]);
+    const [shoesdetail, setShoesDetail] = useState({
+        sizeId: "",
+        colorId: "",
+        quantity: "",
+        price: "",
+        status: ""
+    });
+    const [listshoes, setListShoes] = useState([]);
+    const onClickSize = (value) => {
+        console.log("value:", value);
+    }
+    const onInputChangeAdd = async (e) => {
+        await setShoesDetail({ ...shoesdetail, [e.target.name]: e.target.value });
+    };
 
     //End Hiển Thi Combobox
     return (
@@ -512,9 +652,9 @@ const ListShoesDetail = () => {
                                                 Xuất PDF
                                             </Button>
                                             <Input type="select" name="status" value={search.status} size="sm" onChange={(e) => onInputChange(e)} >
-                                                <option value=" ">Tất cả</option>
-                                                <option value=" "></option>
-                                                <option value=" ">Tất cả</option>
+                                                <option value="0">Tất cả</option>
+                                                <option value="1"></option>
+                                                <option value="2">Tất cả</option>
                                             </Input>
 
 
@@ -589,130 +729,174 @@ const ListShoesDetail = () => {
                                 </CardBody>
                             </Card>
                             <Card className="card-stats m-4 mb-xl-0">
-                                <CardBody >
-                                    <Row className="align-items-center mb-2">
-                                        <Col lg="6">
-                                            <Card className="shadow m-4">
+                                <Row className="align-items-center mb-2">
+                                    <Col lg="6">
+                                        <Card className="shadow m-4">
+                                            <CardBody>
+                                                <CardTitle
+                                                    tag="h5"
+                                                    className="text-uppercase text-muted mb-0"
+                                                >
+                                                    <h3>Màu</h3>
+                                                </CardTitle>
+                                                <FormGroup check>
+                                                    <div className="mb-2">
+                                                        <label>
+                                                            <input
+                                                                type="checkbox"
+                                                                checked={selectAllColor}
+                                                                onChange={handleSelectAllColor}
+                                                            />&nbsp;&nbsp;
+                                                            Tất cả
+                                                        </label>
+                                                    </div>
+                                                    <Row>
+                                                        <Col lg={2}></Col>
+                                                        <Col lg={10}>
+                                                            <Row>
+                                                                {checkboxesColor.map((checkbox) => (
+                                                                    <Col lg={6}>
+                                                                        <label key={checkbox.id}>
+                                                                            <input
+                                                                                type="checkbox"
+                                                                                checked={checkbox.checked}
+                                                                                onChange={() => handleCheckboxColorChange(checkbox.id)}
+                                                                            />&nbsp;&nbsp;
+                                                                            {checkbox.label}
+                                                                        </label>
+                                                                    </Col>
+                                                                ))}
+                                                            </Row>
+                                                        </Col>
+                                                    </Row>
+                                                </FormGroup>
+                                            </CardBody>
+                                        </Card>
 
-                                                <CardBody>
-                                                    <CardTitle
-                                                        tag="h5"
-                                                        className="text-uppercase text-muted mb-0"
+                                    </Col>
+                                    <Col lg="6">
+                                        <Card className="shadow m-4">
+
+                                            <CardBody>
+                                                <CardTitle
+                                                    tag="h5"
+                                                    className="text-uppercase text-muted mb-0"
+                                                >
+                                                    <h3>Size</h3>
+                                                </CardTitle>
+                                                <FormGroup check>
+                                                    <div className="mb-2">
+                                                        <label>
+                                                            <input
+                                                                type="checkbox"
+                                                                checked={selectAllSize}
+                                                                onChange={handleSelectAllSize}
+                                                            />&nbsp;&nbsp;
+                                                            Tất cả
+                                                        </label>
+                                                    </div>
+                                                    <Row>
+                                                        <Col lg={2}></Col>
+                                                        <Col lg={10}>
+                                                            <Row>
+                                                                {checkboxesSize.map((checkbox) => (
+                                                                    <Col lg={6}>
+                                                                        <label key={checkbox.id}>
+                                                                            <input
+                                                                                type="checkbox"
+                                                                                checked={checkbox.checked}
+                                                                                onChange={() => handleCheckboxSizeChange(checkbox.id)}
+                                                                            />&nbsp;&nbsp;
+                                                                            {checkbox.label}
+                                                                        </label>
+                                                                    </Col>
+                                                                ))}
+                                                            </Row>
+                                                        </Col>
+                                                    </Row>
+                                                </FormGroup>
+                                            </CardBody>
+                                        </Card>
+
+                                    </Col>
+                                </Row>
+                                {/*  */}
+                                <Row>
+                                    <Col lg="12">
+                                        <Card className="shadow m-4">
+                                            <CardBody>
+                                                <CardTitle>
+                                                    <Input id="btn_select_tt" type="select" name="sizeId" className="col-2 mt-4"
+                                                        onChange={(e) => onInputChangeSelectedColor(e.target.value)}
                                                     >
-                                                        <h3>Màu</h3>
-                                                    </CardTitle>
-                                                    <FormGroup check>
-                                                        <div className="mb-2">
-                                                            <Input type="checkbox" />Tất cả
-                                                        </div>
-                                                        <Row>
-                                                            <Col lg={2}></Col>
-                                                            <Col lg={10}>
-                                                                <Row>
+                                                        {selectedValuesColor.map((value, index) => (
+                                                            <option value={value.id} key={value.id}>
+                                                                {value.name}
+                                                            </option>
+                                                        ))}
+                                                    </Input>
+                                                </CardTitle>
 
-                                                                    {
-                                                                        listColor && listColor.length &&
-                                                                        listColor.map((item, index) => {
-                                                                            return (
-                                                                                <Col lg={6}>
-                                                                                    <div>
-                                                                                        <Input type="checkbox" value={item.id} key={item.id} />{item.name}
-                                                                                    </div>
-                                                                                </Col>
 
-                                                                            )
-                                                                        })
-                                                                    }
+                                                <Table bordered dark hover responsive striped className="m-4">
+                                                    <thead>
+                                                        <tr>
+                                                            <th >Size</th>
+                                                            <th>Giá</th>
+                                                            <th>Số lượng</th>
+                                                            <th>Trạng Thái</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        {selectedValuesSize.map((value, index) => (
+                                                            <tr key={value.id} onClick={() => onClickSize(value.id)}>
+                                                                <td className="col-1">{value.name}</td>
+                                                                <td className="col-3">
+                                                                    <Input
+                                                                        id="find_code"
+                                                                        name="price"
+                                                                        placeholder="Nhập giá"
+                                                                        value={shoesdetail.price}
+                                                                        onChange={(e) => onInputChangeAdd(e)}
 
-                                                                </Row>
-                                                            </Col>
-                                                        </Row>
-                                                    </FormGroup>
-                                                </CardBody>
-                                            </Card>
+                                                                    />
+                                                                </td>
+                                                                <td className="col-3">
+                                                                    <Input
+                                                                        id="find_code"
+                                                                        name="quantity"
+                                                                        placeholder="Nhập số lượng"
+                                                                        value={shoesdetail.quantity}
+                                                                        onChange={(e) => onInputChangeAdd(e)}
+                                                                    />
+                                                                </td>
+                                                                <td >
+                                                                    <Input id="btn_select_tt" type="select" name="status" value={shoesdetail.status} onChange={(e) => onInputChangeAdd(e)}
+                                                                    >
+                                                                        <option value='1'>
+                                                                            Đang bán
+                                                                        </option>
+                                                                        <option value='0'>
+                                                                            Ngừng bán
+                                                                        </option>
+                                                                        <option value='2'>
+                                                                            Hết hàng
+                                                                        </option>
 
-                                        </Col>
-                                        <Col lg="6">
-                                            <Card className="shadow m-4">
-
-                                                <CardBody>
-                                                    <CardTitle
-                                                        tag="h5"
-                                                        className="text-uppercase text-muted mb-0"
-                                                    >
-                                                        <h3>Size</h3>
-                                                    </CardTitle>
-                                                    <FormGroup check>
-                                                        <div className="mb-2">
-                                                            <Input type="checkbox" />Tất cả
-                                                        </div>
-                                                        <Row>
-                                                            <Col lg={2}></Col>
-                                                            <Col lg={10}>
-                                                                <Row>
-
-                                                                    {
-                                                                        listSize && listSize.length &&
-                                                                        listSize.map((item, index) => {
-                                                                            return (
-                                                                                <Col lg={6}>
-                                                                                    <div>
-                                                                                        <Input type="checkbox" value={item.id} key={item.id} />{item.name}
-                                                                                    </div>
-                                                                                </Col>
-
-                                                                            )
-                                                                        })
-                                                                    }
-
-                                                                </Row>
-                                                            </Col>
-                                                        </Row>
-                                                    </FormGroup>
-                                                </CardBody>
-                                            </Card>
-
-                                        </Col>
-                                    </Row>
-                                    {/*  */}
-                                    <Row className="m-4">
-                                        <Table bordered dark hover responsive striped >
-                                            <thead>
-                                                <tr>
-                                                    <th >Size</th>
-                                                    <th>Giá</th>
-                                                    <th>Số lượng</th>
-                                                    <th>Trạng Thái</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {ListShoesDetail.length <= 0 &&
-                                                    <th className="text-center" colSpan={17}>
-                                                        Không có dữ liệu
-                                                    </th>
-                                                }
-
-                                                {ListShoesDetail && ListShoesDetail.length > 0 &&
-                                                    ListShoesDetail.map((item, index) => {
-                                                        return (
-                                                            <tr key={item.id} >
-                                                                <td>{item.code}</td>
-                                                                <td>{item.color}</td>
-                                                                <td>{item.size}</td>
-                                                                <td>{item.quantity}</td>
+                                                                    </Input>
+                                                                </td>
                                                             </tr>
-                                                        )
+                                                        ))}
+                                                    </tbody>
+                                                </Table>
+                                            </CardBody>
+                                        </Card>
+                                    </Col>
+                                </Row>
 
-                                                    })
-                                                }
 
-                                            </tbody>
-                                        </Table>
-                                    </Row>
+                                {/*  */}
 
-
-                                    {/*  */}
-                                </CardBody>
                             </Card>
                         </Card >
                     </div >
