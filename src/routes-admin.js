@@ -13,7 +13,9 @@ import Products2 from "views/admin/Products2.js";
 import AddProduct2 from "views/admin/AddProduct2.js";
 import EditProduct2 from "views/admin/EditProduct2.js";
 import DetailProduct from "views/admin/DetailProduct.js";
-import BillDetail from "views/admin/BillDetail.js"
+import BillDetail from "views/admin/BillDetail.js";
+import DeliveryOrders from "views/admin/DeliveryOrders";
+import Discount from "views/admin/discount/Discount.js";
 
 var routes = [
   {
@@ -31,6 +33,14 @@ var routes = [
     layout: "/admin",
   },
   {
+    path: "/delivery-orders",
+    name: "Phiếu giao hàng",
+    icon: "ni ni-cart text-blue",
+    component: <DeliveryOrders />,
+    layout: "/admin",
+  },
+  
+  {
     path: "/product",
     name: "Danh sách sản phẩm",
     icon: "ni ni-planet text-orange",
@@ -46,9 +56,16 @@ var routes = [
   },
   {
     path: "/promotion",
-    name: "Khuyến mại",
+    name: "Đợt giảm giá",
     icon: "ni ni-tag text-red",
     component: <Promo />,
+    layout: "/admin",
+  },
+  {
+    path: "/discount",
+    name: "Khuyến mại",
+    icon: "ni ni-tag text-red",
+    component: <Discount />,
     layout: "/admin",
   },
   {

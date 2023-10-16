@@ -39,7 +39,7 @@ const Register = () => {
   const onSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post("http://localhost:33321/api/account/register", user);
+      const response = await axios.post("http://localhost:33321/api/user/register", user);
       navigate("/");
       console.log(response.data);
     } catch (error) {
