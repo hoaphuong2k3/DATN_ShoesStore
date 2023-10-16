@@ -19,6 +19,14 @@ import {
 } from "reactstrap";
 
 const AdminNavbar = (props) => {
+
+  // const handleLogout = () => {
+
+  //   localStorage.removeItem("token");
+  //   localStorage.removeItem("userId");
+  
+  //   window.location.href = "/login"; 
+  // };
   return (
     <>
       <Navbar className="navbar-top navbar-dark" expand="md" id="navbar-main">
@@ -79,7 +87,7 @@ const AdminNavbar = (props) => {
                   <span>Support</span>
                 </DropdownItem>
                 <DropdownItem divider />
-                <DropdownItem href="#pablo" onClick={(e) => e.preventDefault()}>
+                <DropdownItem>
                   <i className="ni ni-user-run" />
                   <span>Logout</span>
                 </DropdownItem>

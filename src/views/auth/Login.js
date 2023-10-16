@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { useAuth } from "services/AuthContext.js";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import {
@@ -22,41 +23,40 @@ const Login = () => {
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [rememberMe, setRememberMe] = useState("");
+  const [rememberMe, setRememberMe] = useState(false);
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const handleLogin = async (e) => {
     e.preventDefault();
 
     try {
-      // Gọi API đăng nhập
       const response = await axios.post("http://localhost:33321/api/oauth/login", {
         username,
         password,
         rememberMe: rememberMe === "on",
       });
 
-      console.log(response.data);
+      const { id, token, authorities } = response.data;
 
-      const token = response.data.token;
-      localStorage.setItem("token", token);
+      login({ id, token, authorities }); // Lưu ID, token và vai trò người dùng vào Context
 
       toast.success("Đăng nhập thành công!");
 
-      const authorities = response.data.authorities;
-      if (authorities.some((authority) => authority.authority === "ROLE_ADMIN")
-        && authorities.some((authority) => authority.authority === "ROLE_SUPPER_ADMIN")) {
+      // Kiểm tra vai trò người dùng và chuyển hướng đến trang tương ứng
+      if (authorities.some((authority) => authority.authority === "ADMIN") || authorities.some((authority) => authority.authority === "SUPPER_ADMIN")) {
         navigate("/admin");
-      } else if (authorities.some((authority) => authority.authority === "ROLE_USER")) {
-        
+      } else if (authorities.some((authority) => authority.authority === "USER")) {
         navigate("/shoes");
       } else {
+        // Xử lý cho các vai trò khác (nếu cần)
         navigate("/");
       }
     } catch (err) {
       toast.error("Đăng nhập thất bại.");
     }
   };
+
 
 
   return (

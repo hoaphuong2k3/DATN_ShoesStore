@@ -1,4 +1,5 @@
-
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import {
   Button,
   Card,
@@ -11,10 +12,35 @@ import {
   Row,
   Col,
 } from "reactstrap";
+import Select from "react-select";
 // core components
 import ProfileHeader from "components/Headers/ProfileHeader";
 
 const Profile = () => {
+
+
+  const [provinces, setProvinces] = useState([]);
+  const [selectedCity, setSelectedCity] = useState("");
+  const [selectedDistrict, setSelectedDistrict] = useState("");
+  const [selectedWard, setSelectedWard] = useState("");
+  const [admins, setAdmins] = useState([]);
+
+  const fetchData = async () => {
+    try {
+      const provincesResponse = await axios.get("https://provinces.open-api.vn/api/?depth=3");
+      setProvinces(provincesResponse.data);
+
+      const adminsResponse = await axios.get("http://localhost:33321/api/account/{username}");
+      setAdmins(adminsResponse.data.content);
+    } catch (error) {
+      console.error("Error fetching data: ", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
   return (
     <>
       <ProfileHeader />
@@ -139,14 +165,13 @@ const Profile = () => {
                             className="form-control-label"
                             htmlFor="input-username"
                           >
-                            Username
+                            Họ tên
                           </label>
                           <Input
                             className="form-control-alternative"
-                            defaultValue="lucky.jesse"
-                            id="input-username"
-                            placeholder="Username"
+                            id="fullname"
                             type="text"
+
                           />
                         </FormGroup>
                       </Col>
@@ -156,13 +181,13 @@ const Profile = () => {
                             className="form-control-label"
                             htmlFor="input-email"
                           >
-                            Email address
+                            Email
                           </label>
                           <Input
                             className="form-control-alternative"
                             id="input-email"
-                            placeholder="jesse@example.com"
                             type="email"
+
                           />
                         </FormGroup>
                       </Col>
@@ -174,14 +199,13 @@ const Profile = () => {
                             className="form-control-label"
                             htmlFor="input-first-name"
                           >
-                            First name
+                            Sinh nhật
                           </label>
                           <Input
                             className="form-control-alternative"
-                            defaultValue="Lucky"
-                            id="input-first-name"
-                            placeholder="First name"
-                            type="text"
+                            id="birthday"
+                            type="date"
+
                           />
                         </FormGroup>
                       </Col>
@@ -191,14 +215,13 @@ const Profile = () => {
                             className="form-control-label"
                             htmlFor="input-last-name"
                           >
-                            Last name
+                            Số điện thoại
                           </label>
                           <Input
                             className="form-control-alternative"
-                            defaultValue="Jesse"
-                            id="input-last-name"
-                            placeholder="Last name"
-                            type="text"
+                            id="phoneNumber"
+                            type="tel"
+
                           />
                         </FormGroup>
                       </Col>
@@ -217,14 +240,13 @@ const Profile = () => {
                             className="form-control-label"
                             htmlFor="input-address"
                           >
-                            Address
+                            Địa chỉ
                           </label>
                           <Input
                             className="form-control-alternative"
-                            defaultValue="Bld Mihail Kogalniceanu, nr. 8 Bl 1, Sc 1, Ap 09"
                             id="input-address"
-                            placeholder="Home Address"
                             type="text"
+
                           />
                         </FormGroup>
                       </Col>
@@ -236,15 +258,23 @@ const Profile = () => {
                             className="form-control-label"
                             htmlFor="input-city"
                           >
-                            City
+                            Thành Phố / Tỉnh
                           </label>
                           <Input
                             className="form-control-alternative"
-                            defaultValue="New York"
-                            id="input-city"
-                            placeholder="City"
-                            type="text"
-                          />
+                            type="select"
+                            value={selectedCity}
+                            onChange={(e) => setSelectedCity(e.target.value)}
+                          >
+                            <option value="">Chọn Thành Phố/Tỉnh</option>
+                            {provinces.map((province) => (
+                              <option key={province.code} value={province.name}>
+                                {province.name}
+                              </option>
+                            ))}
+                          </Input>
+
+
                         </FormGroup>
                       </Col>
                       <Col lg="4">
@@ -253,57 +283,63 @@ const Profile = () => {
                             className="form-control-label"
                             htmlFor="input-country"
                           >
-                            Country
+                            Quận/Huyện
                           </label>
                           <Input
                             className="form-control-alternative"
-                            defaultValue="United States"
-                            id="input-country"
-                            placeholder="Country"
-                            type="text"
-                          />
+                            type="select"
+                            value={selectedDistrict}
+                            onChange={(e) => setSelectedDistrict(e.target.value)}
+                            disabled={!selectedCity}
+                          >
+                            <option value="">Chọn Quận/Huyện</option>
+                            {selectedCity &&
+                              provinces
+                                .find((province) => province.name === selectedCity)
+                                .districts.map((district) => (
+                                  <option key={district.code} value={district.name}>
+                                    {district.name}
+                                  </option>
+                                ))}
+                          </Input>
                         </FormGroup>
                       </Col>
                       <Col lg="4">
                         <FormGroup>
                           <label
-                            className="form-control-label"
-                            htmlFor="input-country"
-                          >
-                            Postal code
+                            className="form-control-label" >
+                            Phường/Xã
                           </label>
                           <Input
                             className="form-control-alternative"
-                            id="input-postal-code"
-                            placeholder="Postal code"
-                            type="number"
-                          />
+                            type="select"
+                            value={selectedWard}
+                            onChange={(e) => setSelectedWard(e.target.value)}
+                            disabled={!selectedDistrict}
+                          >
+                            <option value="">Chọn Phường/Xã</option>
+                            {selectedDistrict &&
+                              provinces
+                                .find((province) => province.name === selectedCity)
+                                .districts.find((district) => district.name === selectedDistrict)
+                                .wards.map((ward) => (
+                                  <option key={ward.code} value={ward.name}>
+                                    {ward.name}
+                                  </option>
+                                ))}
+                          </Input>
                         </FormGroup>
                       </Col>
                     </Row>
                   </div>
                   <hr className="my-4" />
-                  {/* Description */}
-                  <h6 className="heading-small text-muted mb-4">About me</h6>
-                  <div className="pl-lg-4">
-                    <FormGroup>
-                      <label>About Me</label>
-                      <Input
-                        className="form-control-alternative"
-                        placeholder="A few words about you ..."
-                        rows="4"
-                        defaultValue="A beautiful Dashboard for Bootstrap 4. It is Free and
-                          Open Source."
-                        type="textarea"
-                      />
-                    </FormGroup>
-                  </div>
+                 
                 </Form>
               </CardBody>
             </Card>
           </Col>
         </Row>
-      </Container>
+      </Container >
     </>
   );
 };

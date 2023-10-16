@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
-import classes from "assets/css/header.css";
+import { useAuth } from "services/AuthContext.js";
+import { useNavigate } from 'react-router-dom';
 // reactstrap components
 import "assets/css/navbar.css";
 import "assets/css/cartModal.css";
@@ -23,16 +24,21 @@ import {
   InputGroupAddon,
   InputGroupText,
   Form, FormGroup,
-  Button, Card
+  Button
 } from "reactstrap";
 
 // import React, { useState, Modal } from "react";
-import React, { useState } from "react";
+import React from "react";
 import { CartContext } from "contexts/Cart.js";
 
 const UserNavbar = () => {
+  const { logout } = useAuth();
+  const navigate = useNavigate();
 
-
+  const handleLogout = () => {
+    logout();
+    navigate('/');
+  };
   return (
     <>
       <Navbar className="navbar fixednavbar navbar-horizontal fixed-top navbar-dark" expand="md" color-on-scroll="300">
@@ -131,23 +137,23 @@ const UserNavbar = () => {
                     <span>Yêu thích</span>
                   </DropdownItem>
                   <DropdownItem divider />
-                  <DropdownItem href="#" onClick={(e) => e.preventDefault()}>
-                    <i className="ni ni-user-run" />
+                  <DropdownItem>
+                    <i className="ni ni-user-run" onClick={handleLogout} />
                     <span>Đăng xuất</span>
                   </DropdownItem>
                 </DropdownMenu>
               </UncontrolledDropdown>
               <div>
-              <CartContext.Consumer>
-                {({ cartItems }) => (
-                  <Button className="button-cart" to="/shoes/cart" tag={Link} color="white">
-                    <i className="ni ni-cart"/>
-                    <span className="cart-item-count">
-                    ({cartItems.length})
-                    </span>
-                    
-                  </Button>
-                )}
+                <CartContext.Consumer>
+                  {({ cartItems }) => (
+                    <Button className="button-cart" to="/shoes/cart" tag={Link} color="white">
+                      <i className="ni ni-cart" />
+                      <span className="cart-item-count">
+                        ({cartItems.length})
+                      </span>
+
+                    </Button>
+                  )}
                 </CartContext.Consumer>
               </div>
             </Nav>

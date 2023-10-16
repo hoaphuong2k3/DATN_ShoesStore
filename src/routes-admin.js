@@ -46,9 +46,16 @@ var routes = [
   },
   {
     path: "/promotion",
-    name: "Khuyến mại",
+    name: "Đợt giảm giá",
     icon: "ni ni-tag text-red",
     component: <Promo />,
+    layout: "/admin",
+  },
+  {
+    path: "/discount",
+    name: "Khuyến mại",
+    icon: "ni ni-tag text-red",
+    component: <Discount />,
     layout: "/admin",
   },
   {

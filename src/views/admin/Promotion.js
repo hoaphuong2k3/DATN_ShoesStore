@@ -1,20 +1,152 @@
 import React, { useState, useEffect } from "react";
-
+import { FaEdit, FaTrash } from 'react-icons/fa';
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import axiosInstance from "services/custommize-axios";
 // reactstrap components
-import { Card, CardHeader, CardBody, Container, Row, Col, Form, FormGroup, Input, Button, Table, Modal } from "reactstrap";
+import { Card, CardHeader, CardBody, Container, Row, Col, Form, FormGroup, Input, Button, Table } from "reactstrap";
 
 import Header from "components/Headers/Header.js";
 
 
 const Promotion = () => {
 
-    const [category, setCategory] = useState([]);
+    const [discounts, setDiscounts] = useState([]);
 
-    const [selectedOption, setSelectedOption] = useState(null);
+    //loads table
+    const [queryParams, setQueryParams] = useState({
+        page: 0,
+        size: 2,
+        fromDate: "",
+        toDate: "",
+        status: "",
+        isdelete: 0,
+    });
 
-    const handleRadioChange = (event) => {
-        setSelectedOption(event.target.value);
+    const fetchData = async () => {
+        try {
+            const response = await axiosInstance.get("/admin/discount-period/getAll", {
+                params: queryParams
+            });
+            setDiscounts(response.content);
+            // setTotalPages(response.totalPages);
+        } catch (error) {
+            console.error("Lỗi khi lấy dữ liệu:", error);
+        }
     };
+
+    useEffect(() => {
+        fetchData();
+    }, [queryParams]);
+
+    const handlePageChange = (newPage) => {
+        setQueryParams(prevParams => ({
+            ...prevParams,
+            page: newPage
+        }));
+    };
+
+
+    //lọc
+ 
+
+    //click on selected
+    const [formData, setFormData] = useState({
+        id: null,
+        code: "",
+        name: "",
+        startDate: "",
+        endDate: "",
+        salePercent: "",
+    });
+
+    const handleRowClick = (discount) => {
+        setFormData({
+            id: discount.id,
+            code: discount.code,
+            name: discount.name,
+            startDate: discount.startDate,
+            endDate: discount.endDate,
+            salePercent: discount.salePercent || "",
+        });
+    };
+
+    //reset
+    const resetForm = () => {
+        setFormData({
+            code: "",
+            name: "",
+            startDate: "",
+            endDate: "",
+            salePercent: "",
+        });
+    };
+
+    //add
+    const addDiscount = async () => {
+        try {
+            const response = await axiosInstance.post('/admin/discount-period/createDiscountPeriod', {
+
+                code: formData.code,
+                name: formData.name,
+                startDate: formData.startDate,
+                endDate: formData.endDate,
+                salePercent: formData.salePercent,
+            });
+
+            setDiscounts([...discounts, response.data]);
+            toast.success("Thêm thành công!");
+            resetForm();
+        } catch (error) {
+            console.error("Error creating discount:", error);
+            toast.error("Đã có lỗi xảy ra khi thêm dữ liệu. Vui lòng thử lại sau.");
+        }
+    };
+
+    //update
+    const updateDiscount = async () => {
+        try {
+
+            const response = await axiosInstance.put(`/admin/discount-period/updateDiscountPeriod`, {
+                id: formData.id,
+                code: formData.code,
+                name: formData.name,
+                salePercent: formData.salePercent,
+                startDate: formData.startDate,
+                endDate: formData.endDate,
+            });
+
+            const updatedDiscounts = discounts.map(d => (d.code === formData.code ? response.data : d));
+            setDiscounts(updatedDiscounts);
+
+            toast.success("Cập nhật thành công!");
+            resetForm();
+        } catch (error) {
+            console.error("Error updating discount:", error);
+            if (error.response) {
+                console.error("Response data:", error.response.data);
+                toast.error(error.response.data.message);
+            } else {
+                toast.error("Đã có lỗi xảy ra khi cập nhật dữ liệu.");
+            }
+        }
+    };
+
+    //delete
+    const deleteDiscount = (id) => {
+        if (window.confirm("Bạn có chắc chắn muốn xóa khuyến mại này không?")) {
+            axiosInstance.delete(`/admin/discount-period/deleteDiscountPeriod/${id}`)
+                .then(response => {
+                    const updatedDiscounts = discounts.filter(discount => discount.id !== id);
+                    setDiscounts(updatedDiscounts);
+                    toast.success("Xóa thành công");
+                })
+                .catch(error => {
+                    console.error('Lỗi khi xóa dữ liệu:', error);
+                });
+        }
+    };
+
 
     return (
         <>
@@ -30,19 +162,19 @@ const Promotion = () => {
 
                                     <Row className="align-items-center">
                                         <div className="col">
-                                            <h3 className="mb-0">Khuyến mại</h3>
+                                            <h3 className="mb-0">Đợt giảm giá</h3>
                                         </div>
                                         <div className="col text-right">
                                             <Button
                                                 className="btn btn-outline-primary"
-                                                onClick={(e) => e.preventDefault()}
+                                                onClick={addDiscount}
                                                 size="sm"
                                             >
                                                 Thêm mới
                                             </Button>
                                             <Button
                                                 className="btn btn-outline-primary"
-                                                onClick={(e) => e.preventDefault()}
+                                                onClick={updateDiscount}
                                                 size="sm"
                                             >
                                                 Cập nhật
@@ -50,7 +182,7 @@ const Promotion = () => {
 
                                             <Button
                                                 className="btn btn-outline-primary"
-                                                onClick={(e) => e.preventDefault()}
+                                                onClick={resetForm}
                                                 size="sm"
                                             >
                                                 Reset
@@ -64,39 +196,10 @@ const Promotion = () => {
                                             Thông tin
                                         </h6>
                                         <div className="pl-lg-4">
+
+
                                             <Row>
-                                                <Col lg="4">
-                                                    <FormGroup>
-                                                        <label
-                                                            className="form-control-label"
-                                                            htmlFor="code"
-                                                        >
-                                                            Khuyến mại theo:
-                                                        </label>
-                                                        <div style={{ display: "flex" }}>
-                                                            <div className="custom-control custom-radio">
-                                                                <Input
-                                                                    className="custom-control-alternative"
-                                                                    name="type"
-                                                                    type="radio"
-                                                                    value="bills"
-                                                                    checked={selectedOption === "bills"}
-                                                                    onChange={handleRadioChange}
-                                                                />Hóa đơn
-                                                            </div>
-                                                            <div className="custom-control custom-radio">
-                                                                <Input
-                                                                    className="custom-control-alternative"
-                                                                    name="type"
-                                                                    type="radio"
-                                                                    value="products"
-                                                                    checked={selectedOption === "products"}
-                                                                    onChange={handleRadioChange}
-                                                                />Sản phẩm
-                                                            </div>
-                                                        </div>
-                                                    </FormGroup>
-                                                </Col>
+
                                                 <Col lg="4">
                                                     <FormGroup>
                                                         <label
@@ -107,9 +210,10 @@ const Promotion = () => {
                                                         </label>
                                                         <Input
                                                             className="form-control-alternative"
-                                                            placeholder="Code"
                                                             id="code"
                                                             type="text"
+                                                            value={formData.code}
+                                                            onChange={(e) => setFormData({ ...formData, code: e.target.value })}
                                                         />
                                                     </FormGroup>
                                                 </Col>
@@ -124,101 +228,30 @@ const Promotion = () => {
                                                         <Input
                                                             className="form-control-alternative"
                                                             id="name"
-                                                            placeholder="Tên khuyến mại"
                                                             type="text"
+                                                            value={formData.name}
+                                                            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                                                         />
                                                     </FormGroup>
                                                 </Col>
-
                                                 <Col lg="4">
                                                     <FormGroup>
                                                         <label
                                                             className="form-control-label"
-                                                            htmlFor="input-price">
-                                                            Hình thức giảm
+                                                            htmlFor="startDate"
+                                                        >
+                                                            Phần trăm:
                                                         </label>
-                                                        <div style={{ display: "flex" }}>
-                                                            <div className="custom-control custom-radio">
-                                                                <Input
-                                                                    className="custom-control-alternative"
-                                                                    name="price"
-                                                                    type="radio"
-                                                                    value="persent"
-                                                                    checked={selectedOption === "persent"}
-                                                                    onChange={handleRadioChange}
-                                                                />Phần trăm (%)
-                                                            </div>
-                                                            <div className="custom-control custom-radio">
-                                                                <Input
-                                                                    className="custom-control-alternative"
-                                                                    name="price"
-                                                                    type="radio"
-                                                                    value="money"
-                                                                    checked={selectedOption === "money"}
-                                                                    onChange={handleRadioChange}
-                                                                />Tiền
-                                                            </div>
-                                                        </div>
+                                                        <Input
+                                                            className="form-control-alternative"
+                                                            type="number"
+                                                            value={formData.salePercent}
+                                                            onChange={(e) => setFormData({ ...formData, salePercent: e.target.value })}
+                                                        />
                                                     </FormGroup>
                                                 </Col>
 
-                                                {selectedOption === "persent" && (
-                                                    <Col lg="4">
-                                                        <FormGroup>
-                                                            <label
-                                                                className="form-control-label"
-                                                                htmlFor="startDate"
-                                                            >
-                                                                Giảm giá:
-                                                            </label>
-                                                            <Input
-                                                                className="form-control-alternative"
-                                                                id="persent"
-                                                                type="number"
-                                                                placeholder="eg. 10%"
-                                                            />
-                                                        </FormGroup>
-                                                    </Col>
-                                                )}
-
-                                                {selectedOption === "money" && (
-                                                    <Col lg="8" style={{ display: "flex" }}>
-                                                        <FormGroup className="col" lg="6">
-                                                            <label
-                                                                className="form-control-label"
-                                                                htmlFor="startDate"
-                                                            >
-                                                                Giảm giá từ:
-                                                            </label>
-                                                            <Input
-                                                                className="form-control-alternative"
-                                                                id="min"
-                                                                type="number"
-                                                                placeholder="10000"
-                                                            />
-                                                        </FormGroup>
-                                                        <FormGroup className="col" lg="6">
-                                                            <label
-                                                                className="form-control-label"
-                                                                htmlFor="startDate"
-                                                            >
-                                                                Giảm giá đến:
-                                                            </label>
-                                                            <Input
-                                                                className="form-control-alternative"
-                                                                id="max"
-                                                                type="number"
-                                                                placeholder="100000"
-                                                            />
-                                                        </FormGroup>
-                                                    </Col>
-
-
-
-                                                )}
-
-
-                                                <Col lg="4">
+                                                <Col lg="6">
                                                     <FormGroup>
                                                         <label
                                                             className="form-control-label"
@@ -230,10 +263,12 @@ const Promotion = () => {
                                                             className="form-control-alternative"
                                                             id="startDate"
                                                             type="date"
+                                                            value={formData.startDate}
+                                                            onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
                                                         />
                                                     </FormGroup>
                                                 </Col>
-                                                <Col lg="4">
+                                                <Col lg="6">
                                                     <FormGroup>
                                                         <label
                                                             className="form-control-label"
@@ -245,55 +280,11 @@ const Promotion = () => {
                                                             className="form-control-alternative"
                                                             id="endDate"
                                                             type="date"
+                                                            value={formData.endDate}
+                                                            onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
                                                         />
                                                     </FormGroup>
                                                 </Col>
-                                                <Col className="pl-lg-4">
-                                                    <FormGroup>
-                                                        <label
-                                                            className="form-control-label"
-                                                            htmlFor="description"
-                                                        >
-                                                            Mô tả
-                                                        </label>
-                                                        <Input
-                                                            className="form-control-alternative"
-                                                            placeholder="Sản phẩm ....."
-                                                            rows="4"
-                                                            type="textarea"
-                                                        />
-                                                    </FormGroup>
-                                                </Col>
-
-                                                {selectedOption === "products" && (
-                                                    <Col lg="12">
-                                                    <h6 className="heading-small text-muted mb-4">
-                                                      Sản phẩm áp dụng
-                                                    </h6>
-                                                    <Table className="align-items-center table-flush" responsive>
-                                                      <thead className="thead-light">
-                                                        <tr className="text-center">
-                                                          <th scope="col">#</th>
-                                                          <th scope="col">Tên sản phẩm</th>
-                                                          <th scope="col">Thương hiệu</th>
-                                                          <th scope="col">Giá gốc</th>
-                                      
-                                      
-                                                        </tr>
-                                                      </thead>
-                                                      <tbody>
-                                                        <tr>
-                                                          <td className="text-center"><Input type="checkbox" /></td>
-                                                          <td></td>
-                                                          <td></td>
-                                                          <td></td>
-                                      
-                                                        </tr>
-                                                      </tbody>
-                                                    </Table>
-                                                  </Col>
-                                                )}
-
                                             </Row>
 
                                         </div>
@@ -302,16 +293,28 @@ const Promotion = () => {
                                     </Form>
                                     {/* Description */}
                                     <hr className="my-4" />
-                                    <h6 className="heading-small text-muted mb-4">Danh sách</h6>
+                                    <Col style={{ display: "flex" }}>
+                                        <h6 className="heading-small text-muted mb-4">Danh sách</h6>
+
+                                        <div className="col-2">
+                                            <Input
+                                                type="select"
+                                                size="sm"
+                                            >
+                                                <option>Trạng thái</option>
+                                                <option>Chờ hoạt động</option>
+                                                <option>Đang hoạt động</option>
+                                            </Input>
+                                        </div>
+                                    </Col>
+
                                     <Table className="align-items-center table-flush" responsive>
                                         <thead className="thead-light">
                                             <tr>
                                                 <th scope="col">STT</th>
+                                                <th scope="col">Code</th>
                                                 <th scope="col">Tên khuyến mại</th>
-                                                <th scope="col">Loại khuyến mại</th>
-                                                <th scope="col">Mô tả</th>
                                                 <th scope="col">Phần trăm (%)</th>
-                                                <th scope="col">Tiền</th>
                                                 <th scope="col">Ngày bắt đầu</th>
                                                 <th scope="col">Ngày kết thúc</th>
                                                 <th scope="col">Trạng thái</th>
@@ -320,26 +323,30 @@ const Promotion = () => {
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr>
-                                                <td>1</td>
-                                                <td></td>
-                                                <td></td>
-                                                <td></td>
-                                                <td></td>
-                                                <td></td>
-                                                <td></td>
-                                                <td></td>
-                                                <td></td>
-                                                <td></td>
-                                            </tr>
+                                            { discounts.map((discount, index) => (
+                                                    <tr key={index}>
+                                                        <td>{index + 1}</td>
+                                                        <td>{discount.code}</td>
+                                                        <td>{discount.name}</td>
+                                                        <td>{discount.salePercent}</td>
+                                                        <td>{discount.startDate}</td>
+                                                        <td>{discount.endDate}</td>
+                                                        <td>{discount.status === 1 ? "Đang hoạt động" : "Chờ hoạt động"}</td>
+                                                        <td>
+                                                            <Button color="info" size="sm" onClick={() => handleRowClick(discount)}><FaEdit /></Button>
+                                                            <Button color="danger" size="sm" onClick={() => deleteDiscount(discount.id)}><FaTrash /></Button>
+                                                        </td>
+
+                                                    </tr>
+                                                ))}
                                         </tbody>
                                     </Table>
                                 </CardBody>
                             </Card>
                         </div>
-
                     </Col>
                 </Row>
+                <ToastContainer />
             </Container>
         </>
     );
