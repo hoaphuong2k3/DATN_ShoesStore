@@ -15,6 +15,7 @@ import EditProduct2 from "views/admin/EditProduct2.js";
 import DetailProduct from "views/admin/DetailProduct.js";
 import BillDetail from "views/admin/BillDetail.js"
 import ListShoesDetail from "views/admin/ListShoesDetail.js"
+import Discount from "views/admin/discount/Discount.js"
 var routes = [
   {
     path: "/index",
