@@ -191,9 +191,8 @@ const Products2 = () => {
 
   return (
     <>
-      <Header />
       {/* Page content */}
-      <Container className="mt--7" fluid>
+      <Container className="mt-7" fluid>
         <Row className="mb-4">
           <div className="col">
             <Card className="shadow">
@@ -210,41 +209,8 @@ const Products2 = () => {
                     >
                       Thêm mới
                     </Button>
-                    <Button
-                      className="btn btn-outline-primary"
-                      onClick={(e) => e.preventDefault()}
-                      size="sm"
-                    >
-                      Tải mẫu
-                    </Button>
-
-                    <Button
-                      className="btn btn-outline-primary"
-                      size="sm"
-                    >
-                      Nhập Excel
-                    </Button>
-                    <Button
-                      className="btn btn-outline-primary"
-                      size="sm"
-                    >
-                      Xuất Excel
-                    </Button>
-                    <Button
-                      className="btn btn-outline-primary"
-                      size="sm"
-                    >
-                      Xuất PDF
-                    </Button>
-                    <Button
-                      className="btn btn-outline-primary"
-                      size="sm"
-                    >
-                      Báo cáo
-                    </Button>
                   </div>
                 </Row>
-
               </CardHeader>
             </Card>
           </div>
@@ -268,45 +234,6 @@ const Products2 = () => {
                     <div className="icon icon-shape bg-danger text-white rounded-circle shadow">
                       <i className="fas fa-chart-bar" />
                     </div>
-                  </Col>
-                </Row>
-
-                {/* start row find  productAttrinutes*/}
-                <Row className="text-center mb-1">
-                  <Col lg="6" xl="12">
-                    <FormGroup tag="fieldset">
-                      <Row>
-                        <Col lg="6" xl="4">
-                          <FormGroup check>
-                            <Input
-                              name="radio1"
-                              type="radio"
-                            />
-                            {' '}<span className="form-control-label mr--9">Tất cả</span>
-                          </FormGroup>
-                        </Col>
-                        <Col lg="6" xl="3">
-                          <FormGroup check>
-                            <Input
-                              name="radio1"
-                              type="radio"
-                            />
-                            {' '}
-                            <span className="form-control-label">Hoạt động</span>
-                          </FormGroup>
-                        </Col>
-                        <Col lg="6" xl="3">
-                          <FormGroup check>
-                            <Input
-                              name="radio1"
-                              type="radio"
-                            />
-                            {' '}<span className="form-control-label">Ngừng hoạt động</span>
-                          </FormGroup>
-                        </Col>
-                      </Row>
-
-                    </FormGroup>
                   </Col>
                 </Row>
                 <Form>
@@ -351,60 +278,60 @@ const Products2 = () => {
                         </FormGroup>
                       </Col>
                     </Row>
-                    <Row>
-                      <Col lg="6">
-                        <FormGroup>
-                          <label
-                            className="form-control-label"
-                            htmlFor="input-username"
-                          >
-                            Người tạo
-                          </label>
-                          <Input
-                            className="form-control-alternative"
-                            id="find_createdAt"
-                            name="createdBy"
-                            value={search.createdBy}
-                            onChange={(e) => onInputChange(e)}
-                            placeholder="Nhập người tạo"
 
-                          />
-
-                        </FormGroup>
-                      </Col>
-                      <Col lg="6" xl="6">
-                        <FormGroup>
-                          <Label for="find_createdDate" className="form-control-label">
-                            Ngày tạo:
-                          </Label>
-                          <Row>
-                            <Col xl={6}>
-                              <Input
-                                className="form-control-alternative"
-                                id="find_createdDate"
-                                name="fromDateStr"
-                                value={search.fromDateStr}
-                                onChange={(e) => onInputChange(e)}
-                              />
-                            </Col>
-                            <Col xl={6}>
-                              <Input
-                                className="form-control-alternative"
-                                id="find_createdDate"
-                                name="toDateStr"
-                                value={search.toDateStr}
-                                onChange={(e) => onInputChange(e)}
-                              />
-
-                            </Col>
-                          </Row>
-
-                        </FormGroup>
-                      </Col>
-                    </Row>
                     {value === 'yes' &&
                       <Row>
+                        <Col lg="6">
+                          <FormGroup>
+                            <label
+                              className="form-control-label"
+                              htmlFor="input-username"
+                            >
+                              Người tạo
+                            </label>
+                            <Input
+                              className="form-control-alternative"
+                              id="find_createdAt"
+                              name="createdBy"
+                              value={search.createdBy}
+                              onChange={(e) => onInputChange(e)}
+                              placeholder="Nhập người tạo"
 
+                            />
+
+                          </FormGroup>
+                        </Col>
+                        <Col lg="6" xl="6">
+                          <FormGroup>
+                            <Label for="find_createdDate" className="form-control-label">
+                              Ngày tạo:
+                            </Label>
+                            <Row>
+                              <Col xl={6}>
+                                <Input
+                                  type="date"
+                                  className="form-control-alternative"
+                                  id="find_createdDate"
+                                  name="fromDateStr"
+                                  value={search.fromDateStr}
+                                  onChange={(e) => onInputChange(e)}
+                                />
+                              </Col>
+                              <Col xl={6}>
+                                <Input
+                                  type="date"
+                                  className="form-control-alternative"
+                                  id="find_createdDate"
+                                  name="toDateStr"
+                                  value={search.toDateStr}
+                                  onChange={(e) => onInputChange(e)}
+                                />
+
+                              </Col>
+                            </Row>
+
+                          </FormGroup>
+                        </Col>
                         <Col lg="4">
                           <FormGroup>
                             <label
@@ -702,102 +629,147 @@ const Products2 = () => {
           <Col lg="6" xl="12">
             <Card className="card-stats mb-4 mb-xl-0">
               <CardBody>
-                <Row>
-                  <div className="col">
-                    <CardTitle
-                      tag="h5"
-                      className="text-uppercase text-muted mb-0"
-                    >
-                      <h3> DANH SÁCH</h3>
+                <Row className="align-items-center mb-2">
 
-                    </CardTitle>
+                  <CardTitle
+                    tag="h5"
+                    className=" col-2 text-uppercase text-muted mb-0"
+                  >
+                    <h3> DANH SÁCH</h3>
+
+                  </CardTitle>
+
+                  <div className="col text-right" style={{ display: "flex" }}>
+                  <Col>
+                      <Input type="select" name="status"  style={{ width: "150px" }} size="sm" onChange={(e) => onInputChange(e)} >
+                        <option value=" ">Tất cả</option>
+                        <option value=" ">Tất cả</option>
+                      </Input>
+                    </Col>
+                    <Button
+                      className="btn btn-outline-primary"
+                      size="sm"
+                      to="/admin/product2/add" tag={Link}
+                    >
+                      Thêm mới
+                    </Button>
+                    <Button
+                      className="btn btn-outline-primary"
+                      onClick={(e) => e.preventDefault()}
+                      size="sm"
+                    >
+                      Tải mẫu
+                    </Button>
+
+                    <Button
+                      className="btn btn-outline-primary"
+                      size="sm"
+                    >
+                      Nhập Excel
+                    </Button>
+                    <Button
+                      className="btn btn-outline-primary"
+                      size="sm"
+                    >
+                      Xuất Excel
+                    </Button>
+                    <Button
+                      className="btn btn-outline-primary"
+                      size="sm"
+                    >
+                      Xuất PDF
+                    </Button>
+                    <Button
+                      className="btn btn-outline-primary"
+                      size="sm"
+                    >
+                      Báo cáo
+                    </Button>
+                   
+
                   </div>
-                  <Col className="col-auto">
-                    <div className="icon icon-shape bg-danger text-white rounded-circle shadow">
-                      <i className="fas fa-chart-bar" />
-                    </div>
-                  </Col>
                 </Row>
                 {/*  */}
+                <Row>
+                  <Table bordered dark hover responsive striped>
+                    <thead>
+                      <tr>
+                        <th className="text-center pb-4" >
+                          <FormGroup check>
+                            <Input type="checkbox" />
+                          </FormGroup>
 
-                <Table bordered dark hover responsive striped>
-                  <thead>
-                    <tr>
-                      <th className="text-center pb-4" >
-                        <FormGroup check>
-                          <Input type="checkbox" />
-                        </FormGroup>
+                        </th>
+                        <th>STT</th>
+                        <th>Mã</th>
+                        <th>Tên</th>
+                        <th>Hãng</th>
+                        <th>Xuất xứ</th>
+                        <th>Thiết kế</th>
+                        <th>Loại da</th>
+                        <th>Mũi giày</th>
+                        <th>Đế giày</th>
+                        <th>Lót giày</th>
+                        <th>Đệm giày</th>
+                        <th>Số lượng</th>
+                        <th>Số CTSP</th>
+                        <th>Giá Min</th>
+                        <th>Giá Max</th>
 
-                      </th>
-                      <th>STT</th>
-                      <th>Mã</th>
-                      <th>Tên</th>
-                      <th>Hãng</th>
-                      <th>Xuất xứ</th>
-                      <th>Thiết kế</th>
-                      <th>Loại da</th>
-                      <th>Mũi giày</th>
-                      <th>Đế giày</th>
-                      <th>Lót giày</th>
-                      <th>Đệm giày</th>
-                      <th>Số lượng</th>
-                      <th>Số CTSP</th>
-                      <th>Giá Min</th>
-                      <th>Giá Max</th>
+                        <th colSpan={2}>Thao tác</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {listShoes.length <= 0 &&
+                        <th className="text-center" colSpan={17}>
+                          Không có dữ liệu
+                        </th>
+                      }
 
-                      <th colSpan={2}>Thao tác</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {listShoes.length <= 0 &&
-                      <th className="text-center" colSpan={17}>
-                        Không có dữ liệu
-                      </th>
-                    }
+                      {listShoes && listShoes.length > 0 &&
+                        listShoes.map((item, index) => {
+                          return (
+                            <tr key={item.id} >
+                              <td className="text-center">
+                                <FormGroup check>
+                                  <Input type="checkbox" />
+                                </FormGroup>
+                              </td>
+                              <th scope="row"> {index + 1}</th>
+                              <td>{item.code}</td>
+                              <td>{item.name}</td>
+                              <td>{item.brand}</td>
+                              <td>{item.origin}</td>
+                              <td>{item.designStyle}</td>
+                              <td>{item.skinType}</td>
+                              <td>{item.toe}</td>
+                              <td>{item.sole}</td>
+                              <td>{item.lining}</td>
+                              <td>{item.cushion}</td>
+                              <td>{item.priceMin}</td>
+                              <td>{item.priceMax}</td>
+                              <td>{item.totalQuantity}</td>
+                              <td>{item.totalRecord}</td>
+                              <td>
+                                <Button color="danger" to={`/admin/product/detail/${item.id}`} tag={Link} size="sm">
+                                  <i class="fa-solid fa-eye"></i>
+                                </Button>
+                                <Button color="danger" to={`/admin/product2/edit/${item.id}`} tag={Link} size="sm">
+                                  <i class="fa-solid fa-pen" />
+                                </Button>
+                                <Button color="warning" size="sm" onClick={() => handleConfirmDelete(item)}>
+                                  <i class="fa-solid fa-trash" />
+                                </Button>
+                              </td>
+                            </tr>
+                          )
 
-                    {listShoes && listShoes.length > 0 &&
-                      listShoes.map((item, index) => {
-                        return (
-                          <tr key={item.id} >
-                            <td className="text-center">
-                              <FormGroup check>
-                                <Input type="checkbox" />
-                              </FormGroup>
-                            </td>
-                            <th scope="row"> {index + 1}</th>
-                            <td>{item.code}</td>
-                            <td>{item.name}</td>
-                            <td>{item.brand}</td>
-                            <td>{item.origin}</td>
-                            <td>{item.designStyle}</td>
-                            <td>{item.skinType}</td>
-                            <td>{item.toe}</td>
-                            <td>{item.sole}</td>
-                            <td>{item.lining}</td>
-                            <td>{item.cushion}</td>
-                            <td>{item.priceMin}</td>
-                            <td>{item.priceMax}</td>
-                            <td>{item.totalQuantity}</td>
-                            <td>{item.totalRecord}</td>
-                            <td>
-                              <Button color="danger" to={`/admin/product/detail/${item.id}`} tag={Link} size="sm">
-                                <i class="fa-solid fa-eye"></i>
-                              </Button>
-                              <Button color="danger" to={`/admin/product2/edit/${item.id}`} tag={Link} size="sm">
-                                <i class="fa-solid fa-pen" />
-                              </Button>
-                              <Button color="warning" size="sm" onClick={() => handleConfirmDelete(item)}>
-                                <i class="fa-solid fa-trash" />
-                              </Button>
-                            </td>
-                          </tr>
-                        )
+                        })
+                      }
 
-                      })
-                    }
-
-                  </tbody>
-                </Table>
+                    </tbody>
+                  </Table>
+                </Row>
 
 
                 {/*  */}
@@ -821,7 +793,7 @@ const Products2 = () => {
         <ModalFooter>
           <div className="text-center">
             <Button color="danger" onClick={() => handleDelete()}>
-              Sửa
+              Xóa
             </Button>{' '}
             <Button color="danger" onClick={toggle}>
               Không

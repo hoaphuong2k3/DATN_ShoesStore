@@ -124,6 +124,13 @@ var routes = [
     path: "/bill-details/:id",
     component: <BillDetail />,
     layout: "/admin",
-  }
+  },
+  {
+    path: "/discount",
+    name: "Sale",
+    icon: "ni ni-circle-08 text-pink",
+    component: <Discount />,
+    layout: "/admin",
+  },
 ];
 export default routes;
