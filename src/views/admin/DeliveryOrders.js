@@ -233,7 +233,6 @@ const DeliveryOrders = () => {
                                         <Col>
                                             <Input id="search" type="text" placeholder="Search.." style={{ width: "250px" }} size="sm" />
                                         </Col>
-
                                         <Button
                                             color="primary"
                                             onClick={(e) => e.preventDefault()}
@@ -242,7 +241,7 @@ const DeliveryOrders = () => {
                                             Export
                                         </Button>
                                     </div>
-                            </Row>
+                                </Row>
                             </CardHeader>
                             <Table className="align-items-center table-flush" responsive>
                                 <thead className="thead-light">
