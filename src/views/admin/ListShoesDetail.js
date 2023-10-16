@@ -69,7 +69,7 @@ const ListShoesDetail = () => {
                 errorMessage = error.response.data.message;
             }
             toast.error(errorMessage);
-            navigate("/admin/product2");
+            navigate("/admin/product");
         }
     }
     //getAll
@@ -633,7 +633,7 @@ const ListShoesDetail = () => {
                                             <Button
                                                 className="btn btn-outline-primary"
                                                 size="sm"
-                                                to="/admin/product2/add" tag={Link}>
+                                                to="/admin/product/add" tag={Link}>
                                                 Thêm mới
                                             </Button>
                                             <Button
@@ -718,7 +718,7 @@ const ListShoesDetail = () => {
                                                                     <Button color="danger" to={`/admin/product/detail/${item.id}`} tag={Link} size="sm" disabled={item.status === 0 ? true : false}>
                                                                         <i class="fa-solid fa-eye"></i>
                                                                     </Button>
-                                                                    <Button color="danger" to={`/admin/product2/edit/${item.id}`} tag={Link} size="sm" disabled={item.status === 0 ? true : false}>
+                                                                    <Button color="danger" to={`/admin/product/edit/${item.id}`} tag={Link} size="sm" disabled={item.status === 0 ? true : false}>
                                                                         <i class="fa-solid fa-pen" />
                                                                     </Button>
                                                                     <Button color="danger" size="sm" disabled={item.status === 0 ? true : false}>

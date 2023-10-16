@@ -90,8 +90,8 @@ const ProductAttributes = () => {
   }, []);
 
   const getCategory = async () => {
-    let res = await getAllBrand(); 
-    if (res && res.data) {    
+    let res = await getAllBrand();
+    if (res && res.data) {
       const data = res.data;
       const ordersList = Object.keys(data).map((key) => ({
 
@@ -100,7 +100,7 @@ const ProductAttributes = () => {
         name: data[key].name,
       }));
       setListCategory(ordersList);
-      console.log("checkk:",ordersList);
+      console.log("checkk:", ordersList);
     }
   }
 

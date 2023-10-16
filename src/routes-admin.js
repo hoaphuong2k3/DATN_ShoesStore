@@ -4,15 +4,13 @@ import Products from "views/admin/Products.js";
 import ProductAttributes from "views/admin/ProductAttributes.js";
 import Promo from "views/admin/Promotion.js";
 import Staff from "views/admin/Staff.js";
+import Client from "views/admin/Client.js";
 import Partner from "views/admin/Partner.js";
 import Profile from "views/admin/Profile.js";
 import Statistical from "views/admin/Statistical.js";
-import AddProduct from "views/admin/AddProduct.js";
+import AddProduct from "views/admin/AddProduct";
 import EditProduct from "views/admin/EditProduct";
-import Products2 from "views/admin/Products2.js";
-import AddProduct2 from "views/admin/AddProduct2.js";
-import EditProduct2 from "views/admin/EditProduct2.js";
-import DetailProduct from "views/admin/DetailProduct.js";
+import DetailProducts from "views/admin/DetailProduct.js";
 import BillDetail from "views/admin/BillDetail.js"
 import ListShoesDetail from "views/admin/ListShoesDetail.js"
 import Discount from "views/admin/discount/Discount.js"
@@ -34,7 +32,7 @@ var routes = [
   {
     path: "/product",
     name: "Danh sách sản phẩm",
-    icon: "ni ni-planet text-orange",
+    icon: "ni ni-money-coins text-green",
     component: <Products />,
     layout: "/admin",
   },
@@ -67,6 +65,13 @@ var routes = [
     layout: "/admin",
   },
   {
+    path: "/client",
+    name: "Khách hàng",
+    icon: "ni ni-books text-info",
+    component: <Client />,
+    layout: "/admin",
+  },
+  {
     path: "/partner",
     name: "Đối tác",
     icon: "ni ni-circle-08 text-pink",
@@ -88,18 +93,6 @@ var routes = [
     layout: "/admin",
   },
   {
-    path: "/product2",
-    name: "Sản phẩm 2",
-    icon: "ni ni-money-coins text-green",
-    component: <Products2 />,
-    layout: "/admin",
-  },
-  {
-    path: "/product2/add",
-    component: <AddProduct2 />,
-    layout: "/admin",
-  },
-  {
     path: "/product/add",
     component: <AddProduct />,
     layout: "/admin",
@@ -110,13 +103,8 @@ var routes = [
     layout: "/admin",
   },
   {
-    path: "/product2/edit/:id",
-    component: <EditProduct2 />,
-    layout: "/admin",
-  },
-  {
     path: "/product/detail/:id",
-    component: <DetailProduct />,
+    component: <DetailProducts />,
     layout: "/admin",
   },
   {

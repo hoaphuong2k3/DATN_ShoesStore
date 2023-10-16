@@ -9,7 +9,7 @@ import {
 import { toast } from 'react-toastify';
 import Header from "components/Headers/Header.js";
 
-const AddProduct2 = () => {
+const DetailProducts = () => {
 
     const { id } = useParams();
 
@@ -43,7 +43,7 @@ const AddProduct2 = () => {
                 errorMessage = error.response.data.message;
             }
             toast.error(errorMessage);
-            navigate("/admin/product2");
+            navigate("/admin/product");
         }
     }
     useEffect(() => {
@@ -109,7 +109,7 @@ const AddProduct2 = () => {
 
         try {
             await updateShoes(id, formData);
-            navigate("/admin/product2");
+            navigate("/admin/product");
         } catch (error) {
             let errorMessage = "Lỗi từ máy chủ";
             if (error.response && error.response.data && error.response.data.message) {
@@ -520,5 +520,5 @@ const AddProduct2 = () => {
     );
 };
 
-export default AddProduct2;
+export default DetailProducts;
 
