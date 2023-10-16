@@ -46,9 +46,16 @@ var routes = [
   },
   {
     path: "/promotion",
-    name: "Khuyến mại",
+    name: "Đợt giảm giá",
     icon: "ni ni-tag text-red",
     component: <Promo />,
+    layout: "/admin",
+  },
+  {
+    path: "/discount",
+    name: "Khuyến mại",
+    icon: "ni ni-tag text-red",
+    component: <Discount />,
     layout: "/admin",
   },
   {
@@ -115,13 +122,6 @@ var routes = [
     path: "/bill-details/:id",
     component: <BillDetail />,
     layout: "/admin",
-  },
-  {
-    path: "/discount",
-    name: "Sale",
-    icon: "ni ni-circle-08 text-pink",
-    component: <Discount />,
-    layout: "/admin",
-  },
+  }
 ];
 export default routes;

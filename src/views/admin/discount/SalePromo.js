@@ -23,7 +23,6 @@ const Promotion = () => {
         const fetchData = async () => {
             try {
                 const discountsData = await axiosInstance.get("/vouchers/getAll");
-
                 setDiscounts(discountsData.data);
             } catch (error) {
                 console.error("Error fetching data:", error);
@@ -75,13 +74,13 @@ const Promotion = () => {
                 startDate: discount.startDate,
                 endDate: discount.endDate,
                 description: discount.description,
-                salePercent: discount.salePercent, 
-                salePrice: "", 
+                salePercent: discount.salePercent,
+                salePrice: "",
                 minPrice: discount.minPrice,
-                sale: true, 
+                sale: true,
             });
         }
-        if (discount.salePrice !== null) {   
+        if (discount.salePrice !== null) {
             setFormData({
                 id: discount.id,
                 code: discount.code,
@@ -90,9 +89,9 @@ const Promotion = () => {
                 endDate: discount.endDate,
                 description: discount.description,
                 salePercent: "",
-                salePrice: discount.salePrice, 
+                salePrice: discount.salePrice,
                 minPrice: discount.minPrice || "",
-                sale: false, 
+                sale: false,
             });
         }
 
@@ -303,8 +302,6 @@ const Promotion = () => {
                             </Col>
                         </Row>
                         <Row>
-
-
                             <Col lg="4">
                                 <FormGroup>
                                     <label
