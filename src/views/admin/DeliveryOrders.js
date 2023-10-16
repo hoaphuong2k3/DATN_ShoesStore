@@ -9,6 +9,7 @@ const DeliveryOrders = () => {
     const [selectedCity, setSelectedCity] = useState("");
     const [selectedDistrict, setSelectedDistrict] = useState("");
     const [selectedWard, setSelectedWard] = useState("");
+    const [delivery, setDelivery] = useState([])
 
 
     const fetchData = async () => {
@@ -225,23 +226,26 @@ const DeliveryOrders = () => {
                     <Col md="12">
                         <Card className="shadow">
                             <CardHeader className="border-0">
-                                <Row className="align-items-center">
-                                    <div className="col">
-                                        <h3 className="mb-0">Danh sách</h3>
+                                <Row className="mt-2 ">
+                                    <h6 className="heading-small text-muted mb-4">Danh sách</h6>
+                                    <div className="col-2">
+                                        <Input type="select" value={''} onChange={(e) => e.preventDefault()} size="sm">
+                                            <option value="">Tất cả</option>
+                                            <option value="1">Đang hoạt động</option>
+                                            <option value="2"></option>
+                                        </Input>
                                     </div>
-                                    <div className="col text-right" style={{ display: "flex" }}>
-                                        <Col>
-                                            <Input id="search" type="text" placeholder="Search.." style={{ width: "250px" }} size="sm" />
-                                        </Col>
-                                        <Button
+                                    <div className="col text-right">
+                                    <Button
                                             color="primary"
                                             onClick={(e) => e.preventDefault()}
-                                            size="sm"
-                                        >
-                                            Export
-                                        </Button>
+                                            size="sm">
+                                            <i class="fa fa-print" aria-hidden="true"></i>
+                                            In phiếu giao
+                                    </Button>
+                                    
                                     </div>
-                                </Row>
+                                </Row> 
                             </CardHeader>
                             <Table className="align-items-center table-flush" responsive>
                                 <thead className="thead-light">

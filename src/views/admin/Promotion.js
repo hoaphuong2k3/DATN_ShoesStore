@@ -318,7 +318,6 @@ const Promotion = () => {
                                                 <option value="1">Đang hoạt động</option>
                                                 <option value="2">Chờ hoạt động</option>
                                             </Input>
-
                                         </div>
                                     </Col>
 
