@@ -13,7 +13,8 @@ import Products2 from "views/admin/Products2.js";
 import AddProduct2 from "views/admin/AddProduct2.js";
 import EditProduct2 from "views/admin/EditProduct2.js";
 import DetailProduct from "views/admin/DetailProduct.js";
-import BillDetail from "views/admin/BillDetail.js"
+import BillDetail from "views/admin/BillDetail.js";
+import DeliveryOrders from "views/admin/DeliveryOrders";
 
 var routes = [
   {
@@ -30,6 +31,14 @@ var routes = [
     component: <Bills />,
     layout: "/admin",
   },
+  {
+    path: "/delivery-orders",
+    name: "Phiếu giao hàng",
+    icon: "ni ni-cart text-blue",
+    component: <DeliveryOrders />,
+    layout: "/admin",
+  },
+  
   {
     path: "/product",
     name: "Danh sách sản phẩm",
