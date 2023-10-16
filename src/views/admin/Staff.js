@@ -228,7 +228,7 @@ const Staff = () => {
                             className="form-control-label"
                             htmlFor="input-city"
                           >
-                            Thành Phố / Tỉnh
+                            Tỉnh / Thành
                           </label>
                           <Input
                             className="form-control-alternative"
@@ -236,7 +236,7 @@ const Staff = () => {
                             value={selectedCity}
                             onChange={(e) => setSelectedCity(e.target.value)}
                           >
-                            <option value="">Chọn Thành Phố/Tỉnh</option>
+                            <option value="">Chọn Tỉnh / Thành</option>
                             {provinces.map((province) => (
                               <option key={province.code} value={province.name}>
                                 {province.name}
@@ -253,7 +253,7 @@ const Staff = () => {
                             className="form-control-label"
                             htmlFor="input-country"
                           >
-                            Quận/Huyện
+                            Quận / Huyện
                           </label>
                           <Input
                             className="form-control-alternative"
@@ -262,7 +262,7 @@ const Staff = () => {
                             onChange={(e) => setSelectedDistrict(e.target.value)}
                             disabled={!selectedCity}
                           >
-                            <option value="">Chọn Quận/Huyện</option>
+                            <option value="">Chọn Quận / Huyện</option>
                             {selectedCity &&
                               provinces
                                 .find((province) => province.name === selectedCity)
@@ -278,7 +278,7 @@ const Staff = () => {
                         <FormGroup>
                           <label
                             className="form-control-label" >
-                            Phường/Xã
+                            Phường / Xã
                           </label>
                           <Input
                             className="form-control-alternative"
@@ -287,7 +287,7 @@ const Staff = () => {
                             onChange={(e) => setSelectedWard(e.target.value)}
                             disabled={!selectedDistrict}
                           >
-                            <option value="">Chọn Phường/Xã</option>
+                            <option value="">Chọn Phường / Xã</option>
                             {selectedDistrict &&
                               provinces
                                 .find((province) => province.name === selectedCity)

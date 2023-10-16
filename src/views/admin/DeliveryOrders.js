@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import axios from "axios";
+import React, { useState, useEffect } from "react";
 import { Card, CardHeader, CardBody, Container, Row, Col, Form, FormGroup, Input, Button, Table, InputGroup, InputGroupAddon, InputGroupText } from "reactstrap";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import Header from "components/Headers/BillHeader.js";
@@ -9,6 +10,19 @@ const DeliveryOrders = () => {
     const [selectedDistrict, setSelectedDistrict] = useState("");
     const [selectedWard, setSelectedWard] = useState("");
 
+
+    const fetchData = async () => {
+        try {
+            const provincesResponse = await axios.get("https://provinces.open-api.vn/api/?depth=3");
+            setProvinces(provincesResponse.data);
+        } catch (error) {
+            console.error("Error fetching data: ", error);
+        }
+    };
+
+    useEffect(() => {
+        fetchData();
+    }, []);
 
     return (
         <>
@@ -63,21 +77,7 @@ const DeliveryOrders = () => {
                                                     <Input
                                                         className="form-control-alternative"
                                                         id="input-ship-date"
-                                                        placeholder="Ngày giao hàng"
                                                         type="date"
-                                                    />
-                                                </FormGroup>
-                                            </Col>
-                                            <Col lg="4">
-                                                <FormGroup>
-                                                    <label className="form-control-label" htmlFor="input-delivery-address">
-                                                        Địa chỉ giao hàng
-                                                    </label>
-                                                    <Input
-                                                        className="form-control-alternative"
-                                                        id="input-delivery-address"
-                                                        placeholder="Địa chỉ"
-                                                        type="text"
                                                     />
                                                 </FormGroup>
                                             </Col>
@@ -89,13 +89,10 @@ const DeliveryOrders = () => {
                                                     <Input
                                                         className="form-control-alternative"
                                                         id="input-recipient-name"
-                                                        placeholder="Tên người nhận"
                                                         type="text"
                                                     />
                                                 </FormGroup>
                                             </Col>
-                                        </Row>
-                                        <Row>
                                             <Col lg="4">
                                                 <FormGroup>
                                                     <label className="form-control-label" htmlFor="input-recipient-phone">
@@ -104,11 +101,12 @@ const DeliveryOrders = () => {
                                                     <Input
                                                         className="form-control-alternative"
                                                         id="input-recipient-phone"
-                                                        placeholder="Số điện thoại"
                                                         type="text"
                                                     />
                                                 </FormGroup>
                                             </Col>
+                                        </Row>
+                                        <Row>
                                             <Col lg="4">
                                                 <FormGroup>
                                                     <label className="form-control-label" htmlFor="input-delivery-cost">
@@ -117,7 +115,6 @@ const DeliveryOrders = () => {
                                                     <Input
                                                         className="form-control-alternative"
                                                         id="input-delivery-cost"
-                                                        placeholder="Phí giao hàng"
                                                         type="number"
                                                     />
                                                 </FormGroup>
@@ -129,10 +126,92 @@ const DeliveryOrders = () => {
                                                     </label>
                                                     <Input
                                                         className="form-control-alternative"
-                                                        id="input-delivery-cost"
-                                                        placeholder="Trạng thái"
+                                                        id="input-delivery-status"
                                                         type="number"
                                                     />
+                                                </FormGroup>
+                                            </Col>
+                                            <Col lg="4">
+                                                <FormGroup>
+                                                    <label className="form-control-label" htmlFor="input-delivery-address">
+                                                        Địa chỉ giao hàng
+                                                    </label>
+                                                    <Input
+                                                        className="form-control-alternative"
+                                                        id="input-delivery-address"
+                                                        type="text"
+                                                    />
+                                                </FormGroup>
+                                            </Col>
+                                        </Row>
+                                        <Row>
+                                            <Col lg="4">
+                                                <FormGroup>
+                                                    <label className="form-control-label" htmlFor="input_city">
+                                                        Tỉnh / thành
+                                                    </label>
+                                                    <Input className="form-control-alternative"
+                                                        type="select" value={selectedCity} onChange={(e) => setSelectedCity(e.target.value)}>
+                                                        <option value="">Chọn tỉnh / thành</option>
+                                                        {provinces.map((province) => (
+                                                            <option key={province.code} value={province.name}>
+                                                                {province.name}
+                                                            </option>
+                                                        ))}
+                                                    </Input>
+                                                </FormGroup>
+                                            </Col>
+                                            <Col lg="4">
+                                                <FormGroup>
+                                                    <label
+                                                        className="form-control-label"
+                                                        htmlFor="input-country"
+                                                    >
+                                                        Quận / Huyện
+                                                    </label>
+                                                    <Input
+                                                        className="form-control-alternative"
+                                                        type="select"
+                                                        value={selectedDistrict}
+                                                        onChange={(e) => setSelectedDistrict(e.target.value)}
+                                                        disabled={!selectedCity}
+                                                    >
+                                                        <option value="">Chọn Quận / Huyện</option>
+                                                        {selectedCity &&
+                                                            provinces
+                                                                .find((province) => province.name === selectedCity)
+                                                                .districts.map((district) => (
+                                                                    <option key={district.code} value={district.name}>
+                                                                        {district.name}
+                                                                    </option>
+                                                                ))}
+                                                    </Input>
+                                                </FormGroup>
+                                            </Col>
+                                            <Col lg="4">
+                                                <FormGroup>
+                                                    <label
+                                                        className="form-control-label" >
+                                                        Phường / Xã
+                                                    </label>
+                                                    <Input
+                                                        className="form-control-alternative"
+                                                        type="select"
+                                                        value={selectedWard}
+                                                        onChange={(e) => setSelectedWard(e.target.value)}
+                                                        disabled={!selectedDistrict}
+                                                    >
+                                                        <option value="">Chọn Phường / Xã</option>
+                                                        {selectedDistrict &&
+                                                            provinces
+                                                                .find((province) => province.name === selectedCity)
+                                                                .districts.find((district) => district.name === selectedDistrict)
+                                                                .wards.map((ward) => (
+                                                                    <option key={ward.code} value={ward.name}>
+                                                                        {ward.name}
+                                                                    </option>
+                                                                ))}
+                                                    </Input>
                                                 </FormGroup>
                                             </Col>
                                         </Row>
@@ -142,7 +221,6 @@ const DeliveryOrders = () => {
                         </Card>
                     </Col>
                 </Row>
-
                 <Row style={{ marginTop: "20px" }}>
                     <Col md="12">
                         <Card className="shadow">
@@ -164,7 +242,7 @@ const DeliveryOrders = () => {
                                             Export
                                         </Button>
                                     </div>
-                                </Row>
+                            </Row>
                             </CardHeader>
                             <Table className="align-items-center table-flush" responsive>
                                 <thead className="thead-light">
