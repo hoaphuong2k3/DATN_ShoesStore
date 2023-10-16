@@ -125,12 +125,12 @@ var routes = [
     component: <BillDetail />,
     layout: "/admin",
   },
-  {
-    path: "/discount",
-    name: "Sale",
-    icon: "ni ni-circle-08 text-pink",
-    component: <Discount />,
-    layout: "/admin",
-  },
+  // {
+  //   path: "/discount",
+  //   name: "Sale",
+  //   icon: "ni ni-circle-08 text-pink",
+  //   component: <Discount />,
+  //   layout: "/admin",
+  // },
 ];
 export default routes;

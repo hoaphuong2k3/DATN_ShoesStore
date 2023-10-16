@@ -4,14 +4,10 @@ import { FaEye, FaEyeSlash } from "react-icons/fa";
 import Header from "components/Headers/BillHeader.js";
 
 const DeliveryOrders = () => {
-    const [password, setPassword] = useState("");
-    const [showPassword, setShowPassword] = useState(false);
-
-    const toggleShowPassword = () => {
-        setShowPassword(!showPassword);
-    };
-
-
+    const [provinces, setProvinces] = useState([]);
+    const [selectedCity, setSelectedCity] = useState("");
+    const [selectedDistrict, setSelectedDistrict] = useState("");
+    const [selectedWard, setSelectedWard] = useState("");
 
 
     return (
@@ -129,19 +125,18 @@ const DeliveryOrders = () => {
                                             <Col lg="4">
                                                 <FormGroup>
                                                     <label className="form-control-label" htmlFor="input-delivery-cost">
-                                                        Phí giao hàng
+                                                        Trạng thái
                                                     </label>
                                                     <Input
                                                         className="form-control-alternative"
                                                         id="input-delivery-cost"
-                                                        placeholder="Phí giao hàng"
+                                                        placeholder="Trạng thái"
                                                         type="number"
                                                     />
                                                 </FormGroup>
                                             </Col>
                                         </Row>
                                     </div>
-                                    {/* Các trường khác */}
                                 </Form>
                             </CardBody>
                         </Card>
