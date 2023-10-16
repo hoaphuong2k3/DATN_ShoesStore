@@ -29,7 +29,7 @@ const Promotion = () => {
                 params: queryParams
             });
             setDiscounts(response.content);
-            setTotalPages(response.totalPages);
+            // setTotalPages(response.totalPages);
         } catch (error) {
             console.error("Lỗi khi lấy dữ liệu:", error);
         }
