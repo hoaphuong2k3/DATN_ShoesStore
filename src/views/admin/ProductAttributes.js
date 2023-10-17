@@ -358,33 +358,33 @@ const ProductAttributes = () => {
 
                 {/*  */}
               </CardBody>
+              <ReactPaginate
+                breakLabel="..."
+                nextLabel="next >"
+                onPageChange={1}
+                pageRangeDisplayed={3}
+                //số trang
+                pageCount={49}
+                previousLabel="< previous"
+
+                renderOnZeroPageCount={null}
+                pageClassName="page-item"
+                pageLinkClassName="page-link"
+                previousClassName="page-item"
+                previousLinkClassName="page-link"
+                nextClassName="page-item"
+                nextLinkClassName="page-link"
+                breakClassName="page-item"
+                breakLinkClassName="page-link"
+                containerClassName="pagination"
+                activeClassName="active"
+              // Các thuộc tính khác ở đây
+
+
+              />
             </Card>
           </Col>
         </Row>
-        {/* <ReactPaginate
-          breakLabel="..."
-          nextLabel="next >"
-          onPageChange={1}
-          pageRangeDisplayed={3}
-          //số trang
-          pageCount={49}
-          previousLabel="< previous"
-
-          renderOnZeroPageCount={null}
-
-          pageClassName="page-item"
-          pageLinkClassName="page-link"
-          previousClassName="page-item"
-          previousLinkClassName="page-link"
-          nextClassName="page-item"
-          nextLinkClassName="page-link"
-          breakClassName="page-item"
-          breakLinkClassName="page-link"
-          containerClassName="pagination"
-          activeClassName="active"
-
-        /> */}
-
       </Container>
       <Modal
         isOpen={modal}
