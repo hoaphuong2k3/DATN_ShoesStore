@@ -835,7 +835,7 @@ const Products = () => {
                       breakLabel="..."
                       nextLabel=">"
                       pageRangeDisplayed={2} // Number of pages to display on each side of the selected page
-                      pageCount={14} // Total number of pages
+                      pageCount={totalPages} // Total number of pages
                       previousLabel="<"
                       onPageChange={handlePageClick}
                       renderOnZeroPageCount={null}
