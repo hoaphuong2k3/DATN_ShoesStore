@@ -1,6 +1,7 @@
 import { React, useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { getAllShoes, deleteShoes } from "services/Product2Service";
+import ReactPaginate from 'react-paginate';
 import { getAllBrand, getAllOrigin, getAllDesignStyle, getAllSkinType, getAllToe, getAllSole, getAllLining, getAllCushion } from "services/ProductAttributeService";
 // reactstrap components
 import {
@@ -27,6 +28,10 @@ const Products = () => {
   const [listSole, setListSole] = useState([]);
   const [listLining, setListLining] = useState([]);
   const [listCushion, setListCushion] = useState([]);
+  const [totalPages, setTotalPages] = useState(0);
+  const [totalElements, setTotalElenments] = useState(0);
+  const [page, setPage] = useState(0);
+  const [size, setSize] = useState(10);
   const [search, setSearch] = useState({
     code: "",
     name: "",
@@ -67,16 +72,26 @@ const Products = () => {
       createdBy: ""
     })
   };
+  const handlePageClick = (event) => {
+    setPage(+event.selected);
+    getAll(+event.selected + 1);
+  }
+  const onChangeSize = (e) => {
+    setSize(+e.target.value);
+  }
   const onInputChange = async (e) => {
     await setSearch({ ...search, [e.target.name]: e.target.value });
-    getAll(0, 10);
+    getAll(page, size);
   };
   useEffect(() => {
-    getAll(0, 10);
+    getAll(page, size);
   }, [search]);
 
   useEffect(() => {
-    getAll(0, 10);
+    getAll(page, size);
+  }, [size, page]);
+  useEffect(() => {
+    getAll(page, size);
     getlistBrand();
     getListOrigin();
     getListDesignStyle();
@@ -143,10 +158,9 @@ const Products = () => {
       let res = await getAllShoes(page, size, search);
       if (res && res.data && res.data.content) {
         setListShoes(res.data.content);
-        // setListShoes
-        // setTotalUsers(res.total);
-        // setTotalPages(res.total_pages);
-        // setlistUsers(res.data);
+        console.log(res.data);
+        setTotalElenments(res.data.totalElements);
+        setTotalPages(res.data.totalPages);
       }
     } catch (error) {
       let errorMessage = "Lỗi từ máy chủ";
@@ -745,10 +759,10 @@ const Products = () => {
                               <td>{item.sole}</td>
                               <td>{item.lining}</td>
                               <td>{item.cushion}</td>
-                              <td>{item.priceMin}</td>
-                              <td>{item.priceMax}</td>
                               <td>{item.totalQuantity}</td>
                               <td>{item.totalRecord}</td>
+                              <td>{item.priceMin}</td>
+                              <td>{item.priceMax}</td>
                               <td>
                                 <Button color="danger" to={`/admin/shoesdetail/${item.id}`} tag={Link} size="sm">
                                   <i class="fa-solid fa-eye" />&nbsp;CTSP
@@ -772,8 +786,50 @@ const Products = () => {
                     </tbody>
                   </Table>
                 </Row>
+                <Row className="mt-4">
+                  <Col lg={6}>
+                    <div style={{ fontSize: 14 }}>
+                      Đang xem <b>1</b> đến <b>{totalElements < size ? totalElements : size}</b> trong tổng số <b>{totalElements}</b> mục
+                    </div>
+                  </Col>
+                  <Col style={{ fontSize: 14 }} lg={2}>
+                    <Row>
+                      <span>Xem </span>&nbsp;
+                      <span>
+                        <Input type="select" name="status" style={{ width: "60px", fontSize: 14 }} size="sm" onChange={(e) => onChangeSize(e)} className="mt--1">
+                          <option value="10">10</option>
+                          <option value="25">25</option>
+                          <option value="50">50</option>
+                          <option value="100">100</option>
+                        </Input>
+                      </span>&nbsp;
+                      <span> mục</span>
+                    </Row>
 
-
+                  </Col>
+                  <Col lg={4} style={{ fontSize: 11 }} className="mt--1">
+                    <ReactPaginate
+                      breakLabel="..."
+                      nextLabel=">"
+                      pageRangeDisplayed={2} // Number of pages to display on each side of the selected page
+                      pageCount={totalPages} // Total number of pages
+                      previousLabel="<"
+                      onPageChange={handlePageClick}
+                      renderOnZeroPageCount={null}
+                      pageClassName="page-item"
+                      pageLinkClassName="page-link"
+                      previousClassName="page-item"
+                      previousLinkClassName="page-link"
+                      nextClassName="page-item"
+                      nextLinkClassName="page-link"
+                      breakClassName="page-item"
+                      breakLinkClassName="page-link"
+                      containerClassName="pagination"
+                      activeClassName="active"
+                      marginPagesDisplayed={1}
+                    />
+                  </Col>
+                </Row>
                 {/*  */}
               </CardBody>
             </Card>
