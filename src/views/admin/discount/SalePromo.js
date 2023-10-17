@@ -8,7 +8,7 @@ import { format, parseISO } from 'date-fns';
 import { vi } from 'date-fns/locale';
 import "assets/css/pagination.css";
 // reactstrap components
-import { Row, Col, Form, FormGroup, Input, Button, Table } from "reactstrap";
+import { Row, Col, Form, FormGroup, Input, Button, Table, Badge } from "reactstrap";
 
 const Promotion = () => {
 
@@ -56,6 +56,12 @@ const Promotion = () => {
         return index + 1 + queryParams.page * queryParams.size;
     };
 
+    const statusMapping = {
+        0: { color: 'danger', label: 'Kích hoạt' },
+        1: { color: 'success', label: 'Chờ kích hoạt' },
+        2: { color: 'warning', label: 'Ngừng kích hoạt' },
+        default: { color: 'secondary', label: 'Không xác định' },
+    };
     //lọc
 
 
@@ -454,6 +460,22 @@ const Promotion = () => {
                                     />
                                 </FormGroup>
                             </Col>
+                            <Col lg="4">
+                                <FormGroup>
+                                    <label
+                                        className="form-control-label"
+                                        htmlFor="endDate"
+                                    >
+                                        Trạng thái:
+                                    </label>
+                                    <input
+
+                                        type="checkbox"
+
+                                    />
+                                </FormGroup>
+
+                            </Col>
                         </Row>
 
                     </div>
@@ -520,8 +542,10 @@ const Promotion = () => {
 
                                     <td>{format(new Date(discount.startDate), 'yyyy-MM-dd HH:mm', { locale: vi })}</td>
                                     <td>{format(new Date(discount.endDate), 'yyyy-MM-dd HH:mm', { locale: vi })}</td>
-                                    <td >
-                                        {discount.status === 0 ? 'Kích hoạt' : discount.status === 1 ? 'Chờ kích hoạt' : 'Ngừng kích hoạt'}
+                                    <td>
+                                        <Badge color={statusMapping[discount.status]?.color || statusMapping.default.color}>
+                                            {statusMapping[discount.status]?.label || statusMapping.default.label}
+                                        </Badge>
                                     </td>
                                     <td>
                                         <Button color="info" size="sm" onClick={() => handleRowClick(discount)}><FaEdit /></Button>
@@ -534,7 +558,7 @@ const Promotion = () => {
                 </Table>
                 {/* Hiển thị thanh phân trang */}
                 <div className="pagination-container">
-                    <ReactPaginate
+                    {/* <ReactPaginate
                         previousLabel={"Trang trước"}
                         nextLabel={"Trang sau"}
                         breakLabel={"..."}
@@ -545,6 +569,27 @@ const Promotion = () => {
                         containerClassName={"pagination"}
                         subContainerClassName={"pages pagination"}
                         activeClassName={"active"}
+                    /> */}
+
+                    <ReactPaginate
+                        breakLabel="..."
+                        nextLabel=">"
+                        pageRangeDisplayed={2} // Number of pages to display on each side of the selected page
+                        pageCount={totalPages} // Total number of pages
+                        previousLabel="<"
+                        onPageChange={handlePageChange}
+                        renderOnZeroPageCount={null}
+                        pageClassName="page-item"
+                        pageLinkClassName="page-link"
+                        previousClassName="page-item"
+                        previousLinkClassName="page-link"
+                        nextClassName="page-item"
+                        nextLinkClassName="page-link"
+                        breakClassName="page-item"
+                        breakLinkClassName="page-link"
+                        containerClassName="pagination"
+                        activeClassName="active"
+                        marginPagesDisplayed={1}
                     />
                 </div>
             </div>
