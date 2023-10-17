@@ -15,7 +15,6 @@ const Promotion = () => {
 
     const [discounts, setDiscounts] = useState([]);
 
-
     //loads table
     const [queryParams, setQueryParams] = useState({
         page: 0,
@@ -28,6 +27,9 @@ const Promotion = () => {
 
     const [totalPages, setTotalPages] = useState(0);
     const [selectedStatus, setSelectedStatus] = useState("");
+    const [fromDate, setFromDate] = useState("");
+    const [toDate, setToDate] = useState("");
+
 
     const fetchData = async () => {
         try {
@@ -43,6 +45,7 @@ const Promotion = () => {
     useEffect(() => {
         fetchData();
     }, [queryParams]);
+  
 
     const handlePageChange = ({ selected }) => {
         setQueryParams(prevParams => ({ ...prevParams, page: selected }));
@@ -53,18 +56,27 @@ const Promotion = () => {
     };
 
 
-
-
     //lọc
-    const handleStatusChange = (selectedStatus) => {
+    const handleStatusChange = (selectedStatus, fromDate, toDate) => {
         setQueryParams(prevParams => ({
             ...prevParams,
             status: selectedStatus,
-            page: 0
+            page: 0,
+            fromDate: fromDate,
+            toDate: toDate
         }));
         setSelectedStatus(selectedStatus);
     };
 
+    const handleFromDateChange = (value) => {
+        setFromDate(value);
+        handleStatusChange(selectedStatus, value, toDate);
+    };
+
+    const handleToDateChange = (value) => {
+        setToDate(value);
+        handleStatusChange(selectedStatus, fromDate, value);
+    };
 
     //click on selected
     const [formData, setFormData] = useState({
@@ -318,6 +330,22 @@ const Promotion = () => {
                                                 <option value="1">Đang hoạt động</option>
                                                 <option value="2">Chờ hoạt động</option>
                                             </Input>
+                                        </div>
+                                        <div className="col-2">
+                                            <Input
+                                                type="date"
+                                                size="sm"
+                                                value={fromDate}
+                                                onChange={(e) => handleFromDateChange(e.target.value)}
+                                            />
+                                        </div>
+                                        <div className="col-2">
+                                            <Input
+                                                type="date"
+                                                size="sm"
+                                                value={toDate}
+                                                onChange={(e) => handleToDateChange(e.target.value)}
+                                            />
                                         </div>
                                     </Col>
 
