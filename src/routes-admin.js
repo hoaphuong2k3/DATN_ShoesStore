@@ -4,7 +4,6 @@ import Products from "views/admin/Products.js";
 import ProductAttributes from "views/admin/ProductAttributes.js";
 import Promo from "views/admin/Promotion.js";
 import Staff from "views/admin/Staff.js";
-import Partner from "views/admin/Partner.js";
 import Profile from "views/admin/Profile.js";
 import Statistical from "views/admin/Statistical.js";
 import AddProduct from "views/admin/AddProduct.js";
@@ -63,13 +62,6 @@ var routes = [
     name: "Nhân viên",
     icon: "ni ni-books text-info",
     component: <Staff />,
-    layout: "/admin",
-  },
-  {
-    path: "/partner",
-    name: "Đối tác",
-    icon: "ni ni-circle-08 text-pink",
-    component: <Partner />,
     layout: "/admin",
   },
   {

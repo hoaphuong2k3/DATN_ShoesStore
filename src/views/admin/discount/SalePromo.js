@@ -1,55 +1,63 @@
 import React, { useState, useEffect } from "react";
 import { FaEdit, FaTrash } from 'react-icons/fa';
+import ReactPaginate from "react-paginate";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import axiosInstance from "services/custommize-axios";
 import { format, parseISO } from 'date-fns';
 import { vi } from 'date-fns/locale';
+import "assets/css/pagination.css";
 // reactstrap components
 import { Row, Col, Form, FormGroup, Input, Button, Table } from "reactstrap";
 
 const Promotion = () => {
 
-    const [selectedStatusFilter, setSelectedStatusFilter] = useState("Trạng thái");
-    const [discountTypeFilter, setDiscountTypeFilter] = useState("Hình thức");
-
-    const [filteredDiscounts, setFilteredDiscounts] = useState([]);
-
     const [discounts, setDiscounts] = useState([]);
+
+    //loads table
+    const [queryParams, setQueryParams] = useState({
+        page: 0,
+        size: 3,
+        type: 0,
+        fromDate: "",
+        toDate: "",
+        status: "",
+        isdelete: 0,
+    });
+
+    const [totalPages, setTotalPages] = useState(0);
+    const [selectedStatus, setSelectedStatus] = useState("");
+    const [fromDate, setFromDate] = useState("");
+    const [toDate, setToDate] = useState("");
 
 
     //loads table
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const discountsData = await axiosInstance.get("/vouchers/getAll");
-                setDiscounts(discountsData.data);
+                const discountsData = await axiosInstance.get("/vouchers/getAll", {
+                    params: queryParams
+                });
+                setDiscounts(discountsData.content);
+                setTotalPages(discountsData.totalPages);
             } catch (error) {
                 console.error("Error fetching data:", error);
             }
         };
 
         fetchData();
-    }, []);
+    }, [queryParams]);
+
+    const handlePageChange = ({ selected }) => {
+        setQueryParams(prevParams => ({ ...prevParams, page: selected }));
+    };
+
+    const calculateIndex = (index) => {
+        return index + 1 + queryParams.page * queryParams.size;
+    };
 
     //lọc
-    useEffect(() => {
-        const filteredDiscounts = discounts.filter((discount) => {
-            const statusCondition =
-                selectedStatusFilter === "Trạng thái" ||
-                (discount.status === 2 && selectedStatusFilter === "Đang hoạt động") ||
-                (discount.status !== 2 && selectedStatusFilter === "Chờ hoạt động");
 
-            const discountTypeCondition =
-                discountTypeFilter === "Hình thức" ||
-                (discountTypeFilter === "Tiền" && discount.salePrice !== null) ||
-                (discountTypeFilter === "Phần trăm" && discount.salePercent !== null);
-
-            return statusCondition && discountTypeCondition;
-        });
-
-        setFilteredDiscounts(filteredDiscounts);
-    }, [selectedStatusFilter, discountTypeFilter, discounts]);
 
     //click on selected
     const [formData, setFormData] = useState({
@@ -459,8 +467,6 @@ const Promotion = () => {
                         <Input
                             type="select"
                             size="sm"
-                            value={discountTypeFilter}
-                            onChange={(e) => setDiscountTypeFilter(e.target.value)}
                         >
                             <option>Hình thức</option>
                             <option>Tiền</option>
@@ -472,8 +478,6 @@ const Promotion = () => {
                         <Input
                             type="select"
                             size="sm"
-                            value={selectedStatusFilter}
-                            onChange={(e) => setSelectedStatusFilter(e.target.value)}
                         >
                             <option>Trạng thái</option>
                             <option>Chờ hoạt động</option>
@@ -491,8 +495,8 @@ const Promotion = () => {
                             <th scope="col">Tên khuyến mại</th>
                             <th scope="col">Mô tả</th>
                             <th scope="col">Hóa đơn <br />tối thiểu</th>
-                            <th scope="col">Phần trăm (%)</th>
-                            <th scope="col">Tiền</th>
+                            <th scope="col">Giá trị</th>
+                            {/* <th scope="col">Tiền</th> */}
                             <th scope="col">Ngày bắt đầu</th>
                             <th scope="col">Ngày kết thúc</th>
                             <th scope="col">Trạng thái</th>
@@ -501,27 +505,23 @@ const Promotion = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {Array.isArray(filteredDiscounts) &&
-                            filteredDiscounts.map((discount, index) => (
-                                <tr key={index}>
-                                    <td>{index + 1}</td>
+                        {Array.isArray(discounts) &&
+                            discounts.map((discount, index) => (
+                                <tr key={discount.id}>
+                                    <td>{calculateIndex(index)}</td>
                                     <td>{discount.code}</td>
                                     <td>{discount.name}</td>
                                     <td>{discount.description}</td>
                                     <td>{discount.minPrice}</td>
-                                    <td>{discount.salePercent}</td>
-                                    <td>{discount.salePrice}</td>
-                                    <td>{discount.startDate}</td>
-                                    <td>{discount.endDate}</td>
                                     <td>
-                                        <label className="custom-toggle">
-                                            <input
-                                                checked={discount.status === 1}
-                                                type="checkbox"
-                                                onChange={() => handleStatusChange(discount)}
-                                            />
-                                            <span className="custom-toggle-slider rounded-circle" />
-                                        </label>
+                                        {discount.salePercent ? `${discount.salePercent}%` : ""}
+                                        {discount.salePrice ? `${discount.salePrice} VNĐ` : ""}
+                                    </td>
+
+                                    <td>{format(new Date(discount.startDate), 'yyyy-MM-dd HH:mm', { locale: vi })}</td>
+                                    <td>{format(new Date(discount.endDate), 'yyyy-MM-dd HH:mm', { locale: vi })}</td>
+                                    <td >
+                                        {discount.status === 0 ? 'Kích hoạt' : discount.status === 1 ? 'Chờ kích hoạt' : 'Ngừng kích hoạt'}
                                     </td>
                                     <td>
                                         <Button color="info" size="sm" onClick={() => handleRowClick(discount)}><FaEdit /></Button>
@@ -532,7 +532,21 @@ const Promotion = () => {
                             ))}
                     </tbody>
                 </Table>
-
+                {/* Hiển thị thanh phân trang */}
+                <div className="pagination-container">
+                    <ReactPaginate
+                        previousLabel={"Trang trước"}
+                        nextLabel={"Trang sau"}
+                        breakLabel={"..."}
+                        pageCount={totalPages}
+                        marginPagesDisplayed={2}
+                        pageRangeDisplayed={5}
+                        onPageChange={handlePageChange}
+                        containerClassName={"pagination"}
+                        subContainerClassName={"pages pagination"}
+                        activeClassName={"active"}
+                    />
+                </div>
             </div>
 
             <ToastContainer />
