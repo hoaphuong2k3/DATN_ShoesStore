@@ -8,12 +8,6 @@ import Header from "components/Headers/Header.js";
 
 
 const Staff = () => {
-  // const [password, setPassword] = useState("");
-  // const [showPassword, setShowPassword] = useState(false);
-
-  // const toggleShowPassword = () => {
-  //   setShowPassword(!showPassword);
-  // };
 
 
   const [provinces, setProvinces] = useState([]);
@@ -33,7 +27,7 @@ const Staff = () => {
       setAdmins(adminsResponse.data.content);
     } catch (error) {
       console.error("Error fetching data: ", error);
-    }
+    } 
   };
 
   useEffect(() => {
@@ -95,7 +89,6 @@ const Staff = () => {
                 <Form>
                   <div className="pl-lg-4">
                     <Row>
-
                       <Col lg="4">
                         <FormGroup>
                           <label className="form-control-label">
