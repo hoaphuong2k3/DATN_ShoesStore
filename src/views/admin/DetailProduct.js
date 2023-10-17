@@ -9,7 +9,7 @@ import {
 import { toast } from 'react-toastify';
 import Header from "components/Headers/Header.js";
 
-const AddProduct2 = () => {
+const DetailProducts = () => {
 
     const { id } = useParams();
 
@@ -33,6 +33,9 @@ const AddProduct2 = () => {
             let res = await findShoes(id);
             if (res && res.data) {
                 setDataEdit(res.data);
+                setSelectedImage(res.data.imgURI);
+                console.log(res.data.imgURI);
+                console.log(dataEdit.imgURI);
             }
         } catch (error) {
             let errorMessage = "Lỗi từ máy chủ";
@@ -40,7 +43,7 @@ const AddProduct2 = () => {
                 errorMessage = error.response.data.message;
             }
             toast.error(errorMessage);
-            navigate("/admin/product2");
+            navigate("/admin/product");
         }
     }
     useEffect(() => {
@@ -106,7 +109,7 @@ const AddProduct2 = () => {
 
         try {
             await updateShoes(id, formData);
-            navigate("/admin/product2");
+            navigate("/admin/product");
         } catch (error) {
             let errorMessage = "Lỗi từ máy chủ";
             if (error.response && error.response.data && error.response.data.message) {
@@ -454,7 +457,7 @@ const AddProduct2 = () => {
                                                     {selectedImage && (
                                                         <div>
                                                             <p>Selected Image:</p>
-                                                            <img src={URL.createObjectURL(selectedImage)} alt="Selected" />
+                                                            <img src={`https://s3-ap-southeast-1.amazonaws.com/imageshoestore/${selectedImage}`} alt="Ảnh mô tả" />
                                                         </div>
                                                     )}
                                                 </div>
@@ -517,5 +520,5 @@ const AddProduct2 = () => {
     );
 };
 
-export default AddProduct2;
+export default DetailProducts;
 
