@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
+import ReactPaginate from "react-paginate";
 import { FaEdit, FaTrash } from 'react-icons/fa';
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import axiosInstance from "services/custommize-axios";
+import "assets/css/pagination.css";
 // reactstrap components
 import { Card, CardHeader, CardBody, Container, Row, Col, Form, FormGroup, Input, Button, Table } from "reactstrap";
 
@@ -16,12 +18,18 @@ const Promotion = () => {
     //loads table
     const [queryParams, setQueryParams] = useState({
         page: 0,
-        size: 2,
+        size: 3,
         fromDate: "",
         toDate: "",
         status: "",
         isdelete: 0,
     });
+
+    const [totalPages, setTotalPages] = useState(0);
+    const [selectedStatus, setSelectedStatus] = useState("");
+    const [fromDate, setFromDate] = useState("");
+    const [toDate, setToDate] = useState("");
+
 
     const fetchData = async () => {
         try {
@@ -29,26 +37,46 @@ const Promotion = () => {
                 params: queryParams
             });
             setDiscounts(response.content);
-            // setTotalPages(response.totalPages);
+            setTotalPages(response.totalPages);
         } catch (error) {
             console.error("Lỗi khi lấy dữ liệu:", error);
         }
     };
-
     useEffect(() => {
         fetchData();
     }, [queryParams]);
+  
 
-    const handlePageChange = (newPage) => {
-        setQueryParams(prevParams => ({
-            ...prevParams,
-            page: newPage
-        }));
+    const handlePageChange = ({ selected }) => {
+        setQueryParams(prevParams => ({ ...prevParams, page: selected }));
+    };
+
+    const calculateIndex = (index) => {
+        return index + 1 + queryParams.page * queryParams.size;
     };
 
 
     //lọc
- 
+    const handleStatusChange = (selectedStatus, fromDate, toDate) => {
+        setQueryParams(prevParams => ({
+            ...prevParams,
+            status: selectedStatus,
+            page: 0,
+            fromDate: fromDate,
+            toDate: toDate
+        }));
+        setSelectedStatus(selectedStatus);
+    };
+
+    const handleFromDateChange = (value) => {
+        setFromDate(value);
+        handleStatusChange(selectedStatus, value, toDate);
+    };
+
+    const handleToDateChange = (value) => {
+        setToDate(value);
+        handleStatusChange(selectedStatus, fromDate, value);
+    };
 
     //click on selected
     const [formData, setFormData] = useState({
@@ -85,7 +113,7 @@ const Promotion = () => {
     //add
     const addDiscount = async () => {
         try {
-            const response = await axiosInstance.post('/admin/discount-period/createDiscountPeriod', {
+            await axiosInstance.post('/admin/discount-period/createDiscountPeriod', {
 
                 code: formData.code,
                 name: formData.name,
@@ -94,7 +122,8 @@ const Promotion = () => {
                 salePercent: formData.salePercent,
             });
 
-            setDiscounts([...discounts, response.data]);
+            fetchData();
+
             toast.success("Thêm thành công!");
             resetForm();
         } catch (error) {
@@ -107,7 +136,7 @@ const Promotion = () => {
     const updateDiscount = async () => {
         try {
 
-            const response = await axiosInstance.put(`/admin/discount-period/updateDiscountPeriod`, {
+            await axiosInstance.put(`/admin/discount-period/updateDiscountPeriod`, {
                 id: formData.id,
                 code: formData.code,
                 name: formData.name,
@@ -116,8 +145,7 @@ const Promotion = () => {
                 endDate: formData.endDate,
             });
 
-            const updatedDiscounts = discounts.map(d => (d.code === formData.code ? response.data : d));
-            setDiscounts(updatedDiscounts);
+            fetchData();
 
             toast.success("Cập nhật thành công!");
             resetForm();
@@ -137,9 +165,9 @@ const Promotion = () => {
         if (window.confirm("Bạn có chắc chắn muốn xóa khuyến mại này không?")) {
             axiosInstance.delete(`/admin/discount-period/deleteDiscountPeriod/${id}`)
                 .then(response => {
-                    const updatedDiscounts = discounts.filter(discount => discount.id !== id);
-                    setDiscounts(updatedDiscounts);
+                    fetchData();
                     toast.success("Xóa thành công");
+                    resetForm();
                 })
                 .catch(error => {
                     console.error('Lỗi khi xóa dữ liệu:', error);
@@ -297,14 +325,27 @@ const Promotion = () => {
                                         <h6 className="heading-small text-muted mb-4">Danh sách</h6>
 
                                         <div className="col-2">
-                                            <Input
-                                                type="select"
-                                                size="sm"
-                                            >
-                                                <option>Trạng thái</option>
-                                                <option>Chờ hoạt động</option>
-                                                <option>Đang hoạt động</option>
+                                            <Input type="select" value={selectedStatus} onChange={(e) => handleStatusChange(e.target.value)} size="sm">
+                                                <option value="">Tất cả</option>
+                                                <option value="1">Đang hoạt động</option>
+                                                <option value="2">Chờ hoạt động</option>
                                             </Input>
+                                        </div>
+                                        <div className="col-2">
+                                            <Input
+                                                type="date"
+                                                size="sm"
+                                                value={fromDate}
+                                                onChange={(e) => handleFromDateChange(e.target.value)}
+                                            />
+                                        </div>
+                                        <div className="col-2">
+                                            <Input
+                                                type="date"
+                                                size="sm"
+                                                value={toDate}
+                                                onChange={(e) => handleToDateChange(e.target.value)}
+                                            />
                                         </div>
                                     </Col>
 
@@ -323,24 +364,46 @@ const Promotion = () => {
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            { discounts.map((discount, index) => (
-                                                    <tr key={index}>
-                                                        <td>{index + 1}</td>
-                                                        <td>{discount.code}</td>
-                                                        <td>{discount.name}</td>
-                                                        <td>{discount.salePercent}</td>
-                                                        <td>{discount.startDate}</td>
-                                                        <td>{discount.endDate}</td>
-                                                        <td>{discount.status === 1 ? "Đang hoạt động" : "Chờ hoạt động"}</td>
-                                                        <td>
-                                                            <Button color="info" size="sm" onClick={() => handleRowClick(discount)}><FaEdit /></Button>
-                                                            <Button color="danger" size="sm" onClick={() => deleteDiscount(discount.id)}><FaTrash /></Button>
-                                                        </td>
+                                            {discounts.map((discount, index) => (
+                                                <tr key={discount.id}>
+                                                    <td>{calculateIndex(index)}</td>
+                                                    <td>{discount.code}</td>
+                                                    <td>{discount.name}</td>
+                                                    <td>{discount.salePercent}</td>
+                                                    <td>{discount.startDate}</td>
+                                                    <td>{discount.endDate}</td>
+                                                    <td> <label className="custom-toggle">
+                                                        <input
+                                                            checked={discount.status === 1}
+                                                            type="checkbox"
+                                                            readOnly
+                                                        />
+                                                        <span className="custom-toggle-slider rounded-circle" />
+                                                    </label></td>
+                                                    <td>
+                                                        <Button color="info" size="sm" onClick={() => handleRowClick(discount)}><FaEdit /></Button>
+                                                        <Button color="danger" size="sm" onClick={() => deleteDiscount(discount.id)}><FaTrash /></Button>
+                                                    </td>
 
-                                                    </tr>
-                                                ))}
+                                                </tr>
+                                            ))}
                                         </tbody>
                                     </Table>
+                                    {/* Hiển thị thanh phân trang */}
+                                    <div className="pagination-container">
+                                        <ReactPaginate
+                                            previousLabel={"Trang trước"}
+                                            nextLabel={"Trang sau"}
+                                            breakLabel={"..."}
+                                            pageCount={totalPages}
+                                            marginPagesDisplayed={2}
+                                            pageRangeDisplayed={5}
+                                            onPageChange={handlePageChange}
+                                            containerClassName={"pagination"}
+                                            subContainerClassName={"pages pagination"}
+                                            activeClassName={"active"}
+                                        />
+                                    </div>
                                 </CardBody>
                             </Card>
                         </div>

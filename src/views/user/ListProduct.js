@@ -2,28 +2,53 @@ import React, { useState, useEffect } from "react";
 import { Container, Row, Card, CardBody } from "reactstrap";
 import Header from "components/Headers/ProductHeader.js";
 import { Link } from 'react-router-dom';
-
+import axios from "axios";
 
 const Product = () => {
   const [products, setProducts] = useState([]);
+  const [search, setSearch] = useState({
+    code: "",
+    name: "",
+    brandId: null,
+    originId: null,
+    designStyleId: null,
+    skinTypeId: null,
+    soleId: null,
+    liningId: null,
+    toeId: null,
+    cushionId: null,
+    fromPrice: null,
+    toPrice: null,
+    fromQuantity: null,
+    toQuantity: null,
+    fromDateStr: "",
+    toDateStr: "",
+    createdBy: ""
+  });
 
   useEffect(() => {
-    fetch("https://63c1265d376b9b2e64743c4f.mockapi.io/shoes")
-      .then((response) => response.json())
-      .then((data) => {
-        const productsArray = Object.values(data);
-        setProducts(productsArray);
-        console.log(productsArray);
-      })
-      .catch((error) => console.log(error));
+    
+    getListShoes(0,10);
   }, []);
 
+
+  const getListShoes = async (page, size) => {
+    try {
+      const res = await axios.post(`http://localhost:33321/api/user/shoes/search?page=${page}&size=${size}`, search);
+      
+      if (res && res.data) {
+        setProducts(res.data.data.content);
+      }
+      console.log(res.data);
+    } catch (error) {
+      console.error(error);
+    }
+  }
 
   return (
     <>
       <Header />
       <Container fluid>
-        {/* Table */}
         <Row>
           <div className="col">
             <Card className="shadow">
@@ -49,23 +74,27 @@ const Product = () => {
                         }
                     `}
                   </style>
-                  {products.map((product) => (
-                    <div key={product.id} className="col-md-3">
-                      <Link to={`/shoes/productdetail/${product.id}`}>
-                        <img src={product.anh} alt="" className="zoom" />
-                      </Link>
-                      <br />
-                      <br />
-                      <div style={{ fontSize: "large" }} className="p-2">
-                        <Link to={`/shoes/productdetail/${product.id}`} className="text-dark text-decoration-none">
-                          {product.ten}
+                  {Array.isArray(products) ? (
+                    products.map((product) => (
+                      <div key={product.id} className="col-md-3">
+                        <Link to={`/shoes/productdetail/${product.id}`}>
+                          <img src={`https://s3-ap-southeast-1.amazonaws.com/imageshoestore/${product.imgURI}`} alt="" className="zoom" />
                         </Link>
-                        <p className=" font-weight-bold" style={{ color: "rgba(0, 0, 0, 0.705)" }}>
-                          {product.gia}đ&nbsp;
-                        </p>
+                        <br />
+                        <br />
+                        <div style={{ fontSize: "large" }} className="p-2">
+                          <Link to={`/shoes/productdetail/${product.id}`} className="text-dark text-decoration-none">
+                            {product.name}
+                          </Link>
+                          <p className="font-weight-bold" style={{ color: "rgba(0, 0, 0, 0.705)" }}>
+                            {product.priceMin}đ&nbsp;
+                          </p>
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    ))
+                  ) : (
+                    <p>Không có dữ liệu.</p>
+                  )}
                 </div>
               </CardBody>
             </Card>
@@ -75,4 +104,5 @@ const Product = () => {
     </>
   );
 };
+
 export default Product;
