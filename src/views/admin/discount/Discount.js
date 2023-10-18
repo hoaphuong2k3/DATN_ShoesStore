@@ -19,6 +19,7 @@ import {
 import Header from "components/Headers/Header.js";
 import SalePromo from "views/admin/discount/SalePromo.js";
 import SaleProduct from "views/admin/discount/SaleProduct.js";
+import SaleBills from "views/admin/discount/SaleBills.js";
 class Discount extends React.Component {
     state = {
         iconTabs: 1,
@@ -84,6 +85,19 @@ class Discount extends React.Component {
                                                         Sản phẩm
                                                     </NavLink>
                                                 </NavItem>
+                                                <NavItem>
+                                                    <NavLink
+                                                        aria-selected={this.state.iconTabs === 3}
+                                                        className={classnames("mb-sm-3 mb-md-0", {
+                                                            active: this.state.iconTabs === 3,
+                                                        })}
+                                                        onClick={(e) => this.toggleNavs(e, "iconTabs", 3)}
+                                                        role="tab"
+                                                    >
+                                                        <i className="ni ni-bell-55 mr-2" />
+                                                        Hóa đơn 2
+                                                    </NavLink>
+                                                </NavItem>
 
                                             </Nav>
                                         </div>
@@ -95,6 +109,9 @@ class Discount extends React.Component {
                                                     </TabPane>
                                                     <TabPane tabId="iconTabs2">
                                                         <SaleProduct />
+                                                    </TabPane>
+                                                    <TabPane tabId="iconTabs3">
+                                                    <SaleBills />
                                                     </TabPane>
 
                                                 </TabContent>

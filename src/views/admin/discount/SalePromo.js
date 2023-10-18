@@ -460,22 +460,6 @@ const Promotion = () => {
                                     />
                                 </FormGroup>
                             </Col>
-                            <Col lg="4">
-                                <FormGroup>
-                                    <label
-                                        className="form-control-label"
-                                        htmlFor="endDate"
-                                    >
-                                        Trạng thái:
-                                    </label>
-                                    <input
-
-                                        type="checkbox"
-
-                                    />
-                                </FormGroup>
-
-                            </Col>
                         </Row>
 
                     </div>
@@ -518,7 +502,6 @@ const Promotion = () => {
                             <th scope="col">Mô tả</th>
                             <th scope="col">Hóa đơn <br />tối thiểu</th>
                             <th scope="col">Giá trị</th>
-                            {/* <th scope="col">Tiền</th> */}
                             <th scope="col">Ngày bắt đầu</th>
                             <th scope="col">Ngày kết thúc</th>
                             <th scope="col">Trạng thái</th>
@@ -557,7 +540,7 @@ const Promotion = () => {
                     </tbody>
                 </Table>
                 {/* Hiển thị thanh phân trang */}
-                <div className="pagination-container">
+                <div className="pagination-container" >
                     {/* <ReactPaginate
                         previousLabel={"Trang trước"}
                         nextLabel={"Trang sau"}
@@ -574,8 +557,8 @@ const Promotion = () => {
                     <ReactPaginate
                         breakLabel="..."
                         nextLabel=">"
-                        pageRangeDisplayed={2} // Number of pages to display on each side of the selected page
-                        pageCount={totalPages} // Total number of pages
+                        pageRangeDisplayed={2}
+                        pageCount={totalPages} 
                         previousLabel="<"
                         onPageChange={handlePageChange}
                         renderOnZeroPageCount={null}
