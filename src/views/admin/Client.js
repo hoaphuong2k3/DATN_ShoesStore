@@ -26,11 +26,20 @@ const Client = () => {
   const [selectedAdmin, setSelectedAdmin] = useState(null);
   const [gender, setGender] = useState(false);
 
+  const [user, setUser] = useState({
+    fullname: "",
+    phoneNumber: "",
+    email: "",
+    username: "",
+    password: "",
+    confirmPassword: "",
+  });
   const handleModalAdd = () => {
-    // setDeleteShoes(shoes);
-    // setIdDeleteShoes([...iddeleteshoes, shoes.id])
     toggle();
   }
+  const onInputChange = (e) => {
+    setUser({ ...user, [e.target.name]: e.target.value });
+  };
 
   const fetchData = async () => {
     try {
@@ -366,12 +375,13 @@ const Client = () => {
                 <Col lg="4">
                   <FormGroup>
                     <label className="form-control-label">
-                      Tên tài khoản
+                      Tên đăng nhập
                     </label>
                     <Input
                       className="form-control-alternative"
                       type="text"
-                      id="user"
+                      name="username"
+                      onChange={onInputChange}
                     />
                   </FormGroup>
                 </Col>
@@ -385,7 +395,28 @@ const Client = () => {
                     <Input
                       className="form-control-alternative"
                       type="text"
-                      id="pass"
+                      name="password"
+                      onChange={onInputChange}
+                    />
+                    {/* <InputGroupAddon addonType="append">
+                              <InputGroupText style={{ cursor: "pointer" }} onClick={toggleShowPassword}>
+                                {showPassword ? <FaEye /> : <FaEyeSlash />}
+                              </InputGroupText>
+                            </InputGroupAddon>
+                          </InputGroup> */}
+                  </FormGroup>
+                </Col>
+                <Col lg="4">
+                  <FormGroup>
+                    <label className="form-control-label">
+                      Mật khẩu
+                    </label>
+                    {/* <InputGroup > */}
+                    <Input
+                      className="form-control-alternative"
+                      type="text"
+                      name="password"
+                      onChange={onInputChange}
                     />
                     {/* <InputGroupAddon addonType="append">
                               <InputGroupText style={{ cursor: "pointer" }} onClick={toggleShowPassword}>
