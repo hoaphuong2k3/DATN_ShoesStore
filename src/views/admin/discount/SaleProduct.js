@@ -1,56 +1,95 @@
 import React, { useState, useEffect } from "react";
-import { FaEdit, FaTrash } from 'react-icons/fa';
+import { FaEdit, FaTrash, FaSearch, FaFileAlt } from 'react-icons/fa';
+import ReactPaginate from "react-paginate";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import axiosInstance from "services/custommize-axios";
 import { format, parseISO } from 'date-fns';
 import { vi } from 'date-fns/locale';
+import "assets/css/pagination.css";
 // reactstrap components
-import { Row, Col, Form, FormGroup, Input, Button, Table } from "reactstrap";
+import Switch from 'react-input-switch';
+import { Row, Col, Form, FormGroup, Input, Button, Table, Badge, Modal, ModalBody, ModalFooter, ModalHeader } from "reactstrap";
 
-const Promotion = () => {
+const SaleProduct = () => {
 
-    const [selectedStatusFilter, setSelectedStatusFilter] = useState("Trạng thái");
-    const [discountTypeFilter, setDiscountTypeFilter] = useState("Hình thức");
+    const [modal, setModal] = useState(false);
+    const toggle = () => setModal(!modal);
+    const handleModal = () => {
+        resetForm();
+        setModal(true);
+    }
 
-    const [filteredDiscounts, setFilteredDiscounts] = useState([]);
-
+    const [value, setValue] = useState('no');
     const [discounts, setDiscounts] = useState([]);
+    const [totalElements, setTotalElements] = useState(0);
+    const [totalPages, setTotalPages] = useState(0);
+
+
+    const [queryParams, setQueryParams] = useState({
+        page: 0,
+        size: 5,
+        type: 0,
+        code: "",
+        name: "",
+        fromDate: "",
+        toDate: "",
+        status: "",
+        isdelete: 0,
+    });
 
 
     //loads table
+    const fetchData = async () => {
+        try {
+            const response = await axiosInstance.get("/vouchers/getAll", {
+                params: queryParams
+            });
+            setDiscounts(response.content);
+            setTotalElements(response.totalElements);
+            setTotalPages(response.totalPages);
+        } catch (error) {
+            console.error("Lỗi khi lấy dữ liệu:", error);
+        }
+    };
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const discountsData = await axiosInstance.get("/promos/getAll");
-
-                setDiscounts(discountsData.data);
-            } catch (error) {
-                console.error("Error fetching data:", error);
-            }
-        };
-
         fetchData();
-    }, []);
+    }, [queryParams]);
 
+    const handlePageChange = ({ selected }) => {
+        setQueryParams(prevParams => ({ ...prevParams, page: selected }));
+    };
+
+    const handleSizeChange = (e) => {
+        const newSize = parseInt(e.target.value);
+        setQueryParams({ ...queryParams, size: newSize, page: 0 });
+    };
+
+
+
+    const calculateIndex = (index) => {
+        return index + 1 + queryParams.page * queryParams.size;
+    };
+
+    const statusMapping = {
+        0: { color: 'danger', label: 'Kích hoạt' },
+        1: { color: 'success', label: 'Chờ kích hoạt' },
+        2: { color: 'warning', label: 'Đã hủy' },
+    };
     //lọc
-    useEffect(() => {
-        const filteredDiscounts = discounts.filter((discount) => {
-            const statusCondition =
-                selectedStatusFilter === "Trạng thái" ||
-                (discount.status === 2 && selectedStatusFilter === "Đang hoạt động") ||
-                (discount.status !== 2 && selectedStatusFilter === "Chờ hoạt động");
-
-            const discountTypeCondition =
-                discountTypeFilter === "Hình thức" ||
-                (discountTypeFilter === "Tiền" && discount.salePrice !== null) ||
-                (discountTypeFilter === "Phần trăm" && discount.salePercent !== null);
-
-            return statusCondition && discountTypeCondition;
+    const resetFilters = () => {
+        setQueryParams({
+            page: 0,
+            size: 5,
+            type: 0,
+            code: "",
+            name: "",
+            fromDate: "",
+            toDate: "",
+            status: "",
+            isdelete: 0,
         });
-
-        setFilteredDiscounts(filteredDiscounts);
-    }, [selectedStatusFilter, discountTypeFilter, discounts]);
+    };
 
     //click on selected
     const [formData, setFormData] = useState({
@@ -63,7 +102,8 @@ const Promotion = () => {
         salePrice: "",
         description: "",
         startDate: "",
-        endDate: ""
+        endDate: "",
+        status: "",
     });
 
     const handleRowClick = (discount) => {
@@ -79,6 +119,7 @@ const Promotion = () => {
                 salePrice: "",
                 minPrice: discount.minPrice,
                 sale: true,
+                status: discount.status
             });
         }
         if (discount.salePrice !== null) {
@@ -93,9 +134,11 @@ const Promotion = () => {
                 salePrice: discount.salePrice,
                 minPrice: discount.minPrice || "",
                 sale: false,
+                status: discount.status
             });
         }
 
+        setModal(true);
     };
 
     //reset
@@ -115,98 +158,65 @@ const Promotion = () => {
         // setSelectedValueType(null);
     };
 
-    //add
-
+    //save
     const formatDateTime = (dateString) => {
         const parsedDate = parseISO(dateString, "dd/MM/yyyy hh:mm a", new Date());
         return format(parsedDate, "yyyy-MM-dd HH:mm", { locale: vi });
     };
 
-    const addDiscount = async () => {
+    const saveDiscount = async () => {
         try {
             const formattedStartDate = formatDateTime(formData.startDate);
             const formattedEndDate = formatDateTime(formData.endDate);
 
-            const response = await axiosInstance.post('/vouchers/createVoucher', {
-                code: formData.code,
-                name: formData.name,
-                minPrice: formData.minPrice,
-                sale: formData.sale,
-                description: formData.description,
-                startDate: formattedStartDate,
-                endDate: formattedEndDate,
-                salePercent: formData.sale ? formData.salePercent : null,
-                salePrice: formData.sale ? null : formData.salePrice
-            });
+            if (formData.id) {
+                await axiosInstance.put(`/vouchers/updateVoucher`, {
+                    id: formData.id,
+                    code: formData.code,
+                    name: formData.name,
+                    minPrice: formData.minPrice,
+                    sale: formData.sale,
+                    description: formData.description,
+                    startDate: formattedStartDate,
+                    endDate: formattedEndDate,
+                    salePercent: formData.sale ? formData.salePercent : null,
+                    salePrice: formData.sale ? null : formData.salePrice,
+                    status: formData.status
+                });
 
-            setDiscounts([...discounts, response.data]);
-            toast.success("Thêm thành công!");
+                fetchData();
+
+                toast.success("Cập nhật thành công!");
+            } else {
+                await axiosInstance.post('/vouchers/createVoucher', {
+                    code: formData.code,
+                    name: formData.name,
+                    minPrice: formData.minPrice,
+                    sale: formData.sale,
+                    description: formData.description,
+                    startDate: formattedStartDate,
+                    endDate: formattedEndDate,
+                    salePercent: formData.sale ? formData.salePercent : null,
+                    salePrice: formData.sale ? null : formData.salePrice,
+                });
+
+                fetchData();
+                toast.success("Thêm mới thành công!");
+            }
+
+            // Đóng modal và reset form
+            setModal(false);
             resetForm();
         } catch (error) {
-            console.error("Error creating discount:", error);
+            // Xử lý lỗi
+            console.error("Error:", error);
             if (error.response) {
                 console.error("Response data:", error.response.data);
                 toast.error(error.response.data.message);
             } else {
-                toast.error("Đã có lỗi xảy ra khi thêm dữ liệu.");
+                toast.error("Đã có lỗi xảy ra.");
             }
         }
-    };
-
-    //update
-    const updateDiscount = async () => {
-        try {
-            const formattedStartDate = formatDateTime(formData.startDate);
-            const formattedEndDate = formatDateTime(formData.endDate);
-
-            const response = await axiosInstance.put(`/vouchers/updateVoucher`, {
-                id: formData.id,
-                code: formData.code,
-                name: formData.name,
-                minPrice: formData.minPrice,
-                sale: formData.sale,
-                description: formData.description,
-                startDate: formattedStartDate,
-                endDate: formattedEndDate,
-                salePercent: formData.sale ? formData.salePercent : null,
-                salePrice: formData.sale ? null : formData.salePrice
-            });
-
-            const updatedDiscounts = discounts.map(d => (d.code === formData.code ? response.data : d));
-            setDiscounts(updatedDiscounts);
-
-            toast.success("Cập nhật thành công!");
-            resetForm();
-        } catch (error) {
-            console.error("Error updating discount:", error);
-            if (error.response) {
-                console.error("Response data:", error.response.data);
-                toast.error(error.response.data.message);
-            } else {
-                toast.error("Đã có lỗi xảy ra khi cập nhật dữ liệu.");
-            }
-        }
-    };
-
-
-    const handleStatusChange = (discount) => {
-
-        const updatedDiscounts = discounts.map((d) => {
-            if (d.id === discount.id) {
-                return { ...d, status: d.status === 0 ? 1 : 0 };
-            }
-            return d;
-        });
-
-        setDiscounts(updatedDiscounts);
-
-        axiosInstance.put(`https://651d650344e393af2d59b053.mockapi.io/discounts/${discount.id}`, { status: discount.status === 0 ? 1 : 0 })
-            .then(response => {
-                console.log("Cập nhật trạng thái thành công!");
-            })
-            .catch(error => {
-                console.error('Lỗi khi cập nhật trạng thái:', error);
-            });
     };
 
 
@@ -218,8 +228,7 @@ const Promotion = () => {
         if (confirmDelete()) {
             axiosInstance.delete(`/vouchers/deleteVoucher/${id}`)
                 .then(response => {
-                    const updatedDiscounts = discounts.filter(discount => discount.id !== id);
-                    setDiscounts(updatedDiscounts);
+                    fetchData();
                     toast.success("Xóa thành công");
                 })
                 .catch(error => {
@@ -234,36 +243,10 @@ const Promotion = () => {
             <div className="col">
 
                 <Row className="align-items-center">
-                    <div className="col">
-                        <h3 className="heading-small text-muted mb-0"> Thông tin</h3>
-                    </div>
-                    <div className="col text-right">
-                        <Button
-                            className="btn btn-outline-primary"
-                            onClick={addDiscount}
-                            size="sm"
-                        >
-                            Thêm mới
-                        </Button>
-                        <Button
-                            className="btn btn-outline-primary"
-                            onClick={updateDiscount}
-                            size="sm"
-                        >
-                            Cập nhật
-                        </Button>
-
-                        <Button
-                            className="btn btn-outline-primary"
-                            onClick={resetForm}
-                            size="sm"
-                        >
-                            Reset
-                        </Button>
-                    </div>
+                    <FaSearch />
+                    <h3 className="heading-small text-black mb-0 ml-1">Tìm kiếm</h3>
                 </Row>
                 <hr className="my-4" />
-
                 <Form>
                     <div className="pl-lg-4">
                         <Row>
@@ -273,14 +256,14 @@ const Promotion = () => {
                                         className="form-control-label"
                                         htmlFor="code"
                                     >
-                                        Mã KM
+                                        Mã Khuyến mại:
                                     </label>
                                     <Input
                                         className="form-control-alternative"
                                         id="code"
                                         type="text"
-                                        value={formData.code}
-                                        onChange={(e) => setFormData({ ...formData, code: e.target.value })}
+                                        value={queryParams.code}
+                                        onChange={(e) => setQueryParams({ ...queryParams, code: e.target.value })}
                                     />
                                 </FormGroup>
                             </Col>
@@ -290,231 +273,134 @@ const Promotion = () => {
                                         className="form-control-label"
                                         htmlFor="name"
                                     >
-                                        Tên KM
+                                        Tên Khuyến mại:
                                     </label>
                                     <Input
                                         className="form-control-alternative"
                                         id="name"
                                         type="text"
-                                        value={formData.name}
-                                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                        value={queryParams.name}
+                                        onChange={(e) => setQueryParams({ ...queryParams, name: e.target.value })}
                                     />
                                 </FormGroup>
                             </Col>
+
                         </Row>
-                        <Row>
 
+                        {value === 'yes' &&
+                            <Row>
 
-                            <Col lg="4">
-                                <FormGroup>
-                                    <label
-                                        className="form-control-label"
-                                        htmlFor="startDate"
-                                    >
-                                        Hóa đơn tối thiểu:
-                                    </label>
-                                    <Input
-                                        className="form-control-alternative"
-                                        type="number"
-                                        value={formData.minPrice}
-                                        onChange={(e) => setFormData({ ...formData, minPrice: e.target.value })}
-                                    />
-                                </FormGroup>
-                            </Col>
-
-
-                            <Col lg="4">
-                                <FormGroup>
-                                    <label
-                                        className="form-control-label"
-                                        htmlFor="input-price">
-                                        Hình thức
-                                    </label>
-                                    <div style={{ display: "flex" }}>
-                                        <div className="custom-control custom-radio">
-                                            <Input
-                                                className="custom-control-alternative"
-                                                name="sale"
-                                                type="radio"
-                                                checked={!formData.sale}
-                                                onChange={() => setFormData({ ...formData, sale: false })}
-                                            />Tiền
-                                        </div>
-                                        <div className="custom-control custom-radio">
-                                            <Input
-                                                className="custom-control-alternative"
-                                                name="sale"
-                                                type="radio"
-                                                checked={formData.sale}
-                                                onChange={(e) => setFormData({ ...formData, sale: true })}
-                                            />Phần trăm
-                                        </div>
-
-                                    </div>
-                                </FormGroup>
-                            </Col>
-
-                            {formData.sale && (
-                                <Col lg="4">
+                                <Col lg="6">
                                     <FormGroup>
                                         <label
                                             className="form-control-label"
                                             htmlFor="startDate"
                                         >
-                                            Phần trăm:
+                                            Trị giá giảm:
                                         </label>
                                         <Input
                                             className="form-control-alternative"
                                             type="number"
-                                            value={formData.salePercent}
-                                            onChange={(e) => setFormData({ ...formData, salePercent: e.target.value })}
                                         />
                                     </FormGroup>
                                 </Col>
-                            )}
-
-                            {!formData.sale && (
-                                <Col lg="4">
+                                <Col lg="6">
                                     <FormGroup>
                                         <label
                                             className="form-control-label"
                                             htmlFor="startDate"
                                         >
-                                            Trị giá (tiền):
+                                            Trạng thái:
                                         </label>
                                         <Input
                                             className="form-control-alternative"
-                                            type="number"
-                                            value={formData.salePrice}
-                                            onChange={(e) => setFormData({ ...formData, salePrice: e.target.value })}
+                                            type="select"
+                                            value={queryParams.status}
+                                            onChange={(e) => setQueryParams({ ...queryParams, status: e.target.value })}
+                                        >
+                                            <option value="">Tất cả</option>
+                                            <option value="0">Kích hoạt</option>
+                                            <option value="1">Chờ kích hoạt</option>
+                                            <option value="2">Đã hủy</option>
+                                        </Input>
+                                    </FormGroup>
+                                </Col>
+
+                                <Col lg="6">
+                                    <FormGroup>
+                                        <label
+                                            className="form-control-label"
+                                            htmlFor="startDate"
+                                        >
+                                            Từ ngày:
+                                        </label>
+                                        <Input
+                                            className="form-control-alternative"
+                                            id="startDate"
+                                            type="date"
+                                            value={queryParams.fromDate}
+                                            onChange={(e) => setQueryParams({ ...queryParams, fromDate: e.target.value })}
                                         />
                                     </FormGroup>
                                 </Col>
-                            )}
-                        </Row>
+                                <Col lg="6">
+                                    <FormGroup>
+                                        <label
+                                            className="form-control-label"
+                                            htmlFor="endDate"
+                                        >
+                                            Đến ngày:
+                                        </label>
+                                        <Input
+                                            className="form-control-alternative"
+                                            id="endDate"
+                                            type="date"
+                                            value={queryParams.toDate}
+                                            onChange={(e) => setQueryParams({ ...queryParams, toDate: e.target.value })}
+                                        />
+                                    </FormGroup>
+                                </Col>
 
-
-                        <Row>
-                            <Col lg="4">
-                                <FormGroup>
-                                    <label
-                                        className="form-control-label"
-                                        htmlFor="startDate"
-                                    >
-                                        Ngày bắt đầu
-                                    </label>
-                                    <Input
-                                        className="form-control-alternative"
-                                        id="startDate"
-                                        type="datetime-local"
-                                        value={formData.startDate}
-                                        onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
-                                    />
-                                </FormGroup>
-                            </Col>
-                            <Col lg="4">
-                                <FormGroup>
-                                    <label
-                                        className="form-control-label"
-                                        htmlFor="endDate"
-                                    >
-                                        Ngày kết thúc
-                                    </label>
-                                    <Input
-                                        className="form-control-alternative"
-                                        id="endDate"
-                                        type="datetime-local"
-                                        value={formData.endDate}
-                                        onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
-                                    />
-                                </FormGroup>
-                            </Col>
-
-                            <Col className="pl-lg-4">
-                                <FormGroup>
-                                    <label
-                                        className="form-control-label"
-                                        htmlFor="description"
-                                    >
-                                        Mô tả
-                                    </label>
-                                    <Input
-                                        className="form-control-alternative"
-                                        placeholder="Sản phẩm ....."
-                                        rows="4"
-                                        type="textarea"
-                                        value={formData.description}
-                                        onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                                    />
-                                </FormGroup>
-                            </Col>
-                        </Row>
-
-                        <Row>
-                            <Col lg="12">
-                                <h6 className="heading-small text-muted mb-4">
-                                    Sản phẩm áp dụng
-                                </h6>
-                                <Table className="align-items-center table-flush" responsive>
-                                    <thead className="thead-light">
-
-                                        <tr className="text-center">
-                                            <th scope="col">#</th>
-                                            <th scope="col">Tên sản phẩm</th>
-                                            <th scope="col">Thương hiệu</th>
-                                            <th scope="col">Giá gốc</th>
-
-
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-
-                                        <tr>
-                                            <td className="text-center"><Input type="checkbox" /></td>
-                                            <td></td>
-                                            <td></td>
-                                            <td></td>
-                                        </tr>
-
-                                    </tbody>
-                                </Table>
-                            </Col>
-                        </Row>
-
+                            </Row>
+                        }
                     </div>
-
-
                 </Form>
+
+                <Row className="mt-2">
+                    <Col lg="6" xl="4" >
+                        <span>
+                            <Switch on="yes" off="no" value={value} onChange={setValue} />
+                            <span>
+                                &nbsp;&nbsp;
+                                Tìm kiếm nâng cao
+                                &nbsp;&nbsp;
+                            </span>
+                        </span>
+                        <Button color="warning" size="sm" onClick={resetFilters}>
+                            Làm mới bộ lọc
+                        </Button>
+                    </Col>
+                </Row>
+
                 <hr className="my-4" />
-                <Col style={{ display: "flex" }}>
-                    <h6 className="heading-small text-muted mb-4">Danh sách</h6>
-                    <div className="col-2">
-                        <Input
-                            type="select"
+
+                <Row className="align-items-center my-4">
+                    <div className="col" style={{ display: "flex" }}>
+
+                        <h3 className="heading-small text-black mb-0"><FaFileAlt size="16px" className="mr-1" />Danh sách</h3>
+                    </div>
+                    <div className="col text-right">
+                        <Button
+                            color="primary"
+                            onClick={handleModal}
                             size="sm"
-                            value={discountTypeFilter}
-                            onChange={(e) => setDiscountTypeFilter(e.target.value)}
                         >
-                            <option>Hình thức</option>
-                            <option>Tiền</option>
-                            <option>Phần trăm</option>
-                        </Input>
+                            + Thêm mới
+                        </Button>
                     </div>
 
-                    <div className="col-2">
-                        <Input
-                            type="select"
-                            size="sm"
-                            value={selectedStatusFilter}
-                            onChange={(e) => setSelectedStatusFilter(e.target.value)}
-                        >
-                            <option>Trạng thái</option>
-                            <option>Chờ hoạt động</option>
-                            <option>Đang hoạt động</option>
-                            <option>Hết hạn</option>
-                        </Input>
-                    </div>
-                </Col>
+
+                </Row>
 
                 <Table className="align-items-center table-flush" responsive>
                     <thead className="thead-light">
@@ -523,41 +409,33 @@ const Promotion = () => {
                             <th scope="col">Code</th>
                             <th scope="col">Tên khuyến mại</th>
                             <th scope="col">Mô tả</th>
-                            <th scope="col">Hóa đơn <br />tối thiểu</th>
-                            <th scope="col">Phần trăm (%)</th>
-                            <th scope="col">Tiền</th>
+                            <th scope="col">Giá trị</th>
                             <th scope="col">Ngày bắt đầu</th>
                             <th scope="col">Ngày kết thúc</th>
                             <th scope="col">Trạng thái</th>
-                            <th scope="col">Hành động</th>
+                            <th scope="col">Thao tác</th>
 
                         </tr>
                     </thead>
                     <tbody>
-                        {Array.isArray(filteredDiscounts) &&
-                            filteredDiscounts.map((discount, index) => (
-                                <tr key={index}>
-                                    <td>{index + 1}</td>
+                        {Array.isArray(discounts) &&
+                            discounts.map((discount, index) => (
+                                <tr key={discount.id}>
+                                    <td>{calculateIndex(index)}</td>
                                     <td>{discount.code}</td>
                                     <td>{discount.name}</td>
                                     <td>{discount.description}</td>
-                                    <td>{discount.minPrice}</td>
-                                    <td>{discount.salePercent}</td>
-                                    <td>{discount.salePrice}</td>
-                                    <td>{discount.startDate}</td>
-                                    <td>{discount.endDate}</td>
+                                    <td>{discount.salePercent}%</td>
+
+                                    <td>{format(new Date(discount.startDate), 'yyyy-MM-dd HH:mm', { locale: vi })}</td>
+                                    <td>{format(new Date(discount.endDate), 'yyyy-MM-dd HH:mm', { locale: vi })}</td>
                                     <td>
-                                        <label className="custom-toggle">
-                                            <input
-                                                checked={discount.status === 1}
-                                                type="checkbox"
-                                                onChange={() => handleStatusChange(discount)}
-                                            />
-                                            <span className="custom-toggle-slider rounded-circle" />
-                                        </label>
+                                        <Badge color={statusMapping[discount.status]?.color || statusMapping.default.color}>
+                                            {statusMapping[discount.status]?.label || statusMapping.default.label}
+                                        </Badge>
                                     </td>
                                     <td>
-                                        <Button color="info" size="sm" onClick={() => handleRowClick(discount)}><FaEdit /></Button>
+                                        <Button color="info" size="sm" onClick={() => handleRowClick(discount)} disabled={discount.status === 2}><FaEdit /></Button>
                                         <Button color="danger" size="sm" onClick={() => deleteDiscount(discount.id)}><FaTrash /></Button>
                                     </td>
 
@@ -565,13 +443,249 @@ const Promotion = () => {
                             ))}
                     </tbody>
                 </Table>
+                {/* Hiển thị thanh phân trang */}
+                <Row className="mt-4">
+                    <Col lg={6}>
+                        <div style={{ fontSize: 14 }}>
+                            Đang xem <b>{queryParams.page * queryParams.size + 1}</b>  đến <b>{queryParams.page * queryParams.size + discounts.length}</b> trong tổng số <b>{totalElements}</b> mục
+                        </div>
+                    </Col>
+                    <Col style={{ fontSize: 14 }} lg={2}>
+                        <Row>
+                            <span>Xem </span>&nbsp;
+                            <span>
+                                <Input type="select" name="status" style={{ width: "60px", fontSize: 14 }} size="sm" className="mt--1" onChange={handleSizeChange}>
+                                    <option value="5">5</option>
+                                    <option value="25">25</option>
+                                    <option value="50">50</option>
+                                    <option value="100">100</option>
+                                </Input>
+                            </span>&nbsp;
+                            <span> mục</span>
+                        </Row>
+                    </Col>
+                    <Col lg={4} style={{ fontSize: 11 }} className="mt--1 text-right">
+                        <ReactPaginate
+                            breakLabel="..."
+                            nextLabel=">"
+                            pageRangeDisplayed={2}
+                            pageCount={totalPages}
+                            previousLabel="<"
+                            onPageChange={handlePageChange}
+                            renderOnZeroPageCount={null}
+                            pageClassName="page-item"
+                            pageLinkClassName="page-link"
+                            previousClassName="page-item"
+                            previousLinkClassName="page-link"
+                            nextClassName="page-item"
+                            nextLinkClassName="page-link"
+                            breakClassName="page-item"
+                            breakLinkClassName="page-link"
+                            containerClassName="pagination"
+                            activeClassName="active"
+                            marginPagesDisplayed={1}
+                        />
+                    </Col>
 
+                </Row>
             </div>
-
             <ToastContainer />
+            <Modal
+                isOpen={modal}
+                toggle={toggle}
+                backdrop={'static'}
+                keyboard={false}
+                style={{ maxWidth: '900px' }}
+            >
+                <ModalHeader toggle={toggle}>
+                    <h3 className="heading-small text-muted mb-0">{formData.id ? 'Cập Nhật Khuyến mại' : 'Thêm Mới Khuyến mại'}</h3>
+
+                </ModalHeader>
+                <ModalBody>
+                    <Form>
+                        <div className="pl-lg-4">
+                            <Row>
+
+                                <Col lg="3">
+                                    <FormGroup>
+                                        <label
+                                            className="form-control-label"
+                                            style={{ fontSize: 13 }}
+                                        >
+                                            Tên Khuyến mãi
+                                        </label>
+                                        <Input
+                                            className="form-control-alternative"
+                                            id="name"
+                                            type="text"
+                                            value={formData.name}
+                                            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                        />
+                                    </FormGroup>
+                                </Col>
+
+                                <Col lg="3">
+                                    <FormGroup>
+                                        <label
+                                            className="form-control-label"
+                                            style={{ fontSize: 13 }}
+                                        >
+                                            Trị giá giảm
+                                        </label>
+                                        <Input
+                                            className="form-control-alternative"
+                                            type="number"
+                                            value={formData.salePercent}
+                                            onChange={(e) => setFormData({ ...formData, salePercent: e.target.value })}
+                                        />
+
+                                    </FormGroup>
+                                </Col>
+
+
+                                <Col lg="3">
+                                    <FormGroup>
+                                        <label
+                                            className="form-control-label"
+                                            style={{ fontSize: 13 }}
+                                        >
+                                            Ngày bắt đầu
+                                        </label>
+                                        <Input
+                                            className="form-control-alternative"
+                                            id="startDate"
+                                            type="datetime-local"
+                                            value={formData.startDate}
+                                            onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
+                                        />
+                                    </FormGroup>
+                                </Col>
+                                <Col lg="3">
+                                    <FormGroup>
+                                        <label
+                                            className="form-control-label"
+                                            style={{ fontSize: 13 }}
+                                        >
+                                            Ngày kết thúc
+                                        </label>
+                                        <Input
+                                            className="form-control-alternative"
+                                            id="endDate"
+                                            type="datetime-local"
+                                            value={formData.endDate}
+                                            onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
+                                        />
+                                    </FormGroup>
+                                </Col>
+
+                                <Col className="pl-lg-4">
+                                    <FormGroup>
+                                        <label
+                                            className="form-control-label"
+                                            style={{ fontSize: 13 }}
+                                        >
+                                            Mô tả
+                                        </label>
+                                        <Input
+                                            className="form-control-alternative"
+                                            placeholder="Sản phẩm ....."
+                                            rows="3"
+                                            type="textarea"
+                                            value={formData.description}
+                                            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                                        />
+                                    </FormGroup>
+                                </Col>
+                            </Row>
+                        </div>
+                    </Form >
+
+                    <div className="pl-lg-4">
+                        <Row className="align-items-center my-4">
+                            <div className="col" style={{ display: "flex" }}>
+                                <h3 className="heading-small text-black mb-0">Sản phẩm</h3>
+                            </div>
+                            <div className="col-4 text-right">
+                                <Input type="text" size="sm" placeholder="Mã hoặc tên sản phẩm" style={{ fontSize: 11 }} />
+                            </div>
+                        </Row>
+
+                        <Table className="align-items-center table-flush" responsive>
+                            <thead className="thead-light">
+                                <tr >
+                                    <th scope="col" className="text-center"> <Input type="checkbox" /></th>
+                                    <th scope="col">Mã sản phẩm</th>
+                                    <th scope="col">Tên sản phẩm</th>
+                                    <th scope="col">Giá gốc</th>
+                                    <th scope="col">Giá mới</th>
+                                    <th scope="col">Trạng thái</th>
+
+
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {Array.isArray(discounts) &&
+                                    discounts.map((discount, index) => (
+                                        <tr key={discount.id}>
+                                            <td className="text-center">
+                                                <Input type="checkbox" />
+                                            </td>
+                                            <td>{discount.code}</td>
+                                            <td>{discount.name}</td>
+                                            <td>{discount.salePercent}</td>
+                                            <td>{discount.salePercent}</td>
+                                            <td>
+                                                <Badge color={statusMapping[discount.status]?.color || statusMapping.default.color}>
+                                                    {statusMapping[discount.status]?.label || statusMapping.default.label}
+                                                </Badge>
+                                            </td>
+                                        </tr>
+                                    ))}
+                            </tbody>
+                        </Table>
+                        <div className="pagination-container" style={{ fontSize: 8 }}>
+                            <ReactPaginate
+                                breakLabel="..."
+                                nextLabel=">"
+                                pageRangeDisplayed={2}
+                                pageCount={totalPages}
+                                previousLabel="<"
+                                onPageChange={handlePageChange}
+                                renderOnZeroPageCount={null}
+                                pageClassName="page-item"
+                                pageLinkClassName="page-link"
+                                previousClassName="page-item"
+                                previousLinkClassName="page-link"
+                                nextClassName="page-item"
+                                nextLinkClassName="page-link"
+                                breakClassName="page-item"
+                                breakLinkClassName="page-link"
+                                containerClassName="pagination"
+                                activeClassName="active"
+                                marginPagesDisplayed={1}
+                            />
+                        </div>
+
+                    </div>
+                </ModalBody >
+                <ModalFooter>
+                    <div className="text-center">
+                        <Button color="primary" onClick={saveDiscount} size="sm">
+                            {formData.id ? "Cập nhật" : "Thêm mới"}
+                        </Button>
+                        <Button color="primary" onClick={resetForm} size="sm">
+                            Reset
+                        </Button>
+                        <Button color="danger" onClick={toggle} size="sm">
+                            Close
+                        </Button>
+                    </div>
+                </ModalFooter>
+
+            </Modal >
 
         </>
     );
 }
 
-export default Promotion;
+export default SaleProduct;
