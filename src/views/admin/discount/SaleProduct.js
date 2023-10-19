@@ -409,6 +409,7 @@ const SaleProduct = () => {
                             <th scope="col">Code</th>
                             <th scope="col">Tên khuyến mại</th>
                             <th scope="col">Mô tả</th>
+                            <th scope="col">Giá trị  <br /> sản phẩm</th>
                             <th scope="col">Giá trị</th>
                             <th scope="col">Ngày bắt đầu</th>
                             <th scope="col">Ngày kết thúc</th>
@@ -425,7 +426,11 @@ const SaleProduct = () => {
                                     <td>{discount.code}</td>
                                     <td>{discount.name}</td>
                                     <td>{discount.description}</td>
-                                    <td>{discount.salePercent}%</td>
+                                    <td>{discount.minPrice}</td>
+                                    <td>
+                                        {discount.salePercent ? `${discount.salePercent}%` : ""}
+                                        {discount.salePrice ? `${discount.salePrice} VNĐ` : ""}
+                                    </td>
 
                                     <td>{format(new Date(discount.startDate), 'yyyy-MM-dd HH:mm', { locale: vi })}</td>
                                     <td>{format(new Date(discount.endDate), 'yyyy-MM-dd HH:mm', { locale: vi })}</td>
@@ -495,7 +500,7 @@ const SaleProduct = () => {
                 toggle={toggle}
                 backdrop={'static'}
                 keyboard={false}
-                style={{ maxWidth: '900px' }}
+                style={{ maxWidth: '1000px' }}
             >
                 <ModalHeader toggle={toggle}>
                     <h3 className="heading-small text-muted mb-0">{formData.id ? 'Cập Nhật Khuyến mại' : 'Thêm Mới Khuyến mại'}</h3>
@@ -530,17 +535,88 @@ const SaleProduct = () => {
                                             className="form-control-label"
                                             style={{ fontSize: 13 }}
                                         >
-                                            Trị giá giảm
+                                            Giá trị sản phẩm từ:
                                         </label>
                                         <Input
                                             className="form-control-alternative"
                                             type="number"
-                                            value={formData.salePercent}
-                                            onChange={(e) => setFormData({ ...formData, salePercent: e.target.value })}
+                                            value={formData.minPrice}
+                                            onChange={(e) => setFormData({ ...formData, minPrice: e.target.value })}
                                         />
-
                                     </FormGroup>
                                 </Col>
+
+
+                                <Col lg="3">
+                                    <FormGroup>
+                                        <label
+                                            className="form-control-label"
+                                            style={{ fontSize: 13 }}
+                                        >
+                                            Hình thức
+                                        </label>
+                                        <div style={{ display: "flex" }}>
+                                            <div className="custom-control custom-radio">
+                                                <Input
+                                                    className="custom-control-alternative"
+                                                    name="sale"
+                                                    type="radio"
+                                                    checked={!formData.sale}
+                                                    onChange={() => setFormData({ ...formData, sale: false })}
+                                                />Tiền
+                                            </div>
+                                            <div className="custom-control custom-radio">
+                                                <Input
+                                                    className="custom-control-alternative"
+                                                    name="sale"
+                                                    type="radio"
+                                                    checked={formData.sale}
+                                                    onChange={(e) => setFormData({ ...formData, sale: true })}
+                                                />Phần trăm
+                                            </div>
+
+                                        </div>
+                                    </FormGroup>
+                                </Col>
+
+                                {formData.sale && (
+                                    <Col lg="3">
+                                        <FormGroup>
+                                            <label
+                                                className="form-control-label"
+                                                style={{ fontSize: 13 }}
+                                            >
+                                                Phần trăm:
+                                            </label>
+                                            <Input
+                                                className="form-control-alternative"
+                                                type="number"
+                                                value={formData.salePercent}
+                                                onChange={(e) => setFormData({ ...formData, salePercent: e.target.value })}
+                                            />
+
+                                        </FormGroup>
+                                    </Col>
+                                )}
+
+                                {!formData.sale && (
+                                    <Col lg="3">
+                                        <FormGroup>
+                                            <label
+                                                className="form-control-label"
+                                                style={{ fontSize: 13 }}
+                                            >
+                                                Trị giá (tiền):
+                                            </label>
+                                            <Input
+                                                className="form-control-alternative"
+                                                type="number"
+                                                value={formData.salePrice}
+                                                onChange={(e) => setFormData({ ...formData, salePrice: e.target.value })}
+                                            />
+                                        </FormGroup>
+                                    </Col>
+                                )}
 
 
                                 <Col lg="3">
