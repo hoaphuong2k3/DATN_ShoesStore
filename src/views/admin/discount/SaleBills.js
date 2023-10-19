@@ -543,24 +543,8 @@ const SaleBills = () => {
                     <Form>
                         <div className="pl-lg-4">
                             <Row>
-                                <Col lg="6">
-                                    <FormGroup>
-                                        <label
-                                            className="form-control-label"
-                                            htmlFor="code"
-                                        >
-                                            Mã Khuyến mãi
-                                        </label>
-                                        <Input
-                                            className="form-control-alternative"
-                                            id="code"
-                                            type="text"
-                                            value={formData.code}
-                                            onChange={(e) => setFormData({ ...formData, code: e.target.value })}
-                                        />
-                                    </FormGroup>
-                                </Col>
-                                <Col lg="6">
+
+                                <Col lg="4">
                                     <FormGroup>
                                         <label
                                             className="form-control-label"
@@ -577,8 +561,42 @@ const SaleBills = () => {
                                         />
                                     </FormGroup>
                                 </Col>
-                            </Row>
-                            <Row>
+
+                                <Col lg="4">
+                                    <FormGroup>
+                                        <label
+                                            className="form-control-label"
+                                            htmlFor="startDate"
+                                        >
+                                            Ngày bắt đầu
+                                        </label>
+                                        <Input
+                                            className="form-control-alternative"
+                                            id="startDate"
+                                            type="datetime-local"
+                                            value={formData.startDate}
+                                            onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
+                                        />
+                                    </FormGroup>
+                                </Col>
+                                <Col lg="4">
+                                    <FormGroup>
+                                        <label
+                                            className="form-control-label"
+                                            htmlFor="endDate"
+                                        >
+                                            Ngày kết thúc
+                                        </label>
+                                        <Input
+                                            className="form-control-alternative"
+                                            id="endDate"
+                                            type="datetime-local"
+                                            value={formData.endDate}
+                                            onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
+                                        />
+                                    </FormGroup>
+                                </Col>
+
                                 <Col lg="4">
                                     <FormGroup>
                                         <label
@@ -664,45 +682,7 @@ const SaleBills = () => {
                                         </FormGroup>
                                     </Col>
                                 )}
-                            </Row>
 
-
-                            <Row>
-
-                                <Col lg="4">
-                                    <FormGroup>
-                                        <label
-                                            className="form-control-label"
-                                            htmlFor="startDate"
-                                        >
-                                            Ngày bắt đầu
-                                        </label>
-                                        <Input
-                                            className="form-control-alternative"
-                                            id="startDate"
-                                            type="datetime-local"
-                                            value={formData.startDate}
-                                            onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
-                                        />
-                                    </FormGroup>
-                                </Col>
-                                <Col lg="4">
-                                    <FormGroup>
-                                        <label
-                                            className="form-control-label"
-                                            htmlFor="endDate"
-                                        >
-                                            Ngày kết thúc
-                                        </label>
-                                        <Input
-                                            className="form-control-alternative"
-                                            id="endDate"
-                                            type="datetime-local"
-                                            value={formData.endDate}
-                                            onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
-                                        />
-                                    </FormGroup>
-                                </Col>
 
                                 <Col className="pl-lg-4">
                                     <FormGroup>
