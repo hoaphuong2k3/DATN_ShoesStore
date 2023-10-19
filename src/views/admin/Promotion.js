@@ -123,7 +123,6 @@ const Promotion = () => {
             });
 
             fetchData();
-
             toast.success("Thêm thành công!");
             resetForm();
         } catch (error) {
