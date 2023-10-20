@@ -289,21 +289,8 @@ const SaleBills = () => {
 
                         {value === 'yes' &&
                             <Row>
-                                <Col lg="4">
-                                    <FormGroup>
-                                        <label
-                                            className="form-control-label"
-                                            htmlFor="startDate"
-                                        >
-                                            Hóa đơn tối thiểu:
-                                        </label>
-                                        <Input
-                                            className="form-control-alternative"
-                                            type="number"
-                                        />
-                                    </FormGroup>
-                                </Col>
-                                <Col lg="4">
+
+                                <Col lg="6">
                                     <FormGroup>
                                         <label
                                             className="form-control-label"
@@ -322,21 +309,8 @@ const SaleBills = () => {
                                         </Input>
                                     </FormGroup>
                                 </Col>
-                                <Col lg="4">
-                                    <FormGroup>
-                                        <label
-                                            className="form-control-label"
-                                            htmlFor="startDate"
-                                        >
-                                            Trị giá giảm:
-                                        </label>
-                                        <Input
-                                            className="form-control-alternative"
-                                            type="number"
-                                        />
-                                    </FormGroup>
-                                </Col>
-                                <Col lg="4">
+
+                                <Col lg="6">
                                     <FormGroup>
                                         <label
                                             className="form-control-label"
@@ -358,42 +332,69 @@ const SaleBills = () => {
                                     </FormGroup>
                                 </Col>
 
-                                <Col lg="4">
+                                <Col lg="6">
                                     <FormGroup>
-                                        <label
-                                            className="form-control-label"
-                                            htmlFor="startDate"
-                                        >
-                                            Từ ngày:
-                                        </label>
-                                        <Input
-                                            className="form-control-alternative"
-                                            id="startDate"
-                                            type="date"
-                                            value={queryParams.fromDate}
-                                            onChange={(e) => setQueryParams({ ...queryParams, fromDate: e.target.value })}
-                                        />
-                                    </FormGroup>
-                                </Col>
-                                <Col lg="4">
-                                    <FormGroup>
-                                        <label
-                                            className="form-control-label"
-                                            htmlFor="endDate"
-                                        >
-                                            Đến ngày:
-                                        </label>
-                                        <Input
-                                            className="form-control-alternative"
-                                            id="endDate"
-                                            type="date"
-                                            value={queryParams.toDate}
-                                            onChange={(e) => setQueryParams({ ...queryParams, toDate: e.target.value })}
-                                        />
+
+                                        <Row>
+                                            <Col xl="6">
+                                                <label className="form-control-label">
+                                                   Trị giá hóa đơn từ:
+                                                </label>
+                                                <Input
+                                                    className="form-control-alternative"
+                                                    type="number"
+                                                />
+                                            </Col>
+
+                                            <Col xl="6">
+                                                <label className="form-control-label">
+                                                    đến:
+                                                </label>
+                                                <Input
+                                                    className="form-control-alternative"
+                                                    type="number"
+                                                />
+                                            </Col>
+                                        </Row>
                                     </FormGroup>
                                 </Col>
 
-
+                                <Col lg="6">
+                                    <FormGroup>
+                                        <Row>
+                                            <Col xl="6">
+                                                <label
+                                                    className="form-control-label"
+                                                    htmlFor="startDate"
+                                                >
+                                                    Từ ngày:
+                                                </label>
+                                                <Input
+                                                    className="form-control-alternative"
+                                                    id="startDate"
+                                                    type="date"
+                                                    value={queryParams.fromDate}
+                                                    onChange={(e) => setQueryParams({ ...queryParams, fromDate: e.target.value })}
+                                                />
+                                            </Col>
+                                            <Col xl="6">
+                                                <label
+                                                    className="form-control-label"
+                                                    htmlFor="endDate"
+                                                >
+                                                    Đến ngày:
+                                                </label>
+                                                <Input
+                                                    className="form-control-alternative"
+                                                    id="endDate"
+                                                    type="date"
+                                                    value={queryParams.toDate}
+                                                    onChange={(e) => setQueryParams({ ...queryParams, toDate: e.target.value })}
+                                                />
+                                            </Col>
+                                        </Row>
+                                    </FormGroup>
+                                </Col>
 
                             </Row>
                         }
