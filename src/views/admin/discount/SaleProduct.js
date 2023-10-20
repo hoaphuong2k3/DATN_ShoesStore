@@ -29,7 +29,7 @@ const SaleProduct = () => {
     const [queryParams, setQueryParams] = useState({
         page: 0,
         size: 5,
-        type: 0,
+        type: 1,
         code: "",
         name: "",
         fromDate: "",
@@ -426,7 +426,7 @@ const SaleProduct = () => {
                                     <td>{discount.code}</td>
                                     <td>{discount.name}</td>
                                     <td>{discount.description}</td>
-                                    <td>{discount.minPrice}</td>
+                                    <td>{discount.minPrice} VNĐ</td>
                                     <td>
                                         {discount.salePercent ? `${discount.salePercent}%` : ""}
                                         {discount.salePrice ? `${discount.salePrice} VNĐ` : ""}
@@ -677,70 +677,123 @@ const SaleProduct = () => {
                     </Form >
 
                     <div className="pl-lg-4">
-                        <Row className="align-items-center my-4">
-                            <div className="col" style={{ display: "flex" }}>
-                                <h3 className="heading-small text-black mb-0">Sản phẩm</h3>
-                            </div>
-                            <div className="col-4 text-right">
-                                <Input type="text" size="sm" placeholder="Mã hoặc tên sản phẩm" style={{ fontSize: 11 }} />
-                            </div>
+
+                        <Row className="align-items-center">
+                            <h3  className="heading-small text-muted mb-0">Áp dụng với:</h3>
+                        </Row>
+                        <Row>
+                            <Col lg="4">
+                                <Row className="align-items-center my-4">
+                                    <div className="col" style={{ display: "flex" }}>
+                                        <h3 className="heading-small text-black mb-0">Loại sản phẩm</h3>
+                                    </div>
+
+                                </Row>
+
+                                <Table bordered hover responsive>
+                                    <thead className="thead-light">
+                                        <tr >
+                                            <th className="text-center pb-4" >
+                                                <FormGroup check>
+                                                    <Input type="checkbox" />
+                                                </FormGroup>
+
+                                            </th>
+                                            <th scope="col">Mã</th>
+                                            <th scope="col">Loại sản phẩm</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {Array.isArray(discounts) &&
+                                            discounts.map((discount, index) => (
+                                                <tr key={discount.id}>
+                                                    <td className="text-center">
+                                                        <FormGroup check>
+                                                            <Input type="checkbox" />
+                                                        </FormGroup>
+                                                    </td>
+                                                    <td>{discount.code}</td>
+                                                    <td>{discount.name}</td>
+                                                </tr>
+                                            ))}
+                                    </tbody>
+                                </Table>
+                            </Col>
+                            <Col lg="8">
+                                <Row className="align-items-center my-4">
+                                    <div className="col" style={{ display: "flex" }}>
+                                        <h3 className="heading-small text-black mb-0">Chi tiết sản phẩm</h3>
+                                    </div>
+                                    <div className="col-4 text-right">
+                                        <Input type="text" size="sm" placeholder="Mã hoặc tên sản phẩm" style={{ fontSize: 11 }} />
+                                    </div>
+                                </Row>
+                                <Table bordered hover responsive>
+                                    <thead className="thead-light">
+                                        <tr >
+                                            <th className="text-center pb-4" >
+                                                <FormGroup check>
+                                                    <Input type="checkbox" />
+                                                </FormGroup>
+
+                                            </th>
+                                            <th scope="col">Mã sản phẩm</th>
+                                            <th scope="col">Tên sản phẩm</th>
+                                            <th scope="col">Giá gốc</th>
+                                            <th scope="col">Giá mới</th>
+                                            <th scope="col">Trạng thái</th>
+
+
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {Array.isArray(discounts) &&
+                                            discounts.map((discount, index) => (
+                                                <tr key={discount.id}>
+                                                    <td className="text-center">
+                                                        <FormGroup check>
+                                                            <Input type="checkbox" />
+                                                        </FormGroup>
+                                                    </td>
+                                                    <td>{discount.code}</td>
+                                                    <td>{discount.name}</td>
+                                                    <td>{discount.salePercent}</td>
+                                                    <td>{discount.salePercent}</td>
+                                                    <td>
+                                                        <Badge color={statusMapping[discount.status]?.color || statusMapping.default.color}>
+                                                            {statusMapping[discount.status]?.label || statusMapping.default.label}
+                                                        </Badge>
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                    </tbody>
+                                </Table>
+                                <div className="pagination-container" style={{ fontSize: 8 }}>
+                                    <ReactPaginate
+                                        breakLabel="..."
+                                        nextLabel=">"
+                                        pageRangeDisplayed={2}
+                                        pageCount={totalPages}
+                                        previousLabel="<"
+                                        onPageChange={handlePageChange}
+                                        renderOnZeroPageCount={null}
+                                        pageClassName="page-item"
+                                        pageLinkClassName="page-link"
+                                        previousClassName="page-item"
+                                        previousLinkClassName="page-link"
+                                        nextClassName="page-item"
+                                        nextLinkClassName="page-link"
+                                        breakClassName="page-item"
+                                        breakLinkClassName="page-link"
+                                        containerClassName="pagination"
+                                        activeClassName="active"
+                                        marginPagesDisplayed={1}
+                                    />
+                                </div>
+                            </Col>
                         </Row>
 
-                        <Table className="align-items-center table-flush" responsive>
-                            <thead className="thead-light">
-                                <tr >
-                                    <th scope="col" className="text-center"> <Input type="checkbox" /></th>
-                                    <th scope="col">Mã sản phẩm</th>
-                                    <th scope="col">Tên sản phẩm</th>
-                                    <th scope="col">Giá gốc</th>
-                                    <th scope="col">Giá mới</th>
-                                    <th scope="col">Trạng thái</th>
 
-
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {Array.isArray(discounts) &&
-                                    discounts.map((discount, index) => (
-                                        <tr key={discount.id}>
-                                            <td className="text-center">
-                                                <Input type="checkbox" />
-                                            </td>
-                                            <td>{discount.code}</td>
-                                            <td>{discount.name}</td>
-                                            <td>{discount.salePercent}</td>
-                                            <td>{discount.salePercent}</td>
-                                            <td>
-                                                <Badge color={statusMapping[discount.status]?.color || statusMapping.default.color}>
-                                                    {statusMapping[discount.status]?.label || statusMapping.default.label}
-                                                </Badge>
-                                            </td>
-                                        </tr>
-                                    ))}
-                            </tbody>
-                        </Table>
-                        <div className="pagination-container" style={{ fontSize: 8 }}>
-                            <ReactPaginate
-                                breakLabel="..."
-                                nextLabel=">"
-                                pageRangeDisplayed={2}
-                                pageCount={totalPages}
-                                previousLabel="<"
-                                onPageChange={handlePageChange}
-                                renderOnZeroPageCount={null}
-                                pageClassName="page-item"
-                                pageLinkClassName="page-link"
-                                previousClassName="page-item"
-                                previousLinkClassName="page-link"
-                                nextClassName="page-item"
-                                nextLinkClassName="page-link"
-                                breakClassName="page-item"
-                                breakLinkClassName="page-link"
-                                containerClassName="pagination"
-                                activeClassName="active"
-                                marginPagesDisplayed={1}
-                            />
-                        </div>
 
                     </div>
                 </ModalBody >
