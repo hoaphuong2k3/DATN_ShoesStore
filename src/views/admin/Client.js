@@ -24,7 +24,6 @@ const Client = () => {
   const [selectedWard, setSelectedWard] = useState("");
   const [admins, setAdmins] = useState([]);
   const [selectedAdmin, setSelectedAdmin] = useState(null);
-  const [gender, setGender] = useState(false);
 
   const [user, setUser] = useState({
     fullname: "",
@@ -57,11 +56,8 @@ const Client = () => {
     fetchData();
   }, []);
 
-
-
   const handleRowClick = (admin) => {
     setSelectedAdmin(admin);
-    setGender(admin.gender);
   };
 
   const deleteAdmin = (id) => {
@@ -189,8 +185,6 @@ const Client = () => {
                                   name="gender"
                                   type="radio"
                                   value="Nam"
-                                  checked={!gender}
-                                  onChange={() => setGender(false)}
                                 />Nam
                               </div>
                               <div className="custom-control custom-radio">
@@ -200,8 +194,6 @@ const Client = () => {
                                   name="gender"
                                   type="radio"
                                   value="Nữ"
-                                  checked={gender}
-                                  onChange={() => setGender(true)}
                                 />Nữ
                               </div>
                             </div>
@@ -440,8 +432,8 @@ const Client = () => {
                           name="gender"
                           type="radio"
                           value="Nam"
-                          checked={!gender}
-                          onChange={() => setGender(false)}
+                          defaultChecked
+                        // onClick={(e) => zin(e)}
                         />Nam
                       </div>
                       <div className="custom-control custom-radio">
@@ -451,8 +443,7 @@ const Client = () => {
                           name="gender"
                           type="radio"
                           value="Nữ"
-                          checked={gender}
-                          onChange={() => setGender(true)}
+                        // onClick={(e) => zin(e)}
                         />Nữ
                       </div>
                     </div>
@@ -468,24 +459,12 @@ const Client = () => {
                     <Input
                       className="form-control-alternative"
                       type="text"
-                      id="fullname"
-                      value={selectedAdmin ? selectedAdmin.fullname : ''}
+                      name="fullname"
+                      onChange={onInputChange}
                     />
                   </FormGroup>
                 </Col>
-                <Col lg="6">
-                  <FormGroup>
-                    <label className="form-control-label">
-                      Sinh nhật
-                    </label>
-                    <Input
-                      className="form-control-alternative"
-                      type="date"
-                      id="birth"
-                      value={selectedAdmin ? selectedAdmin.dateOfBirth : ''}
-                    />
-                  </FormGroup>
-                </Col>
+
               </Row>
               <Row>
                 <Col lg="6">
