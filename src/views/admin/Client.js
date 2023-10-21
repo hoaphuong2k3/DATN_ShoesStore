@@ -3,6 +3,8 @@ import React, { useState, useEffect } from "react";
 // reactstrap components
 import { Card, CardHeader, CardBody, Container, Row, Col, Form, FormGroup, Input, Button, Table, CardFooter, CardTitle, Label, Modal, ModalHeader, ModalFooter, ModalBody } from "reactstrap";
 import Select from "react-select";
+import ReactPaginate from 'react-paginate';
+import { getAllClient } from "services/ClientService";
 import { FaEdit, FaTrash } from 'react-icons/fa';
 import Header from "components/Headers/Header.js";
 import Switch from 'react-input-switch';
@@ -22,7 +24,7 @@ const Client = () => {
   const [selectedCity, setSelectedCity] = useState("");
   const [selectedDistrict, setSelectedDistrict] = useState("");
   const [selectedWard, setSelectedWard] = useState("");
-  const [admins, setAdmins] = useState([]);
+  const [listClient, setListClient] = useState([]);
   const [selectedAdmin, setSelectedAdmin] = useState(null);
 
   const [user, setUser] = useState({
@@ -44,9 +46,10 @@ const Client = () => {
     try {
       const provincesResponse = await axios.get("https://provinces.open-api.vn/api/?depth=3");
       setProvinces(provincesResponse.data);
-
-      const adminsResponse = await axios.get("http://localhost:33321/api/account/admin");
-      setAdmins(adminsResponse.data.content);
+      const res = await axios.get("http://localhost:33321/api/account/admin");
+      // const res = await getAllClient();
+      // console.log(res);
+      setListClient(res.data.content);
     } catch (error) {
       console.error("Error fetching data: ", error);
     }
@@ -314,7 +317,7 @@ const Client = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {Array.isArray(admins) && admins.map((admin, index) => (
+                  {Array.isArray(listClient) && listClient.map((admin, index) => (
 
                     <tr key={admin.id}>
                       <td>{index + 1}</td>
@@ -364,7 +367,7 @@ const Client = () => {
             <div className="pl-lg-4">
               <Row>
 
-                <Col lg="4">
+                <Col lg="6">
                   <FormGroup>
                     <label className="form-control-label">
                       Tên đăng nhập
@@ -378,79 +381,6 @@ const Client = () => {
                   </FormGroup>
                 </Col>
 
-                <Col lg="4">
-                  <FormGroup>
-                    <label className="form-control-label">
-                      Mật khẩu
-                    </label>
-                    {/* <InputGroup > */}
-                    <Input
-                      className="form-control-alternative"
-                      type="text"
-                      name="password"
-                      onChange={onInputChange}
-                    />
-                    {/* <InputGroupAddon addonType="append">
-                              <InputGroupText style={{ cursor: "pointer" }} onClick={toggleShowPassword}>
-                                {showPassword ? <FaEye /> : <FaEyeSlash />}
-                              </InputGroupText>
-                            </InputGroupAddon>
-                          </InputGroup> */}
-                  </FormGroup>
-                </Col>
-                <Col lg="4">
-                  <FormGroup>
-                    <label className="form-control-label">
-                      Mật khẩu
-                    </label>
-                    {/* <InputGroup > */}
-                    <Input
-                      className="form-control-alternative"
-                      type="text"
-                      name="password"
-                      onChange={onInputChange}
-                    />
-                    {/* <InputGroupAddon addonType="append">
-                              <InputGroupText style={{ cursor: "pointer" }} onClick={toggleShowPassword}>
-                                {showPassword ? <FaEye /> : <FaEyeSlash />}
-                              </InputGroupText>
-                            </InputGroupAddon>
-                          </InputGroup> */}
-                  </FormGroup>
-                </Col>
-
-                <Col lg="4">
-                  <FormGroup>
-                    <label className="form-control-label">
-                      Giới tính
-                    </label>
-                    <div style={{ display: "flex" }}>
-                      <div className="custom-control custom-radio">
-                        <Input
-                          className="custom-control-alternative"
-                          id="nam"
-                          name="gender"
-                          type="radio"
-                          value="Nam"
-                          defaultChecked
-                        // onClick={(e) => zin(e)}
-                        />Nam
-                      </div>
-                      <div className="custom-control custom-radio">
-                        <Input
-                          className="custom-control-alternative"
-                          id="nu"
-                          name="gender"
-                          type="radio"
-                          value="Nữ"
-                        // onClick={(e) => zin(e)}
-                        />Nữ
-                      </div>
-                    </div>
-                  </FormGroup>
-                </Col>
-              </Row>
-              <Row>
                 <Col lg="6">
                   <FormGroup>
                     <label className="form-control-label">
@@ -464,22 +394,6 @@ const Client = () => {
                     />
                   </FormGroup>
                 </Col>
-
-              </Row>
-              <Row>
-                <Col lg="6">
-                  <FormGroup>
-                    <label className="form-control-label">
-                      Số điện thoại
-                    </label>
-                    <Input
-                      className="form-control-alternative"
-                      type="tel"
-                      id="phoneNumber"
-                      value={selectedAdmin ? selectedAdmin.phoneNumber : ''}
-                    />
-                  </FormGroup>
-                </Col>
                 <Col lg="6">
                   <FormGroup>
                     <label className="form-control-label">
@@ -487,98 +401,76 @@ const Client = () => {
                     </label>
                     <Input
                       className="form-control-alternative"
-                      type="email"
-                      id="email"
-                      value={selectedAdmin ? selectedAdmin.email : ''}
+                      type="text"
+                      name="email"
+                      onChange={onInputChange}
+                    />
+                  </FormGroup>
+                </Col>
+                <Col lg="6">
+                  <FormGroup>
+                    <label className="form-control-label">
+                      Số điện thoại
+                    </label>
+                    <Input
+                      className="form-control-alternative"
+                      type="text"
+                      name="phonenumber"
+                      onChange={onInputChange}
+                    />
+                  </FormGroup>
+                </Col>
+                <Col lg="6">
+                  <FormGroup>
+                    <label className="form-control-label">
+                      Giới tính
+                    </label>
+                    <div style={{ display: "flex" }}>
+                      <div className="custom-control custom-radio">
+                        <Input
+                          className="custom-control-alternative"
+                          id="nam"
+                          name="gender"
+                          type="radio"
+                          value="false"
+                          defaultChecked
+                          onClick={(e) => onInputChange(e)}
+                        />Nam
+                      </div>
+                      <div className="custom-control custom-radio">
+                        <Input
+                          className="custom-control-alternative"
+                          id="nu"
+                          name="gender"
+                          type="radio"
+                          value="true"
+                          onClick={(e) => onInputChange(e)}
+                        />Nữ
+                      </div>
+                    </div>
+                  </FormGroup>
+                </Col>
+              </Row>
+              <Row>
+                <Col lg="6">
+                  <FormGroup>
+                    <label className="form-control-label">
+                      Ngày sinh
+                    </label>
+                    <Input
+                      className="form-control-alternative"
+                      type="date"
+                      name="fullname"
+                      onChange={onInputChange}
                     />
                   </FormGroup>
                 </Col>
               </Row>
+
             </div>
 
 
-            <div className="pl-lg-4">
-              <Row>
-                <Col lg="4">
-                  <FormGroup>
-                    <label
-                      className="form-control-label"
-                      htmlFor="input-city"
-                    >
-                      Thành Phố / Tỉnh
-                    </label>
-                    <Input
-                      className="form-control-alternative"
-                      type="select"
-                      value={selectedCity}
-                      onChange={(e) => setSelectedCity(e.target.value)}
-                    >
-                      <option value="">Chọn Thành Phố/Tỉnh</option>
-                      {provinces.map((province) => (
-                        <option key={province.code} value={province.name}>
-                          {province.name}
-                        </option>
-                      ))}
-                    </Input>
 
-
-                  </FormGroup>
-                </Col>
-                <Col lg="4">
-                  <FormGroup>
-                    <label
-                      className="form-control-label"
-                      htmlFor="input-country"
-                    >
-                      Quận/Huyện
-                    </label>
-                    <Input
-                      className="form-control-alternative"
-                      type="select"
-                      value={selectedDistrict}
-                      onChange={(e) => setSelectedDistrict(e.target.value)}
-                      disabled={!selectedCity}
-                    >
-                      <option value="">Chọn Quận/Huyện</option>
-                      {selectedCity &&
-                        provinces
-                          .find((province) => province.name === selectedCity)
-                          .districts.map((district) => (
-                            <option key={district.code} value={district.name}>
-                              {district.name}
-                            </option>
-                          ))}
-                    </Input>
-                  </FormGroup>
-                </Col>
-                <Col lg="4">
-                  <FormGroup>
-                    <label
-                      className="form-control-label" >
-                      Phường/Xã
-                    </label>
-                    <Input
-                      className="form-control-alternative"
-                      type="select"
-                      value={selectedWard}
-                      onChange={(e) => setSelectedWard(e.target.value)}
-                      disabled={!selectedDistrict}
-                    >
-                      <option value="">Chọn Phường/Xã</option>
-                      {selectedDistrict &&
-                        provinces
-                          .find((province) => province.name === selectedCity)
-                          .districts.find((district) => district.name === selectedDistrict)
-                          .wards.map((ward) => (
-                            <option key={ward.code} value={ward.name}>
-                              {ward.name}
-                            </option>
-                          ))}
-                    </Input>
-                  </FormGroup>
-                </Col>
-              </Row>
-            </div>
           </Form>
         </ModalBody>
         <ModalFooter>
