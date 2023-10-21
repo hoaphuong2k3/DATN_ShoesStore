@@ -6,6 +6,7 @@ import Select from "react-select";
 import { FaEdit, FaTrash } from 'react-icons/fa';
 import Header from "components/Headers/Header.js";
 import Switch from 'react-input-switch';
+import { toast } from 'react-toastify';
 
 
 const Staff = () => {
@@ -21,9 +22,41 @@ const Staff = () => {
   const [selectedAdmin, setSelectedAdmin] = useState(null);
   const [gender, setGender] = useState(false);
 
+  const [totalPages, setTotalPages] = useState(0);
+  const [totalElements, setTotalElenments] = useState(0);
+  const [page, setPage] = useState(0);
+  const [size, setSize] = useState(10);
+
+  const [admin, setAdmin] = useState({
+    username: "",
+    fullname: "",
+    gender: "",
+    dateOfBirth: "",
+    email: "",
+    phoneNumber: "",
+
+  });
+
+  const onInputChange = (e) => {
+    setAdmin({ ...admin, [e.target.name]: e.target.value });
+  };
+
+  const onSubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+      const resp = await axios.post("http://localhost:33321/api/admin/create");
+      toggle();
+    } catch (error) {
+      let errorMessage = "Lỗi từ máy chủ";
+      if (error.response && error.response.data && error.response.data.message) {
+        errorMessage = error.response.data.message;
+      }
+      toast.error(errorMessage);
+    }
+  };
+
   const handleModalAdd = () => {
-    // setDeleteShoes(shoes);
-    // setIdDeleteShoes([...iddeleteshoes, shoes.id])
     toggle();
   }
 
@@ -32,7 +65,7 @@ const Staff = () => {
       const provincesResponse = await axios.get("https://provinces.open-api.vn/api/?depth=3");
       setProvinces(provincesResponse.data);
 
-      const adminsResponse = await axios.get("http://localhost:33321/api/account/admin");
+      const adminsResponse = await axios.get("http://localhost:33321/api/admin");
       setAdmins(adminsResponse.data.content);
     } catch (error) {
       console.error("Error fetching data: ", error);
@@ -66,7 +99,7 @@ const Staff = () => {
                   <div className="col">
                     <h3 className="mb-0">Nhân viên</h3>
                   </div>
-                  <div className="col text-right">
+                  <div className="col text-right btn-crud">
                     <Button
                       color="primary"
                       onClick={handleModalAdd}
@@ -102,7 +135,7 @@ const Staff = () => {
             <Card>
               <CardBody>
                 <Row>
-                  <div className="col"> 
+                  <div className="col">
                     <CardTitle
                       tag="h5"
                       className="text-uppercase text-muted mb-0"
@@ -117,7 +150,7 @@ const Staff = () => {
                     </div>
                   </Col>
                 </Row>
-                <Form>
+                <Form className="search">
                   <div className="pl-lg-4">
                     <Row>
                       <Col lg="6">
@@ -220,7 +253,7 @@ const Staff = () => {
                     }
                   </div>
                 </Form>
-                <Row className="mt-2">
+                <Row className="mt-2 search">
                   <Col lg="6" xl="4" >
                     <span>
                       <Switch on="yes" off="no" value={value} onChange={setValue} />
@@ -241,7 +274,7 @@ const Staff = () => {
                     </Button>
                   </Col>
                 </Row>
-                {/* end row find  productAttrinutes*/}
+
               </CardBody>
             </Card>
           </Col>
@@ -250,7 +283,7 @@ const Staff = () => {
           <Col md="12">
             <Card className="shadow">
               <CardHeader className="border-0">
-                <Row className="align-items-center">
+                <Row className="align-items-center export">
                   <div className="col">
                     <h3 className="mb-0">Danh sách</h3>
                   </div>
@@ -258,20 +291,6 @@ const Staff = () => {
                     <Col>
                       <Input id="search" type="text" placeholder="Search.." style={{ width: "250px" }} size="sm" />
                     </Col>
-                    <Button
-                      color="primary"
-                      onClick={(e) => e.preventDefault()}
-                      size="sm"
-                    >
-                      Export
-                    </Button>
-                    <Button
-                      color="primary"
-                      onClick={(e) => e.preventDefault()}
-                      size="sm"
-                    >
-                      Export
-                    </Button>
                     <Button
                       color="primary"
                       onClick={(e) => e.preventDefault()}
@@ -287,7 +306,7 @@ const Staff = () => {
                   <tr>
                     <th scope="col">STT</th>
                     <th scope="col">Họ tên</th>
-                    <th scope="col">Sinh nhật</th>
+                    <th scope="col">Ngày sinh</th>
                     <th scope="col">Giới tính</th>
                     <th scope="col">Số điện thoại</th>
                     <th scope="col">Email</th>
@@ -319,11 +338,7 @@ const Staff = () => {
               </Table>
               <CardFooter>
                 {/* Pagination */}
-                {/* <div>
-                  <button onClick={() => setPage(page - 1)}>Previous</button>
-                  <span>Page {page + 1}</span>
-                  <button onClick={() => setPage(page + 1)}>Next</button>
-                </div> */}
+
               </CardFooter>
             </Card>
           </Col>
@@ -337,13 +352,12 @@ const Staff = () => {
         style={{ maxWidth: '900px' }}
       >
         <ModalHeader toggle={toggle}>
-          Thêm khách hàng
+          Thêm nhân viên
         </ModalHeader>
         <ModalBody>
-          <Form>
+          <Form onSubmit={onSubmit}>
             <div className="pl-lg-4">
               <Row>
-
                 <Col lg="4">
                   <FormGroup>
                     <label className="form-control-label">
@@ -353,30 +367,12 @@ const Staff = () => {
                       className="form-control-alternative"
                       type="text"
                       id="user"
+                      name="username"
+                      onChange={onInputChange}
+                      value={admin.username}
                     />
                   </FormGroup>
                 </Col>
-
-                <Col lg="4">
-                  <FormGroup>
-                    <label className="form-control-label">
-                      Mật khẩu
-                    </label>
-                    {/* <InputGroup > */}
-                    <Input
-                      className="form-control-alternative"
-                      type="text"
-                      id="pass"
-                    />
-                    {/* <InputGroupAddon addonType="append">
-                              <InputGroupText style={{ cursor: "pointer" }} onClick={toggleShowPassword}>
-                                {showPassword ? <FaEye /> : <FaEyeSlash />}
-                              </InputGroupText>
-                            </InputGroupAddon>
-                          </InputGroup> */}
-                  </FormGroup>
-                </Col>
-
                 <Col lg="4">
                   <FormGroup>
                     <label className="form-control-label">
@@ -419,7 +415,8 @@ const Staff = () => {
                       className="form-control-alternative"
                       type="text"
                       id="fullname"
-                      value={selectedAdmin ? selectedAdmin.fullname : ''}
+                      name="fullname"
+                      onChange={(e) => onInputChange(e)}
                     />
                   </FormGroup>
                 </Col>
@@ -432,7 +429,8 @@ const Staff = () => {
                       className="form-control-alternative"
                       type="date"
                       id="birth"
-                      value={selectedAdmin ? selectedAdmin.dateOfBirth : ''}
+                      name="dateOfBirth"
+                      onChange={(e) => onInputChange(e)}
                     />
                   </FormGroup>
                 </Col>
@@ -446,8 +444,9 @@ const Staff = () => {
                     <Input
                       className="form-control-alternative"
                       type="tel"
+                      onChange={(e) => onInputChange(e)}
                       id="phoneNumber"
-                      value={selectedAdmin ? selectedAdmin.phoneNumber : ''}
+                      name="phoneNumber"
                     />
                   </FormGroup>
                 </Col>
@@ -459,8 +458,9 @@ const Staff = () => {
                     <Input
                       className="form-control-alternative"
                       type="email"
+                      onChange={(e) => onInputChange(e)}
                       id="email"
-                      value={selectedAdmin ? selectedAdmin.email : ''}
+                      name="email"
                     />
                   </FormGroup>
                 </Col>
@@ -470,10 +470,7 @@ const Staff = () => {
               <Row>
                 <Col lg="4">
                   <FormGroup>
-                    <label
-                      className="form-control-label"
-                      htmlFor="input-city"
-                    >
+                    <label className="form-control-label" htmlFor="input-city">
                       Tỉnh / Thành
                     </label>
                     <Input
@@ -493,10 +490,7 @@ const Staff = () => {
                 </Col>
                 <Col lg="4">
                   <FormGroup>
-                    <label
-                      className="form-control-label"
-                      htmlFor="input-country"
-                    >
+                    <label className="form-control-label" htmlFor="input-country">
                       Quận / Huyện
                     </label>
                     <Input
@@ -520,8 +514,7 @@ const Staff = () => {
                 </Col>
                 <Col lg="4">
                   <FormGroup>
-                    <label
-                      className="form-control-label">
+                    <label className="form-control-label">
                       Phường / Xã
                     </label>
                     <Input
@@ -550,12 +543,15 @@ const Staff = () => {
         </ModalBody>
         <ModalFooter>
           <div className="text-center">
-            <Button color="danger">
+            <Button color="danger" type="submit">
               Thêm
-            </Button>{' '}
+            </Button>
+            <Button color="secondary" onClick={toggle}>
+              Hủy
+            </Button>
           </div>
         </ModalFooter>
-      </Modal >
+      </Modal>
     </>
   );
 };
