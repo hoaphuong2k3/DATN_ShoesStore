@@ -90,6 +90,7 @@ const Products = () => {
   useEffect(() => {
     getAll(page, size);
   }, [size, page]);
+  
   useEffect(() => {
     getAll(page, size);
     getlistBrand();

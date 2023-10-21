@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import { FaEdit, FaTrash, FaSearch, FaFileAlt } from 'react-icons/fa';
 import ReactPaginate from "react-paginate";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import axiosInstance from "services/custommize-axios";
+import { getAllShoes } from "services/Product2Service";
+import { getAllShoesDetail } from "services/ShoesDetailService.js";
 import { format, parseISO } from 'date-fns';
 import { vi } from 'date-fns/locale';
 import "assets/css/pagination.css";
@@ -25,7 +28,15 @@ const SaleProduct = () => {
     const [totalElements, setTotalElements] = useState(0);
     const [totalPages, setTotalPages] = useState(0);
 
+    const [listShoes, setListShoes] = useState([]);
+    const [selectAll, setSelectAll] = useState(false);
+    const [selectedShoesIds, setSelectedShoesIds] = useState([]);
+    const [page, setPage] = useState(0);
+    const [size, setSize] = useState(10);
 
+    const { id } = useParams();
+    const [shoesDetail, setListShoesDetail] = useState([]);
+    
     const [queryParams, setQueryParams] = useState({
         page: 0,
         size: 5,
@@ -38,8 +49,95 @@ const SaleProduct = () => {
         isdelete: 0,
     });
 
+    const [search, setSearch] = useState({
+        code: "",
+        name: "",
+        brandId: null,
+        originId: null,
+        designStyleId: null,
+        skinTypeId: null,
+        soleId: null,
+        liningId: null,
+        toeId: null,
+        cushionId: null,
+        fromPrice: null,
+        toPrice: null,
+        fromQuantity: null,
+        toQuantity: null,
+        fromDateStr: "",
+        toDateStr: "",
+        createdBy: ""
+    });
+
+    const [search2, setSearch2] = useState({
+        code: "",
+        sizeId: null,
+        colorId: null,
+        fromQuantity: null,
+        toQuantity: null,
+        fromPrice: null,
+        toPrice: null,
+        status: null,
+        fromDateStr: "",
+        toDateStr: "",
+        createdBy: "",
+        fromDate: "",
+        toDate: ""
+    });
 
     //loads table
+    const getAll = async (page, size) => {
+        try {
+            let res = await getAllShoes(page, size, search);
+            if (res && res.data && res.data.content) {
+                setListShoes(res.data.content);
+            }
+        } catch (error) {
+            console.error("Lỗi khi lấy dữ liệu:", error);
+        }
+    }
+
+    useEffect(() => {
+        getAll(page, size);
+    }, [search]);
+
+    const getDetail = async () => {
+        try {
+            let res = await getAllShoesDetail(id, search2);
+            if (res && res.data && res.data.content) {
+                setListShoesDetail(res.data.content);
+                
+            }
+        } catch (error) {
+            console.error("Lỗi khi lấy dữ liệu:", error);
+        }
+    }
+    useEffect(() => {
+        getDetail();
+    }, [search2]);
+
+    useEffect(() => {
+        getDetail();
+    });
+
+    const handleSelectAll = () => {
+        setSelectAll(!selectAll);
+
+        if (!selectAll) {
+            const allShoesIds = listShoes.map(shoes => shoes.id);
+            setSelectedShoesIds(allShoesIds);
+        } else {
+            setSelectedShoesIds([]);
+        }
+    };
+    const handleShoesCheckboxChange = (shoesId) => {
+        if (selectedShoesIds.includes(shoesId)) {
+            setSelectedShoesIds(selectedShoesIds.filter(id => id !== shoesId));
+        } else {
+            setSelectedShoesIds([...selectedShoesIds, shoesId]);
+        }
+    };
+
     const fetchData = async () => {
         try {
             const response = await axiosInstance.get("/vouchers/getAll", {
@@ -52,6 +150,7 @@ const SaleProduct = () => {
             console.error("Lỗi khi lấy dữ liệu:", error);
         }
     };
+
     useEffect(() => {
         fetchData();
     }, [queryParams]);
@@ -64,8 +163,6 @@ const SaleProduct = () => {
         const newSize = parseInt(e.target.value);
         setQueryParams({ ...queryParams, size: newSize, page: 0 });
     };
-
-
 
     const calculateIndex = (index) => {
         return index + 1 + queryParams.page * queryParams.size;
@@ -218,7 +315,6 @@ const SaleProduct = () => {
             }
         }
     };
-
 
     //delete
     const confirmDelete = () => {
@@ -500,7 +596,7 @@ const SaleProduct = () => {
                 toggle={toggle}
                 backdrop={'static'}
                 keyboard={false}
-                style={{ maxWidth: '1000px' }}
+                style={{ maxWidth: '1100px' }}
             >
                 <ModalHeader toggle={toggle}>
                     <h3 className="heading-small text-muted mb-0">{formData.id ? 'Cập Nhật Khuyến mại' : 'Thêm Mới Khuyến mại'}</h3>
@@ -679,10 +775,10 @@ const SaleProduct = () => {
                     <div className="pl-lg-4">
 
                         <Row className="align-items-center">
-                            <h3  className="heading-small text-muted mb-0">Áp dụng với:</h3>
+                            <h3 className="heading-small text-muted mb-0">Áp dụng với:</h3>
                         </Row>
                         <Row>
-                            <Col lg="4">
+                            <Col lg="5">
                                 <Row className="align-items-center my-4">
                                     <div className="col" style={{ display: "flex" }}>
                                         <h3 className="heading-small text-black mb-0">Loại sản phẩm</h3>
@@ -692,34 +788,44 @@ const SaleProduct = () => {
 
                                 <Table bordered hover responsive>
                                     <thead className="thead-light">
-                                        <tr >
-                                            <th className="text-center pb-4" >
+                                        <tr>
+                                            <th className="text-center pb-4">
                                                 <FormGroup check>
-                                                    <Input type="checkbox" />
+                                                    <Input
+                                                        type="checkbox"
+                                                        checked={selectAll}
+                                                        onChange={handleSelectAll}
+                                                    />
                                                 </FormGroup>
-
                                             </th>
+
                                             <th scope="col">Mã</th>
-                                            <th scope="col">Loại sản phẩm</th>
+                                            <th scope="col">Tên sản phẩm</th>
+                                            <th scope="col">Thương hiệu</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {Array.isArray(discounts) &&
-                                            discounts.map((discount, index) => (
-                                                <tr key={discount.id}>
-                                                    <td className="text-center">
-                                                        <FormGroup check>
-                                                            <Input type="checkbox" />
-                                                        </FormGroup>
-                                                    </td>
-                                                    <td>{discount.code}</td>
-                                                    <td>{discount.name}</td>
-                                                </tr>
-                                            ))}
+                                        {listShoes.map((shoes, index) => (
+                                            <tr key={shoes.id}>
+                                                <td className="text-center">
+                                                    <FormGroup check>
+                                                        <Input
+                                                            type="checkbox"
+                                                            checked={selectedShoesIds.includes(shoes.id)}
+                                                            onChange={() => handleShoesCheckboxChange(shoes.id)}
+                                                        />
+                                                    </FormGroup>
+                                                </td>
+                                                <td>{shoes.code}</td>
+                                                <td>{shoes.name}</td>
+                                                <td>{shoes.brand}</td>
+                                            </tr>
+                                        ))}
+
                                     </tbody>
                                 </Table>
                             </Col>
-                            <Col lg="8">
+                            <Col lg="7">
                                 <Row className="align-items-center my-4">
                                     <div className="col" style={{ display: "flex" }}>
                                         <h3 className="heading-small text-black mb-0">Chi tiết sản phẩm</h3>
@@ -747,25 +853,31 @@ const SaleProduct = () => {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {Array.isArray(discounts) &&
-                                            discounts.map((discount, index) => (
-                                                <tr key={discount.id}>
-                                                    <td className="text-center">
-                                                        <FormGroup check>
-                                                            <Input type="checkbox" />
-                                                        </FormGroup>
-                                                    </td>
-                                                    <td>{discount.code}</td>
-                                                    <td>{discount.name}</td>
-                                                    <td>{discount.salePercent}</td>
-                                                    <td>{discount.salePercent}</td>
-                                                    <td>
-                                                        <Badge color={statusMapping[discount.status]?.color || statusMapping.default.color}>
-                                                            {statusMapping[discount.status]?.label || statusMapping.default.label}
-                                                        </Badge>
-                                                    </td>
-                                                </tr>
-                                            ))}
+
+                                        {Array.isArray(shoesDetail) &&
+                                            shoesDetail.map((detail, index) => {
+                                                const matchedShoes = selectedShoesIds.includes(detail.shoesId);
+                                                const selectedShoes = listShoes.find(shoes => shoes.id === detail.shoesId);
+                                            
+                                                if (matchedShoes && selectedShoes) {
+                                                    return (
+                                                        <tr key={detail.id}>
+                                                            <td className="text-center">
+                                                                <FormGroup check>
+                                                                    <Input type="checkbox" />
+                                                                </FormGroup>
+                                                            </td>
+                                                            <td>{detail.code}</td>
+                                                            <td>{detail.name}</td>
+                                                        </tr>
+                                                    );
+                                                } else {
+                                                    return null;
+                                                }
+                                            
+                                            })}
+
+
                                     </tbody>
                                 </Table>
                                 <div className="pagination-container" style={{ fontSize: 8 }}>

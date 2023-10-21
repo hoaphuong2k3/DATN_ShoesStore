@@ -8,11 +8,11 @@ import "assets/css/pagination.css";
 // reactstrap components
 import Switch from 'react-input-switch';
 import { Card, CardHeader, CardBody, Container, Row, Col, Form, FormGroup, Input, Button, Table, Modal, ModalBody, ModalFooter, ModalHeader, Badge } from "reactstrap";
-
+import axios from "axios";
 import Header from "components/Headers/Header.js";
 
 
-const Promotion = () => {
+const Delivery = () => {
 
     const [modal, setModal] = useState(false);
     const toggle = () => setModal(!modal);
@@ -22,7 +22,7 @@ const Promotion = () => {
     }
 
     const [value, setValue] = useState('no');
-    const [discounts, setDiscounts] = useState([]);
+    const [delivery, setDelivery] = useState([]);
     const [totalElements, setTotalElements] = useState(0);
     const [totalPages, setTotalPages] = useState(0);
 
@@ -30,27 +30,20 @@ const Promotion = () => {
     const [queryParams, setQueryParams] = useState({
         page: 0,
         size: 5,
-        code: "",
-        name: "",
-        minPrice: "",
-        maxPrice: "",
-        fromDate: "",
-        toDate: "",
         status: "",
-        isdelete: 0,
     });
 
 
     //loads table
     const fetchData = async () => {
         try {
-            const response = await axiosInstance.get("/admin/discount-period/getAll", {
+            const response = await axiosInstance.get("/delivery", {
                 params: queryParams
             });
-            setDiscounts(response.content);
+            setDelivery(response.content);
             setTotalElements(response.totalElements);
             setTotalPages(response.totalPages);
-            console.log(response.content);
+
         } catch (error) {
             console.error("Lỗi khi lấy dữ liệu:", error);
         }
@@ -75,22 +68,17 @@ const Promotion = () => {
     };
 
     const statusMapping = {
-        0: { color: 'danger', label: 'Kích hoạt' },
-        1: { color: 'success', label: 'Chờ kích hoạt' },
+        '0': { color: 'warning', label: 'Chờ vận chuyển' },
+        '1': { color: 'success', label: 'Đang vận chuyển' },
+        '2': { color: 'primary', label: 'Giao thành công' },
+        '-1': { color: 'danger', label: 'Đã hủy' }
     };
     //lọc
     const resetFilters = () => {
         setQueryParams({
             page: 0,
             size: 5,
-            code: "",
-            name: "",
-            minPrice: "",
-            maxPrice: "",
-            fromDate: "",
-            toDate: "",
             status: "",
-            isdelete: 0,
         });
     };
 
@@ -173,12 +161,11 @@ const Promotion = () => {
 
     //delete
     const deleteDiscount = (id) => {
-        if (window.confirm("Bạn có chắc chắn muốn xóa khuyến mại này không?")) {
-            axiosInstance.delete(`/admin/discount-period/deleteDiscountPeriod/${id}`)
+        if (window.confirm("Bạn có chắc chắn muốn xóa không?")) {
+            axiosInstance.delete(`/delivery/delete/${id}`)
                 .then(response => {
                     fetchData();
                     toast.success("Xóa thành công");
-                    resetForm();
                 })
                 .catch(error => {
                     console.error('Lỗi khi xóa dữ liệu:', error);
@@ -201,7 +188,7 @@ const Promotion = () => {
 
                                     <Row className="align-items-center">
                                         <div className="col">
-                                            <h3 className="mb-0">Đợt giảm giá</h3>
+                                            <h3 className="mb-0">Phiếu giao hàng</h3>
                                         </div>
                                     </Row>
                                 </CardHeader>
@@ -384,34 +371,41 @@ const Promotion = () => {
                                             <thead className="thead-light">
                                                 <tr>
                                                     <th scope="col">STT</th>
-                                                    <th scope="col">Mã</th>
-                                                    <th scope="col">Tên khuyến mại</th>
-                                                    <th scope="col">Giá trị</th>
-                                                    <th scope="col">Ngày bắt đầu</th>
-                                                    <th scope="col">Ngày kết thúc</th>
+                                                    <th scope="col">ID</th>
+                                                    <th scope="col">Tên người nhận</th>
+                                                    <th scope="col">Số điện thoại</th>
+                                                    <th scope="col">Địa chỉ</th>
+                                                    <th scope="col">Giá vận chuyển</th>
+                                                    <th scope="col">Ngày vận chuyển</th>
+                                                    <th scope="col">Ngày tạo</th>
+                                                    <th scope="col">Ngày cập nhật</th>
                                                     <th scope="col">Trạng thái</th>
                                                     <th scope="col">Thao tác</th>
 
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                {Array.isArray(discounts) &&
-                                                    discounts.map((discount, index) => (
-                                                        <tr key={discount.id}>
+                                                {Array.isArray(delivery) &&
+                                                    delivery.map((delivery, index) => (
+                                                        <tr key={delivery.id}>
                                                             <td>{calculateIndex(index)}</td>
-                                                            <td>{discount.code}</td>
-                                                            <td>{discount.name}</td>
-                                                            <td>{discount.salePercent}%</td>
-                                                            <td>{discount.startDate}</td>
-                                                            <td>{discount.endDate}</td>
+                                                            <td>{delivery.id}</td>
+                                                            <td>{delivery.recipientName}</td>
+                                                            <td>{delivery.recipientPhone}</td>
+                                                            <td>{delivery.deliveryAddress}</td>
+                                                            <td>{delivery.deliveryCost}</td>
+                                                            <td>{delivery.shipDate}</td>
+                                                            <td>{delivery.createdTime}</td>
+                                                            <td>{delivery.updatedTime}</td>
+
                                                             <td>
-                                                                <Badge color={statusMapping[discount.status]?.color || statusMapping.default.color}>
-                                                                    {statusMapping[discount.status]?.label || statusMapping.default.label}
+                                                                <Badge color={statusMapping[delivery.status]?.color || statusMapping.default.color}>
+                                                                    {statusMapping[delivery.status]?.label || statusMapping.default.label}
                                                                 </Badge>
                                                             </td>
                                                             <td>
-                                                                <Button color="info" size="sm" onClick={() => handleRowClick(discount)} disabled={discount.status === 2}><FaEdit /></Button>
-                                                                <Button color="danger" size="sm" onClick={() => deleteDiscount(discount.id)}><FaTrash /></Button>
+                                                                <Button color="info" size="sm" onClick={() => handleRowClick(delivery.id)} disabled={delivery.status === -1}><FaEdit /></Button>
+                                                                <Button color="danger" size="sm" onClick={() => deleteDiscount(delivery.id)}><FaTrash /></Button>
                                                             </td>
 
                                                         </tr>
@@ -422,7 +416,7 @@ const Promotion = () => {
                                         <Row className="mt-4">
                                             <Col lg={6}>
                                                 <div style={{ fontSize: 14 }}>
-                                                    Đang xem <b>{queryParams.page * queryParams.size + 1}</b>  đến <b>{queryParams.page * queryParams.size + discounts.length}</b> trong tổng số <b></b> mục
+                                                    Đang xem <b>{queryParams.page * queryParams.size + 1}</b>  đến <b>{queryParams.page * queryParams.size + delivery.length}</b> trong tổng số <b></b> mục
                                                 </div>
                                             </Col>
                                             <Col style={{ fontSize: 14 }} lg={2}>
@@ -586,4 +580,4 @@ const Promotion = () => {
     );
 }
 
-export default Promotion;
+export default Delivery;
