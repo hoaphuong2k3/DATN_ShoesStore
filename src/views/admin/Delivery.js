@@ -162,7 +162,7 @@ const Delivery = () => {
     //delete
     const deleteDiscount = (id) => {
         if (window.confirm("Bạn có chắc chắn muốn xóa không?")) {
-            axiosInstance.delete(`/delivery/delete/${id}`)
+            axiosInstance.patch(`/delivery/delete/${id}`)
                 .then(response => {
                     fetchData();
                     toast.success("Xóa thành công");
