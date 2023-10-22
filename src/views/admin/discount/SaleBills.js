@@ -476,7 +476,6 @@ const SaleBills = () => {
                                         <Button color="info" size="sm" onClick={() => handleRowClick(discount)} disabled={discount.status === 2}><FaEdit /></Button>
                                         <Button color="danger" size="sm" onClick={() => deleteDiscount(discount.id)}><FaTrash /></Button>
                                     </td>
-
                                 </tr>
                             ))}
                     </tbody>

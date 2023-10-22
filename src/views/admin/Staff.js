@@ -41,10 +41,7 @@ const Staff = () => {
     page: 0,
     size: 5,
     type: 0,
-    code: "",
-    name: "",
-    fromDate: "",
-    toDate: "",
+    fullname: "",
     status: "",
     isdelete: 0,
   });
@@ -72,9 +69,9 @@ const Staff = () => {
   }, [queryParams]);
 
   const handleCityChange = (e) => {
-    const selectedCity = e.target.value;
-    setSelectedCity(selectedCity);
-    const selectedProvince = provinces.find((province) => province.name === selectedCity);
+    const selectedCityName = e.target.value;
+    setSelectedCity(selectedCityName);
+    const selectedProvince = provinces.find((province) => province.name === selectedCityName);
     const districts = selectedProvince.districts;
     setFormData({
       ...formData,
@@ -86,7 +83,7 @@ const Staff = () => {
       },
     });
   };
-  
+
   const handleDistrictChange = (e) => {
     const selectedDistrict = e.target.value;
     setSelectedDistrict(selectedDistrict);
@@ -102,7 +99,7 @@ const Staff = () => {
       },
     });
   };
-  
+
   const handleWardChange = (e) => {
     const selectedWard = e.target.value;
     setSelectedWard(selectedWard);
@@ -133,7 +130,7 @@ const Staff = () => {
   const statusMapping = {
     0: { color: 'danger', label: 'Ngừng hoạt động' },
     1: { color: 'success', label: 'Đang hoạt động' },
-    // 2: { color: 'warning', label: 'Đã hủy' },
+
   };
   //lọc
   const resetFilters = () => {
@@ -141,10 +138,7 @@ const Staff = () => {
       page: 0,
       size: 5,
       type: 0,
-      code: "",
-      name: "",
-      fromDate: "",
-      toDate: "",
+      fullname: "",
       status: "",
       isdelete: 0,
     });
@@ -152,8 +146,7 @@ const Staff = () => {
 
   //click on selected
   const [formData, setFormData] = useState({
-    id: null,
-    code: "",
+    id: "",
     username: "",
     fullname: "",
     gender: false,
@@ -171,22 +164,23 @@ const Staff = () => {
   });
 
   const handleRowClick = (admin) => {
-
     setFormData({
       id: admin.id,
-      code: admin.code,
       username: admin.username,
       fullname: admin.fullname,
       gender: admin.gender,
       dateOfBirth: admin.dateOfBirth,
       email: admin.email,
       phoneNumber: admin.phoneNumber,
-      // minPrice: admin.minPrice || "",
-      // sale: false,
-      status: admin.status
+      status: admin.status,
+      address: {
+        proviceCode: admin.proviceCode,
+        districtCode: admin.districtCode,
+        communeCode: admin.communeCode,
+        addressDetail: admin.addressDetail,
+        isDeleted: true,
+      },
     });
-
-
     setModal(true);
   };
 
@@ -194,7 +188,6 @@ const Staff = () => {
   const resetForm = () => {
     setFormData({
       id: null,
-      code: "",
       username: "",
       fullname: "",
       gender: false,
@@ -202,47 +195,56 @@ const Staff = () => {
       email: "",
       phoneNumber: "",
       status: "",
-
+      address: {
+        proviceCode: "",
+        districtCode: "",
+        communeCode: "",
+        addressDetail: "",
+        isDeleted: true,
+      },
     });
     // setSelectedValueType(null);
   };
 
   //save
-  // const formatDateTime = (dateString) => {
-  //   const parsedDate = parseISO(dateString, "dd/MM/yyyy hh:mm a", new Date());
-  //   return format(parsedDate, "yyyy-MM-dd HH:mm", { locale: vi });
-  // };
+
 
   const saveAdmin = async () => {
     try {
-
       if (formData.id) {
         await axiosInstance.put(`/admin/update`, {
           id: formData.id,
-          code: formData.code,
           username: formData.username,
           fullname: formData.fullname,
           gender: formData.gender,
           dateOfBirth: formData.dateOfBirth,
           email: formData.email,
           phoneNumber: formData.phoneNumber,
-
-          status: formData.status
+          address: {
+            proviceCode: formData.address.proviceCode,
+            districtCode: formData.address.districtCode,
+            communeCode: formData.address.communeCode,
+            addressDetail: formData.address.addressDetail,
+            isDeleted: true,
+          },
         });
-
         fetchData();
-
         toast.success("Cập nhật thành công!");
       } else {
         await axiosInstance.post('/admin/create', {
-          code: formData.code,
           username: formData.username,
           fullname: formData.fullname,
           gender: formData.gender,
           dateOfBirth: formData.dateOfBirth,
           email: formData.email,
           phoneNumber: formData.phoneNumber,
-
+          address: {
+            proviceCode: formData.address.proviceCode,
+            districtCode: formData.address.districtCode,
+            communeCode: formData.address.communeCode,
+            addressDetail: formData.address.addressDetail,
+            isDeleted: true,
+          },
         });
 
         fetchData();
@@ -266,12 +268,9 @@ const Staff = () => {
 
 
   //delete
-  const confirmDelete = () => {
-    return window.confirm("Bạn có chắc chắn muốn xóa nhân viên này không?");
-  };
   const deleteAdmin = (id) => {
-    if (confirmDelete()) {
-      axiosInstance.delete(`/admin/delete/${id}`)
+    if (window.confirm("Bạn có chắc chắn muốn xóa không?")) {
+      axiosInstance.patch(`/admin/delete/${id}`)
         .then(response => {
           fetchData();
           toast.success("Xóa thành công");
@@ -310,16 +309,16 @@ const Staff = () => {
                           <FormGroup>
                             <label
                               className="form-control-label"
-                              htmlFor="code"
+                              htmlFor="fullname"
                             >
-                              Mã Nhân Viên:
+                             Tên Nhân Viên:
                             </label>
                             <Input
                               className="form-control-alternative"
-                              id="code"
+                              id="fullname"
                               type="text"
-                              value={queryParams.code}
-                              onChange={(e) => setQueryParams({ ...queryParams, code: e.target.value })}
+                              value={queryParams.fullname}
+                              onChange={(e) => setQueryParams({ ...queryParams, fullname: e.target.value })}
                             />
                           </FormGroup>
                         </Col>
@@ -327,16 +326,16 @@ const Staff = () => {
                           <FormGroup>
                             <label
                               className="form-control-label"
-                              htmlFor="name"
+                              htmlFor="phoneNumber"
                             >
-                              Tên Nhân Viên:
+                              Số điện thoại:
                             </label>
                             <Input
                               className="form-control-alternative"
-                              id="name"
+                              id="phoneNumber"
                               type="text"
-                              value={queryParams.name}
-                              onChange={(e) => setQueryParams({ ...queryParams, name: e.target.value })}
+                              value={queryParams.phoneNumber}
+                              onChange={(e) => setQueryParams({ ...queryParams, phoneNumber: e.target.value })}
                             />
                           </FormGroup>
                         </Col>
@@ -349,9 +348,9 @@ const Staff = () => {
                             <FormGroup>
                               <label
                                 className="form-control-label"
-                                htmlFor="startDate"
+                                htmlFor="dateOfBirth"
                               >
-                                Hóa đơn tối thiểu:
+                                Ngày sinh:
                               </label>
                               <Input
                                 className="form-control-alternative"
@@ -363,18 +362,15 @@ const Staff = () => {
                             <FormGroup>
                               <label
                                 className="form-control-label"
-                                htmlFor="startDate"
+                                htmlFor="gender"
                               >
-                                Hình thức:
+                                Giới tính:
                               </label>
                               <Input
                                 className="form-control-alternative"
-                                type="select"
-
+                                type="radio"
                               >
-                                <option>Tất cả</option>
-                                <option>Tiền</option>
-                                <option>Phần trăm</option>
+                                
                               </Input>
                             </FormGroup>
                           </Col>
@@ -384,11 +380,11 @@ const Staff = () => {
                                 className="form-control-label"
                                 htmlFor="startDate"
                               >
-                                Trị giá giảm:
+                                Email:
                               </label>
                               <Input
                                 className="form-control-alternative"
-                                type="number"
+                                type="email"
                               />
                             </FormGroup>
                           </Col>
@@ -409,11 +405,10 @@ const Staff = () => {
                                 <option value="">Tất cả</option>
                                 <option value="0">Kích hoạt</option>
                                 <option value="1">Chờ kích hoạt</option>
-                                <option value="2">Đã hủy</option>
+
                               </Input>
                             </FormGroup>
                           </Col>
-
                           <Col lg="4">
                             <FormGroup>
                               <label
@@ -455,7 +450,6 @@ const Staff = () => {
                       }
                     </div>
                   </Form>
-
                   <Row className="mt-2">
                     <Col lg="6" xl="4" >
                       <span>
@@ -471,9 +465,7 @@ const Staff = () => {
                       </Button>
                     </Col>
                   </Row>
-
                   <hr className="my-4" />
-
                   <Row className="align-items-center my-4">
                     <div className="col" style={{ display: "flex" }}>
 
@@ -501,7 +493,6 @@ const Staff = () => {
                         <th scope="col">Số điện thoại</th>
                         <th scope="col">Email</th>
                         <th scope="col">Địa chỉ</th>
-
                         <th scope="col">Trạng thái</th>
                         <th scope="col">Thao tác</th>
 
@@ -783,10 +774,7 @@ const Staff = () => {
                       </Col>
                       <Col className="pl-lg-4">
                         <FormGroup>
-                          <label
-                            className="form-control-label"
-                            htmlFor="addressDetail"
-                          >
+                          <label className="form-control-label" htmlFor="addressDetail">
                             Địa chỉ
                           </label>
                           <Input
@@ -794,8 +782,16 @@ const Staff = () => {
                             placeholder="Số nhà ....."
                             rows="4"
                             type="textarea"
-                            value={formData.address.addressDetail}
-                            onChange={(e) => setFormData({ ...formData, addressDetail: e.target.value })}
+                            // value={formData.address}
+                            onChange={(e) =>
+                              setFormData({
+                                ...formData,
+                                address: {
+                                  ...formData.address,
+                                  addressDetail: e.target.value,
+                                },
+                              })
+                            }
                           />
                         </FormGroup>
                       </Col>
