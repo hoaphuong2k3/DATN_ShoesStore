@@ -13,7 +13,8 @@ export const AuthProvider = ({ children }) => {
     setToken(token);
     localStorage.setItem('token', token);
     // localStorage.setItem('username', username); // Lưu username vào localStorage hoặc cookie (nếu cần)
-
+  // Gắn Token vào header của mỗi yêu cầu Axios
+  axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
   };
 
   const logout = () => {
@@ -21,6 +22,8 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
     setToken(null);
     localStorage.removeItem('token');
+      // Xóa Token khỏi header của mỗi yêu cầu Axios
+  delete axios.defaults.headers.common['Authorization'];
   };
 
   return (
