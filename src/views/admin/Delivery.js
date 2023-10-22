@@ -8,7 +8,6 @@ import "assets/css/pagination.css";
 // reactstrap components
 import Switch from 'react-input-switch';
 import { Card, CardHeader, CardBody, Container, Row, Col, Form, FormGroup, Input, Button, Table, Modal, ModalBody, ModalFooter, ModalHeader, Badge } from "reactstrap";
-import axios from "axios";
 import Header from "components/Headers/Header.js";
 
 
@@ -61,8 +60,6 @@ const Delivery = () => {
         setQueryParams({ ...queryParams, size: newSize, page: 0 });
     };
 
-
-
     const calculateIndex = (index) => {
         return index + 1 + queryParams.page * queryParams.size;
     };
@@ -85,70 +82,52 @@ const Delivery = () => {
     //click on selected
     const [formData, setFormData] = useState({
         id: null,
-        code: "",
-        name: "",
-        salePercent: "",
-        startDate: "",
-        endDate: "",
+        recipientName: "",
+        recipientPhone: "",
+        deliveryAddress: "",
+        deliveryCost: "",
         status: "",
     });
 
-    const handleRowClick = (discount) => {
-        setFormData({
-            id: discount.id,
-            code: discount.code,
-            name: discount.name,
-            startDate: discount.startDate,
-            endDate: discount.endDate,
-            salePercent: discount.salePercent,
-            status: discount.status
-        });
 
-        setModal(true);
+    const handleRowClick = async (id) => {
+        try {
+            const response = await axiosInstance.get(`/delivery/detail/${id}`);
+            setFormData(response.data);
+            setModal(true);
+        } catch (error) {
+            console.error("Lỗi khi lấy dữ liệu:", error);
+        }
     };
+
 
     //reset
     const resetForm = () => {
         setFormData({
-            name: "",
-            startDate: "",
-            endDate: "",
-            salePercent: "",
+            recipientName: "",
+            recipientPhone: "",
+            deliveryCost: "",
+            deliveryAddress: "",
+            status: "",
         });
     };
 
     //save
-    const saveDiscount = async () => {
+    const saveDiscount = async (e) => {
+        e.preventDefault();
         try {
             if (formData.id) {
-                await axiosInstance.put(`/admin/discount-period/updateDiscountPeriod`, {
-                    id: formData.id,
-                    code: formData.code,
-                    name: formData.name,
-                    startDate: formData.startDate,
-                    endDate: formData.endDate,
-                    salePercent: formData.salePercent,
-                    status: formData.status,
-                });
+                await axiosInstance.put(`/delivery/update/${formData.id}`, formData);
                 toast.success("Cập nhật thành công!");
             } else {
-                await axiosInstance.post(`/admin/discount-period/createDiscountPeriod`, {
-                    code: formData.code,
-                    name: formData.name,
-                    startDate: formData.startDate,
-                    endDate: formData.endDate,
-                    salePercent: formData.salePercent,
-                    status: formData.status,
-                });
+                await axiosInstance.post("/delivery/create", formData);
                 toast.success("Thêm mới thành công!");
             }
-
             fetchData();
-
             setModal(false);
             resetForm();
         } catch (error) {
-            console.error("Error:", error);
+            console.error("Lỗi khi lưu dữ liệu:", error);
             if (error.response) {
                 console.error("Response data:", error.response.data);
                 toast.error(error.response.data.message);
@@ -157,6 +136,43 @@ const Delivery = () => {
             }
         }
     };
+    // const saveDiscount = async (id) => {
+    //     try {
+    //         if (formData.id) {
+    //             await axiosInstance.put(`/delivery/update/${id}`, {
+    //                 id: formData.id,
+    //                 address: formData.address,
+    //                 recipientName: formData.recipientName,
+    //                 recipientPhone: formData.recipientPhone,
+    //                 deliveryCost: formData.deliveryCost,
+    //                 idOrder: formData.idOrder,
+    //                 status: formData.status,
+    //             });
+    //             toast.success("Cập nhật thành công!");
+    //         } else {
+    //             await axiosInstance.post(`/delivery/create`, {
+    //                 address: formData.address,
+    //                 recipientName: formData.recipientName,
+    //                 recipientPhone: formData.recipientPhone,
+    //                 deliveryCost: formData.deliveryCost,
+    //                 idOrder: formData.idOrder,
+    //             });
+    //             toast.success("Thêm mới thành công!");
+    //         }
+
+    //         fetchData();
+    //         setModal(false);
+    //         resetForm();
+    //     } catch (error) {
+    //         console.error("Error:", error);
+    //         if (error.response) {
+    //             console.error("Response data:", error.response.data);
+    //             toast.error(error.response.data.message);
+    //         } else {
+    //             toast.error("Đã có lỗi xảy ra.");
+    //         }
+    //     }
+    // };
 
 
     //delete
@@ -371,7 +387,7 @@ const Delivery = () => {
                                             <thead className="thead-light">
                                                 <tr>
                                                     <th scope="col">STT</th>
-                                                    <th scope="col">ID</th>
+                                                    <th scope="col">Mã hóa đơn</th>
                                                     <th scope="col">Tên người nhận</th>
                                                     <th scope="col">Số điện thoại</th>
                                                     <th scope="col">Địa chỉ</th>
@@ -389,7 +405,6 @@ const Delivery = () => {
                                                     delivery.map((delivery, index) => (
                                                         <tr key={delivery.id}>
                                                             <td>{calculateIndex(index)}</td>
-                                                            <td>{delivery.id}</td>
                                                             <td>{delivery.recipientName}</td>
                                                             <td>{delivery.recipientPhone}</td>
                                                             <td>{delivery.deliveryAddress}</td>
@@ -467,7 +482,7 @@ const Delivery = () => {
                                         style={{ maxWidth: '700px' }}
                                     >
                                         <ModalHeader toggle={toggle}>
-                                            <h3 className="heading-small text-muted mb-0">{formData.id ? 'Cập Nhật Khuyến mại' : 'Thêm Mới Khuyến mại'}</h3>
+                                            <h3 className="heading-small text-muted mb-0">{formData.id ? 'Cập Nhật Phiếu giao' : 'Thêm Mới Phiếu giao'}</h3>
 
                                         </ModalHeader>
                                         <ModalBody>
@@ -481,14 +496,14 @@ const Delivery = () => {
                                                                     className="form-control-label"
                                                                     htmlFor="name"
                                                                 >
-                                                                    Tên Khuyến mãi
+                                                                    Tên người nhận
                                                                 </label>
                                                                 <Input
                                                                     className="form-control-alternative"
                                                                     id="name"
                                                                     type="text"
-                                                                    value={formData.name}
-                                                                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                                                    value={formData.recipientName}
+                                                                    onChange={(e) => setFormData({ ...formData, recipientName: e.target.value })}
                                                                 />
                                                             </FormGroup>
                                                         </Col>
@@ -498,15 +513,14 @@ const Delivery = () => {
                                                                 <label
                                                                     className="form-control-label"
                                                                 >
-                                                                    Giá trị giảm:
+                                                                    Số điện thoại:
                                                                 </label>
                                                                 <Input
                                                                     className="form-control-alternative"
-                                                                    type="number"
-                                                                    value={formData.salePercent}
-                                                                    onChange={(e) => setFormData({ ...formData, salePercent: e.target.value })}
+                                                                    type="text"
+                                                                    value={formData.recipientPhone}
+                                                                    onChange={(e) => setFormData({ ...formData, recipientPhone: e.target.value })}
                                                                 />
-
                                                             </FormGroup>
                                                         </Col>
 
@@ -516,14 +530,13 @@ const Delivery = () => {
                                                                     className="form-control-label"
                                                                     htmlFor="startDate"
                                                                 >
-                                                                    Ngày bắt đầu
+                                                                    Địa chỉ nhận:
                                                                 </label>
                                                                 <Input
                                                                     className="form-control-alternative"
-                                                                    id="startDate"
-                                                                    type="date"
-                                                                    value={formData.startDate}
-                                                                    onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
+                                                                    type="text"
+                                                                    value={formData.deliveryAddress}
+                                                                    onChange={(e) => setFormData({ ...formData, deliveryAddress: e.target.value })}
                                                                 />
                                                             </FormGroup>
                                                         </Col>
@@ -533,14 +546,13 @@ const Delivery = () => {
                                                                     className="form-control-label"
                                                                     htmlFor="endDate"
                                                                 >
-                                                                    Ngày kết thúc
+                                                                    Giá vận chuyển:
                                                                 </label>
                                                                 <Input
                                                                     className="form-control-alternative"
-                                                                    id="endDate"
-                                                                    type="date"
-                                                                    value={formData.endDate}
-                                                                    onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
+                                                                    type="number"
+                                                                    value={formData.deliveryCost}
+                                                                    onChange={(e) => setFormData({ ...formData, deliveryCost: e.target.value })}
                                                                 />
                                                             </FormGroup>
                                                         </Col>
