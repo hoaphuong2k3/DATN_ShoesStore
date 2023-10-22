@@ -141,8 +141,8 @@ const UserNavbar = () => {
                     <span>Yêu thích</span>
                   </DropdownItem>
                   <DropdownItem divider />
-                  <DropdownItem>
-                    <i className="ni ni-user-run" onClick={handleLogout} />
+                  <DropdownItem onClick={handleLogout}>
+                    <i className="ni ni-user-run"  />
                     <span>Đăng xuất</span>
                   </DropdownItem>
                 </DropdownMenu>

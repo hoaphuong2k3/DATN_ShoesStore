@@ -76,6 +76,7 @@ const Delivery = () => {
             page: 0,
             size: 5,
             status: "",
+            code:"",
         });
     };
 
@@ -87,6 +88,7 @@ const Delivery = () => {
         deliveryAddress: "",
         deliveryCost: "",
         status: "",
+        codeDelivery: "",
     });
 
 
@@ -136,47 +138,10 @@ const Delivery = () => {
             }
         }
     };
-    // const saveDiscount = async (id) => {
-    //     try {
-    //         if (formData.id) {
-    //             await axiosInstance.put(`/delivery/update/${id}`, {
-    //                 id: formData.id,
-    //                 address: formData.address,
-    //                 recipientName: formData.recipientName,
-    //                 recipientPhone: formData.recipientPhone,
-    //                 deliveryCost: formData.deliveryCost,
-    //                 idOrder: formData.idOrder,
-    //                 status: formData.status,
-    //             });
-    //             toast.success("Cập nhật thành công!");
-    //         } else {
-    //             await axiosInstance.post(`/delivery/create`, {
-    //                 address: formData.address,
-    //                 recipientName: formData.recipientName,
-    //                 recipientPhone: formData.recipientPhone,
-    //                 deliveryCost: formData.deliveryCost,
-    //                 idOrder: formData.idOrder,
-    //             });
-    //             toast.success("Thêm mới thành công!");
-    //         }
-
-    //         fetchData();
-    //         setModal(false);
-    //         resetForm();
-    //     } catch (error) {
-    //         console.error("Error:", error);
-    //         if (error.response) {
-    //             console.error("Response data:", error.response.data);
-    //             toast.error(error.response.data.message);
-    //         } else {
-    //             toast.error("Đã có lỗi xảy ra.");
-    //         }
-    //     }
-    // };
-
+  
 
     //delete
-    const deleteDiscount = (id) => {
+    const deletel = (id) => {
         if (window.confirm("Bạn có chắc chắn muốn xóa không?")) {
             axiosInstance.patch(`/delivery/delete/${id}`)
                 .then(response => {
@@ -225,7 +190,7 @@ const Delivery = () => {
                                                                 className="form-control-label"
                                                                 htmlFor="code"
                                                             >
-                                                                Mã Khuyến mại:
+                                                                Mã phiếu giao:
                                                             </label>
                                                             <Input
                                                                 className="form-control-alternative"
@@ -387,7 +352,7 @@ const Delivery = () => {
                                             <thead className="thead-light">
                                                 <tr>
                                                     <th scope="col">STT</th>
-                                                    <th scope="col">Mã hóa đơn</th>
+                                                    <th scope="col">Mã phiếu giao</th>
                                                     <th scope="col">Tên người nhận</th>
                                                     <th scope="col">Số điện thoại</th>
                                                     <th scope="col">Địa chỉ</th>
@@ -405,6 +370,7 @@ const Delivery = () => {
                                                     delivery.map((delivery, index) => (
                                                         <tr key={delivery.id}>
                                                             <td>{calculateIndex(index)}</td>
+                                                            <td>{delivery.codeDelivery}</td>
                                                             <td>{delivery.recipientName}</td>
                                                             <td>{delivery.recipientPhone}</td>
                                                             <td>{delivery.deliveryAddress}</td>
@@ -420,7 +386,7 @@ const Delivery = () => {
                                                             </td>
                                                             <td>
                                                                 <Button color="info" size="sm" onClick={() => handleRowClick(delivery.id)} disabled={delivery.status === -1}><FaEdit /></Button>
-                                                                <Button color="danger" size="sm" onClick={() => deleteDiscount(delivery.id)}><FaTrash /></Button>
+                                                                <Button color="danger" size="sm" onClick={() => deletel(delivery.id)}><FaTrash /></Button>
                                                             </td>
 
                                                         </tr>
