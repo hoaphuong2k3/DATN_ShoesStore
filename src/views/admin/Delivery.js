@@ -224,7 +224,7 @@ const Delivery = () => {
                                                 {value === 'yes' &&
                                                     <Row>
 
-                                                        <Col lg="2">
+                                                        <Col lg="4">
                                                             <FormGroup>
                                                                 <label
                                                                     className="form-control-label"
@@ -239,38 +239,15 @@ const Delivery = () => {
                                                                     onChange={(e) => setQueryParams({ ...queryParams, status: e.target.value })}
                                                                 >
                                                                     <option value="">Tất cả</option>
-                                                                    <option value="0">Kích hoạt</option>
-                                                                    <option value="1">Chờ kích hoạt</option>
+                                                                    <option value="-1">Đã hủy</option>
+                                                                    <option value="0">Chờ vận chuyển</option>
+                                                                    <option value="1">Đang vận chuyển</option>
+                                                                    <option value="2">Giao thành công</option>
                                                                 </Input>
                                                             </FormGroup>
                                                         </Col>
 
-                                                        <Col lg="5">
-                                                            <FormGroup>
-
-                                                                <Row>
-                                                                    <Col xl="6">
-                                                                        <label className="form-control-label">
-                                                                            Trị giá từ:
-                                                                        </label>
-                                                                        <Input
-                                                                            className="form-control-alternative"
-                                                                            type="number"
-                                                                        />
-                                                                    </Col>
-
-                                                                    <Col xl="6">
-                                                                        <label className="form-control-label">
-                                                                            đến:
-                                                                        </label>
-                                                                        <Input
-                                                                            className="form-control-alternative"
-                                                                            type="number"
-                                                                        />
-                                                                    </Col>
-                                                                </Row>
-                                                            </FormGroup>
-                                                        </Col>
+                                                      
                                                         <Col lg="5">
                                                             <FormGroup>
                                                                 <Row>
