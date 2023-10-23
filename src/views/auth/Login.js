@@ -49,10 +49,14 @@ const Login = () => {
       } else if (authorities.some((authority) => authority.authority === "USER")) {
         navigate("/shoes");
       } else {
-        // Xử lý cho các vai trò khác (nếu cần)
         navigate("/");
       }
-    } catch (err) {
+    } catch (error) {
+      
+      if (error.response) {
+          console.error("Response data:", error.response.data);
+          toast.error(error.response.data.message);
+      }
       toast.error("Đăng nhập thất bại.");
     }
   };
