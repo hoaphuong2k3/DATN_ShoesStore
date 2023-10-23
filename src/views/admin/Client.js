@@ -190,8 +190,6 @@ const Client = () => {
       username: response.data.username,
       gender: response.data.gender,
       dateOfBirth: response.data.dateOfBirth,
-      updatedTime: response.data.updatedTime,
-      createdTime: response.data.createdTime
     });
     console.log(editClient);
     toggleEdit();
@@ -218,9 +216,11 @@ const Client = () => {
   //Kết thúc hàm update
 
   //Xử lý địa chỉ
+  const [idClient, setIdClient] = useState(null);
   const [modalAdress, setModalAdress] = useState(false);
-  const toggleEdit = () => setModalEdit(!modalEdit);
+  const toggleAdress = () => setModalAdress(!modalAdress);
   const onClickListAdress = async (id) => {
+    setIdClient(id);
     const response = await detailClient(id);
     setEditClient({
       id: id,
@@ -235,7 +235,25 @@ const Client = () => {
       createdTime: response.data.createdTime
     });
     console.log(editClient);
-    toggleEdit();
+    toggleAdress();
+  };
+  const handleCityChange = (e) => {
+    const selectedCity = e.target.value;
+    setSelectedCity(selectedCity);
+    const selectedProvince = provinces.find((province) => province.name === selectedCity);
+    const districts = selectedProvince.districts;
+  };
+  const handleDistrictChange = (e) => {
+    const selectedDistrict = e.target.value;
+    setSelectedDistrict(selectedDistrict);
+    const selectedProvince = provinces.find((province) => province.name === selectedCity);
+    const selectedDistrictObj = selectedProvince.districts.find((district) => district.name === selectedDistrict);
+    const wards = selectedDistrictObj.wards;
+  };
+
+  const handleWardChange = (e) => {
+    const selectedWard = e.target.value;
+    setSelectedWard(selectedWard);
   };
   //Kết thúc xử lý địa chỉ
 
@@ -250,7 +268,7 @@ const Client = () => {
               <CardBody className="bg-transparent">
                 <Row className="align-items-center">
                   <div className="col">
-                    <h3 className="mb-0">Nhân viên</h3>
+                    <h3 className="mb-0">Khách hàng</h3>
                   </div>
                   <div className="col text-right">
                     <Button
@@ -861,48 +879,28 @@ const Client = () => {
       {/* Kết thúc modal sửa */}
       {/* Modal Địa chỉ */}
       <Modal
-        isOpen={modalEdit}
-        toggle={toggleEdit}
+        isOpen={modalAdress}
+        toggle={toggleAdress}
         backdrop={'static'}
         keyboard={false}
-        style={{ maxWidth: '900px' }}
+        style={{ maxWidth: '500px' }}
       >
-        <ModalHeader toggle={toggleEdit}>
-          <h3 className="heading-small text-muted mb-0">Cập Nhật Thông Tin Khách Hàng</h3>
+        <ModalHeader toggle={toggleAdress}>
+          <h3 className="heading-small text-muted mb-0">Địa chỉ khách hàng</h3>
         </ModalHeader>
         <ModalBody>
           <Form>
             <div className="pl-lg-4">
-              <Row>
-                <Col lg="12" className="text-center">
-                  <img src={`https://s3-ap-southeast-1.amazonaws.com/imageshoestore`} alt="Ảnh mô tả" />
-                </Col>
-              </Row>
-              <Row>
 
-                <Col lg="6">
+              <Row>
+                <Col lg="12">
                   <FormGroup>
                     <label className="form-control-label">
-                      Tên đăng nhập
+                      Chi tiết địa chỉ
                     </label>
                     <Input
                       className="form-control-alternative"
-                      type="text"
-                      name="username"
-                      value={editClient.username}
-                      disabled
-                    />
-                  </FormGroup>
-                </Col>
-
-                <Col lg="6">
-                  <FormGroup>
-                    <label className="form-control-label">
-                      Họ tên
-                    </label>
-                    <Input
-                      className="form-control-alternative"
-                      type="text"
+                      type="textarea"
                       name="fullname"
                       value={editClient.fullname}
                       onChange={onInputChangeDataUpdate}
@@ -911,77 +909,75 @@ const Client = () => {
                 </Col>
                 <Col lg="6">
                   <FormGroup>
-                    <label className="form-control-label">
-                      Email
+                    <label className="form-control-label" htmlFor="input-city">
+                      Tỉnh / Thành
                     </label>
                     <Input
                       className="form-control-alternative"
-                      type="text"
-                      name="email"
-                      value={editClient.email}
-                      onChange={onInputChangeDataUpdate}
-                    />
+                      type="select"
+                      value={selectedCity}
+                      onChange={handleCityChange}
+                    >
+                      <option value="">Chọn Tỉnh / Thành</option>
+                      {provinces.map((province) => (
+                        <option key={province.code} value={province.name}>
+                          {province.name}
+                        </option>
+                      ))}
+                    </Input>
+                  </FormGroup>
+                </Col>
+                <Col lg="6">
+                  <FormGroup>
+                    <label className="form-control-label" htmlFor="input-country">
+                      Quận / Huyện
+                    </label>
+                    <Input
+                      className="form-control-alternative"
+                      type="select"
+                      value={selectedDistrict}
+                      onChange={handleDistrictChange}
+                      disabled={!selectedCity}
+                    >
+                      <option value="">Chọn Quận / Huyện</option>
+                      {selectedCity &&
+                        provinces
+                          .find((province) => province.name === selectedCity)
+                          .districts.map((district) => (
+                            <option key={district.code} value={district.name}>
+                              {district.name}
+                            </option>
+                          ))}
+                    </Input>
                   </FormGroup>
                 </Col>
                 <Col lg="6">
                   <FormGroup>
                     <label className="form-control-label">
-                      Số điện thoại
+                      Phường / Xã
                     </label>
                     <Input
                       className="form-control-alternative"
-                      type="text"
-                      name="phoneNumber"
-                      value={editClient.phoneNumber}
-                      onChange={onInputChangeDataUpdate}
-                    />
+                      type="select"
+                      value={selectedWard}
+                      onChange={handleWardChange}
+                      disabled={!selectedDistrict}
+                    >
+                      <option value="">Chọn Phường / Xã</option>
+                      {selectedDistrict &&
+                        provinces
+                          .find((province) => province.name === selectedCity)
+                          .districts.find((district) => district.name === selectedDistrict)
+                          .wards.map((ward) => (
+                            <option key={ward.code} value={ward.name}>
+                              {ward.name}
+                            </option>
+                          ))}
+                    </Input>
                   </FormGroup>
                 </Col>
-                <Col lg="6">
-                  <FormGroup>
-                    <label className="form-control-label">
-                      Giới tính
-                    </label>
-                    <div style={{ display: "flex" }}>
-                      <div className="custom-control custom-radio">
-                        <Input
-                          className="custom-control-alternative"
-                          id="nam"
-                          name="gender"
-                          type="radio"
-                          value={false}
-                          checked={editClient.gender === false}
-                          onClick={(e) => onInputChangeDataUpdate(e)}
-                        />Nam
-                      </div>
-                      <div className="custom-control custom-radio">
-                        <Input
-                          className="custom-control-alternative"
-                          id="nu"
-                          name="gender"
-                          type="radio"
-                          value={true}
-                          checked={editClient.gender === true}
-                          onClick={(e) => onInputChangeDataUpdate(e)}
-                        />Nữ
-                      </div>
-                    </div>
-                  </FormGroup>
-                </Col>
-                <Col lg="6">
-                  <FormGroup>
-                    <label className="form-control-label">
-                      Ngày sinh
-                    </label>
-                    <Input
-                      className="form-control-alternative"
-                      type="date"
-                      name="dateOfBirth"
-                      value={editClient.dateOfBirth}
-                      onChange={onInputChangeDataUpdate}
-                    />
-                  </FormGroup>
-                </Col>
+
+
               </Row>
             </div>
           </Form>
@@ -994,7 +990,7 @@ const Client = () => {
             <Button color="primary" >
               Reset
             </Button>
-            <Button color="danger" onClick={toggleEdit} >
+            <Button color="danger" onClick={toggleAdress} >
               Close
             </Button>
           </div>
