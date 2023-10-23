@@ -428,7 +428,6 @@ const Delivery = () => {
                                     >
                                         <ModalHeader toggle={toggle}>
                                             <h3 className="heading-small text-muted mb-0">{formData.id ? 'Cập Nhật Phiếu giao' : 'Thêm Mới Phiếu giao'}</h3>
-
                                         </ModalHeader>
                                         <ModalBody>
                                             <Form>

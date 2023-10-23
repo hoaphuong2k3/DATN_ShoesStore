@@ -37,9 +37,9 @@ const Login = () => {
         rememberMe: rememberMe === "on",
       });
 
-      const { id, token, authorities } = response.data;
+      const { id, token, authorities, userId } = response.data;
 
-      login({ id, token, authorities }); // Lưu ID, token và vai trò người dùng vào Context
+      login({ id, token, authorities, userId }); // Lưu ID, token và vai trò người dùng vào Context
 
       toast.success("Đăng nhập thành công!");
 

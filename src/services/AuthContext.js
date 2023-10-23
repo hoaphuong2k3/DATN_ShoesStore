@@ -8,11 +8,11 @@ export const AuthProvider = ({ children }) => {
 
   const login = (userData) => {
 
-    const { id, token } = userData;
+    const { id, token, userId } = userData;
     setUser({ id, ...userData });
     setToken(token);
     localStorage.setItem('token', token);
-    // localStorage.setItem('username', username); // Lưu username vào localStorage hoặc cookie (nếu cần)
+    localStorage.setItem('userId', userId);
   };
 
   const logout = () => {

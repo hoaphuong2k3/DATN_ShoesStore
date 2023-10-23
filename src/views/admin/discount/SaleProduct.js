@@ -34,9 +34,6 @@ const SaleProduct = () => {
     const [page, setPage] = useState(0);
     const [size, setSize] = useState(10);
 
-    const { id } = useParams();
-    const [shoesDetail, setListShoesDetail] = useState([]);
-    
     const [queryParams, setQueryParams] = useState({
         page: 0,
         size: 5,
@@ -69,22 +66,6 @@ const SaleProduct = () => {
         createdBy: ""
     });
 
-    const [search2, setSearch2] = useState({
-        code: "",
-        sizeId: null,
-        colorId: null,
-        fromQuantity: null,
-        toQuantity: null,
-        fromPrice: null,
-        toPrice: null,
-        status: null,
-        fromDateStr: "",
-        toDateStr: "",
-        createdBy: "",
-        fromDate: "",
-        toDate: ""
-    });
-
     //loads table
     const getAll = async (page, size) => {
         try {
@@ -96,29 +77,9 @@ const SaleProduct = () => {
             console.error("Lỗi khi lấy dữ liệu:", error);
         }
     }
-
     useEffect(() => {
         getAll(page, size);
     }, [search]);
-
-    const getDetail = async () => {
-        try {
-            let res = await getAllShoesDetail(id, search2);
-            if (res && res.data && res.data.content) {
-                setListShoesDetail(res.data.content);
-                
-            }
-        } catch (error) {
-            console.error("Lỗi khi lấy dữ liệu:", error);
-        }
-    }
-    useEffect(() => {
-        getDetail();
-    }, [search2]);
-
-    useEffect(() => {
-        getDetail();
-    });
 
     const handleSelectAll = () => {
         setSelectAll(!selectAll);
@@ -841,7 +802,6 @@ const SaleProduct = () => {
                                                 <FormGroup check>
                                                     <Input type="checkbox" />
                                                 </FormGroup>
-
                                             </th>
                                             <th scope="col">Mã</th>
                                             <th scope="col">Size</th>
@@ -852,31 +812,19 @@ const SaleProduct = () => {
                                         </tr>
                                     </thead>
                                     <tbody>
-
-                                        {Array.isArray(shoesDetail) &&
-                                            shoesDetail.map((detail, index) => {
-                                                const matchedShoes = selectedShoesIds.includes(detail.shoesId);
-                                                const selectedShoes = listShoes.find(shoes => shoes.id === detail.shoesId);
-                                            
-                                                if (matchedShoes && selectedShoes) {
-                                                    return (
-                                                        <tr key={detail.id}>
-                                                            <td className="text-center">
-                                                                <FormGroup check>
-                                                                    <Input type="checkbox" />
-                                                                </FormGroup>
-                                                            </td>
-                                                            <td>{detail.code}</td>
-                                                            <td>{detail.name}</td>
-                                                        </tr>
-                                                    );
-                                                } else {
-                                                    return null;
-                                                }
-                                            
-                                            })}
-
-
+                                        <tr>
+                                            <td className="text-center">
+                                                <FormGroup check>
+                                                    <Input type="checkbox" />
+                                                </FormGroup>
+                                            </td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                        </tr>
                                     </tbody>
                                 </Table>
                                 <div className="pagination-container" style={{ fontSize: 8 }}>
