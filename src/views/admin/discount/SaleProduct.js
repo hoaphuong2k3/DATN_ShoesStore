@@ -843,13 +843,12 @@ const SaleProduct = () => {
                                                 </FormGroup>
 
                                             </th>
-                                            <th scope="col">Mã sản phẩm</th>
-                                            <th scope="col">Tên sản phẩm</th>
+                                            <th scope="col">Mã</th>
+                                            <th scope="col">Size</th>
+                                            <th scope="col">Màu</th>
                                             <th scope="col">Giá gốc</th>
                                             <th scope="col">Giá mới</th>
                                             <th scope="col">Trạng thái</th>
-
-
                                         </tr>
                                     </thead>
                                     <tbody>

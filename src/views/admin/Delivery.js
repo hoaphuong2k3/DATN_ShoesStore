@@ -4,7 +4,8 @@ import ReactPaginate from "react-paginate";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import axiosInstance from "services/custommize-axios";
-import "assets/css/pagination.css";
+import { format, parseISO } from 'date-fns';
+import { vi } from 'date-fns/locale';
 // reactstrap components
 import Switch from 'react-input-switch';
 import { Card, CardHeader, CardBody, Container, Row, Col, Form, FormGroup, Input, Button, Table, Modal, ModalBody, ModalFooter, ModalHeader, Badge } from "reactstrap";
@@ -76,7 +77,7 @@ const Delivery = () => {
             page: 0,
             size: 5,
             status: "",
-            code:"",
+            code: "",
         });
     };
 
@@ -138,7 +139,7 @@ const Delivery = () => {
             }
         }
     };
-  
+
 
     //delete
     const deletel = (id) => {
@@ -247,7 +248,7 @@ const Delivery = () => {
                                                             </FormGroup>
                                                         </Col>
 
-                                                      
+
                                                         <Col lg="5">
                                                             <FormGroup>
                                                                 <Row>
@@ -353,8 +354,9 @@ const Delivery = () => {
                                                             <td>{delivery.deliveryAddress}</td>
                                                             <td>{delivery.deliveryCost}</td>
                                                             <td>{delivery.shipDate}</td>
-                                                            <td>{delivery.createdTime}</td>
-                                                            <td>{delivery.updatedTime}</td>
+                                                            <td>{format(new Date(delivery.createdTime), 'yyyy-MM-dd HH:mm', { locale: vi })}</td>
+                                                            <td>{format(new Date(delivery.updatedTime), 'yyyy-MM-dd HH:mm', { locale: vi })}</td>
+                                                            
 
                                                             <td>
                                                                 <Badge color={statusMapping[delivery.status]?.color || statusMapping.default.color}>
