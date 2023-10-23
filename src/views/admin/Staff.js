@@ -782,7 +782,7 @@ const Staff = () => {
                             placeholder="Số nhà ....."
                             rows="4"
                             type="textarea"
-                            // value={formData.address}
+                            value={formData.address.addressDetail}
                             onChange={(e) =>
                               setFormData({
                                 ...formData,
