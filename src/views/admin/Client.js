@@ -5,7 +5,7 @@ import { Card, CardHeader, CardBody, Container, Row, Col, Form, FormGroup, Input
 import Select from "react-select";
 import ReactPaginate from 'react-paginate';
 import { getAllClient, postNewClient, detailClient, updateClient, deleteClient } from "services/ClientService";
-import { FaEdit, FaTrash } from 'react-icons/fa';
+import { FaEdit, FaTrash, FaSearch, FaFileAlt } from 'react-icons/fa';
 import Header from "components/Headers/Header.js";
 import Switch from 'react-input-switch';
 import { toast } from 'react-toastify';
@@ -52,26 +52,23 @@ const Client = () => {
     dateOfBirth: null,
     email: null,
     phoneNumber: null,
-    isDeleted: false
   })
   const resetSearch = () => {
     setSearch({
-      fullname: null,
+      fullname: "",
       gender: false,
-      dateOfBirth: null,
-      email: null,
-      phoneNumber: null,
-      isDeleted: false
+      dateOfBirth: "",
+      email: "",
+      phoneNumber: "",
     });
   };
   const onInputChangeSearch = (e) => {
     setSearch({ ...search, [e.target.name]: e.target.value });
   }
-  const getSearchAll = () => {
-    getAll();
-  }
+
   useEffect(() => {
-    console.log()
+    console.log(search)
+    getAll();
   }, [search]);
   //Page, Size
   const handlePageClick = (event) => {
@@ -263,342 +260,283 @@ const Client = () => {
       {/* Page content */}
       <Container className="mt--7" fluid>
         <Row>
-          <Col md="12">
-            <Card className="shadow">
-              <CardBody className="bg-transparent">
-                <Row className="align-items-center">
-                  <div className="col">
-                    <h3 className="mb-0">Khách hàng</h3>
-                  </div>
-                  <div className="col text-right">
-                    <Button
-                      color="primary"
-                      onClick={toggle}
-                      size="sm">
-                      Thêm
-                    </Button>
-                    <Button
-                      color="primary"
-                      onClick={(e) => e.preventDefault()}
-                      size="sm">
-                      Cập nhật
-                    </Button>
-                    <Button
-                      color="primary"
-                      onClick={(e) => e.preventDefault()}
-                      size="sm">
-                      Xóa
-                    </Button>
-                    <Button
-                      color="primary"
-                      onClick={(e) => e.preventDefault()}
-                      size="sm">
-                      Mới
-                    </Button>
-                  </div>
-                </Row>
-              </CardBody>
-            </Card>
-          </Col>
-        </Row>
-        <Row className="mb-4 mt-4">
-          <Col className="mb-5 mb-xl-0" xl="12">
-            <Card>
-              <CardBody>
-                <Row>
-                  <div className="col">
-                    <CardTitle
-                      tag="h5"
-                      className="text-uppercase text-muted mb-0"
-                    >
-                      <h3>Tìm kiếm</h3>
-                    </CardTitle>
-
-                  </div>
-                  <Col className="col-auto">
-                    <div className="icon icon-shape bg-danger text-white rounded-circle shadow">
-                      <i className="fas fa-chart-bar" />
+          <Col>
+            <div className="col">
+              <Card className="shadow">
+                <CardHeader className="bg-transparent m-2">
+                  <Row className="align-items-center">
+                    <div className="col">
+                      <h3 className="mb-0">Nhân Viên</h3>
                     </div>
-                  </Col>
-                </Row>
-                <Form>
-                  <div className="pl-lg-4">
-                    <Row>
-                      <Col lg="6">
-                        <FormGroup>
-                          <label
-                            className="form-control-label"
-                            htmlFor="input-username"
-                          >
-                            Tên
-                          </label>
-                          <Input
-                            className="form-control-alternative"
-                            id="input-username"
-                            placeholder="Nhập tên"
-                            type="text"
-                            name="fullname"
-                            value={search.fullname}
-                            onChange={(e) => onInputChangeSearch(e)}
-                          />
-                        </FormGroup>
-                      </Col>
-                      <Col lg="6">
-                        <FormGroup>
-                          <label
-                            className="form-control-label"
-                            htmlFor="input-email"
-                          >
-                            Số điên thoại
-                          </label>
-                          <Input
-                            className="form-control-alternative"
-                            id="input-email"
-                            placeholder="Nhập số điện thoại"
-                            type="text"
-                            name="phoneNumber"
-                            value={search.phoneNumber}
-                            onChange={(e) => onInputChangeSearch(e)}
-                          />
-                        </FormGroup>
-                      </Col>
-                    </Row>
-
-                    {value === 'yes' &&
+                  </Row>
+                </CardHeader>
+                <CardBody className="m-2">
+                  <Row className="align-items-center">
+                    <FaSearch className="ml-3" />
+                    <h3 className="heading-small text-black mb-0 ml-2">Tìm kiếm</h3>
+                  </Row>
+                  <hr className="my-4" />
+                  <Form className="search">
+                    <div className="pl-lg-4">
                       <Row>
                         <Col lg="6">
                           <FormGroup>
-                            <label className="form-control-label">
-                              Giới tính
+                            <label
+                              className="form-control-label"
+                              htmlFor="input-username"
+                            >
+                              Tên
                             </label>
-                            <div style={{ display: "flex" }}>
-                              <div className="custom-control custom-radio">
-                                <Input
-                                  className="custom-control-alternative"
-                                  id="nam"
-                                  name="gender"
-                                  type="radio"
-                                  value={false}
-                                  checked={search.gender === false}
-                                  onClick={(e) => onInputChangeSearch(e)}
-                                />Nam
-                              </div>
-                              <div className="custom-control custom-radio">
-                                <Input
-                                  className="custom-control-alternative"
-                                  id="nu"
-                                  name="gender"
-                                  type="radio"
-                                  value={true}
-                                  checked={search.gender === true}
-                                  onClick={(e) => onInputChangeSearch(e)}
-                                />Nữ
-                              </div>
-                            </div>
+                            <Input
+                              className="form-control-alternative"
+                              id="input-username"
+                              placeholder="Nhập tên"
+                              type="text"
+                              name="fullname"
+                              value={search.fullname}
+                              onChange={(e) => onInputChangeSearch(e)}
+                            />
                           </FormGroup>
                         </Col>
                         <Col lg="6">
                           <FormGroup>
                             <label
                               className="form-control-label"
-                              htmlFor="input-city"
+                              htmlFor="input-email"
                             >
-                              Thành Phố / Tỉnh
+                              Số điên thoại
                             </label>
                             <Input
                               className="form-control-alternative"
-                              type="select"
-                              value={selectedCity}
+                              id="input-email"
+                              placeholder="Nhập số điện thoại"
+                              type="text"
+                              name="phoneNumber"
+                              value={search.phoneNumber}
                               onChange={(e) => onInputChangeSearch(e)}
-                            >
-                              <option value="">Chọn Thành Phố/Tỉnh</option>
-                              {provinces.map((province) => (
-                                <option key={province.code} value={province.name}>
-                                  {province.name}
-                                </option>
-                              ))}
-                            </Input>
-
-
+                            />
                           </FormGroup>
                         </Col>
-
                       </Row>
-                    }
-                  </div>
-                </Form>
+
+                      {value === 'yes' &&
+                        <Row>
+                          <Col lg="6">
+                            <FormGroup>
+                              <label className="form-control-label">
+                                Giới tính
+                              </label>
+                              <div style={{ display: "flex" }}>
+                                <div className="custom-control custom-radio">
+                                  <Input
+                                    className="custom-control-alternative"
+                                    id="nam"
+                                    name="gender"
+                                    type="radio"
+                                    value={false}
+                                    checked={search.gender === false || search.gender === 'false'}
+                                    onClick={(e) => onInputChangeSearch(e)}
+                                  />Nam
+                                </div>
+                                <div className="custom-control custom-radio">
+                                  <Input
+                                    className="custom-control-alternative"
+                                    id="nu"
+                                    name="gender"
+                                    type="radio"
+                                    value={true}
+                                    checked={search.gender === true || search.gender === 'true'}
+                                    onClick={(e) => onInputChangeSearch(e)}
+                                  />Nữ
+                                </div>
+                              </div>
+                            </FormGroup>
+                          </Col>
+                          <Col lg="6">
+                            <FormGroup>
+                              <label
+                                className="form-control-label"
+                                htmlFor="input-city"
+                              >
+                                Thành Phố / Tỉnh
+                              </label>
+                              <Input
+                                className="form-control-alternative"
+                                type="select"
+                                value={selectedCity}
+                                onChange={(e) => onInputChangeSearch(e)}
+                              >
+                                <option value="">Chọn Thành Phố/Tỉnh</option>
+                                {provinces.map((province) => (
+                                  <option key={province.code} value={province.name}>
+                                    {province.name}
+                                  </option>
+                                ))}
+                              </Input>
 
 
+                            </FormGroup>
+                          </Col>
 
-
-                <Row className="mt-2">
-                  <Col lg="6" xl="4" >
-                    <span>
-                      <Switch on="yes" off="no" value={value} onChange={setValue} />
-
-                      <span>
-                        &nbsp;&nbsp;
-                        Tìm kiếm nâng cao
-                        &nbsp;&nbsp;
-                      </span>
-                    </span>
-                  </Col>
-                  <Col lg="6" xl="8">
-                    <Button color="warning" onClick={() => getSearchAll()}>
-                      <i class="fa-solid fa-magnifying-glass" /> &nbsp;
-                      Tìm kiếm
-                    </Button>
-                    <Button color="primary" onClick={resetSearch}>
-                      Làm mới bộ lọc
-                    </Button>
-                  </Col>
-                </Row>
-
-                {/* end row find  productAttrinutes*/}
-              </CardBody>
-            </Card>
-          </Col>
-        </Row>
-
-        <Row style={{ marginTop: "20px" }} >
-          <Col md="12" className="pl-lg-4">
-            <Card className="shadow">
-              <CardHeader className="border-0">
-                <Row className="align-items-center">
-                  <div className="col">
-                    <h3 className="mb-0">Danh sách</h3>
-                  </div>
-                  <div className="col text-right" style={{ display: "flex" }}>
-                    <Button
-                      color="primary"
-                      onClick={(e) => e.preventDefault()}
-                      size="sm"
-                    >
-                      Import
-                    </Button>
-                    <Button
-                      color="primary"
-                      onClick={(e) => e.preventDefault()}
-                      size="sm"
-                    >
-                      Export
-                    </Button>
-
-                  </div>
-                </Row>
-              </CardHeader>
-              <Table className="align-items-center table-flush" responsive>
-                <thead className="thead-light">
-                  <tr>
-                    <th className="text-center pb-4" >
-                      <FormGroup check>
-                        <Input type="checkbox" />
-                      </FormGroup>
-
-                    </th>
-                    <th scope="col">STT</th>
-                    <th scope="col">Họ tên</th>
-                    <th scope="col">Email</th>
-                    <th scope="col">Số điện thoại</th>
-                    <th scope="col">Giới tính</th>
-                    <th scope="col">Ngày sinh</th>
-                    <th scope="col">Trạng thái</th>
-                    <th scope="col">Thao tác</th>
-
-                  </tr>
-                </thead>
-                <tbody>
-                  {listClient.length <= 0 &&
-                    <th className="text-center" colSpan={17}>
-                      Không có dữ liệu
-                    </th>
-                  }
-                  {Array.isArray(listClient) && listClient.map((item, index) => (
-
-                    <tr key={item.id}>
-                      <th className="text-center pb-4" >
-                        <FormGroup check>
-                          <Input type="checkbox" />
-                        </FormGroup>
-
-                      </th>
-                      <td className="text-center">{index + 1}</td>
-                      <td>{item.fullname}</td>
-                      <td>{item.email}</td>
-                      <td>{item.phoneNumber}</td>
-                      <td className="text-center">{item.gender ? "Nữ" : "Nam"}</td>
-                      <td>{item.dateOfBirth}</td>
-                      <td></td>
-
-
-                      <td>
-                        <Button color="info" size="sm" onClick={() => handleRowClick(item.id)}>
-                          <FaEdit />
-                        </Button>
-                        <Button color="danger" size="sm" onClick={() => onClickDeleteClient(item.id)}>
-                          <FaTrash />
-                        </Button>
-                        <Button color="danger" size="sm" onClick={() => onClickListAdress(item.id)}>
-                          <i class="fa-regular fa-address-book"></i>
-                        </Button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </Table>
-
-
-              <CardFooter>
-                <Row className="mt-4">
-                  <Col lg={6}>
-                    <div style={{ fontSize: 14 }}>
-                      Đang xem <b>1</b> đến <b>{totalElements < size ? totalElements : size}</b> trong tổng số <b>{totalElements}</b> mục
+                        </Row>
+                      }
                     </div>
-                  </Col>
-                  <Col style={{ fontSize: 14 }} lg={2}>
-                    <Row>
-                      <span>Xem </span>&nbsp;
-                      <span>
-                        <Input type="select" name="status" style={{ width: "60px", fontSize: 14 }} size="sm" onChange={(e) => onChangeSize(e)} className="mt--1">
-                          <option value="5">5</option>
-                          <option value="10">10</option>
-                          <option value="25">25</option>
-                          <option value="50">50</option>
-                          <option value="100">100</option>
-                        </Input>
-                      </span>&nbsp;
-                      <span> mục</span>
-                    </Row>
+                  </Form>
 
-                  </Col>
-                  <Col lg={4} style={{ fontSize: 11 }} className="mt--1">
-                    <ReactPaginate
-                      breakLabel="..."
-                      nextLabel=">"
-                      pageRangeDisplayed={2} // Number of pages to display on each side of the selected page
-                      pageCount={totalPages} // Total number of pages
-                      previousLabel="<"
-                      onPageChange={handlePageClick}
-                      renderOnZeroPageCount={null}
-                      pageClassName="page-item"
-                      pageLinkClassName="page-link"
-                      previousClassName="page-item"
-                      previousLinkClassName="page-link"
-                      nextClassName="page-item"
-                      nextLinkClassName="page-link"
-                      breakClassName="page-item"
-                      breakLinkClassName="page-link"
-                      containerClassName="pagination"
-                      activeClassName="active"
-                      marginPagesDisplayed={1}
-                    />
-                  </Col>
-                </Row>
-              </CardFooter>
-            </Card>
+                  <Row className="mt-2 ml-2">
+                    <Col lg="6" xl="6">
+                      <span>
+                        <Switch on="yes" off="no" value={value} onChange={setValue} />
+                        <span className="mb-3">
+                          &nbsp;&nbsp;
+                          Tìm kiếm nâng cao
+                          &nbsp;&nbsp;
+                        </span>
+                      </span>
+                    </Col>
+                    <Col lg="6" xl="6" className="d-flex justify-content-end">
+                      <Button color="warning" size="sm" onClick={resetSearch}>
+                        Làm mới bộ lọc
+                      </Button>
+                    </Col>
+                  </Row>
+
+
+                  <hr className="my-4" />
+
+                  <Row className="align-items-center my-4">
+                    <div className="col" style={{ display: "flex" }}>
+
+                      <h3 className="heading-small text-black mb-0"><FaFileAlt size="16px" className="mr-1" />Danh sách</h3>
+                    </div>
+                    <div className="col text-right">
+                      <Button
+                        color="primary"
+                        onClick={toggle}
+                        size="sm"
+                      >
+                        + Thêm mới
+                      </Button>
+                    </div>
+
+                  </Row>
+                  <Table className="align-items-center table-flush" responsive>
+                    <thead className="thead-light">
+                      <tr>
+                        <th className="text-center pb-4" >
+                          <FormGroup check>
+                            <Input type="checkbox" />
+                          </FormGroup>
+
+                        </th>
+                        <th scope="col">STT</th>
+                        <th scope="col">Họ tên</th>
+                        <th scope="col">Email</th>
+                        <th scope="col">Số điện thoại</th>
+                        <th scope="col">Giới tính</th>
+                        <th scope="col">Ngày sinh</th>
+                        <th scope="col">Trạng thái</th>
+                        <th scope="col">Thao tác</th>
+
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {listClient.length <= 0 &&
+                        <th className="text-center" colSpan={17}>
+                          Không có dữ liệu
+                        </th>
+                      }
+                      {Array.isArray(listClient) && listClient.map((item, index) => (
+
+                        <tr key={item.id}>
+                          <th className="text-center pb-4" >
+                            <FormGroup check>
+                              <Input type="checkbox" />
+                            </FormGroup>
+
+                          </th>
+                          <td className="text-center">{index + 1}</td>
+                          <td>{item.fullname}</td>
+                          <td>{item.email}</td>
+                          <td>{item.phoneNumber}</td>
+                          <td className="text-center">{item.gender ? "Nữ" : "Nam"}</td>
+                          <td>{item.dateOfBirth}</td>
+                          <td></td>
+
+
+                          <td>
+                            <Button color="info" size="sm" onClick={() => handleRowClick(item.id)}>
+                              <FaEdit />
+                            </Button>
+                            <Button color="danger" size="sm" onClick={() => onClickDeleteClient(item.id)}>
+                              <FaTrash />
+                            </Button>
+                            <Button color="danger" size="sm" onClick={() => onClickListAdress(item.id)}>
+                              <i class="fa-regular fa-address-book"></i>
+                            </Button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </Table>
+
+                  {/* Hiển thị thanh phân trang */}
+                  <Row className="mt-4">
+                    <Col lg={6}>
+                      <div style={{ fontSize: 14 }}>
+                        Đang xem <b>1</b> đến <b>{totalElements < size ? totalElements : size}</b> trong tổng số <b>{totalElements}</b> mục
+                      </div>
+                    </Col>
+                    <Col style={{ fontSize: 14 }} lg={2}>
+                      <Row>
+                        <span>Xem </span>&nbsp;
+                        <span>
+                          <Input type="select" name="status" style={{ width: "60px", fontSize: 14 }} size="sm" onChange={(e) => onChangeSize(e)} className="mt--1">
+                            <option value="5">5</option>
+                            <option value="10">10</option>
+                            <option value="25">25</option>
+                            <option value="50">50</option>
+                            <option value="100">100</option>
+                          </Input>
+                        </span>&nbsp;
+                        <span> mục</span>
+                      </Row>
+
+                    </Col>
+                    <Col lg={4} style={{ fontSize: 11 }} className="mt--1">
+                      <ReactPaginate
+                        breakLabel="..."
+                        nextLabel=">"
+                        pageRangeDisplayed={2} // Number of pages to display on each side of the selected page
+                        pageCount={totalPages} // Total number of pages
+                        previousLabel="<"
+                        onPageChange={handlePageClick}
+                        renderOnZeroPageCount={null}
+                        pageClassName="page-item"
+                        pageLinkClassName="page-link"
+                        previousClassName="page-item"
+                        previousLinkClassName="page-link"
+                        nextClassName="page-item"
+                        nextLinkClassName="page-link"
+                        breakClassName="page-item"
+                        breakLinkClassName="page-link"
+                        containerClassName="pagination"
+                        activeClassName="active"
+                        marginPagesDisplayed={1}
+                      />
+                    </Col>
+                  </Row>
+                </CardBody>
+              </Card>
+            </div>
+
+
+
           </Col>
         </Row>
-      </Container >
+      </Container>
+      {/*  */}
+
       <Modal
         isOpen={modalAdd}
         toggle={toggle}
@@ -726,7 +664,7 @@ const Client = () => {
             <Button color="danger" onClick={(e) => onAddClient(e)}>
               Thêm
             </Button>{' '}
-            <Button color="primary" >
+            <Button color="primary" onClick={resetClient}>
               Reset
             </Button>
             <Button color="danger" onClick={toggle} >
@@ -826,7 +764,7 @@ const Client = () => {
                           name="gender"
                           type="radio"
                           value={false}
-                          checked={editClient.gender === false}
+                          checked={editClient.gender === 'false' || editClient.gender === false}
                           onClick={(e) => onInputChangeDataUpdate(e)}
                         />Nam
                       </div>
@@ -837,7 +775,7 @@ const Client = () => {
                           name="gender"
                           type="radio"
                           value={true}
-                          checked={editClient.gender === true}
+                          checked={editClient.gender === 'true' || editClient.gender === true}
                           onClick={(e) => onInputChangeDataUpdate(e)}
                         />Nữ
                       </div>
