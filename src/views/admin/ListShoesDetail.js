@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { findShoes } from "services/Product2Service";
 import { getAllShoesDetail } from "services/ShoesDetailService.js";
 import { Link } from "react-router-dom";
+import { saveAs } from 'file-saver';
 import { getAllColorId, getAllSizeId, getAllColor, getAllSize } from "services/ProductAttributeService";
 // reactstrap components
 import {
@@ -78,6 +79,7 @@ const ListShoesDetail = () => {
             let res = await getAllShoesDetail(id, search);
             if (res && res.data && res.data.content) {
                 setListShoesDetail(res.data.content);
+                console.log(ListShoesDetail);
                 // setListShoes
                 // setTotalUsers(res.total);
                 // setTotalPages(res.total_pages);
@@ -92,6 +94,8 @@ const ListShoesDetail = () => {
             setListShoesDetail([]);
         }
     }
+    useEffect(() => {
+    }, [ListShoesDetail]);
     useEffect(() => {
         console.log(search);
         getAll();
@@ -288,6 +292,36 @@ const ListShoesDetail = () => {
         getAll();
     };
     //End Hiển Thi Combobox
+
+    const exportExcel = async () => {
+        try {
+            const requestData = ListShoesDetail; // Dữ liệu trong ListShoesDetail
+            const res = await axios.post(`http://localhost:33321/api/admin/shoesdetail/export/excel`, requestData, {
+                responseType: 'blob',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            const blob = new Blob([res.data], { type: 'application/excel' });
+
+            // Tạo một URL cho Blob và tạo một thẻ a để download
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.style.display = 'none';
+            a.href = url;
+            a.download = 'shoes_export.xlsx';
+            document.body.appendChild(a);
+            a.click();
+
+            // Giải phóng tài nguyên
+            window.URL.revokeObjectURL(url);
+
+        } catch (error) {
+            console.error(error);
+        }
+    };
+    //End exportexcel
     return (
         <>
             <Header />
@@ -653,6 +687,7 @@ const ListShoesDetail = () => {
                                             <Button
                                                 className="btn btn-outline-primary"
                                                 size="sm"
+                                                onClick={exportExcel}
                                             >
                                                 Xuất Excel
                                             </Button>
