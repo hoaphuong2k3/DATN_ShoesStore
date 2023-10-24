@@ -359,7 +359,7 @@ const Staff = () => {
                                     value={false}
                                     // checked={search.gender === false || search.gender === 'false'}
                                     onChange={(e) => setQueryParams({ ...queryParams, phoneNumber: e.target.value })}
-                                    />Nam
+                                  />Nam
                                 </div>
                                 <div className="custom-control custom-radio">
                                   <Input
@@ -389,7 +389,7 @@ const Staff = () => {
                                 type="select"
                                 value={selectedCity}
                                 onChange={(e) => setQueryParams({ ...queryParams, phoneNumber: e.target.value })}
-                                >
+                              >
                                 <option value="">Chọn Thành Phố/Tỉnh</option>
                                 {provinces.map((province) => (
                                   <option key={province.code} value={province.name}>
@@ -442,6 +442,15 @@ const Staff = () => {
                   <Table className="align-items-center table-flush" responsive>
                     <thead className="thead-light">
                       <tr>
+                        {/* <th className="text-center pb-4">
+                          <FormGroup check>
+                            <Input
+                              type="checkbox"
+                              checked={selectAll}
+                              onChange={handleSelectAll}
+                            />
+                          </FormGroup>
+                        </th> */}
                         <th scope="col">STT</th>
                         <th scope="col">Họ tên</th>
                         <th scope="col">Ngày sinh</th>
@@ -458,6 +467,15 @@ const Staff = () => {
                       {Array.isArray(admins) && admins.length > 0 ? (
                         admins.map((admin, index) => (
                           <tr key={admin.id}>
+                            {/* <td className="text-center">
+                              <FormGroup check>
+                                <Input
+                                  type="checkbox"
+                                  checked={selectedShoesIds.includes(shoes.id)}
+                                  onChange={() => handleShoesCheckboxChange(shoes.id)}
+                                />
+                              </FormGroup>
+                            </td> */}
                             <td>{calculateIndex(index)}</td>
                             <td>{admin.fullname}</td>
                             <td>{admin.dateOfBirth}</td>
@@ -563,7 +581,7 @@ const Staff = () => {
                             type="text"
                             value={formData.username}
                             onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-                            disabled = {formData.id ? true : false}
+                            disabled={formData.id ? true : false}
                           />
                         </FormGroup>
                       </Col>
