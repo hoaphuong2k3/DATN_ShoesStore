@@ -805,9 +805,6 @@ const Client = () => {
             <Button color="danger" onClick={(e) => onUpdateClient(e)}>
               Sửa
             </Button>{' '}
-            <Button color="primary" >
-              Reset
-            </Button>
             <Button color="danger" onClick={toggleEdit} >
               Close
             </Button>
