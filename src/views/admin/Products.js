@@ -703,6 +703,29 @@ const Products = () => {
                   </div>
                 </Row>
                 {/*  */}
+                {/* <div class="row">
+                  <div class="col-sm-6 text-left">
+                  </div>
+                  <div class="col-sm-6 text-right">
+                    <div class="dt-buttons btn-group" style={{ fontSize: 11 }}>
+                      <button class="btn btn-primary buttons-print" tabindex="0" aria-controls="DataTables_Table_0" type="button" size="sm">
+                        <i class="fa-solid fa-plus"></i>
+                      </button>
+                      <button class="btn btn-primary buttons-copy buttons-html5" tabindex="0" aria-controls="DataTables_Table_0" type="button" size="sm">
+                        <span>Tải mẫu</span>
+                      </button>
+                      <button class="btn btn-primary buttons-excel buttons-html5" tabindex="0" aria-controls="DataTables_Table_0" type="button" size="sm">
+                        <span>Nhập<i class="fa-solid fa-file-excel" style={{color:"green"}}></i></span>
+                      </button>
+                      <button class="btn btn-primary buttons-csv buttons-html5" tabindex="0" aria-controls="DataTables_Table_0" type="button" size="sm">
+                        <span>Xuất<i class="fa-solid fa-file-excel" style={{color:"green"}}></i></span>
+                      </button>
+                      <button class="btn btn-primary buttons-pdf buttons-html5" tabindex="0" aria-controls="DataTables_Table_0" type="button" size="sm">
+                        <span>PDF</span>
+                      </button>
+                    </div>
+                  </div>
+                </div> */}
                 <Row>
                   <Table bordered dark hover responsive striped>
                     <thead>

@@ -11,9 +11,11 @@ import Statistical from "views/admin/Statistical.js";
 import AddProduct from "views/admin/AddProduct";
 import EditProduct from "views/admin/EditProduct";
 import DetailProducts from "views/admin/DetailProduct.js";
-import BillDetail from "views/admin/BillDetail.js"
-import ListShoesDetail from "views/admin/ListShoesDetail.js"
-import Discount from "views/admin/discount/Discount.js"
+import BillDetail from "views/admin/BillDetail.js";
+import ListShoesDetail from "views/admin/ListShoesDetail.js";
+import Discount from "views/admin/discount/Discount.js";
+import DeliveryOrders from "views/admin/DeliveryOrders";
+
 var routes = [
   {
     path: "/index",
@@ -29,6 +31,14 @@ var routes = [
     component: <Bills />,
     layout: "/admin",
   },
+  {
+    path: "/delivery-orders",
+    name: "Phiếu giao hàng",
+    icon: "ni ni-cart text-blue",
+    component: <DeliveryOrders />,
+    layout: "/admin",
+  },
+  
   {
     path: "/product",
     name: "Danh sách sản phẩm",

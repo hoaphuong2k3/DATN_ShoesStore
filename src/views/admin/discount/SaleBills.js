@@ -6,12 +6,12 @@ import "react-toastify/dist/ReactToastify.css";
 import axiosInstance from "services/custommize-axios";
 import { format, parseISO } from 'date-fns';
 import { vi } from 'date-fns/locale';
-import "assets/css/pagination.css";
+
 // reactstrap components
 import Switch from 'react-input-switch';
 import { Row, Col, Form, FormGroup, Input, Button, Table, Badge, Modal, ModalBody, ModalFooter, ModalHeader } from "reactstrap";
 
-const SaleProduct = () => {
+const SaleBills = () => {
 
     const [modal, setModal] = useState(false);
     const toggle = () => setModal(!modal);
@@ -296,14 +296,20 @@ const SaleProduct = () => {
                                             className="form-control-label"
                                             htmlFor="startDate"
                                         >
-                                            Trị giá giảm:
+                                            Hình thức:
                                         </label>
                                         <Input
                                             className="form-control-alternative"
-                                            type="number"
-                                        />
+                                            type="select"
+
+                                        >
+                                            <option>Tất cả</option>
+                                            <option>Tiền</option>
+                                            <option>Phần trăm</option>
+                                        </Input>
                                     </FormGroup>
                                 </Col>
+
                                 <Col lg="6">
                                     <FormGroup>
                                         <label
@@ -328,36 +334,65 @@ const SaleProduct = () => {
 
                                 <Col lg="6">
                                     <FormGroup>
-                                        <label
-                                            className="form-control-label"
-                                            htmlFor="startDate"
-                                        >
-                                            Từ ngày:
-                                        </label>
-                                        <Input
-                                            className="form-control-alternative"
-                                            id="startDate"
-                                            type="date"
-                                            value={queryParams.fromDate}
-                                            onChange={(e) => setQueryParams({ ...queryParams, fromDate: e.target.value })}
-                                        />
+
+                                        <Row>
+                                            <Col xl="6">
+                                                <label className="form-control-label">
+                                                   Trị giá hóa đơn từ:
+                                                </label>
+                                                <Input
+                                                    className="form-control-alternative"
+                                                    type="number"
+                                                />
+                                            </Col>
+
+                                            <Col xl="6">
+                                                <label className="form-control-label">
+                                                    đến:
+                                                </label>
+                                                <Input
+                                                    className="form-control-alternative"
+                                                    type="number"
+                                                />
+                                            </Col>
+                                        </Row>
                                     </FormGroup>
                                 </Col>
+
                                 <Col lg="6">
                                     <FormGroup>
-                                        <label
-                                            className="form-control-label"
-                                            htmlFor="endDate"
-                                        >
-                                            Đến ngày:
-                                        </label>
-                                        <Input
-                                            className="form-control-alternative"
-                                            id="endDate"
-                                            type="date"
-                                            value={queryParams.toDate}
-                                            onChange={(e) => setQueryParams({ ...queryParams, toDate: e.target.value })}
-                                        />
+                                        <Row>
+                                            <Col xl="6">
+                                                <label
+                                                    className="form-control-label"
+                                                    htmlFor="startDate"
+                                                >
+                                                    Từ ngày:
+                                                </label>
+                                                <Input
+                                                    className="form-control-alternative"
+                                                    id="startDate"
+                                                    type="date"
+                                                    value={queryParams.fromDate}
+                                                    onChange={(e) => setQueryParams({ ...queryParams, fromDate: e.target.value })}
+                                                />
+                                            </Col>
+                                            <Col xl="6">
+                                                <label
+                                                    className="form-control-label"
+                                                    htmlFor="endDate"
+                                                >
+                                                    Đến ngày:
+                                                </label>
+                                                <Input
+                                                    className="form-control-alternative"
+                                                    id="endDate"
+                                                    type="date"
+                                                    value={queryParams.toDate}
+                                                    onChange={(e) => setQueryParams({ ...queryParams, toDate: e.target.value })}
+                                                />
+                                            </Col>
+                                        </Row>
                                     </FormGroup>
                                 </Col>
 
@@ -399,7 +434,6 @@ const SaleProduct = () => {
                         </Button>
                     </div>
 
-
                 </Row>
 
                 <Table className="align-items-center table-flush" responsive>
@@ -409,7 +443,7 @@ const SaleProduct = () => {
                             <th scope="col">Code</th>
                             <th scope="col">Tên khuyến mại</th>
                             <th scope="col">Mô tả</th>
-                            <th scope="col">Giá trị  <br /> sản phẩm</th>
+                            <th scope="col">Hóa đơn <br />tối thiểu</th>
                             <th scope="col">Giá trị</th>
                             <th scope="col">Ngày bắt đầu</th>
                             <th scope="col">Ngày kết thúc</th>
@@ -452,7 +486,7 @@ const SaleProduct = () => {
                 <Row className="mt-4">
                     <Col lg={6}>
                         <div style={{ fontSize: 14 }}>
-                            Đang xem <b>{queryParams.page * queryParams.size + 1}</b>  đến <b>{queryParams.page * queryParams.size + discounts.length}</b> trong tổng số <b>{totalElements}</b> mục
+                            Đang xem <b>{queryParams.page * queryParams.size + 1}</b>  đến <b>{queryParams.page * queryParams.size + discounts.length}</b> trong tổng số <b></b> mục
                         </div>
                     </Col>
                     <Col style={{ fontSize: 14 }} lg={2}>
@@ -500,7 +534,7 @@ const SaleProduct = () => {
                 toggle={toggle}
                 backdrop={'static'}
                 keyboard={false}
-                style={{ maxWidth: '1000px' }}
+                style={{ maxWidth: '900px' }}
             >
                 <ModalHeader toggle={toggle}>
                     <h3 className="heading-small text-muted mb-0">{formData.id ? 'Cập Nhật Khuyến mại' : 'Thêm Mới Khuyến mại'}</h3>
@@ -511,11 +545,11 @@ const SaleProduct = () => {
                         <div className="pl-lg-4">
                             <Row>
 
-                                <Col lg="3">
+                                <Col lg="4">
                                     <FormGroup>
                                         <label
                                             className="form-control-label"
-                                            style={{ fontSize: 13 }}
+                                            htmlFor="name"
                                         >
                                             Tên Khuyến mãi
                                         </label>
@@ -529,13 +563,48 @@ const SaleProduct = () => {
                                     </FormGroup>
                                 </Col>
 
-                                <Col lg="3">
+                                <Col lg="4">
                                     <FormGroup>
                                         <label
                                             className="form-control-label"
-                                            style={{ fontSize: 13 }}
+                                            htmlFor="startDate"
                                         >
-                                            Giá trị sản phẩm từ:
+                                            Ngày bắt đầu
+                                        </label>
+                                        <Input
+                                            className="form-control-alternative"
+                                            id="startDate"
+                                            type="datetime-local"
+                                            value={formData.startDate}
+                                            onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
+                                        />
+                                    </FormGroup>
+                                </Col>
+                                <Col lg="4">
+                                    <FormGroup>
+                                        <label
+                                            className="form-control-label"
+                                            htmlFor="endDate"
+                                        >
+                                            Ngày kết thúc
+                                        </label>
+                                        <Input
+                                            className="form-control-alternative"
+                                            id="endDate"
+                                            type="datetime-local"
+                                            value={formData.endDate}
+                                            onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
+                                        />
+                                    </FormGroup>
+                                </Col>
+
+                                <Col lg="4">
+                                    <FormGroup>
+                                        <label
+                                            className="form-control-label"
+                                            htmlFor="startDate"
+                                        >
+                                            Hóa đơn tối thiểu:
                                         </label>
                                         <Input
                                             className="form-control-alternative"
@@ -547,12 +616,11 @@ const SaleProduct = () => {
                                 </Col>
 
 
-                                <Col lg="3">
+                                <Col lg="4">
                                     <FormGroup>
                                         <label
                                             className="form-control-label"
-                                            style={{ fontSize: 13 }}
-                                        >
+                                            htmlFor="input-price">
                                             Hình thức
                                         </label>
                                         <div style={{ display: "flex" }}>
@@ -580,11 +648,10 @@ const SaleProduct = () => {
                                 </Col>
 
                                 {formData.sale && (
-                                    <Col lg="3">
+                                    <Col lg="4">
                                         <FormGroup>
                                             <label
                                                 className="form-control-label"
-                                                style={{ fontSize: 13 }}
                                             >
                                                 Phần trăm:
                                             </label>
@@ -600,11 +667,10 @@ const SaleProduct = () => {
                                 )}
 
                                 {!formData.sale && (
-                                    <Col lg="3">
+                                    <Col lg="4">
                                         <FormGroup>
                                             <label
                                                 className="form-control-label"
-                                                style={{ fontSize: 13 }}
                                             >
                                                 Trị giá (tiền):
                                             </label>
@@ -619,53 +685,18 @@ const SaleProduct = () => {
                                 )}
 
 
-                                <Col lg="3">
-                                    <FormGroup>
-                                        <label
-                                            className="form-control-label"
-                                            style={{ fontSize: 13 }}
-                                        >
-                                            Ngày bắt đầu
-                                        </label>
-                                        <Input
-                                            className="form-control-alternative"
-                                            id="startDate"
-                                            type="datetime-local"
-                                            value={formData.startDate}
-                                            onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
-                                        />
-                                    </FormGroup>
-                                </Col>
-                                <Col lg="3">
-                                    <FormGroup>
-                                        <label
-                                            className="form-control-label"
-                                            style={{ fontSize: 13 }}
-                                        >
-                                            Ngày kết thúc
-                                        </label>
-                                        <Input
-                                            className="form-control-alternative"
-                                            id="endDate"
-                                            type="datetime-local"
-                                            value={formData.endDate}
-                                            onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
-                                        />
-                                    </FormGroup>
-                                </Col>
-
                                 <Col className="pl-lg-4">
                                     <FormGroup>
                                         <label
                                             className="form-control-label"
-                                            style={{ fontSize: 13 }}
+                                            htmlFor="description"
                                         >
                                             Mô tả
                                         </label>
                                         <Input
                                             className="form-control-alternative"
                                             placeholder="Sản phẩm ....."
-                                            rows="3"
+                                            rows="4"
                                             type="textarea"
                                             value={formData.description}
                                             onChange={(e) => setFormData({ ...formData, description: e.target.value })}
@@ -673,76 +704,30 @@ const SaleProduct = () => {
                                     </FormGroup>
                                 </Col>
                             </Row>
+                            <Row>
+                                <Col className="pl-lg-4">
+                                    {formData.id && (
+                                        <FormGroup>
+                                            <label className="form-control-label">
+                                                Trạng thái
+                                            </label>
+                                            <div className="form-control-alternative custom-toggle ml-2">
+                                                <Input
+                                                    checked={formData.status === 0}
+                                                    type="checkbox"
+                                                />
+                                                <span className="custom-toggle-slider rounded-circle" />
+                                            </div>
+
+                                        </FormGroup>
+                                    )}
+                                </Col>
+                            </Row>
+
                         </div>
+
+
                     </Form >
-
-                    <div className="pl-lg-4">
-                        <Row className="align-items-center my-4">
-                            <div className="col" style={{ display: "flex" }}>
-                                <h3 className="heading-small text-black mb-0">Sản phẩm</h3>
-                            </div>
-                            <div className="col-4 text-right">
-                                <Input type="text" size="sm" placeholder="Mã hoặc tên sản phẩm" style={{ fontSize: 11 }} />
-                            </div>
-                        </Row>
-
-                        <Table className="align-items-center table-flush" responsive>
-                            <thead className="thead-light">
-                                <tr >
-                                    <th scope="col" className="text-center"> <Input type="checkbox" /></th>
-                                    <th scope="col">Mã sản phẩm</th>
-                                    <th scope="col">Tên sản phẩm</th>
-                                    <th scope="col">Giá gốc</th>
-                                    <th scope="col">Giá mới</th>
-                                    <th scope="col">Trạng thái</th>
-
-
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {Array.isArray(discounts) &&
-                                    discounts.map((discount, index) => (
-                                        <tr key={discount.id}>
-                                            <td className="text-center">
-                                                <Input type="checkbox" />
-                                            </td>
-                                            <td>{discount.code}</td>
-                                            <td>{discount.name}</td>
-                                            <td>{discount.salePercent}</td>
-                                            <td>{discount.salePercent}</td>
-                                            <td>
-                                                <Badge color={statusMapping[discount.status]?.color || statusMapping.default.color}>
-                                                    {statusMapping[discount.status]?.label || statusMapping.default.label}
-                                                </Badge>
-                                            </td>
-                                        </tr>
-                                    ))}
-                            </tbody>
-                        </Table>
-                        <div className="pagination-container" style={{ fontSize: 8 }}>
-                            <ReactPaginate
-                                breakLabel="..."
-                                nextLabel=">"
-                                pageRangeDisplayed={2}
-                                pageCount={totalPages}
-                                previousLabel="<"
-                                onPageChange={handlePageChange}
-                                renderOnZeroPageCount={null}
-                                pageClassName="page-item"
-                                pageLinkClassName="page-link"
-                                previousClassName="page-item"
-                                previousLinkClassName="page-link"
-                                nextClassName="page-item"
-                                nextLinkClassName="page-link"
-                                breakClassName="page-item"
-                                breakLinkClassName="page-link"
-                                containerClassName="pagination"
-                                activeClassName="active"
-                                marginPagesDisplayed={1}
-                            />
-                        </div>
-
-                    </div>
                 </ModalBody >
                 <ModalFooter>
                     <div className="text-center">
@@ -764,4 +749,4 @@ const SaleProduct = () => {
     );
 }
 
-export default SaleProduct;
+export default SaleBills;
