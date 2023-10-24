@@ -344,105 +344,64 @@ const Staff = () => {
 
                       {value === 'yes' &&
                         <Row>
-                          <Col lg="4">
+                          <Col lg="6">
                             <FormGroup>
-                              <label
-                                className="form-control-label"
-                                htmlFor="dateOfBirth"
-                              >
-                                Ngày sinh:
+                              <label className="form-control-label">
+                                Giới tính
                               </label>
-                              <Input
-                                className="form-control-alternative"
-                                type="number"
-                              />
-                            </FormGroup>
-                          </Col>
-                          <Col lg="4">
-                            <FormGroup>
-                              <label
-                                className="form-control-label"
-                                htmlFor="gender"
-                              >
-                                Giới tính:
-                              </label>
-                              <Input
-                                className="form-control-alternative"
-                                type="radio"
-                              >
+                              <div style={{ display: "flex" }}>
+                                <div className="custom-control custom-radio">
+                                  <Input
+                                    className="custom-control-alternative"
+                                    id="nam"
+                                    name="gender"
+                                    type="radio"
+                                    value={false}
+                                    // checked={search.gender === false || search.gender === 'false'}
+                                    onChange={(e) => setQueryParams({ ...queryParams, phoneNumber: e.target.value })}
+                                    />Nam
+                                </div>
+                                <div className="custom-control custom-radio">
+                                  <Input
+                                    className="custom-control-alternative"
+                                    id="nu"
+                                    name="gender"
+                                    type="radio"
+                                    value={true}
+                                    // checked={search.gender === true || search.gender === 'true'}
+                                    onChange={(e) => setQueryParams({ ...queryParams, phoneNumber: e.target.value })}
 
-                              </Input>
+                                  />Nữ
+                                </div>
+                              </div>
                             </FormGroup>
                           </Col>
-                          <Col lg="4">
+                          <Col lg="6">
                             <FormGroup>
                               <label
                                 className="form-control-label"
-                                htmlFor="startDate"
+                                htmlFor="input-city"
                               >
-                                Email:
-                              </label>
-                              <Input
-                                className="form-control-alternative"
-                                type="email"
-                              />
-                            </FormGroup>
-                          </Col>
-                          <Col lg="4">
-                            <FormGroup>
-                              <label
-                                className="form-control-label"
-                                htmlFor="startDate"
-                              >
-                                Trạng thái:
+                                Thành Phố / Tỉnh
                               </label>
                               <Input
                                 className="form-control-alternative"
                                 type="select"
-                                value={queryParams.status}
-                                onChange={(e) => setQueryParams({ ...queryParams, status: e.target.value })}
-                              >
-                                <option value="">Tất cả</option>
-                                <option value="0">Kích hoạt</option>
-                                <option value="1">Chờ kích hoạt</option>
-
+                                value={selectedCity}
+                                onChange={(e) => setQueryParams({ ...queryParams, phoneNumber: e.target.value })}
+                                >
+                                <option value="">Chọn Thành Phố/Tỉnh</option>
+                                {provinces.map((province) => (
+                                  <option key={province.code} value={province.name}>
+                                    {province.name}
+                                  </option>
+                                ))}
                               </Input>
+
+
                             </FormGroup>
                           </Col>
-                          <Col lg="4">
-                            <FormGroup>
-                              <label
-                                className="form-control-label"
-                                htmlFor="startDate"
-                              >
-                                Từ ngày:
-                              </label>
-                              <Input
-                                className="form-control-alternative"
-                                id="startDate"
-                                type="date"
-                                value={queryParams.fromDate}
-                                onChange={(e) => setQueryParams({ ...queryParams, fromDate: e.target.value })}
-                              />
-                            </FormGroup>
-                          </Col>
-                          <Col lg="4">
-                            <FormGroup>
-                              <label
-                                className="form-control-label"
-                                htmlFor="endDate"
-                              >
-                               Đến ngày:
-                              </label>
-                              <Input
-                                className="form-control-alternative"
-                                id="endDate"
-                                type="date"
-                                value={queryParams.toDate}
-                                onChange={(e) => setQueryParams({ ...queryParams, toDate: e.target.value })}
-                              />
-                            </FormGroup>
-                          </Col>
+
                         </Row>
                       }
                     </div>
@@ -512,7 +471,7 @@ const Staff = () => {
                               </Badge>
                             </td>
                             <td>
-                              <Button color="info" size="sm" onClick={() => handleRowClick(admin.id)} disabled={admin.status === 0}><FaEdit /></Button>
+                              <Button color="info" size="sm" onClick={() => handleRowClick(admin)} disabled={admin.status === 0}><FaEdit /></Button>
                               <Button color="danger" size="sm" onClick={() => deleteAdmin(admin.id)}><FaTrash /></Button>
                             </td>
 
