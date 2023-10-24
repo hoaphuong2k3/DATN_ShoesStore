@@ -283,7 +283,7 @@ const Promotion = () => {
                                                                 <Row>
                                                                     <Col xl="6">
                                                                         <label className="form-control-label">
-                                                                            Trị giá từ:
+                                                                            Giá trị từ:
                                                                         </label>
                                                                         <Input
                                                                             className="form-control-alternative"

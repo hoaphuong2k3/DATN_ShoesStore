@@ -208,7 +208,7 @@ const Delivery = () => {
                                                                 className="form-control-label"
                                                                 htmlFor="name"
                                                             >
-                                                                Tên Khuyến mại:
+                                                                Tên Khách hàng:
                                                             </label>
                                                             <Input
                                                                 className="form-control-alternative"
@@ -247,42 +247,40 @@ const Delivery = () => {
                                                                 </Input>
                                                             </FormGroup>
                                                         </Col>
-
-
-                                                        <Col lg="5">
+                                                        <Col lg="4">
                                                             <FormGroup>
-                                                                <Row>
-                                                                    <Col xl="6">
-                                                                        <label
-                                                                            className="form-control-label"
-                                                                            htmlFor="startDate"
-                                                                        >
-                                                                            Từ ngày:
-                                                                        </label>
-                                                                        <Input
-                                                                            className="form-control-alternative"
-                                                                            id="startDate"
-                                                                            type="date"
-                                                                            value={queryParams.fromDate}
-                                                                            onChange={(e) => setQueryParams({ ...queryParams, fromDate: e.target.value })}
-                                                                        />
-                                                                    </Col>
-                                                                    <Col xl="6">
-                                                                        <label
-                                                                            className="form-control-label"
-                                                                            htmlFor="endDate"
-                                                                        >
-                                                                            Đến ngày:
-                                                                        </label>
-                                                                        <Input
-                                                                            className="form-control-alternative"
-                                                                            id="endDate"
-                                                                            type="date"
-                                                                            value={queryParams.toDate}
-                                                                            onChange={(e) => setQueryParams({ ...queryParams, toDate: e.target.value })}
-                                                                        />
-                                                                    </Col>
-                                                                </Row>
+
+                                                                <label
+                                                                    className="form-control-label"
+                                                                    htmlFor="startDate"
+                                                                >
+                                                                    Ngày vận chuyển:
+                                                                </label>
+                                                                <Input
+                                                                    className="form-control-alternative"
+                                                                    id="startDate"
+                                                                    type="date"
+                                                                    value={queryParams.shipDate}
+                                                                    onChange={(e) => setQueryParams({ ...queryParams, shipDate: e.target.value })}
+                                                                />
+                                                            </FormGroup>
+                                                        </Col>
+                                                        <Col lg="4">
+                                                            <FormGroup>
+
+                                                                <label
+                                                                    className="form-control-label"
+                                                                    htmlFor="startDate"
+                                                                >
+                                                                    Ngày tạo phiếu:
+                                                                </label>
+                                                                <Input
+                                                                    className="form-control-alternative"
+                                                                    id="startDate"
+                                                                    type="date"
+                                                                    value={queryParams.fromDate}
+                                                                    onChange={(e) => setQueryParams({ ...queryParams, fromDate: e.target.value })}
+                                                                />
                                                             </FormGroup>
                                                         </Col>
 
@@ -356,7 +354,7 @@ const Delivery = () => {
                                                             <td>{delivery.shipDate}</td>
                                                             <td>{format(new Date(delivery.createdTime), 'yyyy-MM-dd HH:mm', { locale: vi })}</td>
                                                             <td>{format(new Date(delivery.updatedTime), 'yyyy-MM-dd HH:mm', { locale: vi })}</td>
-                                                            
+
 
                                                             <td>
                                                                 <Badge color={statusMapping[delivery.status]?.color || statusMapping.default.color}>
@@ -428,7 +426,6 @@ const Delivery = () => {
                                     >
                                         <ModalHeader toggle={toggle}>
                                             <h3 className="heading-small text-muted mb-0">{formData.id ? 'Cập Nhật Phiếu giao' : 'Thêm Mới Phiếu giao'}</h3>
-
                                         </ModalHeader>
                                         <ModalBody>
                                             <Form>

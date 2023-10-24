@@ -512,7 +512,7 @@ const Staff = () => {
                               </Badge>
                             </td>
                             <td>
-                              <Button color="info" size="sm" onClick={() => handleRowClick(admin)} disabled={admin.status === 0}><FaEdit /></Button>
+                              <Button color="info" size="sm" onClick={() => handleRowClick(admin.id)} disabled={admin.status === 0}><FaEdit /></Button>
                               <Button color="danger" size="sm" onClick={() => deleteAdmin(admin.id)}><FaTrash /></Button>
                             </td>
 
