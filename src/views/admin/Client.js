@@ -435,7 +435,6 @@ const Client = () => {
                         <th scope="col">Số điện thoại</th>
                         <th scope="col">Giới tính</th>
                         <th scope="col">Ngày sinh</th>
-                        <th scope="col">Trạng thái</th>
                         <th scope="col">Thao tác</th>
 
                       </tr>
@@ -461,9 +460,6 @@ const Client = () => {
                           <td>{item.phoneNumber}</td>
                           <td className="text-center">{item.gender ? "Nữ" : "Nam"}</td>
                           <td>{item.dateOfBirth}</td>
-                          <td></td>
-
-
                           <td>
                             <Button color="info" size="sm" onClick={() => handleRowClick(item.id)}>
                               <FaEdit />
