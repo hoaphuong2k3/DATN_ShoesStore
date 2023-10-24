@@ -684,12 +684,45 @@ const Client = () => {
           <Form>
             <div className="pl-lg-4">
               <Row>
-                <Col lg="12" className="text-center">
-                  <img src={`https://s3-ap-southeast-1.amazonaws.com/imageshoestore`} alt="Ảnh mô tả" />
+                <Col lg="6" className="d-flex justify-content-center align-items-center" >
+                  <div style={{ filter: 'grayscale(100%)', border: '1px solid #ccc', width: '140px', height: '190px' }}>
+                    <img src={`https://s3-ap-southeast-1.amazonaws.com/imageshoestore`} alt="Ảnh mô tả" width={140} height={190} />
+                  </div>
+                </Col>
+                <Col>
+                  <Row>
+                    <Col lg="12">
+                      <FormGroup>
+                        <label className="form-control-label">
+                          Số điện thoại
+                        </label>
+                        <Input
+                          className="form-control-alternative"
+                          type="text"
+                          name="phoneNumber"
+                          value={editClient.phoneNumber}
+                          onChange={onInputChangeDataUpdate}
+                        />
+                      </FormGroup>
+                    </Col>
+                    <Col lg="12">
+                      <FormGroup>
+                        <label className="form-control-label">
+                          Email
+                        </label>
+                        <Input
+                          className="form-control-alternative"
+                          type="text"
+                          name="email"
+                          value={editClient.email}
+                          onChange={onInputChangeDataUpdate}
+                        />
+                      </FormGroup>
+                    </Col>
+                  </Row>
                 </Col>
               </Row>
               <Row>
-
                 <Col lg="6">
                   <FormGroup>
                     <label className="form-control-label">
@@ -701,49 +734,6 @@ const Client = () => {
                       name="username"
                       value={editClient.username}
                       disabled
-                    />
-                  </FormGroup>
-                </Col>
-
-                <Col lg="6">
-                  <FormGroup>
-                    <label className="form-control-label">
-                      Họ tên
-                    </label>
-                    <Input
-                      className="form-control-alternative"
-                      type="text"
-                      name="fullname"
-                      value={editClient.fullname}
-                      onChange={onInputChangeDataUpdate}
-                    />
-                  </FormGroup>
-                </Col>
-                <Col lg="6">
-                  <FormGroup>
-                    <label className="form-control-label">
-                      Email
-                    </label>
-                    <Input
-                      className="form-control-alternative"
-                      type="text"
-                      name="email"
-                      value={editClient.email}
-                      onChange={onInputChangeDataUpdate}
-                    />
-                  </FormGroup>
-                </Col>
-                <Col lg="6">
-                  <FormGroup>
-                    <label className="form-control-label">
-                      Số điện thoại
-                    </label>
-                    <Input
-                      className="form-control-alternative"
-                      type="text"
-                      name="phoneNumber"
-                      value={editClient.phoneNumber}
-                      onChange={onInputChangeDataUpdate}
                     />
                   </FormGroup>
                 </Col>
@@ -776,6 +766,20 @@ const Client = () => {
                         />Nữ
                       </div>
                     </div>
+                  </FormGroup>
+                </Col>
+                <Col lg="6">
+                  <FormGroup>
+                    <label className="form-control-label">
+                      Họ tên
+                    </label>
+                    <Input
+                      className="form-control-alternative"
+                      type="text"
+                      name="fullname"
+                      value={editClient.fullname}
+                      onChange={onInputChangeDataUpdate}
+                    />
                   </FormGroup>
                 </Col>
                 <Col lg="6">
