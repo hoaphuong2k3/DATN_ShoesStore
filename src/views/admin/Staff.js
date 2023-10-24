@@ -311,7 +311,7 @@ const Staff = () => {
                               className="form-control-label"
                               htmlFor="fullname"
                             >
-                             Tên Nhân Viên:
+                              Tên Nhân Viên:
                             </label>
                             <Input
                               className="form-control-alternative"
@@ -370,7 +370,7 @@ const Staff = () => {
                                 className="form-control-alternative"
                                 type="radio"
                               >
-                                
+
                               </Input>
                             </FormGroup>
                           </Col>
@@ -432,7 +432,7 @@ const Staff = () => {
                                 className="form-control-label"
                                 htmlFor="endDate"
                               >
-                                Đến ngày:
+                               Đến ngày:
                               </label>
                               <Input
                                 className="form-control-alternative"
@@ -443,9 +443,6 @@ const Staff = () => {
                               />
                             </FormGroup>
                           </Col>
-
-
-
                         </Row>
                       }
                     </div>
@@ -499,7 +496,7 @@ const Staff = () => {
                       </tr>
                     </thead>
                     <tbody>
-                      {Array.isArray(admins) &&
+                      {Array.isArray(admins) && admins.length > 0 ? (
                         admins.map((admin, index) => (
                           <tr key={admin.id}>
                             <td>{calculateIndex(index)}</td>
@@ -520,7 +517,12 @@ const Staff = () => {
                             </td>
 
                           </tr>
-                        ))}
+                        ))
+                      ) : (
+                        <tr>
+                          <td colSpan={9}>Không có dữ liệu</td>
+                        </tr>
+                      )}
                     </tbody>
                   </Table>
                   {/* Hiển thị thanh phân trang */}
@@ -602,6 +604,7 @@ const Staff = () => {
                             type="text"
                             value={formData.username}
                             onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+                            disabled = {formData.id ? true : false}
                           />
                         </FormGroup>
                       </Col>
