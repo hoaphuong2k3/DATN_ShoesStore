@@ -216,6 +216,8 @@ const Client = () => {
   const [idClient, setIdClient] = useState(null);
   const [modalAdress, setModalAdress] = useState(false);
   const toggleAdress = () => setModalAdress(!modalAdress);
+  const [modalAddAdress, setModalAddAdress] = useState(false);
+  const toggleAddAdress = () => setModalAddAdress(!modalAddAdress);
   const onClickListAdress = async (id) => {
     setIdClient(id);
     const response = await detailClient(id);
@@ -812,15 +814,15 @@ const Client = () => {
         </ModalFooter>
       </Modal >
       {/* Kết thúc modal sửa */}
-      {/* Modal Địa chỉ */}
+      {/* Modal Thêm Địa chỉ */}
       <Modal
-        isOpen={modalAdress}
-        toggle={toggleAdress}
+        isOpen={modalAddAdress}
+        toggle={toggleAddAdress}
         backdrop={'static'}
         keyboard={false}
         style={{ maxWidth: '500px' }}
       >
-        <ModalHeader toggle={toggleAdress}>
+        <ModalHeader toggle={toggleAddAdress}>
           <h3 className="heading-small text-muted mb-0">Địa chỉ khách hàng</h3>
         </ModalHeader>
         <ModalBody>
@@ -925,13 +927,85 @@ const Client = () => {
             <Button color="primary" >
               Reset
             </Button>
+            <Button color="danger" onClick={toggleAddAdress} >
+              Close
+            </Button>
+          </div>
+        </ModalFooter>
+      </Modal >
+      {/* Kết thúc thêm modal địa chỉ */}
+      {/* Modal hiển thị ds Địa chỉ */}
+      <Modal
+        isOpen={modalAdress}
+        toggle={toggleAdress}
+        backdrop={'static'}
+        keyboard={false}
+        style={{ maxWidth: '500px' }}
+      >
+        <ModalHeader toggle={toggleAdress}>
+          <h3 className="heading-small text-muted mb-0">Địa chỉ khách hàng</h3>
+        </ModalHeader>
+        <ModalBody>
+          <Row className="mb-4 mt--4 mr--5">
+
+            <span className="col-8">
+              <label className="form-control-label">
+                Danh sách địa chỉ
+              </label>
+            </span>
+            <span className="col-3 d-flex justify-content-end">
+              <Button color="primary" onClick={toggleAddAdress} size="sm"  >
+                + Thêm
+              </Button>
+            </span>
+          </Row>
+          <Form>
+            <div className="pl-lg-4">
+              <Row>
+                <Col lg="9"  >
+                  <div style={{ fontSize: 13 }} className="text-small text-muted mb-0">
+                    Số nhà 16, 17 Phú Kiều, Phường Phúc Diễn, Quận Bắc Từ Liêm, TP Hà Nội
+                  </div>
+                </Col>
+                <Col lg="3" className="mr--1">
+                  <Button color="info" size="sm">
+                    <FaEdit />
+                  </Button>
+                  <Button color="danger" size="sm" >
+                    <FaTrash />
+                  </Button>
+                </Col>
+              </Row>
+              <hr />
+              <Row>
+                <Col lg="9"  >
+                  <div style={{ fontSize: 13 }} className="text-small text-muted mb-0">
+                    Số nhà 16, 17 Phú Kiều, Phường Phúc Diễn, Quận Bắc Từ Liêm, TP Hà Nội
+                  </div>
+                </Col>
+                <Col lg="3" className="mr--1">
+                  <Button color="info" size="sm">
+                    <FaEdit />
+                  </Button>
+                  <Button color="danger" size="sm" >
+                    <FaTrash />
+                  </Button>
+                </Col>
+              </Row>
+              <hr />
+            </div>
+          </Form>
+        </ModalBody>
+        <ModalFooter>
+          <div className="text-center">
             <Button color="danger" onClick={toggleAdress} >
               Close
             </Button>
           </div>
         </ModalFooter>
       </Modal >
-      {/* Kết thúc modal địa chỉ */}
+      {/* Kết thúc modal hiển thị ds  địa chỉ */}
+
     </>
   );
 };
