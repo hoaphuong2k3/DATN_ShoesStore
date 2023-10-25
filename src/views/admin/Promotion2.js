@@ -479,6 +479,40 @@ const Promotion = () => {
                                                 <div className="pl-lg-4">
                                                     <Row>
 
+                                                        <Col lg="12">
+                                                            <FormGroup>
+                                                                <label
+                                                                    className="form-control-label"
+                                                                >
+                                                                    <div style={{ display: "flex", marginLeft: 115 }}>
+                                                                        <div className="custom-control custom-radio">
+                                                                            <Input
+                                                                                className="custom-control-alternative"
+                                                                                name="type"
+                                                                                type="radio"
+                                                                            />SmallOrder
+                                                                        </div>
+                                                                        <div className="custom-control custom-radio">
+                                                                            <Input
+                                                                                className="custom-control-alternative"
+                                                                                name="type"
+                                                                                type="radio"
+                                                                            />BigOrder
+                                                                        </div>
+                                                                        <div className="custom-control custom-radio">
+                                                                            <Input
+                                                                                className="custom-control-alternative"
+                                                                                name="type"
+                                                                                type="radio"
+                                                                            />FreeShip
+                                                                        </div>
+
+                                                                    </div>
+                                                                </label>
+
+                                                            </FormGroup>
+                                                        </Col>
+
                                                         <Col lg="6">
                                                             <FormGroup>
                                                                 <label
@@ -501,6 +535,54 @@ const Promotion = () => {
                                                             <FormGroup>
                                                                 <label
                                                                     className="form-control-label"
+                                                                    htmlFor="startDate"
+                                                                >
+                                                                    Hóa đơn tối thiểu:
+                                                                </label>
+                                                                <Input
+                                                                    className="form-control-alternative"
+                                                                    type="number"
+                                                                    value={formData.minPrice}
+                                                                    onChange={(e) => setFormData({ ...formData, minPrice: e.target.value })}
+                                                                />
+                                                            </FormGroup>
+                                                        </Col>
+
+                                                        <Col lg="6">
+                                                            <FormGroup>
+                                                                <label
+                                                                    className="form-control-label"
+                                                                    htmlFor="input-price">
+                                                                    Hình thức
+                                                                </label>
+                                                                <div style={{ display: "flex" }}>
+                                                                    <div className="custom-control custom-radio">
+                                                                        <Input
+                                                                            className="custom-control-alternative"
+                                                                            name="sale"
+                                                                            type="radio"
+                                                                            checked={!formData.sale}
+                                                                            onChange={() => setFormData({ ...formData, sale: false })}
+                                                                        />Tiền
+                                                                    </div>
+                                                                    <div className="custom-control custom-radio">
+                                                                        <Input
+                                                                            className="custom-control-alternative"
+                                                                            name="sale"
+                                                                            type="radio"
+                                                                            checked={formData.sale}
+                                                                            onChange={(e) => setFormData({ ...formData, sale: true })}
+                                                                        />Phần trăm
+                                                                    </div>
+
+                                                                </div>
+                                                            </FormGroup>
+                                                        </Col>
+
+                                                        <Col lg="6">
+                                                            <FormGroup>
+                                                                <label
+                                                                    className="form-control-label"
                                                                 >
                                                                     Giá trị giảm:
                                                                 </label>
@@ -510,7 +592,73 @@ const Promotion = () => {
                                                                     value={formData.salePercent}
                                                                     onChange={(e) => setFormData({ ...formData, salePercent: e.target.value })}
                                                                 />
+                                                            </FormGroup>
+                                                        </Col>
 
+                                                        <Col lg="6">
+                                                            <FormGroup>
+                                                                <label
+                                                                    className="form-control-label"
+                                                                    htmlFor="input-price">
+                                                                    Khách hàng
+                                                                </label>
+                                                                <div style={{ display: "flex" }}>
+                                                                    
+                                                                    <div className="custom-control custom-radio">
+                                                                        <Input
+                                                                            className="custom-control-alternative"
+                                                                            name="client"
+                                                                            type="checkbox"
+                                                                        />Đồng
+                                                                    </div>
+                                                                    <div className="custom-control custom-radio">
+                                                                        <Input
+                                                                            className="custom-control-alternative"
+                                                                            name="client"
+                                                                            type="checkbox"
+                                                                        />Bạc
+                                                                    </div>
+                                                                    <div className="custom-control custom-radio">
+                                                                        <Input
+                                                                            className="custom-control-alternative"
+                                                                            name="client"
+                                                                            type="checkbox"
+                                                                        />Vàng
+                                                                    </div>
+                                                                </div>
+                                                                <div style={{ display: "flex" }}>
+                                                                    
+                                                                    <div className="custom-control custom-radio">
+                                                                        <Input
+                                                                            className="custom-control-alternative"
+                                                                            name="client"
+                                                                            type="checkbox"
+                                                                        />Kim cương
+                                                                    </div>
+                                                                    <div className="custom-control custom-radio">
+                                                                        <Input
+                                                                            className="custom-control-alternative"
+                                                                            name="client"
+                                                                            type="checkbox"
+                                                                        />Khách lẻ
+                                                                    </div>
+                                                                </div>
+                                                            </FormGroup>
+                                                        </Col>
+
+                                                        <Col lg="6">
+                                                            <FormGroup>
+                                                                <label
+                                                                    className="form-control-label"
+                                                                    htmlFor="startDate"
+                                                                >
+                                                                    Quà tặng kèm:
+                                                                </label>
+                                                                <Input
+                                                                    className="form-control-alternative"
+                                                                    type="select"
+
+                                                                />
                                                             </FormGroup>
                                                         </Col>
 

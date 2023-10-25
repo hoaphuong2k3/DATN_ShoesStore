@@ -541,18 +541,6 @@ const Promotion = () => {
                 </Table>
                 {/* Hiển thị thanh phân trang */}
                 <div className="pagination-container" >
-                    {/* <ReactPaginate
-                        previousLabel={"Trang trước"}
-                        nextLabel={"Trang sau"}
-                        breakLabel={"..."}
-                        pageCount={totalPages}
-                        marginPagesDisplayed={2}
-                        pageRangeDisplayed={5}
-                        onPageChange={handlePageChange}
-                        containerClassName={"pagination"}
-                        subContainerClassName={"pages pagination"}
-                        activeClassName={"active"}
-                    /> */}
 
                     <ReactPaginate
                         breakLabel="..."

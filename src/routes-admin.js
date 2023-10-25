@@ -14,6 +14,7 @@ import BillDetail from "views/admin/BillDetail.js";
 import ListShoesDetail from "views/admin/ListShoesDetail.js";
 import Discount from "views/admin/discount/Discount.js";
 import Delivery from "views/admin/Delivery.js";
+import Promo2 from "views/admin/Promotion2.js";
 var routes = [
   {
     path: "/index",
@@ -52,7 +53,7 @@ var routes = [
   },
   {
     path: "/promotion",
-    name: "Đợt giảm giá",
+    name: "Chương trình giảm giá",
     icon: "ni ni-tag text-info",
     component: <Promo />,
     layout: "/admin",
@@ -116,6 +117,13 @@ var routes = [
     path: "/shoesdetail/:id",
     component: <ListShoesDetail />,
     layout: "/admin",
-  }
+  },
+  {
+    path: "/promotion2",
+    name: "Giảm giá",
+    icon: "ni ni-tag text-info",
+    component: <Promo2 />,
+    layout: "/admin",
+  },
 ];
 export default routes;
