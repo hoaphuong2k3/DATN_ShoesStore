@@ -12,11 +12,6 @@ import {
   DropdownItem,
   UncontrolledDropdown,
   DropdownToggle,
-  Form,
-  Input,
-  InputGroupAddon,
-  InputGroupText,
-  InputGroup,
   Media,
   NavbarBrand,
   Navbar,
@@ -30,21 +25,15 @@ import {
 
 const Sidebar = (props) => {
   const [collapseOpen, setCollapseOpen] = useState();
-  // verifies if routeName is the one active (in browser input)
-  const activeRoute = (routeName) => {
-    return props.location.pathname.indexOf(routeName) > -1 ? "active" : "";
-  };
-  // toggles collapse between opened and closed (true/false)
+
   const toggleCollapse = () => {
     setCollapseOpen((data) => !data);
   };
-  // closes the collapse
+
   const closeCollapse = () => {
     setCollapseOpen(false);
   };
 
-
-  // creates the links that appear in the left menu / Sidebar
   const createLinks = (routes) => {
     return routes.map((prop, key) => {
       if (prop.name) {
@@ -108,9 +97,9 @@ const Sidebar = (props) => {
 
           </NavbarBrand>
         ) : null}
+        
         {/* User */}
         <Nav className="align-items-center d-md-none">
-
           <UncontrolledDropdown nav>
             <DropdownToggle nav>
               <Media className="align-items-center">
@@ -180,54 +169,12 @@ const Sidebar = (props) => {
               </Col>
             </Row>
           </div>
-          {/* Form */}
-          <Form className="mt-4 mb-3 d-md-none">
-            <InputGroup className="input-group-rounded input-group-merge">
-              <Input
-                aria-label="Search"
-                className="form-control-rounded form-control-prepended"
-                placeholder="Search"
-                type="search"
-              />
-              <InputGroupAddon addonType="prepend">
-                <InputGroupText>
-                  <span className="fa fa-search" />
-                </InputGroupText>
-              </InputGroupAddon>
-            </InputGroup>
-          </Form>
-
+          {/* <hr className="my-3" /> */}
           {/* Navigation */}
           <Nav navbar>
             {createLinks(routes)}
           </Nav>
-          {/* Divider */}
-          <hr className="my-3" />
-          {/* Heading */}
-          <h6 className="navbar-heading text-muted">Documentation</h6>
-          {/* Navigation */}
-          <Nav className="mb-md-3" navbar>
-            <NavItem>
-              <NavLink href="#">
-                <i className="ni ni-spaceship" />
-                Github
-              </NavLink>
-            </NavItem>
-            <NavItem>
-              <NavLink href="#">
-                <i className="ni ni-palette" />
-                Tài liệu đặc tả
-              </NavLink>
-            </NavItem>
-          </Nav>
-          <Nav className="mb-md-3" navbar>
-            <NavItem className="active-pro active">
-              <NavLink href="https://www.creative-tim.com/product/argon-dashboard-pro-react?ref=adr-admin-sidebar">
-                <i className="ni ni-spaceship" />
-                FPT POLYTECHNIC
-              </NavLink>
-            </NavItem>
-          </Nav>
+    
         </Collapse>
       </Container>
     </Navbar>

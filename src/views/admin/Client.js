@@ -268,11 +268,7 @@ const Client = () => {
                 <CardHeader className="bg-transparent m-2">
                   <Row className="align-items-center">
                     <div className="col">
-<<<<<<< HEAD
                       <h3 className="mb-0">Khách Hàng</h3>
-=======
-                      <h3 className="mb-0">Khách hàng</h3>
->>>>>>> 74c19fd2f8e103c117b9d69aa129f285bf4ebf77
                     </div>
                   </Row>
                 </CardHeader>
