@@ -571,7 +571,6 @@ const Staff = () => {
                             value={formData.username}
                             onChange={(e) => setFormData({ ...formData, username: e.target.value })}
                             disabled={formData.id ? true : false}
-                            disabled={formData.id ? true : false}
                           />
                         </FormGroup>
                       </Col>
