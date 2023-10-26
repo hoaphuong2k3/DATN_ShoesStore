@@ -7,7 +7,7 @@ import { saveAs } from 'file-saver';
 import { getAllColorId, getAllSizeId, getAllColor, getAllSize } from "services/ProductAttributeService";
 // reactstrap components
 import {
-    Card, CardBody, Container, Row, Col, FormGroup, Input, Button, Form, CardTitle, Label, Table
+    Card, CardBody, Container, Row, Col, FormGroup, Input, Button, Form, CardTitle, Label, Table, Badge
 } from "reactstrap";
 import { toast } from 'react-toastify';
 import Header from "components/Headers/Header.js";
@@ -17,6 +17,11 @@ import axios from "axios";
 const ListShoesDetail = () => {
     const [value, setValue] = useState('no');
     const { id } = useParams();
+    const statusMapping = {
+        0: { color: 'danger', label: 'Ngừng kinh doanh' },
+        1: { color: 'success', label: 'Đang kinh doanh' },
+        2: { color: 'warning', label: 'Hết hàng' }
+    };
 
     let navigate = useNavigate();
     const [ListShoesDetail, setListShoesDetail] = useState([]);
@@ -662,12 +667,20 @@ const ListShoesDetail = () => {
                                             className=" col-2 text-uppercase text-muted mb-0">
                                             <h3> DANH SÁCH</h3>
                                         </CardTitle>
-
-                                        <div className="col-10 text-right">
+                                        <div className="col text-right" style={{ display: "flex" }}>
+                                            <Col>
+                                                <Input type="select" name="status" style={{ width: "150px" }} size="sm" onChange={(e) => onInputChange(e)} >
+                                                    <option value=" ">Tất cả</option>
+                                                    <option value="1">Đang kinh doanh</option>
+                                                    <option value="0">Ngừng kinh doanh</option>
+                                                    <option value="2">Hết hàng</option>
+                                                </Input>
+                                            </Col>
                                             <Button
                                                 className="btn btn-outline-primary"
                                                 size="sm"
-                                                to="/admin/product/add" tag={Link}>
+                                                to="/admin/product/add" tag={Link}
+                                            >
                                                 Thêm mới
                                             </Button>
                                             <Button
@@ -697,19 +710,19 @@ const ListShoesDetail = () => {
                                             >
                                                 Xuất PDF
                                             </Button>
-                                            <Input type="select" name="status" value={search.status} size="sm" onChange={(e) => onInputChange(e)} >
-                                                <option value="0">Tất cả</option>
-                                                <option value="1"></option>
-                                                <option value="2">Tất cả</option>
-                                            </Input>
-
-
+                                            <Button
+                                                className="btn btn-outline-primary"
+                                                size="sm"
+                                            >
+                                                Báo cáo
+                                            </Button>
                                         </div>
                                     </Row>
+
                                     {/*  */}
                                     <Row>
-                                        <Table bordered dark hover responsive striped>
-                                            <thead>
+                                        <Table responsive className="align-items-center table-flush">
+                                            <thead className="thead-light">
                                                 <tr>
                                                     <th className="text-center pb-4" >
                                                         <FormGroup check>
@@ -723,6 +736,7 @@ const ListShoesDetail = () => {
                                                     <th>Size</th>
                                                     <th>Số lượng</th>
                                                     <th>Giá</th>
+                                                    <th>Trạng thái</th>
 
                                                     <th colSpan={2}>Thao tác</th>
                                                 </tr>
@@ -750,9 +764,11 @@ const ListShoesDetail = () => {
                                                                 <td>{item.quantity}</td>
                                                                 <td>{item.price}</td>
                                                                 <td>
-                                                                    <Button color="danger" to={`/admin/product/detail/${item.id}`} tag={Link} size="sm" disabled={item.status === 0 ? true : false}>
-                                                                        <i class="fa-solid fa-eye"></i>
-                                                                    </Button>
+                                                                    <Badge color={statusMapping[item.status]?.color || statusMapping.default.color}>
+                                                                        {statusMapping[item.status]?.label || statusMapping.default.label}
+                                                                    </Badge>
+                                                                </td>
+                                                                <td>
                                                                     <Button color="danger" to={`/admin/product/edit/${item.id}`} tag={Link} size="sm" disabled={item.status === 0 ? true : false}>
                                                                         <i class="fa-solid fa-pen" />
                                                                     </Button>
@@ -764,7 +780,7 @@ const ListShoesDetail = () => {
                                                                             <i class="fa-solid fa-lock-open fa-flip-horizontal"></i>
                                                                         </Button>
                                                                     }
-                                                                    {item.status === 1 &&
+                                                                    {(item.status === 1 || item.status === 2) &&
                                                                         <Button color="danger" size="sm" onClick={() => lock(item.id)} >
                                                                             <i class="fa-solid fa-lock"></i>
                                                                         </Button>

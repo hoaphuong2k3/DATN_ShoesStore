@@ -2,6 +2,7 @@ import { React, useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { getAllShoes, deleteShoes } from "services/Product2Service";
 import ReactPaginate from 'react-paginate';
+import { FaEdit, FaTrash, FaSearch, FaFileAlt } from 'react-icons/fa';
 import { getAllBrand, getAllOrigin, getAllDesignStyle, getAllSkinType, getAllToe, getAllSole, getAllLining, getAllCushion } from "services/ProductAttributeService";
 // reactstrap components
 import {
@@ -90,7 +91,7 @@ const Products = () => {
   useEffect(() => {
     getAll(page, size);
   }, [size, page]);
-  
+
   useEffect(() => {
     getAll(page, size);
     getlistBrand();
@@ -346,7 +347,7 @@ const Products = () => {
 
                           </FormGroup>
                         </Col>
-                        <Col lg="4">
+                        <Col lg="3">
                           <FormGroup>
                             <label
                               className="form-control-label"
@@ -355,6 +356,7 @@ const Products = () => {
                               Hãng
                             </label>
                             <Input id="btn_select_tt" type="select" name="brandId" value={search.brandId}
+                              className="form-control-alternative"
                               onChange={(e) => onInputChange(e)}>
                               <option value=" "> -- Chọn --  </option>
                               {listBrand && listBrand.length > 0 &&
@@ -370,7 +372,7 @@ const Products = () => {
                             </Input>
                           </FormGroup>
                         </Col>
-                        <Col lg="4">
+                        <Col lg="3">
                           <FormGroup>
                             <label
                               className="form-control-label"
@@ -379,6 +381,7 @@ const Products = () => {
                               Xuất xứ
                             </label>
                             <Input id="btn_select_tt" name="originId" type="select" value={search.originId}
+                              className="form-control-alternative"
                               onChange={(e) => onInputChange(e)}>
                               <option value="" > -- Chọn --  </option>
                               {listorigin && listorigin.length > 0 &&
@@ -394,7 +397,7 @@ const Products = () => {
                             </Input>
                           </FormGroup>
                         </Col>
-                        <Col lg="4">
+                        <Col lg="3">
                           <FormGroup>
                             <label
                               className="form-control-label"
@@ -403,7 +406,7 @@ const Products = () => {
                               Thiết kế
                             </label>
                             <Input id="btn_select_tt" name="designStyleId" type="select" value={search.designStyleId}
-                              onChange={(e) => onInputChange(e)} >
+                              onChange={(e) => onInputChange(e)} className="form-control-alternative">
                               <option value="" > -- Chọn --  </option>
                               {listDesignStyle && listDesignStyle.length > 0 &&
                                 listDesignStyle.map((item, index) => {
@@ -419,7 +422,7 @@ const Products = () => {
                           </FormGroup>
                         </Col>
 
-                        <Col lg="4">
+                        <Col lg="3">
                           <FormGroup>
                             <label
                               className="form-control-label"
@@ -428,7 +431,7 @@ const Products = () => {
                               Loại da
                             </label>
                             <Input id="btn_select_tt" name="skinTypeId" type="select" value={search.skinTypeId}
-                              onChange={(e) => onInputChange(e)} >
+                              onChange={(e) => onInputChange(e)} className="form-control-alternative">
                               <option value="" > -- Chọn --  </option>
                               {listSkinStype && listSkinStype.length > 0 &&
                                 listSkinStype.map((item, index) => {
@@ -443,7 +446,7 @@ const Products = () => {
                             </Input>
                           </FormGroup>
                         </Col>
-                        <Col lg="4">
+                        <Col lg="3">
                           <FormGroup>
                             <label
                               className="form-control-label"
@@ -452,7 +455,7 @@ const Products = () => {
                               Mũi giày
                             </label>
                             <Input id="btn_select_tt" name="toeId" type="select" value={search.toeId}
-                              onChange={(e) => onInputChange(e)} >
+                              onChange={(e) => onInputChange(e)} className="form-control-alternative">
                               <option value="" > -- Chọn --  </option>
                               {listToe && listToe.length > 0 &&
                                 listToe.map((item, index) => {
@@ -467,7 +470,7 @@ const Products = () => {
                             </Input>
                           </FormGroup>
                         </Col>
-                        <Col lg="4">
+                        <Col lg="3">
                           <FormGroup>
                             <label
                               className="form-control-label"
@@ -476,7 +479,7 @@ const Products = () => {
                               Đế giày
                             </label>
                             <Input id="btn_select_tt" name="soleId" type="select" value={search.soleId}
-                              onChange={(e) => onInputChange(e)} >
+                              onChange={(e) => onInputChange(e)} className="form-control-alternative">
                               <option value="" > -- Chọn --  </option>
                               {listSole && listSole.length > 0 &&
                                 listSole.map((item, index) => {
@@ -491,7 +494,7 @@ const Products = () => {
                             </Input>
                           </FormGroup>
                         </Col>
-                        <Col lg="6">
+                        <Col lg="3">
                           <FormGroup>
                             <label
                               className="form-control-label"
@@ -500,7 +503,7 @@ const Products = () => {
                               Lót giày
                             </label>
                             <Input id="btn_select_tt" name="liningId" type="select" value={search.liningId}
-                              onChange={(e) => onInputChange(e)} >
+                              onChange={(e) => onInputChange(e)} className="form-control-alternative">
                               <option value="" > -- Chọn --  </option>
                               {listLining && listLining.length > 0 &&
                                 listLining.map((item, index) => {
@@ -516,7 +519,7 @@ const Products = () => {
                           </FormGroup>
                         </Col>
 
-                        <Col lg="6">
+                        <Col lg="3">
                           <FormGroup>
                             <label
                               className="form-control-label"
@@ -525,7 +528,7 @@ const Products = () => {
                               Đệm giày
                             </label>
                             <Input id="btn_select_tt" name="cushionId" type="select" value={search.cushionId}
-                              onChange={(e) => onInputChange(e)} >
+                              onChange={(e) => onInputChange(e)} className="form-control-alternative" >
                               <option value=" "> -- Chọn --  </option>
                               {listCushion && listCushion.length > 0 &&
                                 listCushion.map((item, index) => {
@@ -549,7 +552,7 @@ const Products = () => {
                             <Row>
                               <Col xl={5}>
                                 <Input
-
+                                  className="form-control-alternative"
                                   id="find_code"
                                   name="fromQuantity"
                                   placeholder="Nhập số lượng"
@@ -562,7 +565,7 @@ const Products = () => {
                               </Label>
                               <Col xl={5}>
                                 <Input
-
+                                  className="form-control-alternative"
                                   id="find_code"
                                   name="toQuantity"
                                   placeholder="Nhập số lượng"
@@ -581,6 +584,7 @@ const Products = () => {
                             <Row>
                               <Col xl={5}>
                                 <Input
+                                  className="form-control-alternative"
                                   id="find_code"
                                   name="fromPrice"
                                   placeholder="Nhập giá"
@@ -593,6 +597,7 @@ const Products = () => {
                               </Label>
                               <Col xl={5}>
                                 <Input
+                                  className="form-control-alternative"
                                   id="find_code"
                                   name="toPrice"
                                   placeholder="Nhập giá"
@@ -699,8 +704,6 @@ const Products = () => {
                     >
                       Báo cáo
                     </Button>
-
-
                   </div>
                 </Row>
                 {/*  */}
@@ -728,8 +731,8 @@ const Products = () => {
                   </div>
                 </div> */}
                 <Row>
-                  <Table bordered dark hover responsive striped>
-                    <thead>
+                  <Table className="align-items-center table-flush" responsive>
+                    <thead className="thead-light">
                       <tr>
                         <th className="text-center pb-4" >
                           <FormGroup check>
@@ -791,13 +794,13 @@ const Products = () => {
                                 <Button color="danger" to={`/admin/shoesdetail/${item.id}`} tag={Link} size="sm">
                                   <i class="fa-solid fa-eye" />&nbsp;CTSP
                                 </Button>
-                                <Button color="danger" to={`/admin/product/detail/${item.id}`} tag={Link} size="sm">
+                                <Button color="gray" to={`/admin/product/detail/${item.id}`} tag={Link} size="sm">
                                   <i class="fa-solid fa-eye"></i>
                                 </Button>
-                                <Button color="danger" to={`/admin/product/edit/${item.id}`} tag={Link} size="sm">
-                                  <i class="fa-solid fa-pen" />
+                                <Button color="info" to={`/admin/product/edit/${item.id}`} tag={Link} size="sm">
+                                  <FaEdit />
                                 </Button>
-                                <Button color="warning" size="sm" onClick={() => handleConfirmDelete(item)}>
+                                <Button color="danger" size="sm" onClick={() => handleConfirmDelete(item)}>
                                   <i class="fa-solid fa-trash" />
                                 </Button>
                               </td>
@@ -821,6 +824,7 @@ const Products = () => {
                       <span>Xem </span>&nbsp;
                       <span>
                         <Input type="select" name="status" style={{ width: "60px", fontSize: 14 }} size="sm" onChange={(e) => onChangeSize(e)} className="mt--1">
+                          <option value="5">5</option>
                           <option value="10">10</option>
                           <option value="25">25</option>
                           <option value="50">50</option>
