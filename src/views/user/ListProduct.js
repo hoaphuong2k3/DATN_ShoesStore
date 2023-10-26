@@ -53,9 +53,10 @@ const Product = () => {
           <div className="col">
             <Card className="shadow">
               <CardBody>
-                <div style={{ display: "table", margin: "auto" }}>
-                  <hr color="orange" width="300px" />
-                  <br />
+                <div style={{ display: "table"}}>
+                  <h2 className="font-weight-bolder">LEATHER GENTS</h2>
+                  <hr color="orange" width="200px" />
+                  <br/>
                 </div>
                 <div className="row">
                   <style>

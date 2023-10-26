@@ -16,6 +16,7 @@ import {
   ModalBody, ModalFooter, ModalHeader, CardBody, CardHeader, CardFooter
 } from "reactstrap";
 import Header from "components/Headers/Header.js";
+// import Select from "react-select/dist/declarations/src/Select";
 
 const Staff = () => {
 
@@ -284,6 +285,45 @@ const Staff = () => {
     }
   };
 
+  // Select checkbox
+  const [isCheckedAll, setIsCheckedAll] = useState(false);
+  const [selectedId, setSelectedId] = useState([]);
+  const [showActions, setShowActions] = useState(false);
+
+  const handleSelectAll = () => {
+    setIsCheckedAll(!isCheckedAll);
+
+    if (!isCheckedAll) {
+      const allStaff = admins.map((staff) => staff.id);
+      setSelectedId(allStaff);
+      setShowActions(true);
+    } else {
+      setSelectedId([]);
+      setShowActions(false);
+    }
+  };
+
+  const handleCheckboxChange = (idStaff) => {
+    if (selectedId.includes(idStaff)) {
+      setSelectedId(selectedId.filter((id) => id !== idStaff));
+      setShowActions(false);
+    } else {
+      setSelectedId([...selectedId, idStaff]);
+      setShowActions(true);
+    }
+    
+  };
+
+  // Hiện action deleteAll
+  const handleActionSelect = (action) => {
+    if(action === "deleteAll"){
+      // Xóa everything
+    }else if(action === "disableAll"){
+      // Ngừng everything
+    }
+    setShowActions(false);
+  };
+
   return (
     <>
       <Header />
@@ -393,7 +433,6 @@ const Staff = () => {
                               />
                             </FormGroup>
                           </Col>
-
                         </Row>
                       }
                     </div>
@@ -416,8 +455,25 @@ const Staff = () => {
                   <hr className="my-4" />
                   <Row className="align-items-center my-4">
                     <div className="col" style={{ display: "flex" }}>
-
                       <h3 className="heading-small text-black mb-0"><FaFileAlt size="16px" className="mr-1" />Danh sách</h3>
+                      {/* Show Action */}
+                      {showActions && (
+                      
+                       <Input type="select" className="ml-3" name="action" style={{width: "150px" }} size="sm" onChange={(e) => handleActionSelect(e.target.value)}>
+                          <option value={""}>Chọn thao tác</option>
+                          <option value="deleteAll">Xóa tất cả</option>
+                          <option value="disableAll">Ngừng hoạt động</option>
+                        </Input>
+                      
+                    )}
+                    {/* End Show Action */}
+                    <Col>
+                      <Input type="select" name="status" style={{ width: "150px" }} size="sm"  >
+                        <option value=" ">Tất cả</option>
+                        <option value=" ">Ngừng hoạt động</option>
+                        <option value=" ">Đang hoạt động</option>
+                      </Input>
+                    </Col>
                     </div>
                     <div className="col text-right">
                       <Button
@@ -430,19 +486,18 @@ const Staff = () => {
                     </div>
 
                   </Row>
-
                   <Table className="align-items-center table-flush" responsive>
                     <thead className="thead-light">
                       <tr>
-                        {/* <th className="text-center pb-4">
+                        <th className="text-center pb-4">
                           <FormGroup check>
                             <Input
                               type="checkbox"
-                              checked={selectAll}
+                              checked={isCheckedAll}
                               onChange={handleSelectAll}
                             />
                           </FormGroup>
-                        </th> */}
+                        </th>
                         <th scope="col">STT</th>
                         <th scope="col">Họ tên</th>
                         <th scope="col">Ngày sinh</th>
@@ -452,22 +507,21 @@ const Staff = () => {
                         <th scope="col">Địa chỉ</th>
                         <th scope="col">Trạng thái</th>
                         <th scope="col">Thao tác</th>
-
                       </tr>
                     </thead>
                     <tbody>
                       {Array.isArray(admins) && admins.length > 0 ? (
                         admins.map((admin, index) => (
                           <tr key={admin.id}>
-                            {/* <td className="text-center">
+                            <td className="text-center">
                               <FormGroup check>
                                 <Input
                                   type="checkbox"
-                                  checked={selectedShoesIds.includes(shoes.id)}
-                                  onChange={() => handleShoesCheckboxChange(shoes.id)}
+                                  checked={selectedId.includes(admin.id)}
+                                  onChange={() => handleCheckboxChange(admin.id)}
                                 />
                               </FormGroup>
-                            </td> */}
+                            </td>
                             <td>{calculateIndex(index)}</td>
                             <td>{admin.fullname}</td>
                             <td>{admin.dateOfBirth}</td>
