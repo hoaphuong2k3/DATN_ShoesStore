@@ -40,10 +40,10 @@ const Staff = () => {
   const [queryParams, setQueryParams] = useState({
     page: 0,
     size: 5,
-    type: 0,
-    fullname: "",
-    status: "",
-    isdelete: 0,
+    fullname: '',
+    phonenumber: '',
+    email: '',
+    gender: '',
   });
 
 
@@ -54,7 +54,13 @@ const Staff = () => {
       setProvinces(provincesResponse.data);
 
       const response = await axiosInstance.get("/admin", {
-        params: queryParams
+        params: {
+          ...queryParams,
+          fullname: queryParams.fullname || null,
+          phonenumber: queryParams.phonenumber || null,
+          email: queryParams.email || null,
+          gender: queryParams.gender === '' ? null : queryParams.gender,
+        },
       });
       setAdmins(response.content);
       console.log(response.content);
@@ -121,7 +127,14 @@ const Staff = () => {
     setQueryParams({ ...queryParams, size: newSize, page: 0 });
   };
 
+  const handleFullnameChange = (e) => {
+    setQueryParams({ ...queryParams, fullname: e.target.value });
+  };
 
+  const handleGenderChange = (e) => {
+    const genderValue = e.target.value == "true";
+    setQueryParams({ ...queryParams, gender: genderValue});
+  }
 
   const calculateIndex = (index) => {
     return index + 1 + queryParams.page * queryParams.size;
@@ -137,10 +150,10 @@ const Staff = () => {
     setQueryParams({
       page: 0,
       size: 5,
-      type: 0,
-      fullname: "",
-      status: "",
-      isdelete: 0,
+      fullname: '',
+      phoneNumber: '',
+      email: '',
+      gender: '',
     });
   };
 
@@ -203,31 +216,13 @@ const Staff = () => {
         isDeleted: true,
       },
     });
-    // setSelectedValueType(null);
   };
 
-  //save
-
-
+  //Add
   const saveAdmin = async () => {
     try {
       if (formData.id) {
-        await axiosInstance.put(`/admin/update`, {
-          id: formData.id,
-          username: formData.username,
-          fullname: formData.fullname,
-          gender: formData.gender,
-          dateOfBirth: formData.dateOfBirth,
-          email: formData.email,
-          phoneNumber: formData.phoneNumber,
-          address: {
-            proviceCode: formData.address.proviceCode,
-            districtCode: formData.address.districtCode,
-            communeCode: formData.address.communeCode,
-            addressDetail: formData.address.addressDetail,
-            isDeleted: true,
-          },
-        });
+        await axiosInstance.put(`/admin/update`, formData);
         fetchData();
         toast.success("Cập nhật thành công!");
       } else {
@@ -266,6 +261,14 @@ const Staff = () => {
     }
   };
 
+  //update status
+  const statusUpdate = (checked) => {
+    const newStatus = checked ? 1 : 0;
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      status: newStatus,
+    }));
+  };
 
   //delete
   const deleteAdmin = (id) => {
@@ -311,14 +314,14 @@ const Staff = () => {
                               className="form-control-label"
                               htmlFor="fullname"
                             >
-                              Tên Nhân Viên:
+                              Họ tên:
                             </label>
                             <Input
                               className="form-control-alternative"
                               id="fullname"
                               type="text"
                               value={queryParams.fullname}
-                              onChange={(e) => setQueryParams({ ...queryParams, fullname: e.target.value })}
+                              onChange={handleFullnameChange}
                             />
                           </FormGroup>
                         </Col>
@@ -334,14 +337,12 @@ const Staff = () => {
                               className="form-control-alternative"
                               id="phoneNumber"
                               type="text"
-                              value={queryParams.phoneNumber}
-                              onChange={(e) => setQueryParams({ ...queryParams, phoneNumber: e.target.value })}
+                              value={queryParams.phonenumber}
+                              onChange={(e) => setQueryParams({ ...queryParams, phonenumber: e.target.value })}
                             />
                           </FormGroup>
                         </Col>
-
                       </Row>
-
                       {value === 'yes' &&
                         <Row>
                           <Col lg="6">
@@ -357,8 +358,8 @@ const Staff = () => {
                                     name="gender"
                                     type="radio"
                                     value={false}
-                                    // checked={search.gender === false || search.gender === 'false'}
-                                    onChange={(e) => setQueryParams({ ...queryParams, phoneNumber: e.target.value })}
+                                    checked={queryParams.gender === false}
+                                    onChange={handleGenderChange}
                                     />Nam
                                 </div>
                                 <div className="custom-control custom-radio">
@@ -368,10 +369,9 @@ const Staff = () => {
                                     name="gender"
                                     type="radio"
                                     value={true}
-                                    // checked={search.gender === true || search.gender === 'true'}
-                                    onChange={(e) => setQueryParams({ ...queryParams, phoneNumber: e.target.value })}
-
-                                  />Nữ
+                                    checked={queryParams.gender === true}
+                                    onChange={handleGenderChange}
+                                    />Nữ
                                 </div>
                               </div>
                             </FormGroup>
@@ -380,25 +380,17 @@ const Staff = () => {
                             <FormGroup>
                               <label
                                 className="form-control-label"
-                                htmlFor="input-city"
+                                htmlFor="email"
                               >
-                                Thành Phố / Tỉnh
+                                Email:
                               </label>
                               <Input
                                 className="form-control-alternative"
-                                type="select"
-                                value={selectedCity}
-                                onChange={(e) => setQueryParams({ ...queryParams, phoneNumber: e.target.value })}
-                                >
-                                <option value="">Chọn Thành Phố/Tỉnh</option>
-                                {provinces.map((province) => (
-                                  <option key={province.code} value={province.name}>
-                                    {province.name}
-                                  </option>
-                                ))}
-                              </Input>
-
-
+                                id="email"
+                                type="text"
+                                value={queryParams.email}
+                                onChange={(e) => setQueryParams({ ...queryParams, email: e.target.value })}
+                              />
                             </FormGroup>
                           </Col>
 
@@ -471,7 +463,7 @@ const Staff = () => {
                               </Badge>
                             </td>
                             <td>
-                              <Button color="info" size="sm" onClick={() => handleRowClick(admin)} disabled={admin.status === 0}><FaEdit /></Button>
+                              <Button color="info" size="sm" onClick={() => handleRowClick(admin)} disabled={false}><FaEdit /></Button>
                               <Button color="danger" size="sm" onClick={() => deleteAdmin(admin.id)}><FaTrash /></Button>
                             </td>
 
@@ -527,7 +519,6 @@ const Staff = () => {
                         marginPagesDisplayed={1}
                       />
                     </Col>
-
                   </Row>
                 </CardBody>
               </Card>
@@ -542,13 +533,11 @@ const Staff = () => {
             >
               <ModalHeader toggle={toggle}>
                 <h3 className="heading-small text-muted mb-0">{formData.id ? 'Cập Nhật Nhân Viên' : 'Thêm Mới Nhân Viên'}</h3>
-
               </ModalHeader>
               <ModalBody>
                 <Form>
                   <div className="pl-lg-4">
                     <Row>
-
                       <Col lg="4">
                         <FormGroup>
                           <label
@@ -563,7 +552,7 @@ const Staff = () => {
                             type="text"
                             value={formData.username}
                             onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-                            disabled = {formData.id ? true : false}
+                            disabled={formData.id ? true : false}
                           />
                         </FormGroup>
                       </Col>
@@ -766,9 +755,10 @@ const Staff = () => {
                               Trạng thái
                             </label>
                             <div className="form-control-alternative custom-toggle ml-2">
-                              <Input
+                              <Switch
                                 checked={formData.status === 0}
-                                type="checkbox"
+
+                                onChange={statusUpdate}
                               />
                               <span className="custom-toggle-slider rounded-circle" />
                             </div>
