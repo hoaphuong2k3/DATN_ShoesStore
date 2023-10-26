@@ -55,7 +55,7 @@ const Bills = () => {
           <BillDetail order={selectedOrder} />
         </Route>
       )}
-      <Container className="mt--7" fluid>
+      <Container className="mt--4" fluid>
         {/* Table */}
         <Row>
           <div className="col">

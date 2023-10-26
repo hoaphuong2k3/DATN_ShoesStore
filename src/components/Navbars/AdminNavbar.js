@@ -32,6 +32,13 @@ const AdminNavbar = (props) => {
     <>
       <Navbar className="navbar-top navbar-dark" expand="md" id="navbar-main">
         <Container fluid>
+          <div className="align-items-center d-none d-md-flex ">
+            <h5>
+              <h6 className="heading-small text-muted mb-4">
+                ADMIN
+              </h6>
+            </h5>
+          </div>
           <Nav className="align-items-center d-none d-md-flex  ml-lg-auto" navbar>
             <UncontrolledDropdown nav>
               <DropdownToggle className="pr-0" nav>
@@ -71,7 +78,7 @@ const AdminNavbar = (props) => {
                 </DropdownItem>
                 <DropdownItem divider />
                 <DropdownItem onClick={handleLogout}>
-                  <i className="ni ni-user-run"   />
+                  <i className="ni ni-user-run" />
                   <span>Logout</span>
                 </DropdownItem>
               </DropdownMenu>
