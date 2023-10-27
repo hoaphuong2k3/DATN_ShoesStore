@@ -189,10 +189,10 @@ const Cart = () => {
                               <td data-label="Ảnh Sản phẩm">
                                 <a href="/shoes/product" className="cart__image small col-md-3">
                                   <img
-                                    src={item.anh}
+                                    src={item.image}
                                     alt={item.name}
-                                    width={'200px'}
-                                    height={'200px'}
+                                    width={'70px'}
+                                    height={'70px'}
                                   />
                                 </a>
                               </td>

@@ -14,8 +14,8 @@ const DeliveryOrders = () => {
 
     const fetchData = async () => {
         try {
-            const provincesResponse = await axios.get("https://provinces.open-api.vn/api/?depth=3");
-            setProvinces(provincesResponse.data);
+            const provincesResponse = await axios.get("http://localhost:33321/api/delivery");
+            setProvinces(provincesResponse.data.data);
         } catch (error) {
             console.error("Error fetching data: ", error);
         }
@@ -128,8 +128,12 @@ const DeliveryOrders = () => {
                                                     <Input
                                                         className="form-control-alternative"
                                                         id="input-delivery-status"
-                                                        type="number"
-                                                    />
+                                                        type="select"
+                                                    >
+                                                        <option value={1}> chờ xác nhân</option>
+                                                        <option value={1}> chờ xác nhân</option>
+                                                        <option value={1}> chờ xác nhân</option>
+                                                    </Input>
                                                 </FormGroup>
                                             </Col>
                                             <Col lg="4">
@@ -250,7 +254,7 @@ const DeliveryOrders = () => {
                             <Table className="align-items-center table-flush" responsive>
                                 <thead className="thead-light">
                                     <tr>
-                                        <th scope="col">Id</th>
+                                        <th scope="col">STT</th>
                                         <th scope="col">Ngày giao</th>
                                         <th scope="col">Địa Chỉ</th>
                                         <th scope="col">Tên người nhận</th>
@@ -265,7 +269,7 @@ const DeliveryOrders = () => {
                                 </thead>
                                 <tbody>
                                     <tr>
-                                        <td>1</td>
+                                        <td>{index+1}</td>
                                         <td></td>
                                         <td></td>
                                         <td></td>
