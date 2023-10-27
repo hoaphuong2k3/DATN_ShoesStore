@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState } from 'react';
-
+import axios from 'axios';
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
@@ -8,12 +8,11 @@ export const AuthProvider = ({ children }) => {
 
   const login = (userData) => {
 
-    const { id, token} = userData;
-    setUser({ id, ...userData});
+    const { id, token, userId } = userData;
+    setUser({ id, ...userData });
     setToken(token);
     localStorage.setItem('token', token);
-    // localStorage.setItem('username', username); // Lưu username vào localStorage hoặc cookie (nếu cần)
-
+    localStorage.setItem('userId', userId);
   };
 
   const logout = () => {
@@ -21,6 +20,8 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
     setToken(null);
     localStorage.removeItem('token');
+    // Xóa Token khỏi header của mỗi yêu cầu Axios
+    delete axios.defaults.headers.common['Authorization'];
   };
 
   return (

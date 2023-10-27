@@ -19,6 +19,7 @@ import {
 import Header from "components/Headers/Header.js";
 import SalePromo from "views/admin/discount/SalePromo.js";
 import SaleProduct from "views/admin/discount/SaleProduct.js";
+import SaleBills from "views/admin/discount/SaleBills.js";
 class Discount extends React.Component {
     state = {
         iconTabs: 1,
@@ -84,6 +85,7 @@ class Discount extends React.Component {
                                                         Sản phẩm
                                                     </NavLink>
                                                 </NavItem>
+                                                
 
                                             </Nav>
                                         </div>
@@ -91,11 +93,12 @@ class Discount extends React.Component {
                                             <CardBody>
                                                 <TabContent activeTab={"iconTabs" + this.state.iconTabs}>
                                                     <TabPane tabId="iconTabs1">
-                                                        <SalePromo />
+                                                    <SaleBills />
                                                     </TabPane>
                                                     <TabPane tabId="iconTabs2">
                                                         <SaleProduct />
                                                     </TabPane>
+                                                    
 
                                                 </TabContent>
                                             </CardBody>

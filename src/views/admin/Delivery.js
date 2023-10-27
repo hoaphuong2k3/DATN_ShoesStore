@@ -4,15 +4,15 @@ import ReactPaginate from "react-paginate";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import axiosInstance from "services/custommize-axios";
-import "assets/css/pagination.css";
+import { format, parseISO } from 'date-fns';
+import { vi } from 'date-fns/locale';
 // reactstrap components
 import Switch from 'react-input-switch';
 import { Card, CardHeader, CardBody, Container, Row, Col, Form, FormGroup, Input, Button, Table, Modal, ModalBody, ModalFooter, ModalHeader, Badge } from "reactstrap";
-
 import Header from "components/Headers/Header.js";
 
 
-const Promotion = () => {
+const Delivery = () => {
 
     const [modal, setModal] = useState(false);
     const toggle = () => setModal(!modal);
@@ -22,7 +22,7 @@ const Promotion = () => {
     }
 
     const [value, setValue] = useState('no');
-    const [discounts, setDiscounts] = useState([]);
+    const [delivery, setDelivery] = useState([]);
     const [totalElements, setTotalElements] = useState(0);
     const [totalPages, setTotalPages] = useState(0);
 
@@ -30,27 +30,20 @@ const Promotion = () => {
     const [queryParams, setQueryParams] = useState({
         page: 0,
         size: 5,
-        code: "",
-        name: "",
-        minPrice: "",
-        maxPrice: "",
-        fromDate: "",
-        toDate: "",
         status: "",
-        isdelete: 0,
     });
 
 
     //loads table
     const fetchData = async () => {
         try {
-            const response = await axiosInstance.get("/admin/discount-period/getAll", {
+            const response = await axiosInstance.get("/delivery", {
                 params: queryParams
             });
-            setDiscounts(response.content);
+            setDelivery(response.content);
             setTotalElements(response.totalElements);
             setTotalPages(response.totalPages);
-            console.log(response.content);
+
         } catch (error) {
             console.error("Lỗi khi lấy dữ liệu:", error);
         }
@@ -68,99 +61,76 @@ const Promotion = () => {
         setQueryParams({ ...queryParams, size: newSize, page: 0 });
     };
 
-
-
     const calculateIndex = (index) => {
         return index + 1 + queryParams.page * queryParams.size;
     };
 
     const statusMapping = {
-        0: { color: 'danger', label: 'Kích hoạt' },
-        1: { color: 'success', label: 'Chờ kích hoạt' },
+        '0': { color: 'warning', label: 'Chờ vận chuyển' },
+        '1': { color: 'success', label: 'Đang vận chuyển' },
+        '2': { color: 'primary', label: 'Giao thành công' },
+        '-1': { color: 'danger', label: 'Đã hủy' }
     };
     //lọc
     const resetFilters = () => {
         setQueryParams({
             page: 0,
             size: 5,
-            code: "",
-            name: "",
-            minPrice: "",
-            maxPrice: "",
-            fromDate: "",
-            toDate: "",
             status: "",
-            isdelete: 0,
+            code: "",
         });
     };
 
     //click on selected
     const [formData, setFormData] = useState({
         id: null,
-        code: "",
-        name: "",
-        salePercent: "",
-        startDate: "",
-        endDate: "",
+        recipientName: "",
+        recipientPhone: "",
+        deliveryAddress: "",
+        deliveryCost: "",
         status: "",
+        codeDelivery: "",
     });
 
-    const handleRowClick = (discount) => {
-        setFormData({
-            id: discount.id,
-            code: discount.code,
-            name: discount.name,
-            startDate: discount.startDate,
-            endDate: discount.endDate,
-            salePercent: discount.salePercent,
-            status: discount.status
-        });
 
-        setModal(true);
+    const handleRowClick = async (id) => {
+        try {
+            const response = await axiosInstance.get(`/delivery/detail/${id}`);
+            setFormData(response.data);
+            setModal(true);
+        } catch (error) {
+            console.error("Lỗi khi lấy dữ liệu:", error);
+        }
     };
+
 
     //reset
     const resetForm = () => {
         setFormData({
-            name: "",
-            startDate: "",
-            endDate: "",
-            salePercent: "",
+            recipientName: "",
+            recipientPhone: "",
+            deliveryCost: "",
+            deliveryAddress: "",
+            status: "",
         });
     };
 
     //save
-    const saveDiscount = async () => {
+    const saveDiscount = async (e) => {
+        e.preventDefault();
         try {
             if (formData.id) {
-                await axiosInstance.put(`/admin/discount-period/updateDiscountPeriod`, {
-                    id: formData.id,
-                    code: formData.code,
-                    name: formData.name,
-                    startDate: formData.startDate,
-                    endDate: formData.endDate,
-                    salePercent: formData.salePercent,
-                    status: formData.status,
-                });
+                await axiosInstance.put(`/delivery/update/${formData.id}`, formData);
                 toast.success("Cập nhật thành công!");
             } else {
-                await axiosInstance.post(`/admin/discount-period/createDiscountPeriod`, {
-                    code: formData.code,
-                    name: formData.name,
-                    startDate: formData.startDate,
-                    endDate: formData.endDate,
-                    salePercent: formData.salePercent,
-                    status: formData.status,
-                });
+                await axiosInstance.post("/delivery/create", formData);
                 toast.success("Thêm mới thành công!");
             }
-
             fetchData();
-
             setModal(false);
             resetForm();
         } catch (error) {
-            console.error("Error:", error);
+            console.error("Lỗi khi lưu dữ liệu:", error);
             if (error.response) {
                 console.error("Response data:", error.response.data);
                 toast.error(error.response.data.message);
@@ -172,13 +142,12 @@ const Promotion = () => {
 
 
     //delete
-    const deleteDiscount = (id) => {
-        if (window.confirm("Bạn có chắc chắn muốn xóa khuyến mại này không?")) {
-            axiosInstance.delete(`/admin/discount-period/deleteDiscountPeriod/${id}`)
+    const deletel = (id) => {
+        if (window.confirm("Bạn có chắc chắn muốn xóa không?")) {
+            axiosInstance.patch(`/delivery/delete/${id}`)
                 .then(response => {
                     fetchData();
                     toast.success("Xóa thành công");
-                    resetForm();
                 })
                 .catch(error => {
                     console.error('Lỗi khi xóa dữ liệu:', error);
@@ -201,7 +170,7 @@ const Promotion = () => {
 
                                     <Row className="align-items-center">
                                         <div className="col">
-                                            <h3 className="mb-0">Đợt giảm giá</h3>
+                                            <h3 className="mb-0">Phiếu giao hàng</h3>
                                         </div>
                                     </Row>
                                 </CardHeader>
@@ -222,7 +191,7 @@ const Promotion = () => {
                                                                 className="form-control-label"
                                                                 htmlFor="code"
                                                             >
-                                                                Mã Khuyến mại:
+                                                                Mã phiếu giao:
                                                             </label>
                                                             <Input
                                                                 className="form-control-alternative"
@@ -239,7 +208,7 @@ const Promotion = () => {
                                                                 className="form-control-label"
                                                                 htmlFor="name"
                                                             >
-                                                                Tên Khuyến mại:
+                                                                Tên Khách hàng:
                                                             </label>
                                                             <Input
                                                                 className="form-control-alternative"
@@ -256,7 +225,7 @@ const Promotion = () => {
                                                 {value === 'yes' &&
                                                     <Row>
 
-                                                        <Col lg="2">
+                                                        <Col lg="4">
                                                             <FormGroup>
                                                                 <label
                                                                     className="form-control-label"
@@ -271,72 +240,47 @@ const Promotion = () => {
                                                                     onChange={(e) => setQueryParams({ ...queryParams, status: e.target.value })}
                                                                 >
                                                                     <option value="">Tất cả</option>
-                                                                    <option value="0">Kích hoạt</option>
-                                                                    <option value="1">Chờ kích hoạt</option>
+                                                                    <option value="-1">Đã hủy</option>
+                                                                    <option value="0">Chờ vận chuyển</option>
+                                                                    <option value="1">Đang vận chuyển</option>
+                                                                    <option value="2">Giao thành công</option>
                                                                 </Input>
                                                             </FormGroup>
                                                         </Col>
-
-                                                        <Col lg="5">
+                                                        <Col lg="4">
                                                             <FormGroup>
 
-                                                                <Row>
-                                                                    <Col xl="6">
-                                                                        <label className="form-control-label">
-                                                                            Giá trị từ:
-                                                                        </label>
-                                                                        <Input
-                                                                            className="form-control-alternative"
-                                                                            type="number"
-                                                                        />
-                                                                    </Col>
-
-                                                                    <Col xl="6">
-                                                                        <label className="form-control-label">
-                                                                            đến:
-                                                                        </label>
-                                                                        <Input
-                                                                            className="form-control-alternative"
-                                                                            type="number"
-                                                                        />
-                                                                    </Col>
-                                                                </Row>
+                                                                <label
+                                                                    className="form-control-label"
+                                                                    htmlFor="startDate"
+                                                                >
+                                                                    Ngày vận chuyển:
+                                                                </label>
+                                                                <Input
+                                                                    className="form-control-alternative"
+                                                                    id="startDate"
+                                                                    type="date"
+                                                                    value={queryParams.shipDate}
+                                                                    onChange={(e) => setQueryParams({ ...queryParams, shipDate: e.target.value })}
+                                                                />
                                                             </FormGroup>
                                                         </Col>
-                                                        <Col lg="5">
+                                                        <Col lg="4">
                                                             <FormGroup>
-                                                                <Row>
-                                                                    <Col xl="6">
-                                                                        <label
-                                                                            className="form-control-label"
-                                                                            htmlFor="startDate"
-                                                                        >
-                                                                            Từ ngày:
-                                                                        </label>
-                                                                        <Input
-                                                                            className="form-control-alternative"
-                                                                            id="startDate"
-                                                                            type="date"
-                                                                            value={queryParams.fromDate}
-                                                                            onChange={(e) => setQueryParams({ ...queryParams, fromDate: e.target.value })}
-                                                                        />
-                                                                    </Col>
-                                                                    <Col xl="6">
-                                                                        <label
-                                                                            className="form-control-label"
-                                                                            htmlFor="endDate"
-                                                                        >
-                                                                            Đến ngày:
-                                                                        </label>
-                                                                        <Input
-                                                                            className="form-control-alternative"
-                                                                            id="endDate"
-                                                                            type="date"
-                                                                            value={queryParams.toDate}
-                                                                            onChange={(e) => setQueryParams({ ...queryParams, toDate: e.target.value })}
-                                                                        />
-                                                                    </Col>
-                                                                </Row>
+
+                                                                <label
+                                                                    className="form-control-label"
+                                                                    htmlFor="startDate"
+                                                                >
+                                                                    Ngày tạo phiếu:
+                                                                </label>
+                                                                <Input
+                                                                    className="form-control-alternative"
+                                                                    id="startDate"
+                                                                    type="date"
+                                                                    value={queryParams.fromDate}
+                                                                    onChange={(e) => setQueryParams({ ...queryParams, fromDate: e.target.value })}
+                                                                />
                                                             </FormGroup>
                                                         </Col>
 
@@ -384,34 +328,42 @@ const Promotion = () => {
                                             <thead className="thead-light">
                                                 <tr>
                                                     <th scope="col">STT</th>
-                                                    <th scope="col">Mã</th>
-                                                    <th scope="col">Tên khuyến mại</th>
-                                                    <th scope="col">Giá trị</th>
-                                                    <th scope="col">Ngày bắt đầu</th>
-                                                    <th scope="col">Ngày kết thúc</th>
+                                                    <th scope="col">Mã phiếu giao</th>
+                                                    <th scope="col">Tên người nhận</th>
+                                                    <th scope="col">Số điện thoại</th>
+                                                    <th scope="col">Địa chỉ</th>
+                                                    <th scope="col">Giá vận chuyển</th>
+                                                    <th scope="col">Ngày vận chuyển</th>
+                                                    <th scope="col">Ngày tạo</th>
+                                                    <th scope="col">Ngày cập nhật</th>
                                                     <th scope="col">Trạng thái</th>
                                                     <th scope="col">Thao tác</th>
 
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                {Array.isArray(discounts) &&
-                                                    discounts.map((discount, index) => (
-                                                        <tr key={discount.id}>
+                                                {Array.isArray(delivery) &&
+                                                    delivery.map((delivery, index) => (
+                                                        <tr key={delivery.id}>
                                                             <td>{calculateIndex(index)}</td>
-                                                            <td>{discount.code}</td>
-                                                            <td>{discount.name}</td>
-                                                            <td>{discount.salePercent}%</td>
-                                                            <td>{discount.startDate}</td>
-                                                            <td>{discount.endDate}</td>
+                                                            <td>{delivery.codeDelivery}</td>
+                                                            <td>{delivery.recipientName}</td>
+                                                            <td>{delivery.recipientPhone}</td>
+                                                            <td>{delivery.deliveryAddress}</td>
+                                                            <td>{delivery.deliveryCost}</td>
+                                                            <td>{delivery.shipDate}</td>
+                                                            <td>{format(new Date(delivery.createdTime), 'yyyy-MM-dd HH:mm', { locale: vi })}</td>
+                                                            <td>{format(new Date(delivery.updatedTime), 'yyyy-MM-dd HH:mm', { locale: vi })}</td>
+
+
                                                             <td>
-                                                                <Badge color={statusMapping[discount.status]?.color || statusMapping.default.color}>
-                                                                    {statusMapping[discount.status]?.label || statusMapping.default.label}
+                                                                <Badge color={statusMapping[delivery.status]?.color || statusMapping.default.color}>
+                                                                    {statusMapping[delivery.status]?.label || statusMapping.default.label}
                                                                 </Badge>
                                                             </td>
                                                             <td>
-                                                                <Button color="info" size="sm" onClick={() => handleRowClick(discount)} disabled={discount.status === 2}><FaEdit /></Button>
-                                                                <Button color="danger" size="sm" onClick={() => deleteDiscount(discount.id)}><FaTrash /></Button>
+                                                                <Button color="info" size="sm" onClick={() => handleRowClick(delivery.id)} disabled={delivery.status === -1}><FaEdit /></Button>
+                                                                <Button color="danger" size="sm" onClick={() => deletel(delivery.id)}><FaTrash /></Button>
                                                             </td>
 
                                                         </tr>
@@ -422,7 +374,7 @@ const Promotion = () => {
                                         <Row className="mt-4">
                                             <Col lg={6}>
                                                 <div style={{ fontSize: 14 }}>
-                                                    Đang xem <b>{queryParams.page * queryParams.size + 1}</b>  đến <b>{queryParams.page * queryParams.size + discounts.length}</b> trong tổng số <b></b> mục
+                                                    Đang xem <b>{queryParams.page * queryParams.size + 1}</b>  đến <b>{queryParams.page * queryParams.size + delivery.length}</b> trong tổng số <b></b> mục
                                                 </div>
                                             </Col>
                                             <Col style={{ fontSize: 14 }} lg={2}>
@@ -473,8 +425,7 @@ const Promotion = () => {
                                         style={{ maxWidth: '700px' }}
                                     >
                                         <ModalHeader toggle={toggle}>
-                                            <h3 className="heading-small text-muted mb-0">{formData.id ? 'Cập Nhật Khuyến mại' : 'Thêm Mới Khuyến mại'}</h3>
-
+                                            <h3 className="heading-small text-muted mb-0">{formData.id ? 'Cập Nhật Phiếu giao' : 'Thêm Mới Phiếu giao'}</h3>
                                         </ModalHeader>
                                         <ModalBody>
                                             <Form>
@@ -487,14 +438,14 @@ const Promotion = () => {
                                                                     className="form-control-label"
                                                                     htmlFor="name"
                                                                 >
-                                                                    Tên Khuyến mãi
+                                                                    Tên người nhận
                                                                 </label>
                                                                 <Input
                                                                     className="form-control-alternative"
                                                                     id="name"
                                                                     type="text"
-                                                                    value={formData.name}
-                                                                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                                                    value={formData.recipientName}
+                                                                    onChange={(e) => setFormData({ ...formData, recipientName: e.target.value })}
                                                                 />
                                                             </FormGroup>
                                                         </Col>
@@ -504,15 +455,14 @@ const Promotion = () => {
                                                                 <label
                                                                     className="form-control-label"
                                                                 >
-                                                                    Giá trị giảm:
+                                                                    Số điện thoại:
                                                                 </label>
                                                                 <Input
                                                                     className="form-control-alternative"
-                                                                    type="number"
-                                                                    value={formData.salePercent}
-                                                                    onChange={(e) => setFormData({ ...formData, salePercent: e.target.value })}
+                                                                    type="text"
+                                                                    value={formData.recipientPhone}
+                                                                    onChange={(e) => setFormData({ ...formData, recipientPhone: e.target.value })}
                                                                 />
-
                                                             </FormGroup>
                                                         </Col>
 
@@ -522,14 +472,13 @@ const Promotion = () => {
                                                                     className="form-control-label"
                                                                     htmlFor="startDate"
                                                                 >
-                                                                    Ngày bắt đầu
+                                                                    Địa chỉ nhận:
                                                                 </label>
                                                                 <Input
                                                                     className="form-control-alternative"
-                                                                    id="startDate"
-                                                                    type="date"
-                                                                    value={formData.startDate}
-                                                                    onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
+                                                                    type="text"
+                                                                    value={formData.deliveryAddress}
+                                                                    onChange={(e) => setFormData({ ...formData, deliveryAddress: e.target.value })}
                                                                 />
                                                             </FormGroup>
                                                         </Col>
@@ -539,14 +488,13 @@ const Promotion = () => {
                                                                     className="form-control-label"
                                                                     htmlFor="endDate"
                                                                 >
-                                                                    Ngày kết thúc
+                                                                    Giá vận chuyển:
                                                                 </label>
                                                                 <Input
                                                                     className="form-control-alternative"
-                                                                    id="endDate"
-                                                                    type="date"
-                                                                    value={formData.endDate}
-                                                                    onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
+                                                                    type="number"
+                                                                    value={formData.deliveryCost}
+                                                                    onChange={(e) => setFormData({ ...formData, deliveryCost: e.target.value })}
                                                                 />
                                                             </FormGroup>
                                                         </Col>
@@ -586,4 +534,4 @@ const Promotion = () => {
     );
 }
 
-export default Promotion;
+export default Delivery;

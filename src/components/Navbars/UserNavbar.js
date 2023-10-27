@@ -132,13 +132,17 @@ const UserNavbar = () => {
                     <i className="ni ni-single-02" />
                     <span>Tài khoản</span>
                   </DropdownItem>
+                  <DropdownItem to="/shoes/account" tag={Link}>
+                    <i className="ni ni-single-02" />
+                    <span>Đơn mua</span>
+                  </DropdownItem>
                   <DropdownItem to="/" tag={Link}>
                     <i className="ni ni-favourite-28" />
                     <span>Yêu thích</span>
                   </DropdownItem>
                   <DropdownItem divider />
-                  <DropdownItem>
-                    <i className="ni ni-user-run" onClick={handleLogout} />
+                  <DropdownItem onClick={handleLogout}>
+                    <i className="ni ni-user-run"  />
                     <span>Đăng xuất</span>
                   </DropdownItem>
                 </DropdownMenu>

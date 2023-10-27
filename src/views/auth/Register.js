@@ -43,11 +43,15 @@ const Register = () => {
       navigate("/");
       console.log(response.data);
     } catch (error) {
-      if (error.response && error.response.data && error.response.data.errors) {
-        setErrors(error.response.data.errors);
-      } else {
-        console.error("Lỗi từ máy chủ:", error.response ? error.response.data : error.message);
-      }
+      console.error("Response data:", error.response.data);
+      // setErrors(error.response.data.message.errors);
+      toast.error(error.response.data.message);
+
+      // if (error.response && error.response.data && error.response.data.errors) {
+      //   setErrors(error.response.data.errors);
+      // } else {
+      //   console.error("Lỗi từ máy chủ:", error.response ? error.response.data : error.message);
+      // }
       toast.error("Đăng ký thất bại.");
     }
   };

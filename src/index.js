@@ -8,7 +8,6 @@ import "assets/plugins/nucleo/css/nucleo.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import "assets/scss/argon-dashboard-react.scss";
 import 'bootstrap/dist/css/bootstrap.min.css';
-
 import AdminLayout from "layouts/Admin.js";
 import AuthLayout from "layouts/Auth.js";
 import UserLayout from "layouts/User.js";
@@ -20,15 +19,15 @@ const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <>
     <BrowserRouter>
-    <AuthProvider>
-      <CartProvider>
-        <Routes>
-          <Route path="/admin/*" element={<AdminLayout />} />
-          <Route path="/*" element={<AuthLayout />} />
-          <Route path="/shoes/*" element={<UserLayout />} />
-          <Route path="*" element={<Navigate to="/login" replace />} />
-        </Routes>
-      </CartProvider>
+      <AuthProvider>
+        <CartProvider>
+          <Routes>
+            <Route path="/admin/*" element={<AdminLayout />} />
+            <Route path="/*" element={<AuthLayout />} />
+            <Route path="/shoes/*" element={<UserLayout />} />
+            <Route path="*" element={<Navigate to="/login" replace />} />
+          </Routes>
+        </CartProvider>
       </AuthProvider>
     </BrowserRouter>
     {/* // <DetailSP /> */}
