@@ -759,7 +759,8 @@ const Products = () => {
 
                         </th>
                         <th>STT</th>
-                        <th>Mã</th>
+                        <th>Mã <i class="fa-solid fa-arrow-up"></i>
+                        <i class="fa-solid fa-arrow-down"></i></th>
                         <th>Tên</th>
                         <th>Hãng</th>
                         <th>Xuất xứ</th>

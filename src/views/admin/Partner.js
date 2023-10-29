@@ -22,6 +22,8 @@ const Partner = () => {
   const handleDelete = () => {
     setUploadedFile(null);
   };
+  const base64Data ='';
+  const dataUrl = `data:image/png;base64,${base64Data}`;
   return (
     <>
       <Header />
@@ -33,6 +35,14 @@ const Partner = () => {
                 <h3 className="mb-0">Đối tác</h3>
               </CardHeader>
               <CardBody>
+           
+
+     
+                {/* <div>
+                  <img src={`data:image/png;base64,${}`} alt="Image" />
+                </div> */}
+        
+
                 <div className="upload-container">
                   {uploadedFile ? (
                     <div className="uploaded-image">
