@@ -397,11 +397,8 @@ const Staff = () => {
                                   </option>
                                 ))}
                               </Input>
-
-
                             </FormGroup>
                           </Col>
-
                         </Row>
                       }
                     </div>
@@ -436,21 +433,11 @@ const Staff = () => {
                         + Thêm mới
                       </Button>
                     </div>
-
                   </Row>
-
                   <Table className="align-items-center table-flush" responsive>
                     <thead className="thead-light">
                       <tr>
-                        {/* <th className="text-center pb-4">
-                          <FormGroup check>
-                            <Input
-                              type="checkbox"
-                              checked={selectAll}
-                              onChange={handleSelectAll}
-                            />
-                          </FormGroup>
-                        </th> */}
+                        
                         <th scope="col">STT</th>
                         <th scope="col">Họ tên</th>
                         <th scope="col">Ngày sinh</th>
