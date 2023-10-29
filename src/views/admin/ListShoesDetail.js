@@ -91,11 +91,6 @@ const ListShoesDetail = () => {
                 // setlistUsers(res.data);
             }
         } catch (error) {
-            let errorMessage = "Lỗi từ máy chủ";
-            if (error.response && error.response.data && error.response.data.message) {
-                errorMessage = error.response.data.message;
-            }
-            toast.error(errorMessage);
             setListShoesDetail([]);
         }
     }
@@ -736,6 +731,7 @@ const ListShoesDetail = () => {
                                                     <th>Size</th>
                                                     <th>Số lượng</th>
                                                     <th>Giá</th>
+                                                    <th>Giá sau khuyến mại</th>
                                                     <th>Trạng thái</th>
 
                                                     <th colSpan={2}>Thao tác</th>
@@ -763,6 +759,7 @@ const ListShoesDetail = () => {
                                                                 <td>{item.size}</td>
                                                                 <td>{item.quantity}</td>
                                                                 <td>{item.price}</td>
+                                                                <td>{item.discountPrice}</td>
                                                                 <td>
                                                                     <Badge color={statusMapping[item.status]?.color || statusMapping.default.color}>
                                                                         {statusMapping[item.status]?.label || statusMapping.default.label}

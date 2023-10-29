@@ -52,6 +52,28 @@ const Products = () => {
     toDateStr: "",
     createdBy: ""
   });
+  useEffect(() => {
+    if (value === 'no') {
+      setSearch({
+        ...search,
+        brandId: null,
+        originId: null,
+        designStyleId: null,
+        skinTypeId: null,
+        soleId: null,
+        liningId: null,
+        toeId: null,
+        cushionId: null,
+        fromPrice: null,
+        toPrice: null,
+        fromQuantity: null,
+        toQuantity: null,
+        fromDateStr: "",
+        toDateStr: "",
+        createdBy: ""
+      })
+    }
+  }, [value]);
   const resetSearch = () => {
     setSearch({
       code: "",
@@ -80,14 +102,15 @@ const Products = () => {
   const onChangeSize = (e) => {
     setSize(+e.target.value);
   }
-  const onInputChange = async (e) => {
-    await setSearch({ ...search, [e.target.name]: e.target.value });
-    getAll(page, size);
+  const onInputChange = (e) => {
+    setSearch({ ...search, [e.target.name]: e.target.value });
   };
   useEffect(() => {
     getAll(page, size);
   }, [search]);
-
+  const searchShoes = () => {
+    getAll(page, size);
+  };
   useEffect(() => {
     getAll(page, size);
   }, [size, page]);
@@ -165,11 +188,6 @@ const Products = () => {
         setTotalPages(res.data.totalPages);
       }
     } catch (error) {
-      let errorMessage = "Lỗi từ máy chủ";
-      if (error.response && error.response.data && error.response.data.message) {
-        errorMessage = error.response.data.message;
-      }
-      toast.error(errorMessage);
       setListShoes([]);
     }
   }
@@ -629,7 +647,7 @@ const Products = () => {
                     </span>
                   </Col>
                   <Col lg="6" xl="8">
-                    <Button color="warning" >
+                    <Button color="warning" onClick={searchShoes}>
                       <i class="fa-solid fa-magnifying-glass" /> &nbsp;
                       Tìm kiếm
                     </Button>
@@ -839,7 +857,7 @@ const Products = () => {
                     <ReactPaginate
                       breakLabel="..."
                       nextLabel=">"
-                      pageRangeDisplayed={2} // Number of pages to display on each side of the selected page
+                      pageRangeDisplayed={1} // Number of pages to display on each side of the selected page
                       pageCount={totalPages} // Total number of pages
                       previousLabel="<"
                       onPageChange={handlePageClick}

@@ -14,6 +14,7 @@ import BillDetail from "views/admin/BillDetail.js";
 import ListShoesDetail from "views/admin/ListShoesDetail.js";
 import Discount from "views/admin/discount/Discount.js";
 import Delivery from "views/admin/Delivery.js";
+import Partner from "views/admin/Partner.js";
 var routes = [
   {
     path: "/index",
@@ -115,6 +116,13 @@ var routes = [
   {
     path: "/shoesdetail/:id",
     component: <ListShoesDetail />,
+    layout: "/admin",
+  },
+  {
+    path: "/partner",
+    name: "Thống kê",
+    icon: "ni ni-money-coins text-green",
+    component: <Partner />,
     layout: "/admin",
   }
 ];

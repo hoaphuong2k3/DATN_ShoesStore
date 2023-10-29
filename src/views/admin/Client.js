@@ -19,10 +19,7 @@ const Client = () => {
   const [modalAdd, setModalAdd] = useState(false);
   const toggle = () => setModalAdd(!modalAdd);
   const [value, setValue] = useState('no');
-  const [provinces, setProvinces] = useState([]);
-  const [selectedCity, setSelectedCity] = useState("");
-  const [selectedDistrict, setSelectedDistrict] = useState("");
-  const [selectedWard, setSelectedWard] = useState("");
+
   const [listClient, setListClient] = useState([]);
 
 
@@ -45,21 +42,24 @@ const Client = () => {
       dateOfBirth: ""
     });
   };
-
+  useEffect(() => {
+    { value === 'no' && setSearch({ ...search, email: "", gender: "" }) }
+  }, [value]);
   const [search, setSearch] = useState({
     fullname: null,
-    gender: false,
+    gender: null,
     dateOfBirth: null,
     email: null,
-    phoneNumber: null,
+    phonenumber: null,
   })
+
   const resetSearch = () => {
     setSearch({
       fullname: "",
-      gender: false,
+      gender: "",
       dateOfBirth: "",
       email: "",
-      phoneNumber: "",
+      phonenumber: "",
     });
   };
   const onInputChangeSearch = (e) => {
@@ -213,27 +213,38 @@ const Client = () => {
   //Kết thúc hàm update
 
   //Xử lý địa chỉ
+  const [provinces, setProvinces] = useState([]);
+  const [selectedCity, setSelectedCity] = useState("");
+  const [selectedDistrict, setSelectedDistrict] = useState("");
+  const [selectedWard, setSelectedWard] = useState("");
   const [idClient, setIdClient] = useState(null);
   const [modalAdress, setModalAdress] = useState(false);
   const toggleAdress = () => setModalAdress(!modalAdress);
+
+  useEffect(() => {
+    if (modalAdress === false) {
+      setIdClient(null);
+      setListAddress([])
+    }
+  }, [modalAdress]);
   const [modalAddAdress, setModalAddAdress] = useState(false);
   const toggleAddAdress = () => setModalAddAdress(!modalAddAdress);
+  const [listAddress, setListAddress] = useState([]);
+  const getAllAddress = async () => {
+    console.log(idClient)
+    const res = await axios.get(`http://localhost:33321/api/address/${idClient}`);
+    console.log("chek", res);
+    if (res && res.data) {
+      setListAddress(res.data.content);
+      console.log(listAddress);
+    }
+  }
+
   const onClickListAdress = async (id) => {
+    const res = await axios.get(`http://localhost:33321/api/address/${id}`);
+    console.log(res.data.content)
+    setListAddress(res.data.content);
     setIdClient(id);
-    const response = await detailClient(id);
-    setEditClient({
-      id: id,
-      avatar: response.data.avatar,
-      fullname: response.data.fullname,
-      phoneNumber: response.data.phoneNumber,
-      email: response.data.email,
-      username: response.data.username,
-      gender: response.data.gender,
-      dateOfBirth: response.data.dateOfBirth,
-      updatedTime: response.data.updatedTime,
-      createdTime: response.data.createdTime
-    });
-    console.log(editClient);
     toggleAdress();
   };
   const handleCityChange = (e) => {
@@ -313,8 +324,8 @@ const Client = () => {
                               id="input-email"
                               placeholder="Nhập số điện thoại"
                               type="text"
-                              name="phoneNumber"
-                              value={search.phoneNumber}
+                              name="phonenumber"
+                              value={search.phonenumber}
                               onChange={(e) => onInputChangeSearch(e)}
                             />
                           </FormGroup>
@@ -360,21 +371,17 @@ const Client = () => {
                                 className="form-control-label"
                                 htmlFor="input-city"
                               >
-                                Thành Phố / Tỉnh
+                                Email
                               </label>
                               <Input
                                 className="form-control-alternative"
-                                type="select"
-                                value={selectedCity}
+                                id="input-username"
+                                placeholder="Nhập tên"
+                                type="text"
+                                name="email"
+                                value={search.email}
                                 onChange={(e) => onInputChangeSearch(e)}
-                              >
-                                <option value="">Chọn Thành Phố/Tỉnh</option>
-                                {provinces.map((province) => (
-                                  <option key={province.code} value={province.name}>
-                                    {province.name}
-                                  </option>
-                                ))}
-                              </Input>
+                              />
 
 
                             </FormGroup>
@@ -432,11 +439,11 @@ const Client = () => {
 
                         </th>
                         <th scope="col">STT</th>
-                        <th scope="col">Họ tên</th>
-                        <th scope="col">Email</th>
-                        <th scope="col">Số điện thoại</th>
+                        <th scope="col">Họ tên <i class="fa-solid fa-arrow-up"></i><i class="fa-solid fa-arrow-down"></i></th>
+                        <th scope="col">Email <i class="fa-solid fa-arrow-up"></i><i class="fa-solid fa-arrow-down"></i></th>
+                        <th scope="col">Số điện thoại <i class="fa-solid fa-arrow-up"></i><i class="fa-solid fa-arrow-down"></i></th>
                         <th scope="col">Giới tính</th>
-                        <th scope="col">Ngày sinh</th>
+                        <th scope="col">Ngày sinh <i class="fa-solid fa-arrow-up"></i><i class="fa-solid fa-arrow-down"></i></th>
                         <th scope="col">Thao tác</th>
 
                       </tr>
@@ -501,11 +508,11 @@ const Client = () => {
                       </Row>
 
                     </Col>
-                    <Col lg={4} style={{ fontSize: 11 }} className="mt--1">
+                    <Col lg={4} style={{ fontSize: 11 }} className="mt--1 d-flex justify-content-end">
                       <ReactPaginate
                         breakLabel="..."
                         nextLabel=">"
-                        pageRangeDisplayed={2} // Number of pages to display on each side of the selected page
+                        pageRangeDisplayed={1} // Number of pages to display on each side of the selected page
                         pageCount={totalPages} // Total number of pages
                         previousLabel="<"
                         onPageChange={handlePageClick}
@@ -961,22 +968,37 @@ const Client = () => {
           </Row>
           <Form>
             <div className="pl-lg-4">
-              <Row>
-                <Col lg="9"  >
-                  <div style={{ fontSize: 13 }} className="text-small text-muted mb-0">
-                    Số nhà 16, 17 Phú Kiều, Phường Phúc Diễn, Quận Bắc Từ Liêm, TP Hà Nội
-                  </div>
-                </Col>
-                <Col lg="3" className="mr--1">
-                  <Button color="info" size="sm">
-                    <FaEdit />
-                  </Button>
-                  <Button color="danger" size="sm" >
-                    <FaTrash />
-                  </Button>
-                </Col>
-              </Row>
-              <hr />
+              {listAddress.length <= 0 &&
+                <Row style={{ fontSize: 13 }} className="text-small text-muted mb-0">
+                  Không có dữ liệu
+                </Row>
+              }
+              {
+                listAddress && listAddress.length > 0 &&
+                listAddress.map((item, index) => {
+                  return (
+                    <>
+                      <Row>
+                        <Col lg="9"  >
+                          <div style={{ fontSize: 13 }} className="text-small text-muted mb-0">
+                            {item.addressDetail},&nbsp;{item.proviceCode},&nbsp;{item.districtCode},&nbsp;{item.communeCode}
+                          </div>
+                        </Col>
+                        <Col lg="3" className="mr--1">
+                          <Button color="info" size="sm">
+                            <FaEdit />
+                          </Button>
+                          <Button color="danger" size="sm" >
+                            <FaTrash />
+                          </Button>
+                        </Col>
+                      </Row>
+                      <hr />
+                    </>
+                  )
+                })
+              }
+
               <Row>
                 <Col lg="9"  >
                   <div style={{ fontSize: 13 }} className="text-small text-muted mb-0">
