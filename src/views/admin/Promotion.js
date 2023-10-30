@@ -25,18 +25,21 @@ const Promotion = () => {
     const [discounts, setDiscounts] = useState([]);
     const [totalElements, setTotalElements] = useState(0);
     const [totalPages, setTotalPages] = useState(0);
-
+    const [selectAll, setSelectAll] = useState(false);
+    const [selectedItems, setSelectedItems] = useState([]);
+    const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
 
     const [queryParams, setQueryParams] = useState({
         page: 0,
         size: 5,
         code: "",
         name: "",
-        minPrice: "",
-        maxPrice: "",
+        minPercent: "",
+        maxPercent: "",
         fromDate: "",
         toDate: "",
         status: "",
+        typePeriod: "",
         isdelete: 0,
     });
 
@@ -92,15 +95,39 @@ const Promotion = () => {
         });
     };
 
+    //checkbox
+    const handleCheckboxChange = (id) => {
+        const updatedSelectedItems = [...selectedItems];
+        if (updatedSelectedItems.includes(id)) {
+            updatedSelectedItems.splice(updatedSelectedItems.indexOf(id), 1);
+        } else {
+            updatedSelectedItems.push(id);
+        }
+        setSelectedItems(updatedSelectedItems);
+        setSelectAll(updatedSelectedItems.length === discounts.length);
+    };
+
+    const handleSelectAll = () => {
+        if (selectAll) {
+            setSelectedItems([]);
+        } else {
+            setSelectedItems(discounts.map(discount => discount.id));
+        }
+        setSelectAll(!selectAll);
+    };
+
     //click on selected
     const [formData, setFormData] = useState({
         id: null,
         code: "",
         name: "",
+        minPrice: "",
         salePercent: "",
         startDate: "",
         endDate: "",
         status: "",
+        giftId: "",
+        typePeriod: "",
     });
 
     const handleRowClick = (discount) => {
@@ -108,10 +135,13 @@ const Promotion = () => {
             id: discount.id,
             code: discount.code,
             name: discount.name,
+            minPrice: discount.minPrice,
+            salePercent: discount.salePercent,
             startDate: discount.startDate,
             endDate: discount.endDate,
-            salePercent: discount.salePercent,
-            status: discount.status
+            status: discount.status,
+            giftId: discount.giftId,
+            typePeriod: discount.typePeriod,
         });
 
         setModal(true);
@@ -121,9 +151,13 @@ const Promotion = () => {
     const resetForm = () => {
         setFormData({
             name: "",
+            minPrice: "",
+            salePercent: "",
             startDate: "",
             endDate: "",
-            salePercent: "",
+            status: "",
+            giftId: "",
+            typePeriod: "",
         });
     };
 
@@ -135,20 +169,25 @@ const Promotion = () => {
                     id: formData.id,
                     code: formData.code,
                     name: formData.name,
+                    minPrice: formData.minPrice,
+                    salePercent: formData.salePercent,
                     startDate: formData.startDate,
                     endDate: formData.endDate,
-                    salePercent: formData.salePercent,
                     status: formData.status,
+                    giftId: formData.giftId,
+                    typePeriod: formData.typePeriod,
                 });
                 toast.success("Cập nhật thành công!");
             } else {
                 await axiosInstance.post(`/admin/discount-period/createDiscountPeriod`, {
                     code: formData.code,
                     name: formData.name,
+                    minPrice: formData.minPrice,
+                    salePercent: formData.salePercent,
                     startDate: formData.startDate,
                     endDate: formData.endDate,
-                    salePercent: formData.salePercent,
-                    status: formData.status,
+                    giftId: formData.giftId,
+                    typePeriod: formData.typePeriod,
                 });
                 toast.success("Thêm mới thành công!");
             }
@@ -184,6 +223,16 @@ const Promotion = () => {
         }
     };
 
+    const handleDeleteButtonClick = () => {
+        if (selectedItems.length > 0) {
+            if (window.confirm("Bạn có chắc chắn muốn xóa các khuyến mại đã chọn không?")) {
+                selectedItems.forEach(id => {
+                    deleteDiscount(id);
+                });
+                setSelectedItems([]);
+            }
+        }
+    };
 
     return (
         <>
@@ -368,6 +417,14 @@ const Promotion = () => {
                                             </div>
                                             <div className="col text-right">
                                                 <Button
+                                                    color="danger"
+                                                    size="sm"
+                                                    onClick={handleDeleteButtonClick}
+                                                    disabled={selectedItems.length === 0}
+                                                >
+                                                    Xóa tất cả
+                                                </Button>
+                                                <Button
                                                     color="primary"
                                                     onClick={handleModal}
                                                     size="sm"
@@ -381,14 +438,26 @@ const Promotion = () => {
                                         <Table className="align-items-center table-flush" responsive>
                                             <thead className="thead-light">
                                                 <tr>
+                                                    <th className="text-center pb-4">
+                                                        <FormGroup check>
+                                                            <Input
+                                                                type="checkbox"
+                                                                checked={selectAll}
+                                                                onChange={handleSelectAll}
+                                                            />
+                                                        </FormGroup>
+                                                    </th>
                                                     <th scope="col">STT</th>
+                                                    <th scope="col">Trạng thái</th>
+                                                    <th scope="col">Loại</th>
                                                     <th scope="col">Mã</th>
                                                     <th scope="col">Tên khuyến mại</th>
+                                                    <th scope="col">Hóa đơn <br />tối thiểu </th>
                                                     <th scope="col">Giá trị</th>
+                                                    <th scope="col">Quà tặng</th>
                                                     <th scope="col">Ngày bắt đầu</th>
                                                     <th scope="col">Ngày kết thúc</th>
-                                                    <th scope="col">Trạng thái</th>
-                                                    <th scope="col">Thao tác</th>
+                                                    <th scope="col" className="fixed-column">Thao tác</th>
 
                                                 </tr>
                                             </thead>
@@ -396,20 +465,33 @@ const Promotion = () => {
                                                 {Array.isArray(discounts) &&
                                                     discounts.map((discount, index) => (
                                                         <tr key={discount.id}>
+                                                            <td className="text-center">
+                                                                <FormGroup check>
+                                                                    <Input
+                                                                        type="checkbox"
+                                                                        checked={selectedItems.includes(discount.id)}
+                                                                        onChange={() => handleCheckboxChange(discount.id)}
+                                                                    />
+                                                                </FormGroup>
+                                                            </td>
                                                             <td>{calculateIndex(index)}</td>
-                                                            <td>{discount.code}</td>
-                                                            <td>{discount.name}</td>
-                                                            <td>{discount.salePercent}%</td>
-                                                            <td>{discount.startDate}</td>
-                                                            <td>{discount.endDate}</td>
                                                             <td>
                                                                 <Badge color={statusMapping[discount.status]?.color || statusMapping.default.color}>
                                                                     {statusMapping[discount.status]?.label || statusMapping.default.label}
                                                                 </Badge>
                                                             </td>
+                                                            <td>{discount.typePeriod == 0 ? "Order" : "FreeShip"}</td>
+                                                            <td>{discount.code}</td>
+                                                            <td>{discount.name}</td>
+                                                            <td>{discount.minPrice}VNĐ</td>
+                                                            <td>{discount.salePercent}%</td>
+                                                            <td>{discount.giftId}</td>
+                                                            <td>{discount.startDate}</td>
+                                                            <td>{discount.endDate}</td>
+
                                                             <td>
-                                                                <Button color="info" size="sm" onClick={() => handleRowClick(discount)} disabled={discount.status === 2}><FaEdit /></Button>
-                                                                <Button color="danger" size="sm" onClick={() => deleteDiscount(discount.id)}><FaTrash /></Button>
+                                                                <Button color="danger" size="sm" onClick={() => handleRowClick(discount)} disabled={discount.status === 2}><i class="fa-solid fa-pen" /></Button>
+                                                                <Button color="danger" size="sm" onClick={() => deleteDiscount(discount.id)}> <i class="fa-solid fa-trash" /></Button>
                                                             </td>
 
                                                         </tr>
@@ -483,6 +565,37 @@ const Promotion = () => {
                                                             <FormGroup>
                                                                 <label
                                                                     className="form-control-label"
+                                                                >
+                                                                    Loại Khuyến mại
+                                                                </label>
+                                                                <div style={{ display: "flex" }}>
+
+                                                                    <div className="custom-control custom-radio">
+                                                                        <Input
+                                                                            className="custom-control-alternative"
+                                                                            name="type"
+                                                                            type="radio"
+                                                                            checked={formData.typePeriod === 0}
+                                                                            onChange={() => setFormData({ ...formData, typePeriod: 0 })}
+                                                                        />Order
+                                                                    </div>
+                                                                    <div className="custom-control custom-radio">
+                                                                        <Input
+                                                                            className="custom-control-alternative"
+                                                                            type="radio"
+                                                                            checked={formData.typePeriod === 1}
+                                                                            onChange={() => setFormData({ ...formData, typePeriod: 1 })}
+                                                                        />FreeShip
+                                                                    </div>
+
+                                                                </div>
+                                                            </FormGroup>
+                                                        </Col>
+
+                                                        <Col lg="6">
+                                                            <FormGroup>
+                                                                <label
+                                                                    className="form-control-label"
                                                                     htmlFor="name"
                                                                 >
                                                                     Tên Khuyến mãi
@@ -496,24 +609,110 @@ const Promotion = () => {
                                                                 />
                                                             </FormGroup>
                                                         </Col>
+                                                        {formData.typePeriod === 0 ? (
+                                                            <>
+                                                                <Col lg="6">
+                                                                    <FormGroup>
+                                                                        <label
+                                                                            className="form-control-label"
+                                                                            htmlFor="startDate"
+                                                                        >
+                                                                            Hóa đơn tối thiểu:
+                                                                        </label>
+                                                                        <Input
+                                                                            className="form-control-alternative"
+                                                                            type="number"
+                                                                            value={formData.minPrice}
+                                                                            onChange={(e) => setFormData({ ...formData, minPrice: e.target.value })}
+                                                                        />
+                                                                    </FormGroup>
+                                                                </Col>
 
-                                                        <Col lg="6">
+                                                                <Col lg="6">
+                                                                    <FormGroup>
+                                                                        <label
+                                                                            className="form-control-label"
+                                                                        >
+                                                                            Giá trị giảm:
+                                                                        </label>
+                                                                        <Input
+                                                                            className="form-control-alternative"
+                                                                            type="number"
+                                                                            value={formData.salePercent}
+                                                                            onChange={(e) => setFormData({ ...formData, salePercent: e.target.value })}
+                                                                        />
+                                                                    </FormGroup>
+                                                                </Col>
+
+                                                                {/* <Col lg="6">
                                                             <FormGroup>
                                                                 <label
                                                                     className="form-control-label"
-                                                                >
-                                                                    Giá trị giảm:
+                                                                    htmlFor="input-price">
+                                                                    Khách hàng
                                                                 </label>
-                                                                <Input
-                                                                    className="form-control-alternative"
-                                                                    type="number"
-                                                                    value={formData.salePercent}
-                                                                    onChange={(e) => setFormData({ ...formData, salePercent: e.target.value })}
-                                                                />
-
+                                                                <div style={{ display: "flex" }}>
+                                                                    
+                                                                    <div className="custom-control custom-radio">
+                                                                        <Input
+                                                                            className="custom-control-alternative"
+                                                                            name="client"
+                                                                            type="checkbox"
+                                                                        />Đồng
+                                                                    </div>
+                                                                    <div className="custom-control custom-radio">
+                                                                        <Input
+                                                                            className="custom-control-alternative"
+                                                                            name="client"
+                                                                            type="checkbox"
+                                                                        />Bạc
+                                                                    </div>
+                                                                    <div className="custom-control custom-radio">
+                                                                        <Input
+                                                                            className="custom-control-alternative"
+                                                                            name="client"
+                                                                            type="checkbox"
+                                                                        />Vàng
+                                                                    </div>
+                                                                </div>
+                                                                <div style={{ display: "flex" }}>
+                                                                    
+                                                                    <div className="custom-control custom-radio">
+                                                                        <Input
+                                                                            className="custom-control-alternative"
+                                                                            name="client"
+                                                                            type="checkbox"
+                                                                        />Kim cương
+                                                                    </div>
+                                                                    <div className="custom-control custom-radio">
+                                                                        <Input
+                                                                            className="custom-control-alternative"
+                                                                            name="client"
+                                                                            type="checkbox"
+                                                                        />Khách lẻ
+                                                                    </div>
+                                                                </div>
                                                             </FormGroup>
-                                                        </Col>
+                                                        </Col> */}
 
+                                                                <Col lg="6">
+                                                                    <FormGroup>
+                                                                        <label
+                                                                            className="form-control-label"
+                                                                        >
+                                                                            Quà tặng kèm:
+                                                                        </label>
+                                                                        <Input
+                                                                            className="form-control-alternative"
+                                                                            type="select"
+                                                                            value={formData.giftId}
+                                                                            onChange={(e) => setFormData({ ...formData, giftId: e.target.value })}
+                                                                        />
+                                                                    </FormGroup>
+                                                                </Col>
+                                                            </>
+
+                                                        ) : null}
                                                         <Col lg="6">
                                                             <FormGroup>
                                                                 <label
