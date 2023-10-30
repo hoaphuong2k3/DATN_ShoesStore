@@ -65,12 +65,26 @@ const Delivery = () => {
         return index + 1 + queryParams.page * queryParams.size;
     };
 
-    const statusMapping = {
-        '0': { color: 'warning', label: 'Chờ vận chuyển' },
-        '1': { color: 'success', label: 'Đang vận chuyển' },
-        '2': { color: 'primary', label: 'Giao thành công' },
-        '-1': { color: 'danger', label: 'Đã hủy' }
+    const statusOptions = [
+        { value: '0', label: 'Chờ vận chuyển' },
+        { value: '1', label: 'Đang vận chuyển' },
+        { value: '2', label: 'Giao thành công' },
+        { value: '-1', label: 'Đã hủy' }
+    ];
+    const handleStatusChange = (event, deliveryId) => {
+        const selectedStatus = event.target.value;
+        axiosInstance
+            .put(`/delivery/update-status/${deliveryId}/${selectedStatus}`)
+            .then(response => {
+                toast.success("Cập nhật trạng thái thành công");
+                fetchData();
+            })
+            .catch(error => {
+                console.error('Lỗi khi cập nhật trạng thái:', error);
+                toast.error("Có lỗi xảy ra khi cập nhật trạng thái");
+            });
     };
+
     //lọc
     const resetFilters = () => {
         setQueryParams({
@@ -328,15 +342,18 @@ const Delivery = () => {
                                             <thead className="thead-light">
                                                 <tr>
                                                     <th scope="col">STT</th>
+                                                    <th scope="col">Trạng thái</th>
                                                     <th scope="col">Mã phiếu giao</th>
                                                     <th scope="col">Tên người nhận</th>
                                                     <th scope="col">Số điện thoại</th>
                                                     <th scope="col">Địa chỉ</th>
                                                     <th scope="col">Giá vận chuyển</th>
                                                     <th scope="col">Ngày vận chuyển</th>
+                                                    <th scope="col">Ngày nhận</th>
                                                     <th scope="col">Ngày tạo</th>
                                                     <th scope="col">Ngày cập nhật</th>
-                                                    <th scope="col">Trạng thái</th>
+                                                    <th scope="col">Ngày hủy</th>
+
                                                     <th scope="col">Thao tác</th>
 
                                                 </tr>
@@ -346,21 +363,28 @@ const Delivery = () => {
                                                     delivery.map((delivery, index) => (
                                                         <tr key={delivery.id}>
                                                             <td>{calculateIndex(index)}</td>
+                                                            <td>
+                                                                <select
+                                                                    value={delivery.status.toString()}
+                                                                    onChange={(event) => handleStatusChange(event, delivery.id)}
+                                                                    disabled={delivery.status === -1}
+                                                                >
+                                                                    {statusOptions.map(option => (
+                                                                        <option key={option.value} value={option.value}>{option.label}</option>
+                                                                    ))}
+                                                                </select>
+                                                            </td>
+
                                                             <td>{delivery.codeDelivery}</td>
                                                             <td>{delivery.recipientName}</td>
                                                             <td>{delivery.recipientPhone}</td>
                                                             <td>{delivery.deliveryAddress}</td>
-                                                            <td>{delivery.deliveryCost}</td>
+                                                            <td>{delivery.deliveryCost} VNĐ</td>
                                                             <td>{delivery.shipDate}</td>
+                                                            <td>{delivery.receivedDate}</td>
                                                             <td>{format(new Date(delivery.createdTime), 'yyyy-MM-dd HH:mm', { locale: vi })}</td>
                                                             <td>{format(new Date(delivery.updatedTime), 'yyyy-MM-dd HH:mm', { locale: vi })}</td>
-
-
-                                                            <td>
-                                                                <Badge color={statusMapping[delivery.status]?.color || statusMapping.default.color}>
-                                                                    {statusMapping[delivery.status]?.label || statusMapping.default.label}
-                                                                </Badge>
-                                                            </td>
+                                                            <td>{delivery.cancellationDate}</td>
                                                             <td>
                                                                 <Button color="info" size="sm" onClick={() => handleRowClick(delivery.id)} disabled={delivery.status === -1}><FaEdit /></Button>
                                                                 <Button color="danger" size="sm" onClick={() => deletel(delivery.id)}><FaTrash /></Button>
