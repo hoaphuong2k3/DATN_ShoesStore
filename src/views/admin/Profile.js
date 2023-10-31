@@ -13,6 +13,7 @@ import {
   Col,
 } from "reactstrap";
 import Select from "react-select";
+import axiosInstance from "services/custommize-axios";
 // core components
 import ProfileHeader from "components/Headers/ProfileHeader";
 
@@ -23,15 +24,32 @@ const Profile = () => {
   const [selectedCity, setSelectedCity] = useState("");
   const [selectedDistrict, setSelectedDistrict] = useState("");
   const [selectedWard, setSelectedWard] = useState("");
-  const [admins, setAdmins] = useState([]);
+  const [admins, setAdmins] = useState({
+    id: "",
+    username: "",
+    fullname: "",
+    gender: false,
+    dateOfBirth: "",
+    email: "",
+    phoneNumber: "",
+    // address: {
+      proviceCode: "",
+      districtCode: "",
+      communeCode: "",
+      addressDetail: "",
+      isDeleted: true,
+    // },
+    status: "",
+  });
 
   const fetchData = async () => {
     try {
       const provincesResponse = await axios.get("https://provinces.open-api.vn/api/?depth=3");
       setProvinces(provincesResponse.data);
 
-      const adminsResponse = await axios.get("http://localhost:33321/api/account/{username}");
-      setAdmins(adminsResponse.data.content);
+      const response = await axiosInstance.get("/staff/detail/6");
+      setAdmins(response.data);
+      console.log(response.data);
     } catch (error) {
       console.error("Error fetching data: ", error);
     }
@@ -167,11 +185,11 @@ const Profile = () => {
                           >
                             Họ tên
                           </label>
-                          <Input
+                          <Input 
                             className="form-control-alternative"
                             id="fullname"
                             type="text"
-
+                            value={admins.fullname}
                           />
                         </FormGroup>
                       </Col>
@@ -187,7 +205,7 @@ const Profile = () => {
                             className="form-control-alternative"
                             id="input-email"
                             type="email"
-
+                            value={admins.email}
                           />
                         </FormGroup>
                       </Col>
@@ -199,13 +217,13 @@ const Profile = () => {
                             className="form-control-label"
                             htmlFor="input-first-name"
                           >
-                            Sinh nhật
+                            Ngày Sinh
                           </label>
                           <Input
                             className="form-control-alternative"
                             id="birthday"
                             type="date"
-
+                            value={admins.dateOfBirth}
                           />
                         </FormGroup>
                       </Col>
@@ -221,7 +239,7 @@ const Profile = () => {
                             className="form-control-alternative"
                             id="phoneNumber"
                             type="tel"
-
+                            value={admins.phoneNumber}
                           />
                         </FormGroup>
                       </Col>
@@ -246,7 +264,7 @@ const Profile = () => {
                             className="form-control-alternative"
                             id="input-address"
                             type="text"
-
+                            value={admins.addressDetail}
                           />
                         </FormGroup>
                       </Col>

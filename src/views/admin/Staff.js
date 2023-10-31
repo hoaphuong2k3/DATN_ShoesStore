@@ -54,13 +54,14 @@ const Staff = () => {
       const provincesResponse = await axios.get("https://provinces.open-api.vn/api/?depth=3");
       setProvinces(provincesResponse.data);
 
-      const response = await axiosInstance.get("/admin", {
+      const response = await axiosInstance.get("/staff", {
         params: {
           ...queryParams,
           fullname: queryParams.fullname || null,
           phonenumber: queryParams.phonenumber || null,
           email: queryParams.email || null,
           gender: queryParams.gender === '' ? null : queryParams.gender,
+          // gender: queryParams.gender
         },
       });
       setAdmins(response.content);
@@ -223,11 +224,11 @@ const Staff = () => {
   const saveAdmin = async () => {
     try {
       if (formData.id) {
-        await axiosInstance.put(`/admin/update`, formData);
+        await axiosInstance.put(`/staff/update`, formData);
         fetchData();
         toast.success("Cập nhật thành công!");
       } else {
-        await axiosInstance.post('/admin/create', {
+        await axiosInstance.post('/staff/create', {
           username: formData.username,
           fullname: formData.fullname,
           gender: formData.gender,
@@ -274,7 +275,7 @@ const Staff = () => {
   //delete
   const deleteAdmin = (id) => {
     if (window.confirm("Bạn có chắc chắn muốn xóa không?")) {
-      axiosInstance.patch(`/admin/delete/${id}`)
+      axiosInstance.patch(`/staff/delete/${id}`)
         .then(response => {
           fetchData();
           toast.success("Xóa thành công");
@@ -323,6 +324,16 @@ const Staff = () => {
     }
     setShowActions(false);
   };
+
+  // update status
+    const lock = async (id) => {
+        await axiosInstance.put(`/staff/update-status/${id}`);
+        fetchData();
+    };
+    // const openlock = async (id) => {
+    //     await axios.put(`/staff/update-status/{id}/${id}`);
+    //     getAll();
+    // };
 
   return (
     <>
