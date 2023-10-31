@@ -464,7 +464,7 @@ const Client = () => {
 
                           </th>
                           <td className="text-center">{index + 1}</td>
-                          <td>{item.fullname}</td>
+
                           <td>
                             <img src={`data:image/png;base64,${item.avatar}`} alt="Image" />
                           </td>

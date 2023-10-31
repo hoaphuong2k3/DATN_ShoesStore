@@ -457,6 +457,7 @@ const DetailProducts = () => {
                                                     {selectedImage && (
                                                         <div>
                                                             <p>Selected Image:</p>
+                                                            <img src={`data:image/png;base64,${selectedImage}`} alt="Image" />
                                                             <img src={`https://s3-ap-southeast-1.amazonaws.com/imageshoestore/${selectedImage}`} alt="Ảnh mô tả" />
                                                         </div>
                                                     )}
