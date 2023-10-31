@@ -65,7 +65,7 @@ const SaleProduct = () => {
     const getAll2 = async (id, page, size) => {
         try {
             let res = await getAllShoesDetail2(id, page, size, search2);
-            console.log(res);
+            console.log(res.data.content);
             if (res && res.data && res.data.content) {
                 setListShoesDetail(res.data.content);
             }
@@ -157,13 +157,13 @@ const SaleProduct = () => {
     };
 
     const handleShoesCheckboxChange = (shoesId) => {
-        let updatedSelectedShoesIds = [...selectedShoesIds];
-        if (updatedSelectedShoesIds.includes(shoesId)) {
-            updatedSelectedShoesIds = updatedSelectedShoesIds.filter(id => id !== shoesId);
+        let shoesIds = [...selectedShoesIds];
+        if (shoesIds.includes(shoesId)) {
+            shoesIds = shoesIds.filter(id => id !== shoesId);
         } else {
-            updatedSelectedShoesIds.push(shoesId);
+            shoesIds.push(shoesId);
         }
-        setSelectedShoesIds(updatedSelectedShoesIds);
+        setSelectedShoesIds(shoesIds);
     };
 
     const fetchSelectedShoesDetails = () => {
@@ -180,22 +180,16 @@ const SaleProduct = () => {
         fetchSelectedShoesDetails();
     }, [selectedShoesIds, page, size]);
 
-    const handleSelectAllDetails = () => {
-        if (selectedDetailIds.length === listDetail.length) {
-            setSelectedDetailIds([]);
-        } else {
-            const allDetailIds = listDetail.map(detail => detail.id);
-            setSelectedDetailIds(allDetailIds);
-        }
-    };
     const handleDetailCheckboxChange = (detailId) => {
-        if (selectedDetailIds.includes(detailId)) {
-            setSelectedDetailIds(selectedDetailIds.filter(id => id !== detailId));
+        let detailIds = [...selectedDetailIds];
+        if (detailIds.includes(detailId)) {
+            detailIds = detailIds.filter(id => id !== detailId);
         } else {
-            setSelectedDetailIds([...selectedDetailIds, detailId]);
+            detailIds.push(detailId);
         }
+        setSelectedDetailIds(detailIds); 
+        console.log(detailIds);
     };
-
 
     //click on selected
     const [formData, setFormData] = useState({
@@ -210,7 +204,7 @@ const SaleProduct = () => {
         startDate: "",
         endDate: "",
         status: "",
-        idShoes: null,
+        // idShoe: [],
     });
 
     const handleRowClick = (discount) => {
@@ -275,10 +269,8 @@ const SaleProduct = () => {
         try {
             const formattedStartDate = formatDateTime(formData.startDate);
             const formattedEndDate = formatDateTime(formData.endDate);
-            const discountData = {
-                selectedDetails: selectedDetailIds.map(detailId => ({ id: detailId })),
-            };
-    
+            console.log("formData:", formData);
+            console.log("selectedDetailIds:", selectedDetailIds);
 
             if (formData.id) {
                 await axiosInstance.put(`/promos/updatePromos`, {
@@ -293,11 +285,9 @@ const SaleProduct = () => {
                     salePercent: formData.sale ? formData.salePercent : null,
                     salePrice: formData.sale ? null : formData.salePrice,
                     status: formData.status,
-                    selectedDetails: discountData.selectedDetails,
+                    idShoe: selectedDetailIds,
                 });
-
                 fetchData();
-
                 toast.success("Cập nhật thành công!");
             } else {
                 await axiosInstance.post('/promos/createPromos', {
@@ -310,9 +300,8 @@ const SaleProduct = () => {
                     endDate: formattedEndDate,
                     salePercent: formData.sale ? formData.salePercent : null,
                     salePrice: formData.sale ? null : formData.salePrice,
-                    selectedDetails: discountData.selectedDetails,
+                    idShoe: selectedDetailIds,
                 });
-
                 fetchData();
                 toast.success("Thêm mới thành công!");
             }
@@ -338,7 +327,7 @@ const SaleProduct = () => {
     };
     const deleteDiscount = (id) => {
         if (confirmDelete()) {
-            axiosInstance.delete(`/promos/deletePromos/${id}`)
+            axiosInstance.delete(`/promos/deletePromos`)
                 .then(response => {
                     fetchData();
                     toast.success("Xóa thành công");
@@ -863,8 +852,7 @@ const SaleProduct = () => {
                                                 <FormGroup check>
                                                     <Input
                                                         type="checkbox"
-                                                        checked={selectedDetailIds.length === listDetail.length}
-                                                        onChange={handleSelectAllDetails}
+
                                                     />
                                                 </FormGroup>
                                             </th>
@@ -883,7 +871,7 @@ const SaleProduct = () => {
                                                     <FormGroup check>
                                                         <Input
                                                             type="checkbox"
-                                                            checked={selectedDetailIds.includes(detail.id)}
+                                                            checked={selectedDetailIds.includes(detail.id)}  
                                                             onChange={() => handleDetailCheckboxChange(detail.id)}
                                                         />
                                                     </FormGroup>

@@ -20,6 +20,8 @@ const Promotion = () => {
         resetForm();
         setModal(true);
     }
+    const [secondModal, setSecondModal] = useState(false);
+    const toggleSecondModal = () => setSecondModal(!secondModal);
 
     const [value, setValue] = useState('no');
     const [discounts, setDiscounts] = useState([]);
@@ -27,7 +29,6 @@ const Promotion = () => {
     const [totalPages, setTotalPages] = useState(0);
     const [selectAll, setSelectAll] = useState(false);
     const [selectedItems, setSelectedItems] = useState([]);
-    const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
 
     const [queryParams, setQueryParams] = useState({
         page: 0,
@@ -78,6 +79,7 @@ const Promotion = () => {
     const statusMapping = {
         0: { color: 'danger', label: 'Kích hoạt' },
         1: { color: 'success', label: 'Chờ kích hoạt' },
+        2: { color: 'warning', label: 'Ngừng kích hoạt' }
     };
     //lọc
     const resetFilters = () => {
@@ -127,7 +129,7 @@ const Promotion = () => {
         endDate: "",
         status: "",
         giftId: "",
-        typePeriod: "",
+        typePeriod: 0,
     });
 
     const handleRowClick = (discount) => {
@@ -157,15 +159,21 @@ const Promotion = () => {
             endDate: "",
             status: "",
             giftId: "",
-            typePeriod: "",
+            typePeriod: 0,
         });
     };
 
     //save
     const saveDiscount = async () => {
         try {
-            if (formData.id) {
-                await axiosInstance.put(`/admin/discount-period/updateDiscountPeriod`, {
+            const apiUrl = formData.id
+                ? `/admin/discount-period/updateDiscountPeriod`
+                : `/admin/discount-period/createDiscountPeriod`;
+
+            await axiosInstance({
+                method: formData.id ? 'put' : 'post',
+                url: apiUrl,
+                data: {
                     id: formData.id,
                     code: formData.code,
                     name: formData.name,
@@ -176,24 +184,16 @@ const Promotion = () => {
                     status: formData.status,
                     giftId: formData.giftId,
                     typePeriod: formData.typePeriod,
-                });
+                },
+            });
+
+            if (formData.id) {
                 toast.success("Cập nhật thành công!");
             } else {
-                await axiosInstance.post(`/admin/discount-period/createDiscountPeriod`, {
-                    code: formData.code,
-                    name: formData.name,
-                    minPrice: formData.minPrice,
-                    salePercent: formData.salePercent,
-                    startDate: formData.startDate,
-                    endDate: formData.endDate,
-                    giftId: formData.giftId,
-                    typePeriod: formData.typePeriod,
-                });
                 toast.success("Thêm mới thành công!");
             }
 
             fetchData();
-
             setModal(false);
             resetForm();
         } catch (error) {
@@ -206,7 +206,6 @@ const Promotion = () => {
             }
         }
     };
-
 
     //delete
     const deleteDiscount = (id) => {
@@ -449,15 +448,15 @@ const Promotion = () => {
                                                     </th>
                                                     <th scope="col">STT</th>
                                                     <th scope="col">Trạng thái</th>
-                                                    <th scope="col">Loại</th>
                                                     <th scope="col">Mã</th>
+                                                    <th scope="col">Loại</th>
                                                     <th scope="col">Tên khuyến mại</th>
                                                     <th scope="col">Hóa đơn <br />tối thiểu </th>
                                                     <th scope="col">Giá trị</th>
                                                     <th scope="col">Quà tặng</th>
                                                     <th scope="col">Ngày bắt đầu</th>
                                                     <th scope="col">Ngày kết thúc</th>
-                                                    <th scope="col" style={{position: "sticky",zIndex: '1',right: '0'}}>Thao tác</th>
+                                                    <th scope="col" style={{ position: "sticky", zIndex: '1', right: '0' }}>Thao tác</th>
 
                                                 </tr>
                                             </thead>
@@ -475,23 +474,23 @@ const Promotion = () => {
                                                                 </FormGroup>
                                                             </td>
                                                             <td>{calculateIndex(index)}</td>
-                                                            <td>
+                                                            <td style={{ textAlign: "center" }}>
                                                                 <Badge color={statusMapping[discount.status]?.color || statusMapping.default.color}>
                                                                     {statusMapping[discount.status]?.label || statusMapping.default.label}
                                                                 </Badge>
                                                             </td>
-                                                            <td>{discount.typePeriod == 0 ? "Order" : "FreeShip"}</td>
                                                             <td>{discount.code}</td>
+                                                            <td>{discount.typePeriod == 0 ? "Order" : "FreeShip"}</td>
                                                             <td>{discount.name}</td>
-                                                            <td>{discount.minPrice}VNĐ</td>
+                                                            <td style={{ textAlign: "right" }}>{discount.minPrice} VNĐ</td>
                                                             <td>{discount.salePercent}%</td>
                                                             <td>{discount.giftId}</td>
                                                             <td>{discount.startDate}</td>
                                                             <td>{discount.endDate}</td>
 
-                                                            <td style={{position: "sticky",zIndex: '1',right: '0'}}>
-                                                                <Button color="danger" size="sm" onClick={() => handleRowClick(discount)} disabled={discount.status === 2}><i class="fa-solid fa-pen" /></Button>
-                                                                <Button color="danger" size="sm" onClick={() => deleteDiscount(discount.id)}> <i class="fa-solid fa-trash" /></Button>
+                                                            <td style={{ position: "sticky", zIndex: '1', right: '0', background: "#f6f9fc" }}>
+                                                                <Button color="info" size="sm" onClick={() => handleRowClick(discount)}><FaEdit /></Button>
+                                                                <Button color="danger" size="sm" onClick={() => deleteDiscount(discount.id)}> <FaTrash /></Button>
                                                             </td>
 
                                                         </tr>
@@ -695,12 +694,13 @@ const Promotion = () => {
                                                             </FormGroup>
                                                         </Col> */}
 
-                                                                <Col lg="6">
+                                                                <Col lg="12">
                                                                     <FormGroup>
                                                                         <label
                                                                             className="form-control-label"
                                                                         >
                                                                             Quà tặng kèm:
+                                                                            <Button className="ml-2" size="sm" onClick={toggleSecondModal}>+</Button>
                                                                         </label>
                                                                         <Input
                                                                             className="form-control-alternative"
@@ -747,14 +747,8 @@ const Promotion = () => {
                                                                 />
                                                             </FormGroup>
                                                         </Col>
-
-
-
                                                     </Row>
-
                                                 </div>
-
-
                                             </Form >
                                         </ModalBody >
                                         <ModalFooter>
@@ -770,8 +764,80 @@ const Promotion = () => {
                                                 </Button>
                                             </div>
                                         </ModalFooter>
-
                                     </Modal >
+
+                                    <Modal isOpen={secondModal} toggle={toggleSecondModal}>
+                                        <ModalHeader toggle={toggleSecondModal}>
+                                            Quà tặng
+                                        </ModalHeader>
+                                        <ModalBody>
+                                            <Form>
+                                                <div className="pl-lg-4">
+                                                    <Row>
+                                                        <Col lg="6" className="d-flex justify-content-center" >
+                                                            <div style={{ filter: 'grayscale(100%)', border: '1px solid #ccc', width: '140px', height: '110px' }}>
+                                                                <img src={require("../../assets/img/theme/team-4-800x800.jpg")} alt="..." width={140} height={110} />
+                                                            </div>
+                                                        </Col>
+                                                        <Col>
+                                                            <Row>
+                                                                <Col lg="12">
+                                                                    <FormGroup>
+                                                                        <Input
+                                                                            className="form-control-alternative"
+                                                                            type="text"
+                                                                            placeholder="Tên quà tặng"
+                                                                        />
+                                                                    </FormGroup>
+                                                                </Col>
+                                                                <Col lg="12">
+                                                                    <FormGroup>
+                                                                        <Input
+                                                                            className="form-control-alternative"
+                                                                            type="number" min={0}
+                                                                            placeholder="Số lượng"
+                                                                        />
+                                                                    </FormGroup>
+                                                                </Col>
+                                                            </Row>
+                                                        </Col>
+                                                    </Row>
+
+                                                    <Table>
+                                                        <thead className="thead-light">
+                                                            <tr>
+                                                                <th scope="col">STT</th>
+                                                                <th scope="col">Mã</th>
+                                                                <th scope="col">Ảnh</th>
+                                                                <th scope="col">Tên</th>
+                                                                <th scope="col">Số lượng</th>
+                                                                <th scope="col">Trạng thái</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+
+
+                                                        </tbody>
+                                                    </Table>
+
+
+                                                </div>
+                                            </Form>
+                                        </ModalBody>
+                                        <ModalFooter>
+                                            <Button color="primary" size="sm">
+                                                Cập nhật
+                                            </Button>
+                                            <Button color="primary" size="sm">
+                                                Thêm
+                                            </Button>
+
+                                            <Button color="danger" size="sm" onClick={toggleSecondModal}>
+                                                Đóng
+                                            </Button>
+                                        </ModalFooter>
+                                    </Modal>
+
                                 </CardBody>
                             </Card>
                         </div>
