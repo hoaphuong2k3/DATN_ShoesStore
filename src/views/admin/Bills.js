@@ -15,14 +15,6 @@ const Bills = () => {
 
 
   useEffect(() => {
-    // fetch("https://datnshoes-default-rtdb.firebaseio.com/order.json")
-    // .then((response) => response.json())
-    // .then((data) => {
-    //   const ordersArray = Object.values(data);
-    //   setorders(ordersArray);
-    //   console.log(ordersArray);
-    // })
-    // .catch((err) => console.error(err));
     fetchOrders();
   }, []);
 
@@ -55,7 +47,7 @@ const Bills = () => {
           <BillDetail order={selectedOrder} />
         </Route>
       )}
-      <Container className="mt--4" fluid>
+      <Container fluid>
         {/* Table */}
         <Row>
           <div className="col">

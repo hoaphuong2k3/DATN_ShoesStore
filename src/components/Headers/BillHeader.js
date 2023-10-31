@@ -3,7 +3,7 @@ import { Card, CardBody, CardTitle, Container, Row, Col, CardHeader } from "reac
 const Header = () => {
   return (
     <>
-      <div className="header bg-gradient-info pb-4 pt-4 pt-md-6">
+      <div className="header bg-gradient-light pt-4 pt-md-6 mb-3">
         {/* <Container fluid>
           <div className="header-body">
            

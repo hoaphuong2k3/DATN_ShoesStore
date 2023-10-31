@@ -126,8 +126,9 @@ var routes = [
     component: <Promo2 />,
     layout: "/admin",
   },
+  {
     path: "/partner",
-    name: "Thống kê",
+    name: "Thống kê 1",
     icon: "ni ni-money-coins text-green",
     component: <Partner />,
     layout: "/admin",
