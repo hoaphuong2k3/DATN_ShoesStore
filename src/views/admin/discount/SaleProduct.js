@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
 import { FaEdit, FaTrash, FaSearch, FaFileAlt } from 'react-icons/fa';
 import ReactPaginate from "react-paginate";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import axiosInstance from "services/custommize-axios";
 import { getAllShoes } from "services/Product2Service";
-import { getAllShoesDetail } from "services/ShoesDetailService.js";
+import { getAllShoesDetail2 } from "services/ShoesDetailService.js";
 import { format, parseISO } from 'date-fns';
 import { vi } from 'date-fns/locale';
 import "assets/css/pagination.css";
@@ -29,11 +28,55 @@ const SaleProduct = () => {
     const [totalPages, setTotalPages] = useState(0);
 
     const [listShoes, setListShoes] = useState([]);
+    const [listDetail, setListShoesDetail] = useState([]);
     const [selectAll, setSelectAll] = useState(false);
     const [selectedShoesIds, setSelectedShoesIds] = useState([]);
     const [page, setPage] = useState(0);
     const [size, setSize] = useState(10);
 
+
+
+    const [search1, setSearch1] = useState({
+        code: "",
+        name: "",
+    });
+    const [search2, setSearch2] = useState({
+        code: "",
+        "status": 1
+    });
+
+    //loads product
+    const getAll1 = async (page, size) => {
+        try {
+            let res = await getAllShoes(page, size, search1);
+            if (res && res.data && res.data.content) {
+                setListShoes(res.data.content);
+            }
+        } catch (error) {
+            console.error("Lỗi khi lấy dữ liệu:", error);
+        }
+    }
+    useEffect(() => {
+        getAll1(page, size);
+    }, [search1]);
+
+    //loads productDetail
+    const getAll2 = async (id, page, size) => {
+        try {
+            let res = await getAllShoesDetail2(id ,page, size, search2);
+            console.log(res);
+            if (res && res.data && res.data.content) {
+                setListShoesDetail(res.data.content);
+            }
+        } catch (error) {
+            setListShoesDetail([]);
+        }
+    }
+    useEffect(() => {
+        getAll2(page, size);
+    }, [search2]);
+
+    //loads voucher
     const [queryParams, setQueryParams] = useState({
         page: 0,
         size: 5,
@@ -45,59 +88,6 @@ const SaleProduct = () => {
         status: "",
         isdelete: 0,
     });
-
-    const [search, setSearch] = useState({
-        code: "",
-        name: "",
-        brandId: null,
-        originId: null,
-        designStyleId: null,
-        skinTypeId: null,
-        soleId: null,
-        liningId: null,
-        toeId: null,
-        cushionId: null,
-        fromPrice: null,
-        toPrice: null,
-        fromQuantity: null,
-        toQuantity: null,
-        fromDateStr: "",
-        toDateStr: "",
-        createdBy: ""
-    });
-
-    //loads table
-    const getAll = async (page, size) => {
-        try {
-            let res = await getAllShoes(page, size, search);
-            if (res && res.data && res.data.content) {
-                setListShoes(res.data.content);
-            }
-        } catch (error) {
-            console.error("Lỗi khi lấy dữ liệu:", error);
-        }
-    }
-    useEffect(() => {
-        getAll(page, size);
-    }, [search]);
-
-    const handleSelectAll = () => {
-        setSelectAll(!selectAll);
-
-        if (!selectAll) {
-            const allShoesIds = listShoes.map(shoes => shoes.id);
-            setSelectedShoesIds(allShoesIds);
-        } else {
-            setSelectedShoesIds([]);
-        }
-    };
-    const handleShoesCheckboxChange = (shoesId) => {
-        if (selectedShoesIds.includes(shoesId)) {
-            setSelectedShoesIds(selectedShoesIds.filter(id => id !== shoesId));
-        } else {
-            setSelectedShoesIds([...selectedShoesIds, shoesId]);
-        }
-    };
 
     const fetchData = async () => {
         try {
@@ -116,6 +106,7 @@ const SaleProduct = () => {
         fetchData();
     }, [queryParams]);
 
+    //phân trang
     const handlePageChange = ({ selected }) => {
         setQueryParams(prevParams => ({ ...prevParams, page: selected }));
     };
@@ -129,11 +120,13 @@ const SaleProduct = () => {
         return index + 1 + queryParams.page * queryParams.size;
     };
 
+    //status
     const statusMapping = {
         0: { color: 'danger', label: 'Kích hoạt' },
         1: { color: 'success', label: 'Chờ kích hoạt' },
         2: { color: 'warning', label: 'Đã hủy' },
     };
+
     //lọc
     const resetFilters = () => {
         setQueryParams({
@@ -149,6 +142,44 @@ const SaleProduct = () => {
         });
     };
 
+    //checkbox
+    const handleSelectAll = () => {
+        setSelectAll(!selectAll);
+
+        if (!selectAll) {
+            const allShoesIds = listShoes.map(shoes => shoes.id);
+            setSelectedShoesIds(allShoesIds);
+            
+        } else {
+            setSelectedShoesIds([]);
+        }
+    };
+   
+    const handleShoesCheckboxChange = (shoesId) => {
+        let updatedSelectedShoesIds = [...selectedShoesIds];
+        if (updatedSelectedShoesIds.includes(shoesId)) {
+            updatedSelectedShoesIds = updatedSelectedShoesIds.filter(id => id !== shoesId);
+        } else {
+            updatedSelectedShoesIds.push(shoesId);
+        }
+        setSelectedShoesIds(updatedSelectedShoesIds);
+    };
+
+    const fetchSelectedShoesDetails = () => {
+        if (selectedShoesIds.length > 0) {
+            selectedShoesIds.forEach(shoesId => {
+                getAll2(shoesId, page, size);
+            });
+        } else {
+            setListShoesDetail([]);
+        }
+    };
+
+    useEffect(() => {
+        fetchSelectedShoesDetails();
+    }, [selectedShoesIds, page, size]);
+
+
     //click on selected
     const [formData, setFormData] = useState({
         id: null,
@@ -162,6 +193,7 @@ const SaleProduct = () => {
         startDate: "",
         endDate: "",
         status: "",
+        idShoe: [""],
     });
 
     const handleRowClick = (discount) => {
@@ -239,7 +271,8 @@ const SaleProduct = () => {
                     endDate: formattedEndDate,
                     salePercent: formData.sale ? formData.salePercent : null,
                     salePrice: formData.sale ? null : formData.salePrice,
-                    status: formData.status
+                    status: formData.status,
+                    idShoe: formData.idShoe,
                 });
 
                 fetchData();
@@ -256,6 +289,7 @@ const SaleProduct = () => {
                     endDate: formattedEndDate,
                     salePercent: formData.sale ? formData.salePercent : null,
                     salePrice: formData.sale ? null : formData.salePrice,
+                    idShoe: formData.idShoe,
                 });
 
                 fetchData();
@@ -557,7 +591,7 @@ const SaleProduct = () => {
                 toggle={toggle}
                 backdrop={'static'}
                 keyboard={false}
-                style={{ maxWidth: '1100px' }}
+                style={{ maxWidth: '1200px' }}
             >
                 <ModalHeader toggle={toggle}>
                     <h3 className="heading-small text-muted mb-0">{formData.id ? 'Cập Nhật Khuyến mại' : 'Thêm Mới Khuyến mại'}</h3>
@@ -739,7 +773,7 @@ const SaleProduct = () => {
                             <h3 className="heading-small text-muted mb-0">Áp dụng với:</h3>
                         </Row>
                         <Row>
-                            <Col lg="5">
+                            <Col lg="6">
                                 <Row className="align-items-center my-4">
                                     <div className="col" style={{ display: "flex" }}>
                                         <h3 className="heading-small text-black mb-0">Loại sản phẩm</h3>
@@ -763,6 +797,9 @@ const SaleProduct = () => {
                                             <th scope="col">Mã</th>
                                             <th scope="col">Tên sản phẩm</th>
                                             <th scope="col">Thương hiệu</th>
+                                            <th scope="col">Xuất xứ</th>
+                                            <th scope="col">Thiết kế</th>
+                                            <th scope="col">Loại da</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -780,13 +817,16 @@ const SaleProduct = () => {
                                                 <td>{shoes.code}</td>
                                                 <td>{shoes.name}</td>
                                                 <td>{shoes.brand}</td>
+                                                <td>{shoes.origin}</td>
+                                                <td>{shoes.designStyle}</td>
+                                                <td>{shoes.skinType}</td>
                                             </tr>
                                         ))}
 
                                     </tbody>
                                 </Table>
                             </Col>
-                            <Col lg="7">
+                            <Col lg="6">
                                 <Row className="align-items-center my-4">
                                     <div className="col" style={{ display: "flex" }}>
                                         <h3 className="heading-small text-black mb-0">Chi tiết sản phẩm</h3>
@@ -812,19 +852,21 @@ const SaleProduct = () => {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr>
+                                    {listDetail.map((detail, index) => (
+                                        <tr key={detail.id}>
                                             <td className="text-center">
                                                 <FormGroup check>
                                                     <Input type="checkbox" />
                                                 </FormGroup>
                                             </td>
+                                            <td>{detail.code}</td>
+                                            <td>{detail.size}</td>
+                                            <td>{detail.color}</td>
+                                            <td>{detail.price}</td>
                                             <td></td>
-                                            <td></td>
-                                            <td></td>
-                                            <td></td>
-                                            <td></td>
-                                            <td></td>
+                                            <td>{detail.status === 1 ? "Đang kinh doanh": ""}</td>
                                         </tr>
+                                        ))}
                                     </tbody>
                                 </Table>
                                 <div className="pagination-container" style={{ fontSize: 8 }}>

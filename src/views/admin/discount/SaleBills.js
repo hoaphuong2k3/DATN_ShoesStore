@@ -155,7 +155,6 @@ const SaleBills = () => {
             sale: false
 
         });
-        // setSelectedValueType(null);
     };
 
     //save

@@ -457,7 +457,7 @@ const Promotion = () => {
                                                     <th scope="col">Quà tặng</th>
                                                     <th scope="col">Ngày bắt đầu</th>
                                                     <th scope="col">Ngày kết thúc</th>
-                                                    <th scope="col" className="fixed-column">Thao tác</th>
+                                                    <th scope="col" style={{position: "sticky",zIndex: '1',right: '0'}}>Thao tác</th>
 
                                                 </tr>
                                             </thead>
@@ -489,7 +489,7 @@ const Promotion = () => {
                                                             <td>{discount.startDate}</td>
                                                             <td>{discount.endDate}</td>
 
-                                                            <td>
+                                                            <td style={{position: "sticky",zIndex: '1',right: '0'}}>
                                                                 <Button color="danger" size="sm" onClick={() => handleRowClick(discount)} disabled={discount.status === 2}><i class="fa-solid fa-pen" /></Button>
                                                                 <Button color="danger" size="sm" onClick={() => deleteDiscount(discount.id)}> <i class="fa-solid fa-trash" /></Button>
                                                             </td>
