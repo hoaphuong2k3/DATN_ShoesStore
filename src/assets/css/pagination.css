@@ -15,3 +15,9 @@
     margin: 0 5px; /* Điều chỉnh khoảng cách giữa các trang trong thanh phân trang */
 }
 
+.fixed-column {
+    position: sticky;
+    right: 0;
+    background-color: white; /* Màu nền của cột */
+    z-index: 1;
+}
