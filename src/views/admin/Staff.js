@@ -135,7 +135,7 @@ const Staff = () => {
 
   const handleGenderChange = (e) => {
     const genderValue = e.target.value == "true";
-    setQueryParams({ ...queryParams, gender: genderValue});
+    setQueryParams({ ...queryParams, gender: genderValue });
   }
 
   const calculateIndex = (index) => {
@@ -312,29 +312,40 @@ const Staff = () => {
       setSelectedId([...selectedId, idStaff]);
       setShowActions(true);
     }
-    
+
   };
 
   // Hiện action deleteAll
   const handleActionSelect = (action) => {
-    if(action === "deleteAll"){
+    if (action === "deleteAll") {
       // Xóa everything
-    }else if(action === "disableAll"){
+    } else if (action === "disableAll") {
       // Ngừng everything
     }
     setShowActions(false);
   };
 
-  // update status
-    const lock = async (id) => {
-        await axiosInstance.put(`/staff/update-status/${id}`);
-        fetchData();
-    };
-    // const openlock = async (id) => {
-    //     await axios.put(`/staff/update-status/{id}/${id}`);
-    //     getAll();
-    // };
+  //updat-status
+  const updateStatus = async (id, status) => {
+    try {
+      await axiosInstance.put(`/staff/update-status/${id}?status=${status}`);
+      fetchData();
+      toast.success("Cập nhật trạng thái thành công!");
+    } catch (error) {
+      console.error("Error updating staff status:", error);
+    }
+  };
 
+  // lọc status
+  const [selectedStatus, setSelectedStatus] = useState('');
+
+  const filterAdmins = admins.filter((admin) => {
+    if (selectedStatus === '') {
+      return true;
+    } else {
+      return admin.status.toString() === selectedStatus;
+    }
+  });
   return (
     <>
       <Header />
@@ -411,7 +422,7 @@ const Staff = () => {
                                     value={false}
                                     checked={queryParams.gender === false}
                                     onChange={handleGenderChange}
-                                    />Nam
+                                  />Nam
                                 </div>
                                 <div className="custom-control custom-radio">
                                   <Input
@@ -422,7 +433,7 @@ const Staff = () => {
                                     value={true}
                                     checked={queryParams.gender === true}
                                     onChange={handleGenderChange}
-                                    />Nữ
+                                  />Nữ
                                 </div>
                               </div>
                             </FormGroup>
@@ -469,22 +480,29 @@ const Staff = () => {
                       <h3 className="heading-small text-black mb-0"><FaFileAlt size="16px" className="mr-1" />Danh sách</h3>
                       {/* Show Action */}
                       {showActions && (
-                      
-                       <Input type="select" className="ml-3" name="action" style={{width: "150px" }} size="sm" onChange={(e) => handleActionSelect(e.target.value)}>
+
+                        <Input type="select" className="ml-3" name="action" style={{ width: "150px" }} size="sm" onChange={(e) => handleActionSelect(e.target.value)}>
                           <option value={""}>Chọn thao tác</option>
                           <option value="deleteAll">Xóa tất cả</option>
                           <option value="disableAll">Ngừng hoạt động</option>
                         </Input>
-                      
-                    )}
-                    {/* End Show Action */}
-                    <Col>
-                      <Input type="select" name="status" style={{ width: "150px" }} size="sm"  >
-                        <option value=" ">Tất cả</option>
-                        <option value=" ">Ngừng hoạt động</option>
-                        <option value=" ">Đang hoạt động</option>
-                      </Input>
-                    </Col>
+
+                      )}
+                      {/* End Show Action */}
+
+                      {/* filter status */}
+                      <Col>
+                        <Input type="select" name="status" style={{ width: "150px" }} size="sm" 
+                        value={selectedStatus} 
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          setSelectedStatus(value === '' ? '' : value);
+                        }}>
+                          <option value="">Tất cả</option>
+                          <option value="0">Ngừng hoạt động</option>
+                          <option value="1">Đang hoạt động</option>
+                        </Input>
+                      </Col>
                     </div>
                     <div className="col text-right">
                       <Button
@@ -509,19 +527,19 @@ const Staff = () => {
                           </FormGroup>
                         </th>
                         <th scope="col">STT</th>
+                        <th scope="col">Trạng thái</th>
                         <th scope="col">Họ tên</th>
                         <th scope="col">Ngày sinh</th>
                         <th scope="col">Giới tính</th>
                         <th scope="col">Số điện thoại</th>
                         <th scope="col">Email</th>
                         <th scope="col">Địa chỉ</th>
-                        <th scope="col">Trạng thái</th>
-                        <th scope="col">Thao tác</th>
+                        <th scope="col" style={{ position: "sticky", zIndex: '1', right: '0' }}>Thao tác</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {Array.isArray(admins) && admins.length > 0 ? (
-                        admins.map((admin, index) => (
+                      {Array.isArray(filterAdmins) && filterAdmins.length > 0 ? (
+                        filterAdmins.map((admin, index) => (
                           <tr key={admin.id}>
                             <td className="text-center">
                               <FormGroup check>
@@ -533,20 +551,31 @@ const Staff = () => {
                               </FormGroup>
                             </td>
                             <td>{calculateIndex(index)}</td>
+                            <td>
+                              <Badge color={statusMapping[admin.status]?.color || statusMapping.default.color}>
+                                {statusMapping[admin.status]?.label || statusMapping.default.label}
+                              </Badge>
+                            </td>
                             <td>{admin.fullname}</td>
                             <td>{admin.dateOfBirth}</td>
                             <td>{admin.gender ? "Nữ" : "Nam"}</td>
                             <td>{admin.phoneNumber}</td>
                             <td>{admin.email}</td>
                             <td>{admin.addressDetail}, {admin.communeCode}, {admin.districtCode}, {admin.proviceCode} </td>
-                            <td>
-                              <Badge color={statusMapping[admin.status]?.color || statusMapping.default.color}>
-                                {statusMapping[admin.status]?.label || statusMapping.default.label}
-                              </Badge>
-                            </td>
-                            <td>
+
+                            <td style={{ position: "sticky", zIndex: '1', right: '0', backgroundColor: '#fff' }}>
                               <Button color="info" size="sm" onClick={() => handleRowClick(admin)} disabled={false}><FaEdit /></Button>
                               <Button color="danger" size="sm" onClick={() => deleteAdmin(admin.id)}><FaTrash /></Button>
+                              {admin.status === 0 &&
+                                <Button color="warning" size="sm" onClick={() => updateStatus(admin.id, 1)}>
+                                  <i class="fa-solid fa-lock-open fa-flip-horizontal"></i>
+                                </Button>
+                              }
+                              {admin.status === 1 &&
+                                <Button color="warning" size="sm" onClick={() => updateStatus(admin.id, 0)} >
+                                  <i class="fa-solid fa-lock"></i>
+                                </Button>
+                              }
                             </td>
 
                           </tr>
@@ -829,26 +858,7 @@ const Staff = () => {
                         </FormGroup>
                       </Col>
                     </Row>
-                    <Row>
-                      <Col className="pl-lg-4">
-                        {formData.id && (
-                          <FormGroup>
-                            <label className="form-control-label">
-                              Trạng thái
-                            </label>
-                            <div className="form-control-alternative custom-toggle ml-2">
-                              <Switch
-                                checked={formData.status === 0}
 
-                                onChange={statusUpdate}
-                              />
-                              <span className="custom-toggle-slider rounded-circle" />
-                            </div>
-
-                          </FormGroup>
-                        )}
-                      </Col>
-                    </Row>
                   </div>
                 </Form >
               </ModalBody >
