@@ -31,6 +31,7 @@ const SaleProduct = () => {
     const [listDetail, setListShoesDetail] = useState([]);
     const [selectAll, setSelectAll] = useState(false);
     const [selectedShoesIds, setSelectedShoesIds] = useState([]);
+    const [selectedDetailIds, setSelectedDetailIds] = useState([]);
     const [page, setPage] = useState(0);
     const [size, setSize] = useState(10);
 
@@ -63,7 +64,7 @@ const SaleProduct = () => {
     //loads productDetail
     const getAll2 = async (id, page, size) => {
         try {
-            let res = await getAllShoesDetail2(id ,page, size, search2);
+            let res = await getAllShoesDetail2(id, page, size, search2);
             console.log(res);
             if (res && res.data && res.data.content) {
                 setListShoesDetail(res.data.content);
@@ -149,12 +150,12 @@ const SaleProduct = () => {
         if (!selectAll) {
             const allShoesIds = listShoes.map(shoes => shoes.id);
             setSelectedShoesIds(allShoesIds);
-            
+
         } else {
             setSelectedShoesIds([]);
         }
     };
-   
+
     const handleShoesCheckboxChange = (shoesId) => {
         let updatedSelectedShoesIds = [...selectedShoesIds];
         if (updatedSelectedShoesIds.includes(shoesId)) {
@@ -179,6 +180,22 @@ const SaleProduct = () => {
         fetchSelectedShoesDetails();
     }, [selectedShoesIds, page, size]);
 
+    const handleSelectAllDetails = () => {
+        if (selectedDetailIds.length === listDetail.length) {
+            setSelectedDetailIds([]);
+        } else {
+            const allDetailIds = listDetail.map(detail => detail.id);
+            setSelectedDetailIds(allDetailIds);
+        }
+    };
+    const handleDetailCheckboxChange = (detailId) => {
+        if (selectedDetailIds.includes(detailId)) {
+            setSelectedDetailIds(selectedDetailIds.filter(id => id !== detailId));
+        } else {
+            setSelectedDetailIds([...selectedDetailIds, detailId]);
+        }
+    };
+
 
     //click on selected
     const [formData, setFormData] = useState({
@@ -193,7 +210,7 @@ const SaleProduct = () => {
         startDate: "",
         endDate: "",
         status: "",
-        idShoe: [""],
+        idShoes: null,
     });
 
     const handleRowClick = (discount) => {
@@ -258,9 +275,13 @@ const SaleProduct = () => {
         try {
             const formattedStartDate = formatDateTime(formData.startDate);
             const formattedEndDate = formatDateTime(formData.endDate);
+            const discountData = {
+                selectedDetails: selectedDetailIds.map(detailId => ({ id: detailId })),
+            };
+    
 
             if (formData.id) {
-                await axiosInstance.put(`/vouchers/updateVoucher`, {
+                await axiosInstance.put(`/promos/updatePromos`, {
                     id: formData.id,
                     code: formData.code,
                     name: formData.name,
@@ -272,14 +293,14 @@ const SaleProduct = () => {
                     salePercent: formData.sale ? formData.salePercent : null,
                     salePrice: formData.sale ? null : formData.salePrice,
                     status: formData.status,
-                    idShoe: formData.idShoe,
+                    selectedDetails: discountData.selectedDetails,
                 });
 
                 fetchData();
 
                 toast.success("Cập nhật thành công!");
             } else {
-                await axiosInstance.post('/vouchers/createVoucher', {
+                await axiosInstance.post('/promos/createPromos', {
                     code: formData.code,
                     name: formData.name,
                     minPrice: formData.minPrice,
@@ -289,7 +310,7 @@ const SaleProduct = () => {
                     endDate: formattedEndDate,
                     salePercent: formData.sale ? formData.salePercent : null,
                     salePrice: formData.sale ? null : formData.salePrice,
-                    idShoe: formData.idShoe,
+                    selectedDetails: discountData.selectedDetails,
                 });
 
                 fetchData();
@@ -317,7 +338,7 @@ const SaleProduct = () => {
     };
     const deleteDiscount = (id) => {
         if (confirmDelete()) {
-            axiosInstance.delete(`/vouchers/deleteVoucher/${id}`)
+            axiosInstance.delete(`/promos/deletePromos/${id}`)
                 .then(response => {
                     fetchData();
                     toast.success("Xóa thành công");
@@ -838,9 +859,13 @@ const SaleProduct = () => {
                                 <Table bordered hover responsive>
                                     <thead className="thead-light">
                                         <tr >
-                                            <th className="text-center pb-4" >
+                                            <th className="text-center pb-4">
                                                 <FormGroup check>
-                                                    <Input type="checkbox" />
+                                                    <Input
+                                                        type="checkbox"
+                                                        checked={selectedDetailIds.length === listDetail.length}
+                                                        onChange={handleSelectAllDetails}
+                                                    />
                                                 </FormGroup>
                                             </th>
                                             <th scope="col">Mã</th>
@@ -852,20 +877,24 @@ const SaleProduct = () => {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                    {listDetail.map((detail, index) => (
-                                        <tr key={detail.id}>
-                                            <td className="text-center">
-                                                <FormGroup check>
-                                                    <Input type="checkbox" />
-                                                </FormGroup>
-                                            </td>
-                                            <td>{detail.code}</td>
-                                            <td>{detail.size}</td>
-                                            <td>{detail.color}</td>
-                                            <td>{detail.price}</td>
-                                            <td></td>
-                                            <td>{detail.status === 1 ? "Đang kinh doanh": ""}</td>
-                                        </tr>
+                                        {listDetail.map((detail, index) => (
+                                            <tr key={detail.id}>
+                                                <td className="text-center">
+                                                    <FormGroup check>
+                                                        <Input
+                                                            type="checkbox"
+                                                            checked={selectedDetailIds.includes(detail.id)}
+                                                            onChange={() => handleDetailCheckboxChange(detail.id)}
+                                                        />
+                                                    </FormGroup>
+                                                </td>
+                                                <td>{detail.code}</td>
+                                                <td>{detail.size}</td>
+                                                <td>{detail.color}</td>
+                                                <td>{detail.price}</td>
+                                                <td></td>
+                                                <td>{detail.status === 1 ? "Đang kinh doanh" : ""}</td>
+                                            </tr>
                                         ))}
                                     </tbody>
                                 </Table>
