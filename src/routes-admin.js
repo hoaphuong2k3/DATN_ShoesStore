@@ -15,6 +15,7 @@ import ListShoesDetail from "views/admin/ListShoesDetail.js";
 import Discount from "views/admin/discount/Discount.js";
 import Delivery from "views/admin/Delivery.js";
 import Promo2 from "views/admin/Promotion2.js";
+import Partner from "views/admin/Partner.js";
 var routes = [
   {
     path: "/index",
@@ -125,5 +126,11 @@ var routes = [
     component: <Promo2 />,
     layout: "/admin",
   },
+    path: "/partner",
+    name: "Thống kê",
+    icon: "ni ni-money-coins text-green",
+    component: <Partner />,
+    layout: "/admin",
+  }
 ];
 export default routes;

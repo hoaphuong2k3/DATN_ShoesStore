@@ -294,8 +294,8 @@ const ProductAttributes = () => {
                 </Row>
                 {/*  */}
 
-                <Table bordered dark hover responsive striped>
-                  <thead>
+                <Table  responsive className="align-items-center table-flush">
+                  <thead className="thead-light">
                     <tr>
                       <th>STT</th>
                       <th>Mã</th>
