@@ -2,7 +2,7 @@ import Index from "views/admin/Index.js";
 import Bills from "views/admin/transaction/Bills.js";
 import Products from "views/admin/Products.js";
 import ProductAttributes from "views/admin/ProductAttributes.js";
-import Promo from "views/admin/Promotion.js";
+import Promo from "views/admin/discount/Promotion.js";
 import Staff from "views/admin/Staff.js";
 import Client from "views/admin/Client.js";
 import Profile from "views/admin/Profile.js";

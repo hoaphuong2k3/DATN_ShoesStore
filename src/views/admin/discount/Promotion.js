@@ -10,7 +10,7 @@ import Switch from 'react-input-switch';
 import { Card, CardHeader, CardBody, Container, Row, Col, Form, FormGroup, Input, Button, Table, Modal, ModalBody, ModalFooter, ModalHeader, Badge } from "reactstrap";
 
 import Header from "components/Headers/Header.js";
-
+import ImageUpload from "views/admin/discount/ImageUpload.js";
 
 const Promotion = () => {
 
@@ -850,12 +850,8 @@ const Promotion = () => {
 
                                                 <Row>
                                                     <Col lg="6" className="d-flex justify-content-center" >
-                                                        <div style={{ filter: 'grayscale(100%)', border: '1px solid #ccc', width: '140px', height: '110px' }}>
-                                                            <img src={require("../../assets/img/theme/team-4-800x800.jpg")}
-                                                                alt="..." width={140} height={110}
-                                                                value={formData2.image}
-                                                                onChange={(e) => setFormData2({ ...formData2, image: e.target.value })}
-                                                            />
+                                                        <div>
+                                                            <ImageUpload />
                                                         </div>
                                                     </Col>
                                                     <Col>
@@ -919,7 +915,7 @@ const Promotion = () => {
                                                     </Table>
                                                 </Row>
 
-                                                
+
 
 
                                             </Form>
