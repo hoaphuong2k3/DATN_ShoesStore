@@ -1,14 +1,13 @@
 import 'assets/scss/detailsp.scss';
-import { Container, Row, Card, CardBody,Button } from "reactstrap";
+import { Container, Row, Card, CardBody} from "reactstrap";
 import Header from "components/Headers/ProductHeader.js";
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { CartContext } from "contexts/Cart.js";
 
 const DetailProduct = () => {
   const [productDetail, setProductDetail] = useState([]);
-  const [cartItems, setCartItems] = useState([]);
   const { id } = useParams();
   // const navigate = useNavigate();
 

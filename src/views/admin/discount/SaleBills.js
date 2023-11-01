@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { FaEdit, FaTrash, FaSearch, FaFileAlt } from 'react-icons/fa';
+import { FaEdit, FaTrash, FaSearch, FaFileAlt, FaLock, FaLockOpen } from 'react-icons/fa';
 import ReactPaginate from "react-paginate";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -435,9 +435,10 @@ const SaleBills = () => {
                 </Row>
 
                 <Table className="align-items-center table-flush" responsive>
-                    <thead className="thead-light">
+                    <thead className="thead-light text-center">
                         <tr>
                             <th scope="col">STT</th>
+                            <th scope="col">Trạng thái</th>
                             <th scope="col">Code</th>
                             <th scope="col">Tên khuyến mại</th>
                             <th scope="col">Mô tả</th>
@@ -445,8 +446,7 @@ const SaleBills = () => {
                             <th scope="col">Giá trị</th>
                             <th scope="col">Ngày bắt đầu</th>
                             <th scope="col">Ngày kết thúc</th>
-                            <th scope="col">Trạng thái</th>
-                            <th scope="col">Thao tác</th>
+                            <th scope="col" style={{ position: "sticky", zIndex: '1', right: '0' }}>Thao tác</th>
 
                         </tr>
                     </thead>
@@ -455,25 +455,31 @@ const SaleBills = () => {
                             discounts.map((discount, index) => (
                                 <tr key={discount.id}>
                                     <td>{calculateIndex(index)}</td>
-                                    <td>{discount.code}</td>
-                                    <td>{discount.name}</td>
-                                    <td>{discount.description}</td>
-                                    <td>{discount.minPrice}</td>
-                                    <td>
-                                        {discount.salePercent ? `${discount.salePercent}%` : ""}
-                                        {discount.salePrice ? `${discount.salePrice} VNĐ` : ""}
-                                    </td>
-
-                                    <td>{format(new Date(discount.startDate), 'yyyy-MM-dd HH:mm', { locale: vi })}</td>
-                                    <td>{format(new Date(discount.endDate), 'yyyy-MM-dd HH:mm', { locale: vi })}</td>
-                                    <td>
+                                    <td style={{ textAlign: "center" }}>
                                         <Badge color={statusMapping[discount.status]?.color || statusMapping.default.color}>
                                             {statusMapping[discount.status]?.label || statusMapping.default.label}
                                         </Badge>
                                     </td>
-                                    <td>
-                                        <Button color="info" size="sm" onClick={() => handleRowClick(discount)} disabled={discount.status === 2}><FaEdit /></Button>
-                                        <Button color="danger" size="sm" onClick={() => deleteDiscount(discount.id)}><FaTrash /></Button>
+                                    <td>{discount.code}</td>
+                                    <td>{discount.name}</td>
+                                    <td>{discount.description}</td>
+                                    <td style={{ textAlign: "right" }}>{discount.minPrice} VNĐ</td>
+                                    <td style={{ textAlign: "right" }}>
+                                        {discount.salePercent ? `${discount.salePercent}%` : ""}
+                                        {discount.salePrice ? `${discount.salePrice} VNĐ` : ""}
+                                    </td>
+                                    <td>{format(new Date(discount.startDate), 'yyyy-MM-dd HH:mm', { locale: vi })}</td>
+                                    <td>{format(new Date(discount.endDate), 'yyyy-MM-dd HH:mm', { locale: vi })}</td>
+
+                                    <td style={{ position: "sticky", zIndex: '1', right: '0', background: "#f6f9fc" }}>
+                                        {discount.status === 0 &&
+                                            <Button color="link" size="sm"><FaLockOpen color="green" /></Button>
+                                        }
+                                        {(discount.status === 1 || discount.status === 2) &&
+                                            <Button color="link" size="sm"><FaLock color="green" /></Button>
+                                        }
+                                        <Button color="link" size="sm" onClick={() => handleRowClick(discount)}><FaEdit color="orange" /></Button>
+                                        <Button color="link" size="sm" onClick={() => deleteDiscount(discount.id)}> <FaTrash color="red" /></Button>
                                     </td>
 
                                 </tr>
@@ -702,25 +708,7 @@ const SaleBills = () => {
                                     </FormGroup>
                                 </Col>
                             </Row>
-                            <Row>
-                                <Col className="pl-lg-4">
-                                    {formData.id && (
-                                        <FormGroup>
-                                            <label className="form-control-label">
-                                                Trạng thái
-                                            </label>
-                                            <div className="form-control-alternative custom-toggle ml-2">
-                                                <Input
-                                                    checked={formData.status === 0}
-                                                    type="checkbox"
-                                                />
-                                                <span className="custom-toggle-slider rounded-circle" />
-                                            </div>
-
-                                        </FormGroup>
-                                    )}
-                                </Col>
-                            </Row>
+                            
 
                         </div>
 

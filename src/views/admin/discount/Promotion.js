@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { FaEdit, FaTrash, FaSearch, FaFileAlt } from 'react-icons/fa';
+import { FaEdit, FaTrash, FaSearch, FaFileAlt, FaLock, FaLockOpen } from 'react-icons/fa';
 import ReactPaginate from "react-paginate";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -509,7 +509,7 @@ const Promotion = () => {
                                         </Row>
 
                                         <Table className="align-items-center table-flush" responsive>
-                                            <thead className="thead-light">
+                                            <thead className="thead-light text-center">
                                                 <tr>
                                                     <th >
                                                         <FormGroup check>
@@ -555,17 +555,27 @@ const Promotion = () => {
                                                                 </Badge>
                                                             </td>
                                                             <td>{discount.code}</td>
-                                                            <td>{discount.typePeriod == 0 ? "Order" : "FreeShip"}</td>
+                                                            <td>{discount.typePeriod === 0 ? "Order" : "FreeShip"}</td>
                                                             <td>{discount.name}</td>
-                                                            <td style={{ textAlign: "right" }}>{discount.minPrice} VNĐ</td>
-                                                            <td>{discount.salePercent}%</td>
+                                                            <td style={{ textAlign: "right" }}>
+                                                                {discount.typePeriod === 0 ? `${discount.minPrice} VNĐ` : ""}
+                                                            </td>
+                                                            <td style={{ textAlign: "right" }}>
+                                                                {discount.typePeriod === 0 ? `${discount.salePercent}%` : ""}
+                                                            </td>
                                                             <td>{discount.giftId}</td>
                                                             <td>{discount.startDate}</td>
                                                             <td>{discount.endDate}</td>
 
                                                             <td style={{ position: "sticky", zIndex: '1', right: '0', background: "#f6f9fc" }}>
-                                                                <Button color="link" size="sm" onClick={() => handleRowClick(discount)}><FaEdit /></Button>
-                                                                <Button color="link" size="sm" onClick={() => deleteDiscount(discount.id)}> <FaTrash /></Button>
+                                                                {discount.status === 0 &&
+                                                                    <Button color="link" size="sm"><FaLockOpen color="green" /></Button>
+                                                                }
+                                                                {(discount.status === 1 || discount.status === 2) &&
+                                                                    <Button color="link" size="sm"><FaLock color="green"/></Button>
+                                                                }
+                                                                <Button color="link" size="sm" onClick={() => handleRowClick(discount)}><FaEdit color="orange" /></Button>
+                                                                <Button color="link" size="sm" onClick={() => deleteDiscount(discount.id)}> <FaTrash color="red"/></Button>
                                                             </td>
 
                                                         </tr>
@@ -624,7 +634,7 @@ const Promotion = () => {
                                         toggle={toggle}
                                         backdrop={'static'}
                                         keyboard={false}
-                                        style={{ maxWidth: '700px' }}
+                                        style={{ maxWidth: '600px' }}
                                     >
                                         <ModalHeader toggle={toggle}>
                                             <h3 className="heading-small text-muted mb-0">{formData.id ? 'Cập Nhật Khuyến mại' : 'Thêm Mới Khuyến mại'}</h3>
@@ -841,7 +851,7 @@ const Promotion = () => {
                                         </ModalFooter>
                                     </Modal >
 
-                                    <Modal isOpen={secondModal} toggle={toggleSecondModal} style={{ maxWidth: '550px' }}>
+                                    <Modal isOpen={secondModal} toggle={toggleSecondModal} style={{ maxWidth: '600px' }}>
                                         <ModalHeader toggle={toggleSecondModal}>
                                             Quà tặng
                                         </ModalHeader>

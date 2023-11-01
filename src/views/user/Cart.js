@@ -1,14 +1,12 @@
 import React, { useContext, useState, useEffect } from "react";
 import {
   Card,
-  CardHeader,
   CardBody,
   Container,
   Row,
   Table,
   Input,
   Button,
-  Label,
 } from "reactstrap";
 import { Link } from "react-router-dom";
 import Header from "components/Headers/ProductHeader";
