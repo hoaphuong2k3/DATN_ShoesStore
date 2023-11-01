@@ -341,7 +341,7 @@ const SaleProduct = () => {
     return (
         <>
 
-            <div className="col">
+            <div className="col mt-4">
 
                 <Row className="align-items-center">
                     <FaSearch />
