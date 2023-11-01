@@ -155,7 +155,6 @@ const SaleBills = () => {
             sale: false
 
         });
-        // setSelectedValueType(null);
     };
 
     //save
@@ -240,8 +239,7 @@ const SaleBills = () => {
     return (
         <>
 
-            <div className="col">
-
+            <div className="col mt-4">
                 <Row className="align-items-center">
                     <FaSearch />
                     <h3 className="heading-small text-black mb-0 ml-1">Tìm kiếm</h3>
@@ -338,7 +336,7 @@ const SaleBills = () => {
                                         <Row>
                                             <Col xl="6">
                                                 <label className="form-control-label">
-                                                   Trị giá hóa đơn từ:
+                                                    Trị giá hóa đơn từ:
                                                 </label>
                                                 <Input
                                                     className="form-control-alternative"

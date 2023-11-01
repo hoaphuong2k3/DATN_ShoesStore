@@ -169,7 +169,7 @@ const Sidebar1 = (props) => {
                 label={"Quản lý giao dịch"}
                 icon={<RiSwapBoxLine />}
               >
-                <MenuItem icon={<RiExchangeFundsLine />}><NavLink style={{ fontSize: 15, color: "black" }} to="/admin/bills" tag={Link}>Bán hàng</NavLink></MenuItem>
+                <MenuItem icon={<RiExchangeFundsLine />}><NavLink style={{ fontSize: 15, color: "black" }} to="/admin/direct-sales" tag={Link}>Bán hàng</NavLink></MenuItem>
                 <MenuItem icon={<RiExchangeFundsLine />}><NavLink style={{ fontSize: 15, color: "black" }} to="/admin/bills" tag={Link}>Hóa đơn</NavLink></MenuItem>
                 <MenuItem icon={<RiExchangeFundsLine />}><NavLink style={{ fontSize: 15, color: "black" }} to="/admin/delivery" tag={Link}>Phiếu giao hàng</NavLink></MenuItem>
               </SubMenu>

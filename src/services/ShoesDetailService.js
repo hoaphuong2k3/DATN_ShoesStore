@@ -4,6 +4,10 @@ const getAllShoesDetail = (id, search) => {
   return axios.post(`/admin/shoesdetail/search/${id}`, search)
 }
 
+const getAllShoesDetail2 = (id, page, size, search) => {
+  return axios.post(`/admin/shoesdetail/search/${id}?page=${page}&size=${size}`, search)
+}
+
 const postNewShoes = (shoes) => {
   return axios.post('/admin/shoes', shoes, {
     headers: {
@@ -26,4 +30,4 @@ const updateShoes = (id, shoes) => {
 const deleteShoes = (id) => {
   return axios.delete('/admin/shoes/delete', id)
 }
-export { getAllShoesDetail, postNewShoes, findShoes, updateShoes, deleteShoes };
+export { getAllShoesDetail, postNewShoes, findShoes, updateShoes, deleteShoes, getAllShoesDetail2 };

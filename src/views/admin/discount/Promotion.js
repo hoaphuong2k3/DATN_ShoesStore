@@ -10,7 +10,7 @@ import Switch from 'react-input-switch';
 import { Card, CardHeader, CardBody, Container, Row, Col, Form, FormGroup, Input, Button, Table, Modal, ModalBody, ModalFooter, ModalHeader, Badge } from "reactstrap";
 
 import Header from "components/Headers/Header.js";
-
+import ImageUpload from "views/admin/discount/ImageUpload.js";
 
 const Promotion = () => {
 
@@ -20,14 +20,19 @@ const Promotion = () => {
         resetForm();
         setModal(true);
     }
-
+    const [secondModal, setSecondModal] = useState(false);
+    const toggleSecondModal = () => setSecondModal(!secondModal);
+    const handleModal2 = () => {
+        resetGift();
+        setSecondModal(true);
+    }
     const [value, setValue] = useState('no');
     const [discounts, setDiscounts] = useState([]);
+    const [freeGift, setfreeGift] = useState([]);
     const [totalElements, setTotalElements] = useState(0);
     const [totalPages, setTotalPages] = useState(0);
     const [selectAll, setSelectAll] = useState(false);
     const [selectedItems, setSelectedItems] = useState([]);
-    const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
 
     const [queryParams, setQueryParams] = useState({
         page: 0,
@@ -43,6 +48,11 @@ const Promotion = () => {
         isdelete: 0,
     });
 
+    const [queryParams2, setQueryParams2] = useState({
+        page: 0,
+        size: 5,
+    });
+
 
     //loads table
     const fetchData = async () => {
@@ -50,17 +60,22 @@ const Promotion = () => {
             const response = await axiosInstance.get("/admin/discount-period/getAll", {
                 params: queryParams
             });
+            const response2 = await axiosInstance.get("/free-gift", {
+                params: queryParams2
+            });
+            setfreeGift(response2.content);
             setDiscounts(response.content);
+
             setTotalElements(response.totalElements);
             setTotalPages(response.totalPages);
-            console.log(response.content);
+
         } catch (error) {
             console.error("Lỗi khi lấy dữ liệu:", error);
         }
     };
     useEffect(() => {
         fetchData();
-    }, [queryParams]);
+    }, [queryParams, queryParams2]);
 
     const handlePageChange = ({ selected }) => {
         setQueryParams(prevParams => ({ ...prevParams, page: selected }));
@@ -78,6 +93,7 @@ const Promotion = () => {
     const statusMapping = {
         0: { color: 'danger', label: 'Kích hoạt' },
         1: { color: 'success', label: 'Chờ kích hoạt' },
+        2: { color: 'warning', label: 'Ngừng kích hoạt' }
     };
     //lọc
     const resetFilters = () => {
@@ -116,7 +132,7 @@ const Promotion = () => {
         setSelectAll(!selectAll);
     };
 
-    //click on selected
+
     const [formData, setFormData] = useState({
         id: null,
         code: "",
@@ -127,9 +143,9 @@ const Promotion = () => {
         endDate: "",
         status: "",
         giftId: "",
-        typePeriod: "",
+        typePeriod: 0,
     });
-
+    //click on selected 
     const handleRowClick = (discount) => {
         setFormData({
             id: discount.id,
@@ -143,10 +159,8 @@ const Promotion = () => {
             giftId: discount.giftId,
             typePeriod: discount.typePeriod,
         });
-
         setModal(true);
     };
-
     //reset
     const resetForm = () => {
         setFormData({
@@ -157,15 +171,20 @@ const Promotion = () => {
             endDate: "",
             status: "",
             giftId: "",
-            typePeriod: "",
+            typePeriod: 0,
         });
     };
-
-    //save
+    //save Promotion
     const saveDiscount = async () => {
         try {
-            if (formData.id) {
-                await axiosInstance.put(`/admin/discount-period/updateDiscountPeriod`, {
+            const apiUrl = formData.id
+                ? `/admin/discount-period/updateDiscountPeriod`
+                : `/admin/discount-period/createDiscountPeriod`;
+
+            await axiosInstance({
+                method: formData.id ? 'put' : 'post',
+                url: apiUrl,
+                data: {
                     id: formData.id,
                     code: formData.code,
                     name: formData.name,
@@ -176,24 +195,16 @@ const Promotion = () => {
                     status: formData.status,
                     giftId: formData.giftId,
                     typePeriod: formData.typePeriod,
-                });
+                },
+            });
+
+            if (formData.id) {
                 toast.success("Cập nhật thành công!");
             } else {
-                await axiosInstance.post(`/admin/discount-period/createDiscountPeriod`, {
-                    code: formData.code,
-                    name: formData.name,
-                    minPrice: formData.minPrice,
-                    salePercent: formData.salePercent,
-                    startDate: formData.startDate,
-                    endDate: formData.endDate,
-                    giftId: formData.giftId,
-                    typePeriod: formData.typePeriod,
-                });
                 toast.success("Thêm mới thành công!");
             }
 
             fetchData();
-
             setModal(false);
             resetForm();
         } catch (error) {
@@ -206,9 +217,7 @@ const Promotion = () => {
             }
         }
     };
-
-
-    //delete
+    //delete Promotion
     const deleteDiscount = (id) => {
         if (window.confirm("Bạn có chắc chắn muốn xóa khuyến mại này không?")) {
             axiosInstance.delete(`/admin/discount-period/deleteDiscountPeriod/${id}`)
@@ -222,7 +231,6 @@ const Promotion = () => {
                 });
         }
     };
-
     const handleDeleteButtonClick = () => {
         if (selectedItems.length > 0) {
             if (window.confirm("Bạn có chắc chắn muốn xóa các khuyến mại đã chọn không?")) {
@@ -233,6 +241,71 @@ const Promotion = () => {
             }
         }
     };
+
+    // FreeGift //
+    const [formData2, setFormData2] = useState({
+        id: null,
+        name: "",
+        image: "",
+        quantity: "",
+        status: "",
+    });
+    //select
+    const handleRowClick2 = async (id) => {
+        try {
+            const response = await axiosInstance.patch(`/free-gift/detail/${id}`);
+            setFormData2(response.data);
+            setSecondModal(true);
+        } catch (error) {
+            console.error("Lỗi khi lấy dữ liệu:", error);
+        }
+    };
+    //reset
+    const resetGift = () => {
+        setFormData2({
+            name: "",
+            image: "",
+            quantity: "",
+            status: "",
+        });
+    };
+    //save FreeGift
+    const saveGift = async (e) => {
+        e.preventDefault();
+        try {
+            if (formData2.id) {
+                await axiosInstance.put(`/free-gift/update`, formData2);
+                toast.success("Cập nhật thành công!");
+            } else {
+                await axiosInstance.post(`/free-gift/create`, formData2);
+                toast.success("Thêm mới thành công!");
+            }
+            fetchData();
+            resetGift();
+        } catch (error) {
+            console.error("Lỗi khi lưu dữ liệu:", error);
+            if (error.response) {
+                console.error("Response data:", error.response.data);
+                toast.error(error.response.data.message);
+            } else {
+                toast.error("Đã có lỗi xảy ra.");
+            }
+        }
+    };
+    //delete Gift
+    const deletel = (id) => {
+        if (window.confirm("Bạn có chắc chắn muốn xóa không?")) {
+            axiosInstance.patch(`/free-gift/delete/${id}`)
+                .then(response => {
+                    fetchData();
+                    toast.success("Xóa thành công");
+                })
+                .catch(error => {
+                    console.error('Lỗi khi xóa dữ liệu:', error);
+                });
+        }
+    };
+    //========//
 
     return (
         <>
@@ -438,26 +511,26 @@ const Promotion = () => {
                                         <Table className="align-items-center table-flush" responsive>
                                             <thead className="thead-light">
                                                 <tr>
-                                                    <th className="text-center pb-4">
+                                                    <th >
                                                         <FormGroup check>
                                                             <Input
                                                                 type="checkbox"
                                                                 checked={selectAll}
                                                                 onChange={handleSelectAll}
-                                                            />
+                                                            />STT
                                                         </FormGroup>
                                                     </th>
-                                                    <th scope="col">STT</th>
+
                                                     <th scope="col">Trạng thái</th>
-                                                    <th scope="col">Loại</th>
                                                     <th scope="col">Mã</th>
+                                                    <th scope="col">Loại</th>
                                                     <th scope="col">Tên khuyến mại</th>
                                                     <th scope="col">Hóa đơn <br />tối thiểu </th>
                                                     <th scope="col">Giá trị</th>
                                                     <th scope="col">Quà tặng</th>
                                                     <th scope="col">Ngày bắt đầu</th>
                                                     <th scope="col">Ngày kết thúc</th>
-                                                    <th scope="col" className="fixed-column">Thao tác</th>
+                                                    <th scope="col" style={{ position: "sticky", zIndex: '1', right: '0' }}>Thao tác</th>
 
                                                 </tr>
                                             </thead>
@@ -465,33 +538,34 @@ const Promotion = () => {
                                                 {Array.isArray(discounts) &&
                                                     discounts.map((discount, index) => (
                                                         <tr key={discount.id}>
-                                                            <td className="text-center">
+                                                            <td>
                                                                 <FormGroup check>
                                                                     <Input
                                                                         type="checkbox"
                                                                         checked={selectedItems.includes(discount.id)}
                                                                         onChange={() => handleCheckboxChange(discount.id)}
                                                                     />
+                                                                    {calculateIndex(index)}
                                                                 </FormGroup>
                                                             </td>
-                                                            <td>{calculateIndex(index)}</td>
-                                                            <td>
+
+                                                            <td style={{ textAlign: "center" }}>
                                                                 <Badge color={statusMapping[discount.status]?.color || statusMapping.default.color}>
                                                                     {statusMapping[discount.status]?.label || statusMapping.default.label}
                                                                 </Badge>
                                                             </td>
-                                                            <td>{discount.typePeriod == 0 ? "Order" : "FreeShip"}</td>
                                                             <td>{discount.code}</td>
+                                                            <td>{discount.typePeriod == 0 ? "Order" : "FreeShip"}</td>
                                                             <td>{discount.name}</td>
-                                                            <td>{discount.minPrice}VNĐ</td>
+                                                            <td style={{ textAlign: "right" }}>{discount.minPrice} VNĐ</td>
                                                             <td>{discount.salePercent}%</td>
                                                             <td>{discount.giftId}</td>
                                                             <td>{discount.startDate}</td>
                                                             <td>{discount.endDate}</td>
 
-                                                            <td>
-                                                                <Button color="danger" size="sm" onClick={() => handleRowClick(discount)} disabled={discount.status === 2}><i class="fa-solid fa-pen" /></Button>
-                                                                <Button color="danger" size="sm" onClick={() => deleteDiscount(discount.id)}> <i class="fa-solid fa-trash" /></Button>
+                                                            <td style={{ position: "sticky", zIndex: '1', right: '0', background: "#f6f9fc" }}>
+                                                                <Button color="link" size="sm" onClick={() => handleRowClick(discount)}><FaEdit /></Button>
+                                                                <Button color="link" size="sm" onClick={() => deleteDiscount(discount.id)}> <FaTrash /></Button>
                                                             </td>
 
                                                         </tr>
@@ -695,12 +769,13 @@ const Promotion = () => {
                                                             </FormGroup>
                                                         </Col> */}
 
-                                                                <Col lg="6">
+                                                                <Col lg="12">
                                                                     <FormGroup>
                                                                         <label
                                                                             className="form-control-label"
                                                                         >
                                                                             Quà tặng kèm:
+                                                                            <Button className="ml-2" size="sm" onClick={handleModal2}>+</Button>
                                                                         </label>
                                                                         <Input
                                                                             className="form-control-alternative"
@@ -747,14 +822,8 @@ const Promotion = () => {
                                                                 />
                                                             </FormGroup>
                                                         </Col>
-
-
-
                                                     </Row>
-
                                                 </div>
-
-
                                             </Form >
                                         </ModalBody >
                                         <ModalFooter>
@@ -770,8 +839,101 @@ const Promotion = () => {
                                                 </Button>
                                             </div>
                                         </ModalFooter>
-
                                     </Modal >
+
+                                    <Modal isOpen={secondModal} toggle={toggleSecondModal} style={{ maxWidth: '550px' }}>
+                                        <ModalHeader toggle={toggleSecondModal}>
+                                            Quà tặng
+                                        </ModalHeader>
+                                        <ModalBody>
+                                            <Form>
+
+                                                <Row>
+                                                    <Col lg="6" className="d-flex justify-content-center" >
+                                                        <div>
+                                                            <ImageUpload />
+                                                        </div>
+                                                    </Col>
+                                                    <Col>
+                                                        <Row>
+                                                            <Col lg="12">
+                                                                <FormGroup>
+                                                                    <Input
+                                                                        className="form-control-alternative"
+                                                                        type="text"
+                                                                        placeholder="Tên quà tặng"
+                                                                        value={formData2.name}
+                                                                        onChange={(e) => setFormData2({ ...formData2, name: e.target.value })}
+                                                                    />
+                                                                </FormGroup>
+                                                            </Col>
+                                                            <Col lg="12">
+                                                                <FormGroup>
+                                                                    <Input
+                                                                        className="form-control-alternative"
+                                                                        type="number" min={0}
+                                                                        placeholder="Số lượng"
+                                                                        value={formData2.quantity}
+                                                                        onChange={(e) => setFormData2({ ...formData2, quantity: e.target.value })}
+                                                                    />
+                                                                </FormGroup>
+                                                            </Col>
+                                                        </Row>
+                                                    </Col>
+                                                </Row>
+
+                                                <Row>
+                                                    <Table>
+                                                        <thead className="thead-light">
+                                                            <tr>
+                                                                <th scope="col">STT</th>
+                                                                <th scope="col">Mã</th>
+                                                                <th scope="col">Ảnh</th>
+                                                                <th scope="col">Tên</th>
+                                                                <th scope="col">Số lượng</th>
+                                                                <th scope="col">Thao tác</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            {freeGift.map((gift, index) => (
+                                                                <tr key={gift.id}>
+                                                                    <td>{index + 1}</td>
+                                                                    <td>{gift.code}</td>
+                                                                    <td className="avatar avatar-sm rounded-circle" style={{ margin: 10 }}>
+                                                                        <img src={gift.image} alt="" />
+                                                                    </td>
+                                                                    <td>{gift.name}</td>
+                                                                    <td>{gift.quantity}</td>
+                                                                    <td>
+                                                                        <Button color="link" size="sm" onClick={() => handleRowClick2(gift.id)}><FaEdit /></Button>
+                                                                        <Button color="link" size="sm" onClick={() => deletel(gift.id)}><FaTrash /></Button>
+                                                                    </td>
+                                                                </tr>
+                                                            ))}
+
+                                                        </tbody>
+                                                    </Table>
+                                                </Row>
+
+
+
+
+                                            </Form>
+                                        </ModalBody>
+                                        <ModalFooter>
+
+                                            <Button color="primary" onClick={saveGift} size="sm">
+                                                {formData2.id ? "Cập nhật" : "Thêm mới"}
+                                            </Button>
+                                            <Button color="primary" onClick={resetGift} size="sm">
+                                                Reset
+                                            </Button>
+                                            <Button color="danger" size="sm" onClick={toggleSecondModal}>
+                                                Đóng
+                                            </Button>
+                                        </ModalFooter>
+                                    </Modal>
+
                                 </CardBody>
                             </Card>
                         </div>
