@@ -5,9 +5,10 @@ import { Link } from 'react-router-dom';
 import { Dropdown, DropdownButton } from 'react-bootstrap';
 import axios from "axios";
 import { toast } from 'react-toastify';
+import 'assets/css/listProduct.css';
 // list
 import { getAllBrand, getAllOrigin, getAllDesignStyle, getAllSkinType, getAllToe, getAllSole, getAllLining, getAllCushion } from "services/ProductAttributeService";
-import { getAllShoes} from "services/Product2Service";
+import { getAllShoes } from "services/Product2Service";
 
 const Product = () => {
   const [products, setProducts] = useState([]);
@@ -32,7 +33,7 @@ const Product = () => {
   });
 
   const [listBrand, setListBrand] = useState([]);
-  const [listorigin, setListOrigin] = useState([]);
+  const [listOrigin, setListOrigin] = useState([]);
   const [listDesignStyle, setListDesignStyle] = useState([]);
   const [listSkinStype, setListSkinType] = useState([]);
   const [listToe, setListToe] = useState([]);
@@ -45,10 +46,20 @@ const Product = () => {
   const [size, setSize] = useState(10);
 
   useEffect(() => {
-
     getListShoes(page, size);
+    getlistBrand();
+    getListOrigin();
+    getListDesignStyle();
+    getListSkinType();
+    getListToe();
+    getListSole();
+    getListLining();
+    getListCushion();
   }, []);
 
+  useEffect(() => {
+    getListShoes(page, size);
+  }, [search]);
 
   const getListShoes = async (page, size) => {
     try {
@@ -68,7 +79,7 @@ const Product = () => {
       setProducts([]);
     }
   }
-const getlistBrand = async () => {
+  const getlistBrand = async () => {
     let res = await getAllBrand();
     console.log(res);
     if (res && res.data) {
@@ -117,6 +128,20 @@ const getlistBrand = async () => {
       setListCushion(res.data);
     }
   }
+
+  // Lọc
+  const [contentState, setContentState] = useState({
+    brand: false,
+    origin: false,
+    design: false,
+    skin: false,
+    sole: false,
+    lining: false,
+    toe: false,
+    cushion: false,
+  });
+
+
   return (
     <>
       <Header />
@@ -125,55 +150,236 @@ const getlistBrand = async () => {
           <div className="col">
             <Card className="">
               <CardBody>
-                <div style={{ display: "table" }}>
-                  <h3 className="font-weight-bolder ml-4 mt-3">LEATHER GENTS</h3>
-                  <hr color="orange" width="200px" className="m-0 mb-3" />
-                </div>
-                
-                <Row className="mt-4">
-                  <div className="col-md-3 search">
-                    <Card>
-                      
-                    </Card>
-                  </div>
-                  <style>
-                    {`
-                        .zoom {
-                          padding: 0px;
-                          transition: transform .3s;
-                          width: 200px;
-                          height: 200px;
-                          margin: auto;
-                        }
-                        .zoom:hover {
-                          -ms-transform: scale(1.0);
-                          -webkit-transform: scale(1.0);
-                          transform: scale(1.1);
-                        }
-                    `}
-                  </style>
-                  <div className="col-md-9 row">
-                  {Array.isArray(products) ? (
-                    products.map((product) => (
-                      <div key={product.id} className="col-md-3">
-                        <Link to={`/shoes/productdetail/${product.id}`}>
-                          <img src={`https://s3-ap-southeast-1.amazonaws.com/imageshoestore/${product.imgURI}`} alt="" className="zoom"/>
-                        </Link>
-                        <br />
-                        <br />
-                        <div style={{ fontSize: "medium" }} className="p-2">
-                          <Link to={`/shoes/productdetail/${product.id}`} className="text-dark text-decoration-none">
-                            {product.name}
-                          </Link>
-                          <p className="font-weight-bold" style={{ color: "rgba(0, 0, 0, 0.705)" }}>
-                            {product.priceMin}đ&nbsp;
-                          </p>
+
+                <Row className="mt-5">
+                  <div className="col-md-3">
+                    <div style={{ display: "table" }}>
+                      <h3 className="titleFilter ml-4 mt-3">
+                        <img className="icon" src='https://cdn-icons-png.flaticon.com/128/7855/7855877.png'></img>
+                        Bộ Lọc Tìm Kiếm
+                      </h3>
+                      <hr color="orange" width="250px" className="m-0 mb-3" />
+                    </div>
+                    <div className=" search">
+                      {/* brand */}
+                      <div className='category'>
+                        <div className="title" >
+                          <ul className="nav justify-content-between mt-1">
+                            <li className="nac-item">
+                              <p className="font-weight-bold">Thương Hiệu</p>
+                            </li>
+                            <li className="more">
+                              <button className="button" onClick={() => setContentState((prevState) => ({ ...prevState, brand: !prevState.brand }))}>
+                                <i className={`fa-solid ${contentState.brand ? "fa-minus" : "fa-plus"}`} />
+                              </button>
+                            </li>
+                          </ul>
+                        </div>
+                        <div className={`content ${contentState.brand ? "show" : "hide"}`}>
+                          {listBrand.map((x) => (
+                            <div key={x.id}>
+                              <input type="checkbox" className="mr-4 ml-2" />
+                              <label className="content-name">{x.name}</label>
+                            </div>
+                          ))}
                         </div>
                       </div>
-                    ))
-                  ) : (
-                    <p>Không có dữ liệu.</p>
-                  )}
+
+                      {/* Origin */}
+                      <div className='category'>
+                        <div className="title" >
+                          <ul className="nav justify-content-between mt-1">
+                            <li className="nac-item">
+                              <p className="font-weight-bold">Xuất Xứ</p>
+                            </li>
+                            <li className="more">
+                              <button className="button" onClick={() => setContentState((prevState) => ({ ...prevState, origin: !prevState.origin }))}>
+                                <i className={`fa-solid ${contentState.origin ? "fa-minus" : "fa-plus"}`} />
+                              </button>
+                            </li>
+                          </ul>
+                        </div>
+                        <div className={`content ${contentState.origin ? "show" : "hide"}`}>
+                          {listOrigin.map((x) => (
+                            <div key={x.id}>
+                              <input type="checkbox" className="mr-4 ml-2" />
+                              <label className="content-name">{x.name}</label>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* design style */}
+                      <div className='category'>
+                        <div className="title" >
+                          <ul className="nav justify-content-between mt-1">
+                            <li className="nac-item">
+                              <p className="font-weight-bold">Kiểu Thiết Kế</p>
+                            </li>
+                            <li className="more">
+                              <button className="button" onClick={() => setContentState((prevState) => ({ ...prevState, design: !prevState.design }))}>
+                                <i className={`fa-solid ${contentState.design ? "fa-minus" : "fa-plus"}`} />
+                              </button>
+                            </li>
+                          </ul>
+                        </div>
+                        <div className={`content ${contentState.design ? "show" : "hide"}`}>
+                          {listDesignStyle.map((x) => (
+                            <div key={x.id}>
+                              <input type="checkbox" className="mr-4 ml-2" />
+                              <label className="content-name">{x.name}</label>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* skin type */}
+                      <div className='category'>
+                        <div className="title" >
+                          <ul className="nav justify-content-between mt-1">
+                            <li className="nac-item">
+                              <p className="font-weight-bold">Loại Da</p>
+                            </li>
+                            <li className="more">
+                              <button className="button" onClick={() => setContentState((prevState) => ({ ...prevState, skin: !prevState.skin }))}>
+                                <i className={`fa-solid ${contentState.skin ? "fa-minus" : "fa-plus"}`} />
+                              </button>
+                            </li>
+                          </ul>
+                        </div>
+                        <div className={`content ${contentState.skin ? "show" : "hide"}`}>
+                          {listSkinStype.map((x) => (
+                            <div key={x.id}>
+                              <input type="checkbox" className="mr-4 ml-2" />
+                              <label className="content-name">{x.name}</label>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Sole */}
+                      <div className='category'>
+                        <div className="title" >
+                          <ul className="nav justify-content-between mt-1">
+                            <li className="nac-item">
+                              <p className="font-weight-bold">Đế Giày</p>
+                            </li>
+                            <li className="more">
+                              <button className="button" onClick={() => setContentState((prevState) => ({ ...prevState, sole: !prevState.sole }))} >
+                                <i className={`fa-solid ${contentState.sole ? "fa-minus" : "fa-plus"}`} />
+                              </button>
+                            </li>
+                          </ul>
+                        </div>
+                        <div className={`content ${contentState.sole ? "show" : "hide"}`}>
+                          {listSole.map((x) => (
+                            <div key={x.id}>
+                              <input type="checkbox" className="mr-4 ml-2" />
+                              <label className="content-name">{x.name}</label>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* lining */}
+                      <div className='category'>
+                        <div className="title" >
+                          <ul className="nav justify-content-between mt-1">
+                            <li className="nac-item">
+                              <p className="font-weight-bold">Lót Giày</p>
+                            </li>
+                            <li className="more">
+                              <button className="button" onClick={() => setContentState((prevState) => ({ ...prevState, lining: !prevState.lining }))}>
+                                <i className={`fa-solid ${contentState.lining ? "fa-minus" : "fa-plus"}`} />
+                              </button>
+                            </li>
+                          </ul>
+                        </div>
+                        <div className={`content ${contentState.lining ? "show" : "hide"}`}>
+                          {listLining.map((x) => (
+                            <div key={x.id}>
+                              <input type="checkbox" className="mr-4 ml-2" />
+                              <label className="content-name">{x.name}</label>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Toe */}
+                      <div className='category'>
+                        <div className="title" >
+                          <ul className="nav justify-content-between mt-1">
+                            <li className="nac-item">
+                              <p className="font-weight-bold">Mũi Giày</p>
+                            </li>
+                            <li className="more">
+                              <button className="button" onClick={() => setContentState((prevState) => ({ ...prevState, toe: !prevState.toe }))}>
+                                <i className={`fa-solid ${contentState.toe ? "fa-minus" : "fa-plus"}`} />
+                              </button>
+                            </li>
+                          </ul>
+                        </div>
+                        <div className={`content ${contentState.toe ? "show" : "hide"}`}>
+                          {listToe.map((x) => (
+                            <div key={x.id}>
+                              <input type="checkbox" className="mr-4 ml-2" />
+                              <label className="content-name">{x.name}</label>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Cushion */}
+                      <div className='category'>
+                        <div className="title" >
+                          <ul className="nav justify-content-between mt-1">
+                            <li className="nac-item">
+                              <p className="font-weight-bold">Đệm</p>
+                            </li>
+                            <li className="more">
+                              <button className="button" onClick={() => setContentState((prevState) => ({ ...prevState, cushion: !prevState.cushion }))}>
+                                <i className={`fa-solid ${contentState.cushion ? "fa-minus" : "fa-plus"}`} />
+                              </button>
+                            </li>
+                          </ul>
+                        </div>
+                        <div className={`content ${contentState.cushion ? "show" : "hide"}`}>
+                          {listCushion.map((x) => (
+                            <div key={x.id}>
+                              <input type="checkbox" className="mr-4 ml-2" />
+                              <label className="content-name">{x.name}</label>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+
+                  <div className="col-md-9">
+                    <div className="row item">
+                      {Array.isArray(products) ? (
+                        products.map((product) => (
+                          <div key={product.id} className="col-md-3">
+                            <Link to={`/shoes/productdetail/${product.id}`}>
+                              <img src={`https://s3-ap-southeast-1.amazonaws.com/imageshoestore/${product.imgURI}`} alt="" className="zoom" />
+                            </Link>
+                            <br />
+                            <br />
+                            <div style={{ fontSize: "medium" }} className="p-2">
+                              <Link to={`/shoes/productdetail/${product.id}`} className="text-dark text-decoration-none">
+                                {product.name}
+                              </Link>
+                              <p className="font-weight-bold" style={{ color: "rgba(0, 0, 0, 0.705)" }}>
+                                {product.priceMin}đ&nbsp;
+                              </p>
+                            </div>
+                          </div>
+                        ))
+                      ) : (
+                        <p>Không có dữ liệu.</p>
+                      )}
+                    </div>
                   </div>
                 </Row>
               </CardBody>
