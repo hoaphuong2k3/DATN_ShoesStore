@@ -1,7 +1,7 @@
 
 import {Card, CardHeader, CardBody, Container, Row,} from "reactstrap";
 // core components
-import Header from "components/Headers/UserHeader2.js";
+import Header from "components/Headers/ProductHeader";
 
 const Introduce = () => {
     return (

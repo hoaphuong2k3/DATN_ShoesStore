@@ -5,8 +5,8 @@ import ReactPaginate from "react-paginate";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import axiosInstance from "services/custommize-axios";
-import { format, parseISO } from 'date-fns';
-import { vi } from 'date-fns/locale';
+import Header from "components/Headers/Header.js";
+
 
 // reactstrap components
 import Switch from 'react-input-switch';
@@ -15,7 +15,7 @@ import {
   Input, Button, Table, Badge, Modal, Container,
   ModalBody, ModalFooter, ModalHeader, CardBody, CardHeader, CardFooter
 } from "reactstrap";
-import Header from "components/Headers/Header.js";
+
 
 const Staff = () => {
 
@@ -40,10 +40,10 @@ const Staff = () => {
   const [queryParams, setQueryParams] = useState({
     page: 0,
     size: 5,
-    type: 0,
-    fullname: "",
-    status: "",
-    isdelete: 0,
+    fullname: '',
+    phonenumber: '',
+    email: '',
+    gender: '',
   });
 
 
@@ -53,8 +53,15 @@ const Staff = () => {
       const provincesResponse = await axios.get("https://provinces.open-api.vn/api/?depth=3");
       setProvinces(provincesResponse.data);
 
-      const response = await axiosInstance.get("/admin", {
-        params: queryParams
+      const response = await axiosInstance.get("/staff", {
+        params: {
+          ...queryParams,
+          fullname: queryParams.fullname || null,
+          phonenumber: queryParams.phonenumber || null,
+          email: queryParams.email || null,
+          gender: queryParams.gender === '' ? null : queryParams.gender,
+          // gender: queryParams.gender
+        },
       });
       setAdmins(response.content);
       console.log(response.content);
@@ -121,7 +128,14 @@ const Staff = () => {
     setQueryParams({ ...queryParams, size: newSize, page: 0 });
   };
 
+  const handleFullnameChange = (e) => {
+    setQueryParams({ ...queryParams, fullname: e.target.value });
+  };
 
+  const handleGenderChange = (e) => {
+    const genderValue = e.target.value == "true";
+    setQueryParams({ ...queryParams, gender: genderValue });
+  }
 
   const calculateIndex = (index) => {
     return index + 1 + queryParams.page * queryParams.size;
@@ -137,10 +151,10 @@ const Staff = () => {
     setQueryParams({
       page: 0,
       size: 5,
-      type: 0,
-      fullname: "",
-      status: "",
-      isdelete: 0,
+      fullname: '',
+      phoneNumber: '',
+      email: '',
+      gender: '',
     });
   };
 
@@ -203,35 +217,17 @@ const Staff = () => {
         isDeleted: true,
       },
     });
-    // setSelectedValueType(null);
   };
 
-  //save
-
-
+  //Add
   const saveAdmin = async () => {
     try {
       if (formData.id) {
-        await axiosInstance.put(`/admin/update`, {
-          id: formData.id,
-          username: formData.username,
-          fullname: formData.fullname,
-          gender: formData.gender,
-          dateOfBirth: formData.dateOfBirth,
-          email: formData.email,
-          phoneNumber: formData.phoneNumber,
-          address: {
-            proviceCode: formData.address.proviceCode,
-            districtCode: formData.address.districtCode,
-            communeCode: formData.address.communeCode,
-            addressDetail: formData.address.addressDetail,
-            isDeleted: true,
-          },
-        });
+        await axiosInstance.put(`/staff/update`, formData);
         fetchData();
         toast.success("Cập nhật thành công!");
       } else {
-        await axiosInstance.post('/admin/create', {
+        await axiosInstance.post('/staff/create', {
           username: formData.username,
           fullname: formData.fullname,
           gender: formData.gender,
@@ -266,11 +262,10 @@ const Staff = () => {
     }
   };
 
-
   //delete
   const deleteAdmin = (id) => {
     if (window.confirm("Bạn có chắc chắn muốn xóa không?")) {
-      axiosInstance.patch(`/admin/delete/${id}`)
+      axiosInstance.patch(`/staff/delete/${id}`)
         .then(response => {
           fetchData();
           toast.success("Xóa thành công");
@@ -281,6 +276,66 @@ const Staff = () => {
     }
   };
 
+  // Select checkbox
+  const [isCheckedAll, setIsCheckedAll] = useState(false);
+  const [selectedId, setSelectedId] = useState([]);
+  const [showActions, setShowActions] = useState(false);
+
+  const handleSelectAll = () => {
+    setIsCheckedAll(!isCheckedAll);
+
+    if (!isCheckedAll) {
+      const allStaff = admins.map((staff) => staff.id);
+      setSelectedId(allStaff);
+      setShowActions(true);
+    } else {
+      setSelectedId([]);
+      setShowActions(false);
+    }
+  };
+
+  const handleCheckboxChange = (idStaff) => {
+    if (selectedId.includes(idStaff)) {
+      setSelectedId(selectedId.filter((id) => id !== idStaff));
+      setShowActions(false);
+    } else {
+      setSelectedId([...selectedId, idStaff]);
+      setShowActions(true);
+    }
+
+  };
+
+  // Hiện action deleteAll
+  const handleActionSelect = (action) => {
+    if (action === "deleteAll") {
+      // Xóa everything
+    } else if (action === "disableAll") {
+      // Ngừng everything
+    }
+    setShowActions(false);
+  };
+
+  //updat-status
+  const updateStatus = async (id, status) => {
+    try {
+      await axiosInstance.put(`/staff/update-status/${id}?status=${status}`);
+      fetchData();
+      toast.success("Cập nhật trạng thái thành công!");
+    } catch (error) {
+      console.error("Error updating staff status:", error);
+    }
+  };
+
+  // lọc status
+  const [selectedStatus, setSelectedStatus] = useState('');
+
+  const filterAdmins = admins.filter((admin) => {
+    if (selectedStatus === '') {
+      return true;
+    } else {
+      return admin.status.toString() === selectedStatus;
+    }
+  });
   return (
     <>
       <Header />
@@ -302,7 +357,7 @@ const Staff = () => {
                     <h3 className="heading-small text-black mb-0 ml-2">Tìm kiếm</h3>
                   </Row>
                   <hr className="my-4" />
-                  <Form className="search">
+                  <Form>
                     <div className="pl-lg-4">
                       <Row>
                         <Col lg="6">
@@ -311,14 +366,14 @@ const Staff = () => {
                               className="form-control-label"
                               htmlFor="fullname"
                             >
-                              Tên Nhân Viên:
+                              Họ tên:
                             </label>
                             <Input
                               className="form-control-alternative"
                               id="fullname"
                               type="text"
                               value={queryParams.fullname}
-                              onChange={(e) => setQueryParams({ ...queryParams, fullname: e.target.value })}
+                              onChange={handleFullnameChange}
                             />
                           </FormGroup>
                         </Col>
@@ -334,14 +389,12 @@ const Staff = () => {
                               className="form-control-alternative"
                               id="phoneNumber"
                               type="text"
-                              value={queryParams.phoneNumber}
-                              onChange={(e) => setQueryParams({ ...queryParams, phoneNumber: e.target.value })}
+                              value={queryParams.phonenumber}
+                              onChange={(e) => setQueryParams({ ...queryParams, phonenumber: e.target.value })}
                             />
                           </FormGroup>
                         </Col>
-
                       </Row>
-
                       {value === 'yes' &&
                         <Row>
                           <Col lg="6">
@@ -357,8 +410,8 @@ const Staff = () => {
                                     name="gender"
                                     type="radio"
                                     value={false}
-                                    // checked={search.gender === false || search.gender === 'false'}
-                                    onChange={(e) => setQueryParams({ ...queryParams, phoneNumber: e.target.value })}
+                                    checked={queryParams.gender === false}
+                                    onChange={handleGenderChange}
                                   />Nam
                                 </div>
                                 <div className="custom-control custom-radio">
@@ -368,9 +421,8 @@ const Staff = () => {
                                     name="gender"
                                     type="radio"
                                     value={true}
-                                    // checked={search.gender === true || search.gender === 'true'}
-                                    onChange={(e) => setQueryParams({ ...queryParams, phoneNumber: e.target.value })}
-
+                                    checked={queryParams.gender === true}
+                                    onChange={handleGenderChange}
                                   />Nữ
                                 </div>
                               </div>
@@ -380,23 +432,17 @@ const Staff = () => {
                             <FormGroup>
                               <label
                                 className="form-control-label"
-                                htmlFor="input-city"
+                                htmlFor="email"
                               >
-                                Thành Phố / Tỉnh
+                                Email:
                               </label>
                               <Input
                                 className="form-control-alternative"
-                                type="select"
-                                value={selectedCity}
-                                onChange={(e) => setQueryParams({ ...queryParams, phoneNumber: e.target.value })}
-                              >
-                                <option value="">Chọn Thành Phố/Tỉnh</option>
-                                {provinces.map((province) => (
-                                  <option key={province.code} value={province.name}>
-                                    {province.name}
-                                  </option>
-                                ))}
-                              </Input>
+                                id="email"
+                                type="text"
+                                value={queryParams.email}
+                                onChange={(e) => setQueryParams({ ...queryParams, email: e.target.value })}
+                              />
                             </FormGroup>
                           </Col>
                         </Row>
@@ -421,8 +467,32 @@ const Staff = () => {
                   <hr className="my-4" />
                   <Row className="align-items-center my-4">
                     <div className="col" style={{ display: "flex" }}>
-
                       <h3 className="heading-small text-black mb-0"><FaFileAlt size="16px" className="mr-1" />Danh sách</h3>
+                      {/* Show Action */}
+                      {showActions && (
+
+                        <Input type="select" className="ml-3" name="action" style={{ width: "150px" }} size="sm" onChange={(e) => handleActionSelect(e.target.value)}>
+                          <option value={""}>Chọn thao tác</option>
+                          <option value="deleteAll">Xóa tất cả</option>
+                          <option value="disableAll">Ngừng hoạt động</option>
+                        </Input>
+
+                      )}
+                      {/* End Show Action */}
+
+                      {/* filter status */}
+                      <Col>
+                        <Input type="select" name="status" style={{ width: "150px" }} size="sm" 
+                        value={selectedStatus} 
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          setSelectedStatus(value === '' ? '' : value);
+                        }}>
+                          <option value="">Tất cả</option>
+                          <option value="0">Ngừng hoạt động</option>
+                          <option value="1">Đang hoạt động</option>
+                        </Input>
+                      </Col>
                     </div>
                     <div className="col text-right">
                       <Button
@@ -437,47 +507,65 @@ const Staff = () => {
                   <Table className="align-items-center table-flush" responsive>
                     <thead className="thead-light">
                       <tr>
-                        
+                        <th className="text-center pb-4">
+                          <FormGroup check>
+                            <Input
+                              type="checkbox"
+                              checked={isCheckedAll}
+                              onChange={handleSelectAll}
+                            />
+                          </FormGroup>
+                        </th>
                         <th scope="col">STT</th>
+                        <th scope="col">Trạng thái</th>
                         <th scope="col">Họ tên</th>
                         <th scope="col">Ngày sinh</th>
                         <th scope="col">Giới tính</th>
                         <th scope="col">Số điện thoại</th>
                         <th scope="col">Email</th>
                         <th scope="col">Địa chỉ</th>
-                        <th scope="col">Trạng thái</th>
-                        <th scope="col">Thao tác</th>
-
+                        <th scope="col" style={{ position: "sticky", zIndex: '1', right: '0' }}>Thao tác</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {Array.isArray(admins) && admins.length > 0 ? (
-                        admins.map((admin, index) => (
+                      {Array.isArray(filterAdmins) && filterAdmins.length > 0 ? (
+                        filterAdmins.map((admin, index) => (
                           <tr key={admin.id}>
-                            {/* <td className="text-center">
+                            <td className="text-center">
                               <FormGroup check>
                                 <Input
                                   type="checkbox"
-                                  checked={selectedShoesIds.includes(shoes.id)}
-                                  onChange={() => handleShoesCheckboxChange(shoes.id)}
+                                  checked={selectedId.includes(admin.id)}
+                                  onChange={() => handleCheckboxChange(admin.id)}
                                 />
                               </FormGroup>
-                            </td> */}
+                            </td>
                             <td>{calculateIndex(index)}</td>
+                            <td>
+                              <Badge color={statusMapping[admin.status]?.color || statusMapping.default.color}>
+                                {statusMapping[admin.status]?.label || statusMapping.default.label}
+                              </Badge>
+                            </td>
                             <td>{admin.fullname}</td>
                             <td>{admin.dateOfBirth}</td>
                             <td>{admin.gender ? "Nữ" : "Nam"}</td>
                             <td>{admin.phoneNumber}</td>
                             <td>{admin.email}</td>
                             <td>{admin.addressDetail}, {admin.communeCode}, {admin.districtCode}, {admin.proviceCode} </td>
-                            <td>
-                              <Badge color={statusMapping[admin.status]?.color || statusMapping.default.color}>
-                                {statusMapping[admin.status]?.label || statusMapping.default.label}
-                              </Badge>
-                            </td>
-                            <td>
-                              <Button color="info" size="sm" onClick={() => handleRowClick(admin)} disabled={admin.status === 0}><FaEdit /></Button>
+
+                            <td style={{ position: "sticky", zIndex: '1', right: '0', backgroundColor: '#fff' }}>
+                              <Button color="info" size="sm" onClick={() => handleRowClick(admin)} disabled={false}><FaEdit /></Button>
                               <Button color="danger" size="sm" onClick={() => deleteAdmin(admin.id)}><FaTrash /></Button>
+                              {admin.status === 0 &&
+                                <Button color="warning" size="sm" onClick={() => updateStatus(admin.id, 1)}>
+                                  <i class="fa-solid fa-lock-open fa-flip-horizontal"></i>
+                                </Button>
+                              }
+                              {admin.status === 1 &&
+                                <Button color="warning" size="sm" onClick={() => updateStatus(admin.id, 0)} >
+                                  <i class="fa-solid fa-lock"></i>
+                                </Button>
+                              }
                             </td>
 
                           </tr>
@@ -532,7 +620,6 @@ const Staff = () => {
                         marginPagesDisplayed={1}
                       />
                     </Col>
-
                   </Row>
                 </CardBody>
               </Card>
@@ -547,13 +634,11 @@ const Staff = () => {
             >
               <ModalHeader toggle={toggle}>
                 <h3 className="heading-small text-muted mb-0">{formData.id ? 'Cập Nhật Nhân Viên' : 'Thêm Mới Nhân Viên'}</h3>
-
               </ModalHeader>
               <ModalBody>
                 <Form>
                   <div className="pl-lg-4">
                     <Row>
-
                       <Col lg="4">
                         <FormGroup>
                           <label
@@ -763,25 +848,7 @@ const Staff = () => {
                         </FormGroup>
                       </Col>
                     </Row>
-                    <Row>
-                      <Col className="pl-lg-4">
-                        {formData.id && (
-                          <FormGroup>
-                            <label className="form-control-label">
-                              Trạng thái
-                            </label>
-                            <div className="form-control-alternative custom-toggle ml-2">
-                              <Input
-                                checked={formData.status === 0}
-                                type="checkbox"
-                              />
-                              <span className="custom-toggle-slider rounded-circle" />
-                            </div>
 
-                          </FormGroup>
-                        )}
-                      </Col>
-                    </Row>
                   </div>
                 </Form >
               </ModalBody >
@@ -800,7 +867,6 @@ const Staff = () => {
               </ModalFooter>
 
             </Modal >
-
           </Col>
         </Row>
       </Container>
