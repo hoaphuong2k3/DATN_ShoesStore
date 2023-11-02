@@ -44,7 +44,7 @@ const AddProduct = () => {
     };
 
     //Img
-    const [selectedImage, setSelectedImage] = useState(null);
+    const [selectedImage, setSelectedImage] = useState(new File([""], { type: "text/plain" }));
 
     const handleImageChange = (e) => {
         const file = e.target.files[0];
@@ -55,12 +55,9 @@ const AddProduct = () => {
     const onSubmit = async (e) => {
 
         e.preventDefault();
-
         const shoesDataJson = JSON.stringify(shoes);
-
         formData.append('file', selectedImage);
         formData.append('data', shoesDataJson);
-
         try {
             const response = await postNewShoes(formData);
             navigate("/admin/product");

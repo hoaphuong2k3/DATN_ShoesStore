@@ -217,22 +217,30 @@ const Client = () => {
   const [selectedCity, setSelectedCity] = useState("");
   const [selectedDistrict, setSelectedDistrict] = useState("");
   const [selectedWard, setSelectedWard] = useState("");
-  const [idClient, setIdClient] = useState(null);
+  // const [idClient, setIdClient] = useState(null);
   const [modalAdress, setModalAdress] = useState(false);
   const toggleAdress = () => setModalAdress(!modalAdress);
 
   useEffect(() => {
     if (modalAdress === false) {
-      setIdClient(null);
+      // setIdClient(null);
+      setFormData({ ...formData, idClient: "" });
       setListAddress([])
     }
   }, [modalAdress]);
   const [modalAddAdress, setModalAddAdress] = useState(false);
   const toggleAddAdress = () => setModalAddAdress(!modalAddAdress);
+
+  useEffect(() => {
+    if (modalAddAdress === false) {
+      // setIdClient(null);
+      resetFormData();
+    }
+  }, [modalAddAdress]);
   const [listAddress, setListAddress] = useState([]);
   const getAllAddress = async () => {
-    console.log(idClient)
-    const res = await axios.get(`http://localhost:33321/api/address/${idClient}`);
+    console.log(formData.idClient);
+    const res = await axios.get(`http://localhost:33321/api/address/${formData.idClient}`);
     console.log("chek", res);
     if (res && res.data) {
       setListAddress(res.data.content);
@@ -244,26 +252,131 @@ const Client = () => {
     const res = await axios.get(`http://localhost:33321/api/address/${id}`);
     console.log(res.data.content)
     setListAddress(res.data.content);
-    setIdClient(id);
+    setFormData({ ...formData, idClient: id });
+    // setIdClient(id);
     toggleAdress();
   };
+  const [formData, setFormData] = useState({
+    id: null,
+    proviceCode: null,
+    districtCode: null,
+    communeCode: null,
+    addressDetail: null,
+    idClient: ""
+  });
+  const resetFormData = () => {
+    setSelectedCity(null);
+    setSelectedDistrict(null);
+    setSelectedWard(null);
+    setFormData({
+      ...formData,
+      id: null,
+      proviceCode: null,
+      districtCode: null,
+      communeCode: null,
+      addressDetail: null
+    });
+
+  }
+  useEffect(() => {
+  }, [selectedCity]);
+  useEffect(() => {
+  }, [selectedDistrict]);
+  useEffect(() => {
+  }, [selectedWard]);
+  useEffect(() => {
+    console.log("check khi thay dỏi formData", formData);
+  }, [formData]);
   const handleCityChange = (e) => {
     const selectedCity = e.target.value;
-    setSelectedCity(selectedCity);
     const selectedProvince = provinces.find((province) => province.name === selectedCity);
     const districts = selectedProvince.districts;
+    setFormData({
+      ...formData,
+      proviceCode: selectedCity,
+      districtCode: null,
+      communeCode: null
+    });
+    setSelectedCity(selectedCity);
+    setSelectedDistrict(null);
+    setSelectedWard(null);
   };
   const handleDistrictChange = (e) => {
     const selectedDistrict = e.target.value;
-    setSelectedDistrict(selectedDistrict);
     const selectedProvince = provinces.find((province) => province.name === selectedCity);
     const selectedDistrictObj = selectedProvince.districts.find((district) => district.name === selectedDistrict);
     const wards = selectedDistrictObj.wards;
+    setFormData({
+      ...formData,
+      districtCode: selectedDistrict,
+      communeCode: ""
+    });
+    setSelectedDistrict(selectedDistrict);
+    setSelectedWard("");
   };
 
   const handleWardChange = (e) => {
     const selectedWard = e.target.value;
+    setFormData({
+      ...formData,
+      communeCode: selectedWard
+    });
     setSelectedWard(selectedWard);
+  };
+  const CLickUpdateAddress = (item) => {
+    setFormData({
+      ...formData,
+      id: item.id,
+      proviceCode: item.proviceCode,
+      districtCode: item.districtCode,
+      communeCode: item.communeCode,
+      addressDetail: item.addressDetail
+    });
+    setSelectedCity(item.proviceCode);
+    setSelectedDistrict(item.districtCode);
+    setSelectedWard(item.communeCode,);
+    toggleAddAdress();
+  }
+  const saveAddress = async () => {
+    try {
+      if (formData.id) {
+        await axios.put(`/admin/update`, {
+          id: formData.id,
+          proviceCode: formData.proviceCode,
+          districtCode: formData.districtCode,
+          communeCode: formData.communeCode,
+          addressDetail: formData.addressDetail,
+          idClient: formData.idClient,
+        });
+        fetchData();
+        toast.success("Cập nhật thành công!");
+      } else {
+        console.log("ck:", formData);
+        await axios.post('http://localhost:33321/api/address/create', {
+          proviceCode: formData.proviceCode,
+          districtCode: formData.districtCode,
+          communeCode: formData.communeCode,
+          addressDetail: formData.addressDetail,
+          idClient: formData.idClient,
+        });
+
+        getAllAddress();
+        toast.success("Thêm mới thành công!");
+      }
+
+      // Đóng modal và reset form
+      toggleAddAdress();
+      resetFormData();
+    } catch (error) {
+      // Xử lý lỗi
+      console.error("Error:", error);
+      if (error.response) {
+        console.error("Response data:", error.response.data);
+        toast.error(error.response.data.message);
+      } else {
+        toast.error("Đã có lỗi xảy ra.");
+      }
+    }
   };
   //Kết thúc xử lý địa chỉ
 
@@ -466,7 +579,7 @@ const Client = () => {
                           <td className="text-center">{index + 1}</td>
 
                           <td>
-                            <img src={`data:image/png;base64,${item.avatar}`} alt="Image" />
+                            {item.fullname}
                           </td>
 
                           <td>{item.email}</td>
@@ -834,7 +947,7 @@ const Client = () => {
         style={{ maxWidth: '500px' }}
       >
         <ModalHeader toggle={toggleAddAdress}>
-          <h3 className="heading-small text-muted mb-0">Địa chỉ khách hàng</h3>
+          <h3 className="heading-small text-muted mb-0">{formData.id ? 'Cập Nhật Địa chỉ khách hàng' : 'Thêm Mới Địa chỉ khách hàng'}</h3>
         </ModalHeader>
         <ModalBody>
           <Form>
@@ -849,9 +962,13 @@ const Client = () => {
                     <Input
                       className="form-control-alternative"
                       type="textarea"
-                      name="fullname"
-                      value={editClient.fullname}
-                      onChange={onInputChangeDataUpdate}
+                      name="addressDetail"
+                      value={formData.addressDetail}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          addressDetail: e.target.value,
+                        })}
                     />
                   </FormGroup>
                 </Col>
@@ -932,12 +1049,17 @@ const Client = () => {
         </ModalBody>
         <ModalFooter>
           <div className="text-center">
-            <Button color="danger" onClick={(e) => onUpdateClient(e)}>
-              Sửa
+            <Button color="danger" onClick={(e) => saveAddress(e)}>
+              {formData.id ? "Cập nhật" : "Thêm mới"}
             </Button>{' '}
-            <Button color="primary" >
-              Reset
-            </Button>
+            {formData.id
+              ?
+              ""
+              :
+              <Button color="primary" onClick={resetFormData}>
+                Reset
+              </Button>
+            }
             <Button color="danger" onClick={toggleAddAdress} >
               Close
             </Button>
@@ -985,11 +1107,11 @@ const Client = () => {
                       <Row>
                         <Col lg="9"  >
                           <div style={{ fontSize: 13 }} className="text-small text-muted mb-0">
-                            {item.addressDetail},&nbsp;{item.proviceCode},&nbsp;{item.districtCode},&nbsp;{item.communeCode}
+                            {item.addressDetail},&nbsp;{item.communeCode},&nbsp;{item.districtCode},&nbsp;{item.proviceCode}
                           </div>
                         </Col>
                         <Col lg="3" className="mr--1">
-                          <Button color="info" size="sm">
+                          <Button color="info" size="sm" onClick={() => CLickUpdateAddress(item)}>
                             <FaEdit />
                           </Button>
                           <Button color="danger" size="sm" >
@@ -1002,23 +1124,6 @@ const Client = () => {
                   )
                 })
               }
-
-              <Row>
-                <Col lg="9"  >
-                  <div style={{ fontSize: 13 }} className="text-small text-muted mb-0">
-                    Số nhà 16, 17 Phú Kiều, Phường Phúc Diễn, Quận Bắc Từ Liêm, TP Hà Nội
-                  </div>
-                </Col>
-                <Col lg="3" className="mr--1">
-                  <Button color="info" size="sm">
-                    <FaEdit />
-                  </Button>
-                  <Button color="danger" size="sm" >
-                    <FaTrash />
-                  </Button>
-                </Col>
-              </Row>
-              <hr />
             </div>
           </Form>
         </ModalBody>
