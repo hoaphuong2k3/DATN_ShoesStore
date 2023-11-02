@@ -1,5 +1,5 @@
 import axios from "axios";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 // reactstrap components
 import { Card, CardHeader, CardBody, Container, Row, Col, Form, FormGroup, Input, Button, Table, CardFooter, CardTitle, Label, Modal, ModalHeader, ModalFooter, ModalBody } from "reactstrap";
 import Select from "react-select";
@@ -214,34 +214,31 @@ const Client = () => {
 
   //Xử lý địa chỉ
   const [provinces, setProvinces] = useState([]);
-  const [selectedCity, setSelectedCity] = useState("");
-  const [selectedDistrict, setSelectedDistrict] = useState("");
-  const [selectedWard, setSelectedWard] = useState("");
-  // const [idClient, setIdClient] = useState(null);
   const [modalAdress, setModalAdress] = useState(false);
   const toggleAdress = () => setModalAdress(!modalAdress);
 
   useEffect(() => {
-    if (modalAdress === false) {
-      // setIdClient(null);
+    if (modalAdress === false && modalAddAdress === false) {
       setFormData({ ...formData, idClient: "" });
       setListAddress([])
     }
   }, [modalAdress]);
+
   const [modalAddAdress, setModalAddAdress] = useState(false);
   const toggleAddAdress = () => setModalAddAdress(!modalAddAdress);
 
   useEffect(() => {
-    if (modalAddAdress === false) {
-      // setIdClient(null);
+    if (modalAdress === true && modalAddAdress === false) {
       resetFormData();
+      toggleAdress();
+    }
+    if (modalAddAdress === true) {
+      toggleAdress();
     }
   }, [modalAddAdress]);
   const [listAddress, setListAddress] = useState([]);
   const getAllAddress = async () => {
-    console.log(formData.idClient);
     const res = await axios.get(`http://localhost:33321/api/address/${formData.idClient}`);
-    console.log("chek", res);
     if (res && res.data) {
       setListAddress(res.data.content);
       console.log(listAddress);
@@ -253,9 +250,9 @@ const Client = () => {
     console.log(res.data.content)
     setListAddress(res.data.content);
     setFormData({ ...formData, idClient: id });
-    // setIdClient(id);
     toggleAdress();
   };
+
   const [formData, setFormData] = useState({
     id: null,
     proviceCode: null,
@@ -265,64 +262,19 @@ const Client = () => {
     idClient: ""
   });
   const resetFormData = () => {
-    setSelectedCity(null);
-    setSelectedDistrict(null);
-    setSelectedWard(null);
     setFormData({
       ...formData,
       id: null,
-      proviceCode: null,
-      districtCode: null,
-      communeCode: null,
-      addressDetail: null
+      proviceCode: "",
+      districtCode: "",
+      communeCode: "",
+      addressDetail: ""
     });
-
   }
   useEffect(() => {
-  }, [selectedCity]);
-  useEffect(() => {
-  }, [selectedDistrict]);
-  useEffect(() => {
-  }, [selectedWard]);
-  useEffect(() => {
-    console.log("check khi thay dỏi formData", formData);
+    console.log("check", formData);
   }, [formData]);
-  const handleCityChange = (e) => {
-    const selectedCity = e.target.value;
-    const selectedProvince = provinces.find((province) => province.name === selectedCity);
-    const districts = selectedProvince.districts;
-    setFormData({
-      ...formData,
-      proviceCode: selectedCity,
-      districtCode: null,
-      communeCode: null
-    });
-    setSelectedCity(selectedCity);
-    setSelectedDistrict(null);
-    setSelectedWard(null);
-  };
-  const handleDistrictChange = (e) => {
-    const selectedDistrict = e.target.value;
-    const selectedProvince = provinces.find((province) => province.name === selectedCity);
-    const selectedDistrictObj = selectedProvince.districts.find((district) => district.name === selectedDistrict);
-    const wards = selectedDistrictObj.wards;
-    setFormData({
-      ...formData,
-      districtCode: selectedDistrict,
-      communeCode: ""
-    });
-    setSelectedDistrict(selectedDistrict);
-    setSelectedWard("");
-  };
 
-  const handleWardChange = (e) => {
-    const selectedWard = e.target.value;
-    setFormData({
-      ...formData,
-      communeCode: selectedWard
-    });
-    setSelectedWard(selectedWard);
-  };
   const CLickUpdateAddress = (item) => {
     setFormData({
       ...formData,
@@ -332,34 +284,29 @@ const Client = () => {
       communeCode: item.communeCode,
       addressDetail: item.addressDetail
     });
-    setSelectedCity(item.proviceCode);
-    setSelectedDistrict(item.districtCode);
-    setSelectedWard(item.communeCode,);
     toggleAddAdress();
   }
   const saveAddress = async () => {
     try {
       if (formData.id) {
-        await axios.put(`/admin/update`, {
+        await axios.put(`http://localhost:33321/api/address/update`, {
           id: formData.id,
           proviceCode: formData.proviceCode,
           districtCode: formData.districtCode,
           communeCode: formData.communeCode,
           addressDetail: formData.addressDetail,
-          idClient: formData.idClient,
+          idClient: formData.idClient
         });
-        fetchData();
+        getAllAddress();
         toast.success("Cập nhật thành công!");
       } else {
-        console.log("ck:", formData);
         await axios.post('http://localhost:33321/api/address/create', {
           proviceCode: formData.proviceCode,
           districtCode: formData.districtCode,
           communeCode: formData.communeCode,
           addressDetail: formData.addressDetail,
-          idClient: formData.idClient,
+          idClient: formData.idClient
         });
-
         getAllAddress();
         toast.success("Thêm mới thành công!");
       }
@@ -376,6 +323,18 @@ const Client = () => {
       } else {
         toast.error("Đã có lỗi xảy ra.");
       }
+    }
+  };
+  const deleteAddress = (id) => {
+    if (window.confirm("Bạn có chắc chắn muốn xóa không?")) {
+      axios.patch(`http://localhost:33321/api/address/delete/${id}`)
+        .then(response => {
+          getAllAddress();
+          toast.success("Xóa thành công");
+        })
+        .catch(error => {
+          console.error('Lỗi khi xóa dữ liệu:', error);
+        });
     }
   };
   //Kết thúc xử lý địa chỉ
@@ -952,7 +911,6 @@ const Client = () => {
         <ModalBody>
           <Form>
             <div className="pl-lg-4">
-
               <Row>
                 <Col lg="12">
                   <FormGroup>
@@ -962,12 +920,11 @@ const Client = () => {
                     <Input
                       className="form-control-alternative"
                       type="textarea"
-                      name="addressDetail"
                       value={formData.addressDetail}
                       onChange={(e) =>
                         setFormData({
                           ...formData,
-                          addressDetail: e.target.value,
+                          addressDetail: e.target.value
                         })}
                     />
                   </FormGroup>
@@ -980,8 +937,13 @@ const Client = () => {
                     <Input
                       className="form-control-alternative"
                       type="select"
-                      value={selectedCity}
-                      onChange={handleCityChange}
+                      value={formData.proviceCode}
+                      onChange={(e) => setFormData({
+                        ...formData,
+                        proviceCode: e.target.value,
+                        districtCode: null,
+                        communeCode: null
+                      })}
                     >
                       <option value="">Chọn Tỉnh / Thành</option>
                       {provinces.map((province) => (
@@ -1000,14 +962,18 @@ const Client = () => {
                     <Input
                       className="form-control-alternative"
                       type="select"
-                      value={selectedDistrict}
-                      onChange={handleDistrictChange}
-                      disabled={!selectedCity}
+                      value={formData.districtCode}
+                      onChange={(e) => setFormData({
+                        ...formData,
+                        districtCode: e.target.value,
+                        communeCode: ""
+                      })}
+                      disabled={!formData.proviceCode}
                     >
                       <option value="">Chọn Quận / Huyện</option>
-                      {selectedCity &&
+                      {formData.proviceCode &&
                         provinces
-                          .find((province) => province.name === selectedCity)
+                          .find((province) => province.name === formData.proviceCode)
                           .districts.map((district) => (
                             <option key={district.code} value={district.name}>
                               {district.name}
@@ -1024,15 +990,18 @@ const Client = () => {
                     <Input
                       className="form-control-alternative"
                       type="select"
-                      value={selectedWard}
-                      onChange={handleWardChange}
-                      disabled={!selectedDistrict}
+                      value={formData.communeCode}
+                      onChange={(e) => setFormData({
+                        ...formData,
+                        communeCode: e.target.value
+                      })}
+                      disabled={!formData.districtCode}
                     >
                       <option value="">Chọn Phường / Xã</option>
-                      {selectedDistrict &&
+                      {formData.districtCode &&
                         provinces
-                          .find((province) => province.name === selectedCity)
-                          .districts.find((district) => district.name === selectedDistrict)
+                          .find((province) => province.name === formData.proviceCode)
+                          .districts.find((district) => district.name === formData.districtCode)
                           .wards.map((ward) => (
                             <option key={ward.code} value={ward.name}>
                               {ward.name}
@@ -1041,8 +1010,6 @@ const Client = () => {
                     </Input>
                   </FormGroup>
                 </Col>
-
-
               </Row>
             </div>
           </Form>
@@ -1114,7 +1081,7 @@ const Client = () => {
                           <Button color="info" size="sm" onClick={() => CLickUpdateAddress(item)}>
                             <FaEdit />
                           </Button>
-                          <Button color="danger" size="sm" >
+                          <Button color="danger" size="sm" onClick={() => deleteAddress(item.id)}>
                             <FaTrash />
                           </Button>
                         </Col>
