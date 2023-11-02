@@ -5,8 +5,8 @@ import ReactPaginate from "react-paginate";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import axiosInstance from "services/custommize-axios";
-import { format, parseISO } from 'date-fns';
-import { vi } from 'date-fns/locale';
+import Header from "components/Headers/Header.js";
+
 
 // reactstrap components
 import Switch from 'react-input-switch';
@@ -15,8 +15,7 @@ import {
   Input, Button, Table, Badge, Modal, Container,
   ModalBody, ModalFooter, ModalHeader, CardBody, CardHeader, CardFooter
 } from "reactstrap";
-import Header from "components/Headers/Header.js";
-// import Select from "react-select/dist/declarations/src/Select";
+
 
 const Staff = () => {
 
@@ -263,15 +262,6 @@ const Staff = () => {
     }
   };
 
-  //update status
-  const statusUpdate = (checked) => {
-    const newStatus = checked ? 1 : 0;
-    setFormData((prevFormData) => ({
-      ...prevFormData,
-      status: newStatus,
-    }));
-  };
-
   //delete
   const deleteAdmin = (id) => {
     if (window.confirm("Bạn có chắc chắn muốn xóa không?")) {
@@ -367,7 +357,7 @@ const Staff = () => {
                     <h3 className="heading-small text-black mb-0 ml-2">Tìm kiếm</h3>
                   </Row>
                   <hr className="my-4" />
-                  <Form className="search">
+                  <Form>
                     <div className="pl-lg-4">
                       <Row>
                         <Col lg="6">
@@ -877,7 +867,6 @@ const Staff = () => {
               </ModalFooter>
 
             </Modal >
-
           </Col>
         </Row>
       </Container>

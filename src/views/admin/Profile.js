@@ -87,8 +87,7 @@ const Profile = () => {
 
                 <div className="text-center">
                   <div className="h5 mt-6">
-                    <i className="ni business_briefcase-24 mr-2" />
-                    hoaphuong, 19/07/2003
+                    <i className="ni business_briefcase-24 mr-2" data-value={admins.fullname}/>
                   </div>
                   <div>
                     <i className="ni education_hat mr-2" />

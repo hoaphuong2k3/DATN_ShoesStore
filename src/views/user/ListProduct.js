@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { Container, Row, Card, CardBody, Button, Col, Input } from "reactstrap";
+import { Container, Row, Card, CardBody, Button, Col, Input, Label } from "reactstrap";
 import Header from "components/Headers/UserHeader2.js";
 import { Link } from 'react-router-dom';
-import { Dropdown, DropdownButton } from 'react-bootstrap';
-import axios from "axios";
 import { toast } from 'react-toastify';
 import 'assets/css/listProduct.css';
 // list
@@ -12,26 +10,6 @@ import { getAllShoes } from "services/Product2Service";
 
 const Product = () => {
   const [products, setProducts] = useState([]);
-  const [search, setSearch] = useState({
-    code: "",
-    name: "",
-    brandId: null,
-    originId: null,
-    designStyleId: null,
-    skinTypeId: null,
-    soleId: null,
-    liningId: null,
-    toeId: null,
-    cushionId: null,
-    fromPrice: null,
-    toPrice: null,
-    fromQuantity: null,
-    toQuantity: null,
-    fromDateStr: "",
-    toDateStr: "",
-    createdBy: ""
-  });
-
   const [listBrand, setListBrand] = useState([]);
   const [listOrigin, setListOrigin] = useState([]);
   const [listDesignStyle, setListDesignStyle] = useState([]);
@@ -44,22 +22,20 @@ const Product = () => {
   const [totalElements, setTotalElenments] = useState(0);
   const [page, setPage] = useState(0);
   const [size, setSize] = useState(10);
+  const [search, setSearch] = useState({
+    name: "",
+    brandId: null,
+    originId: null,
+    designStyleId: null,
+    skinTypeId: null,
+    soleId: null,
+    liningId: null,
+    toeId: null,
+    cushionId: null,
+    fromPrice: null,
+    toPrice: null,
 
-  useEffect(() => {
-    getListShoes(page, size);
-    getlistBrand();
-    getListOrigin();
-    getListDesignStyle();
-    getListSkinType();
-    getListToe();
-    getListSole();
-    getListLining();
-    getListCushion();
-  }, []);
-
-  useEffect(() => {
-    getListShoes(page, size);
-  }, [search]);
+  });
 
   const getListShoes = async (page, size) => {
     try {
@@ -129,6 +105,29 @@ const Product = () => {
     }
   }
 
+  useEffect(() => {
+    getListShoes(page, size);
+    getlistBrand();
+    getListOrigin();
+    getListDesignStyle();
+    getListSkinType();
+    getListToe();
+    getListSole();
+    getListLining();
+    getListCushion();
+  }, [search]);
+
+  useEffect(() => {
+    getListShoes(page, size, search);
+  }, [page, size, search]);
+
+  const handleCheckboxChange = (propertyName, value) => {
+    setSearch((prevSearch) => ({
+      ...prevSearch,
+      [propertyName]: prevSearch[propertyName] === value ? null : value,
+    }));
+  };
+
   // Lọc
   const [contentState, setContentState] = useState({
     brand: false,
@@ -178,7 +177,10 @@ const Product = () => {
                         <div className={`content ${contentState.brand ? "show" : "hide"}`}>
                           {listBrand.map((x) => (
                             <div key={x.id}>
-                              <input type="checkbox" className="mr-4 ml-2" />
+                              <input type="checkbox" className="mr-4 ml-2"
+                                onChange={() => handleCheckboxChange("brandId", x.id)}
+                                checked={search.brandId === x.id}
+                              />
                               <label className="content-name">{x.name}</label>
                             </div>
                           ))}
@@ -202,7 +204,10 @@ const Product = () => {
                         <div className={`content ${contentState.origin ? "show" : "hide"}`}>
                           {listOrigin.map((x) => (
                             <div key={x.id}>
-                              <input type="checkbox" className="mr-4 ml-2" />
+                              <input type="checkbox" className="mr-4 ml-2"
+                                onChange={() => handleCheckboxChange("originId", x.id)}
+                                checked={search.originId === x.id}
+                              />
                               <label className="content-name">{x.name}</label>
                             </div>
                           ))}
@@ -226,7 +231,10 @@ const Product = () => {
                         <div className={`content ${contentState.design ? "show" : "hide"}`}>
                           {listDesignStyle.map((x) => (
                             <div key={x.id}>
-                              <input type="checkbox" className="mr-4 ml-2" />
+                              <input type="checkbox" className="mr-4 ml-2"
+                                onChange={() => handleCheckboxChange('designStyleId', x.id)}
+                                checked={search.designStyleId === x.id}
+                              />
                               <label className="content-name">{x.name}</label>
                             </div>
                           ))}
@@ -250,7 +258,10 @@ const Product = () => {
                         <div className={`content ${contentState.skin ? "show" : "hide"}`}>
                           {listSkinStype.map((x) => (
                             <div key={x.id}>
-                              <input type="checkbox" className="mr-4 ml-2" />
+                              <input type="checkbox" className="mr-4 ml-2"
+                                onChange={() => handleCheckboxChange('skinTypeId', x.id)}
+                                checked={search.skinTypeId === x.id}
+                              />
                               <label className="content-name">{x.name}</label>
                             </div>
                           ))}
@@ -274,7 +285,10 @@ const Product = () => {
                         <div className={`content ${contentState.sole ? "show" : "hide"}`}>
                           {listSole.map((x) => (
                             <div key={x.id}>
-                              <input type="checkbox" className="mr-4 ml-2" />
+                              <input type="checkbox" className="mr-4 ml-2"
+                                onChange={() => handleCheckboxChange('soleId', x.id)}
+                                checked={search.soleId === x.id}
+                              />
                               <label className="content-name">{x.name}</label>
                             </div>
                           ))}
@@ -298,7 +312,10 @@ const Product = () => {
                         <div className={`content ${contentState.lining ? "show" : "hide"}`}>
                           {listLining.map((x) => (
                             <div key={x.id}>
-                              <input type="checkbox" className="mr-4 ml-2" />
+                              <input type="checkbox" className="mr-4 ml-2"
+                                onChange={() => handleCheckboxChange('liningId', x.id)}
+                                checked={search.liningId === x.id}
+                              />
                               <label className="content-name">{x.name}</label>
                             </div>
                           ))}
@@ -322,7 +339,10 @@ const Product = () => {
                         <div className={`content ${contentState.toe ? "show" : "hide"}`}>
                           {listToe.map((x) => (
                             <div key={x.id}>
-                              <input type="checkbox" className="mr-4 ml-2" />
+                              <input type="checkbox" className="mr-4 ml-2"
+                                onChange={() => handleCheckboxChange('toeId', x.id)}
+                                checked={search.toeId === x.id}
+                              />
                               <label className="content-name">{x.name}</label>
                             </div>
                           ))}
@@ -346,18 +366,57 @@ const Product = () => {
                         <div className={`content ${contentState.cushion ? "show" : "hide"}`}>
                           {listCushion.map((x) => (
                             <div key={x.id}>
-                              <input type="checkbox" className="mr-4 ml-2" />
+                              <input type="checkbox" className="mr-4 ml-2"
+                                onChange={() => handleCheckboxChange('cushionId', x.id)}
+                                checked={search.cushionId === x.id}
+                              />
                               <label className="content-name">{x.name}</label>
                             </div>
                           ))}
                         </div>
                       </div>
+                      <div className='category'>
+                        <Label for="find_code" className="font-weight-bold">
+                          Giá:
+                        </Label>
+                        <Row>
+                          <Col xl={4}>
+                            <Input
+                              className="form-control-alternative"
+                              id="find_code"
+                              name="fromPrice"
+                              placeholder="Nhập giá"
+                            // value={search.fromPrice}
+                            // onChange={(e) => onInputChange(e)}
+                            />
+                          </Col>
+                          <Label for="find_code" xl={1} className="form-control-label text-center">
+                            <i class="fa-solid fa-arrow-right"></i>
+                          </Label>
+                          <Col xl={4}>
+                            <Input
+                              className="form-control-alternative"
+                              id="find_code"
+                              name="toPrice"
+                              placeholder="Nhập giá"
+                            // value={search.toPrice}
+                            // onChange={(e) => onInputChange(e)}
+                            />
+                          </Col>
+                        </Row>
+                      </div>
                     </div>
                   </div>
 
 
-                  <div className="col-md-9">
-                    <div className="row item">
+                  <div className="col-md-9 mt-5">
+                    <div className="selectItem">
+                      {/* <p>Lọc:</p> */}
+                      <ul>
+                        
+                      </ul>
+                    </div>
+                    <div className="row item mt-3">
                       {Array.isArray(products) ? (
                         products.map((product) => (
                           <div key={product.id} className="col-md-3">
