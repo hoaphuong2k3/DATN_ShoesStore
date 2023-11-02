@@ -4,7 +4,7 @@ import { format, parseISO } from 'date-fns';
 import { vi } from 'date-fns/locale';
 
 // reactstrap components
-import { Row, Col, Button, Table, Input, FormGroup, InputGroup, InputGroupAddon, InputGroupText, Modal, ModalBody, ModalFooter, ModalHeader } from "reactstrap";
+import { Row, Col, Button, Table, Input, FormGroup, InputGroup, InputGroupAddon, InputGroupText, Modal, ModalBody, ModalFooter, ModalHeader, Label, Form } from "reactstrap";
 import { FaRegEdit, FaSearch } from 'react-icons/fa';
 
 const Waitting = () => {
@@ -135,7 +135,93 @@ const Waitting = () => {
                             <h3 className="heading-small text-muted mb-0">Chi tiết hóa đơn</h3>
                         </ModalHeader>
                         <ModalBody>
+                            <Form>
+                                <Row>
+                                    <Col md={6}>
+                                        <FormGroup>
+                                            <Label for="exampleEmail">
+                                                Email
+                                            </Label>
+                                            <Input
+                                                id="exampleEmail" size="sm"
+                                                name="email"
+                                                placeholder="with a placeholder"
+                                                type="email"
+                                                
+                                            />
+                                        </FormGroup>
+                                    </Col>
+                                    <Col md={6}>
+                                        <FormGroup>
+                                            <Label for="examplePassword">
+                                                Password
+                                            </Label>
+                                            <Input
+                                                id="examplePassword" size="sm"
+                                                name="password"
+                                                placeholder="password placeholder"
+                                                type="password"
+                                            />
+                                        </FormGroup>
+                                    </Col>
+                                </Row>
+                                <FormGroup>
+                                    <Label for="exampleAddress">
+                                        Address
+                                    </Label>
+                                    <Input
+                                        id="exampleAddress" size="sm"
+                                        name="address"
+                                        placeholder="1234 Main St"
+                                    />
+                                </FormGroup>
+                                <FormGroup>
+                                    <Label for="exampleAddress2">
+                                        Address 2
+                                    </Label>
+                                    <Input
+                                        id="exampleAddress2" size="sm"
+                                        name="address2"
+                                        placeholder="Apartment, studio, or floor"
+                                    />
+                                </FormGroup>
+                                <Row>
+                                    <Col md={6}>
+                                        <FormGroup>
+                                            <Label for="exampleCity">
+                                                City
+                                            </Label>
+                                            <Input
+                                                id="exampleCity" size="sm"
+                                                name="city"
+                                            />
+                                        </FormGroup>
+                                    </Col>
+                                    <Col md={4}>
+                                        <FormGroup>
+                                            <Label for="exampleState">
+                                                State
+                                            </Label>
+                                            <Input
+                                                id="exampleState" size="sm"
+                                                name="state"
+                                            />
+                                        </FormGroup>
+                                    </Col>
+                                    <Col md={2}>
+                                        <FormGroup>
+                                            <Label for="exampleZip">
+                                                Zip
+                                            </Label>
+                                            <Input
+                                                id="exampleZip" size="sm"
+                                                name="zip"
+                                            />
+                                        </FormGroup>
+                                    </Col>
+                                </Row>
 
+                            </Form>
                         </ModalBody >
                         <ModalFooter>
                             <div className="text-center">
