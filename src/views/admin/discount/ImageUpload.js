@@ -1,71 +1,54 @@
 import React, { useState } from 'react';
-import { PlusOutlined } from '@ant-design/icons';
-import { Modal, Upload } from 'antd';
-
-const getBase64 = (file) =>
-  new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = () => resolve(reader.result);
-    reader.onerror = (error) => reject(error);
-  });
+import { FaCamera } from 'react-icons/fa'; 
 
 const ImageUpload = () => {
-  const [previewOpen, setPreviewOpen] = useState(false);
-  const [previewImage, setPreviewImage] = useState('');
-  const [previewTitle, setPreviewTitle] = useState('');
-  const [fileList, setFileList] = useState([]);
+  const [file, setFile] = useState(null);
 
-  const handleCancel = () => setPreviewOpen(false);
-
-  const handlePreview = async (file) => {
-    if (!file.url && !file.preview) {
-      file.preview = await getBase64(file.originFileObj);
+  const handleFileChange = (e) => {
+    const selectedFile = e.target.files[0];
+    if (selectedFile) {
+      setFile(selectedFile);
     }
-    setPreviewImage(file.url || file.preview);
-    setPreviewOpen(true);
-    setPreviewTitle(file.name || file.url.substring(file.url.lastIndexOf('/') + 1));
   };
 
-  const handleChange = ({ fileList: newFileList }) => {
-    const newFile = newFileList.slice(-1);
-    setFileList(newFile);
+  const imageUrl = file ? URL.createObjectURL(file) : null;
+
+  const imageSize = '110px'; 
+
+  const imageStyle = {
+    width: imageSize,
+    height: imageSize,
+    // borderRadius: '50%', 
   };
 
-  const uploadButton = (
-    <div>
-      <PlusOutlined />
-      <div
-        style={{
-          marginTop: 8,
-        }}
-      >
-        Upload
-      </div>
-    </div>
-  );
+  const buttonStyle = {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    // backgroundColor: 'transparent', 
+    color: '#000',
+    padding: '8px',
+    // borderRadius: '50%',
+    cursor: 'pointer',
+    border:  '1px dashed gray',
+    width: imageSize,
+    height: imageSize,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  };
 
   return (
-    <>
-      <Upload
-        action="https://run.mocky.io/v3/435e224c-44fb-4773-9faf-380c5e6a2188"
-        listType="picture-circle"
-        fileList={fileList}
-        onPreview={handlePreview}
-        onChange={handleChange}
-      >
-        {fileList.length >= 1 ? null : uploadButton}
-      </Upload>
-      <Modal visible={previewOpen} title={previewTitle} footer={null} onCancel={handleCancel}>
-        <img
-          alt="example"
-          style={{
-            width: '100%',
-          }}
-          src={previewImage}
-        />
-      </Modal>
-    </>
+    <div
+      style={{ position: 'relative', width: imageSize, height: imageSize }}
+    >
+      {imageUrl && <img alt="preview" src={imageUrl} style={imageStyle} />}
+      <label htmlFor="file-input" style={buttonStyle}>
+        <FaCamera size={15} /> 
+      </label>
+      <input type="file" id="file-input" onChange={handleFileChange} style={{ display: 'none' }} />
+    </div>
   );
 };
 
