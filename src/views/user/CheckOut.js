@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Card, CardBody, Container, Row, Button, Modal, Table, ModalHeader, ModalBody, ModalFooter, Input, Label } from "reactstrap";
+import { Card, CardBody, Container, Row, Button, Modal, ModalHeader, ModalBody, ModalFooter, Input, Label } from "reactstrap";
 import Header from "components/Headers/ProductHeader";
 import Select from 'react-select';
 

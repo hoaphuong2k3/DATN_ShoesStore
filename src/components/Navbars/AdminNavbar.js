@@ -30,7 +30,7 @@ const AdminNavbar = (props) => {
   };
   return (
     <>
-      <Navbar className="navbar-top bg-gradient-light" expand="md" id="navbar-main">
+      <Navbar className="navbar-top" expand="md" id="navbar-main">
         <Container fluid>
           <div className="align-items-center d-none d-md-flex ">
             <h5>

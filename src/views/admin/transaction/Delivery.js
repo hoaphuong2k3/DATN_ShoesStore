@@ -4,11 +4,11 @@ import ReactPaginate from "react-paginate";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import axiosInstance from "services/custommize-axios";
-import { format, parseISO } from 'date-fns';
+import { format} from 'date-fns';
 import { vi } from 'date-fns/locale';
 // reactstrap components
 import Switch from 'react-input-switch';
-import { Card, CardHeader, CardBody, Container, Row, Col, Form, FormGroup, Input, Button, Table, Modal, ModalBody, ModalFooter, ModalHeader, Badge } from "reactstrap";
+import { Card, CardHeader, CardBody, Container, Row, Col, Form, FormGroup, Input, Button, Table, Modal, ModalBody, ModalFooter, ModalHeader} from "reactstrap";
 import Header from "components/Headers/Header.js";
 
 

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 import { useAuth } from "services/AuthContext.js";
 import { ToastContainer, toast } from "react-toastify";
@@ -52,10 +52,10 @@ const Login = () => {
         navigate("/");
       }
     } catch (error) {
-      
+
       if (error.response) {
-          console.error("Response data:", error.response.data);
-          toast.error(error.response.data.message);
+        console.error("Response data:", error.response.data);
+        toast.error(error.response.data.message);
       }
       toast.error("Đăng nhập thất bại.");
     }
@@ -179,13 +179,9 @@ const Login = () => {
             </a>
           </Col>
           <Col className="text-right" xs="6">
-            <a
-              className="text-light"
-              href="#pablo"
-              onClick={(e) => e.preventDefault()}
-            >
-              <small>Create new account</small>
-            </a>
+            <Link className="text-light" to="/register" tag={Link}>
+            <small>Tạo tài khoản mới</small>
+            </Link>
           </Col>
         </Row>
       </Col>
