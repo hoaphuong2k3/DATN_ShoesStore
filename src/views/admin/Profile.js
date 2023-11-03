@@ -16,6 +16,7 @@ import Select from "react-select";
 import axiosInstance from "services/custommize-axios";
 // core components
 import ProfileHeader from "components/Headers/ProfileHeader";
+import ImageUpload from "views/admin/discount/ImageUpload.js";
 
 const Profile = () => {
 
@@ -33,11 +34,11 @@ const Profile = () => {
     email: "",
     phoneNumber: "",
     // address: {
-      proviceCode: "",
-      districtCode: "",
-      communeCode: "",
-      addressDetail: "",
-      isDeleted: true,
+    proviceCode: "",
+    districtCode: "",
+    communeCode: "",
+    addressDetail: "",
+    isDeleted: true,
     // },
     status: "",
   });
@@ -63,145 +64,64 @@ const Profile = () => {
     <>
       <ProfileHeader />
       {/* Page content */}
-      <Container className="mt--7" fluid>
+      <Container className="mt--6" fluid>
         <Row>
-          <Col className="order-xl-2 mb-5 mb-xl-0" xl="4">
-            <Card className="card-profile shadow">
-              <Row className="justify-content-center">
-                <Col className="order-lg-2" lg="3">
-                  <div className="card-profile-image">
-                    <a href="#s" onClick={(e) => e.preventDefault()}>
-                      <img
-                        alt="..."
-                        className="rounded-circle"
-                        src={require("../../assets/img/theme/team-4-800x800.jpg")}
-                      />
-                    </a>
-                  </div>
-                </Col>
-              </Row>
-              <CardHeader className="text-center border-0 pt-8 pt-md-4 pb-0 pb-md-4">
-
-              </CardHeader>
-              <CardBody className="pt-0 pt-md-4">
-
-                <div className="text-center">
-                  <div className="h5 mt-6">
-                    <i className="ni business_briefcase-24 mr-2" data-value={admins.fullname}/>
-                  </div>
-                  <div>
-                    <i className="ni education_hat mr-2" />
-                    Leather Gent
-                  </div>
-                  <hr className="my-4" />
-                  <p>
-                    Ryan — the name taken by Melbourne-raised, Brooklyn-based
-                    Nick Murphy — writes, performs and records all of his own
-                    music.
-                  </p>
+          <div class="col-lg-9">
+            {/* <!-- Card -->  */}
+            <div class="card mb-3 mb-lg-5">
+              <div class="card-header d-flex justify-content-between align-items-center">
+                <h2 class="card-title h4">Basic information</h2>
+                <div class="ml-auto mt--5">
+                  <ImageUpload className=" bg-light" />
                 </div>
-              </CardBody>
-            </Card>
-          </Col>
-          <Col className="order-xl-1" xl="8">
-            <Card className="bg-secondary shadow">
-              <CardHeader className="bg-white border-0">
-                <Row className="align-items-center">
-                  <Col xs="8">
-                    <h3 className="mb-0">My account</h3>
-                  </Col>
-                  <Col className="text-right" xs="4">
-                    <Button
-                      color="primary"
-                      href="#pablo"
-                      onClick={(e) => e.preventDefault()}
-                      size="sm"
-                    >
-                      Settings
-                    </Button>
-                  </Col>
-                </Row>
-              </CardHeader>
-              <CardBody>
-                <Form>
-                  <h6 className="heading-small text-muted mb-4">
-                    User information
-                  </h6>
-                  <div className="pl-lg-4">
-                    <Row>
-                      <Col lg="6">
-                        <FormGroup>
-                          <label
-                            className="form-control-label"
-                            htmlFor="input-username"
-                          >
-                            Họ tên
-                          </label>
-                          <Input 
-                            className="form-control-alternative"
-                            id="fullname"
-                            type="text"
-                            value={admins.fullname}
-                          />
-                        </FormGroup>
-                      </Col>
-                      <Col lg="6">
-                        <FormGroup>
-                          <label
-                            className="form-control-label"
-                            htmlFor="input-email"
-                          >
-                            Email
-                          </label>
-                          <Input
-                            className="form-control-alternative"
-                            id="input-email"
-                            type="email"
-                            value={admins.email}
-                          />
-                        </FormGroup>
-                      </Col>
-                    </Row>
-                    <Row>
-                      <Col lg="6">
-                        <FormGroup>
-                          <label
-                            className="form-control-label"
-                            htmlFor="input-first-name"
-                          >
-                            Ngày Sinh
-                          </label>
-                          <Input
-                            className="form-control-alternative"
-                            id="birthday"
-                            type="date"
-                            value={admins.dateOfBirth}
-                          />
-                        </FormGroup>
-                      </Col>
-                      <Col lg="6">
-                        <FormGroup>
-                          <label
-                            className="form-control-label"
-                            htmlFor="input-last-name"
-                          >
-                            Số điện thoại
-                          </label>
-                          <Input
-                            className="form-control-alternative"
-                            id="phoneNumber"
-                            type="tel"
-                            value={admins.phoneNumber}
-                          />
-                        </FormGroup>
-                      </Col>
-                    </Row>
+              </div>
+              {/* <!-- Body --> */}
+              <div class="card-body">
+                {/* <!-- Form --> */}
+                <form>
+                  {/* <!-- Form Group --> */}
+                  <div class="row form-group">
+                    <label for="firstNameLabel" class="col-sm-3 col-form-label input-label">Full name
+                      <i class="tio-help-outlined text-body ml-1" data-toggle="tooltip" data-placement="top"></i>
+                    </label>
+
+                    <div class="col-sm-9">
+                      <div class="input-group input-group-sm-down-break">
+                        <Input type="text" class="form-control" name="fullname"
+                          placeholder="fullname" value={admins.fullname} />
+
+                      </div>
+                    </div>
                   </div>
-                  <hr className="my-4" />
-                  {/* Address */}
-                  <h6 className="heading-small text-muted mb-4">
-                    Contact information
-                  </h6>
+                  {/* <!-- End Form Group --> */}
+
+                  {/* <!-- Form Group --> */}
+                  <div class="row form-group">
+                    <label for="emailLabel" class="col-sm-3 col-form-label input-label">Email</label>
+
+                    <div class="col-sm-9">
+                      <Input type="email" class="form-control" name="email" id="emailLabel"
+                        placeholder="Email" aria-label="Email" value={admins.email} />
+                    </div>
+                  </div>
+                  {/* <!-- End Form Group -->
+
+                        <!-- Form Group --> */}
+                  <div class="row form-group">
+                    <label for="phoneLabel" class="col-sm-3 col-form-label input-label">Phone <span
+                      class="input-label-secondary">(Optional)</span></label>
+
+                    <div class="col-sm-9">
+                      <Input type="text" class="js-masked-input form-control" name="phone" id="phoneLabel"
+                        placeholder="+x(xxx)xxx-xx-xx"
+                        value={admins.phoneNumber} data-hs-mask-options='{
+                             "template": "+0(000)000-00-00"
+                           }'/>
+                    </div>
+                  </div>
+                  {/* <!-- End Form Group -->
+
+                        <!-- Form Group --> */}
                   <div className="pl-lg-4">
                     <Row>
                       <Col md="12">
@@ -302,12 +222,198 @@ const Profile = () => {
                       </Col>
                     </Row>
                   </div>
-                  <hr className="my-4" />
+                  {/* <!-- End Form Group --> */}
+
+
+                </form>
+                {/* <!-- End Form --> */}
+              </div>
+              {/* <!-- End Body --> */}
+            </div>
+            {/* <!-- End Card --> */}
+
+            {/* <!-- Card --> */}
+            <div id="emailSection" class="card mb-3 mb-lg-5">
+              <div class="card-header">
+                <h3 class="card-title h4">Email</h3>
+              </div>
+
+              {/* <!-- Body --> */}
+              <div class="card-body">
+                <p>Your current email address is <span class="font-weight-bold">mark@example.com</span></p>
+
+                {/* <!-- Form --> */}
+                <Form>
+                  {/* <!-- Form Group --> */}
+                  <div class="row form-group">
+                    <label for="newEmailLabel" class="col-sm-3 col-form-label input-label">New email
+                      address</label>
+
+                    <div class="col-sm-9">
+                      <Input type="email" class="form-control" name="newEmail" id="newEmailLabel"
+                        placeholder="Enter new email address" aria-label="Enter new email address" />
+                    </div>
+                  </div>
+                  {/* <!-- End Form Group --> */}
+
 
                 </Form>
+                {/* <!-- End Form --> */}
+              </div>
+              {/* <!-- End Body --> */}
+            </div>
+            {/* <!-- End Card --> */}
+
+            {/* <!-- Card --> */}
+            <div id="passwordSection" class="card mb-3 mb-lg-5">
+              <div class="card-header">
+                <h4 class="card-title">Change your password</h4>
+              </div>
+
+              {/* <!-- Body --> */}
+              <div class="card-body">
+                {/* <!-- Form --> */}
+                <form id="changePasswordForm">
+                  {/* <!-- Form Group --> */}
+                  <div class="row form-group">
+                    <label for="currentPasswordLabel" class="col-sm-3 col-form-label input-label">Current
+                      password</label>
+
+                    <div class="col-sm-9">
+                      <Input type="password" class="form-control" name="currentPassword"
+                        id="currentPasswordLabel" placeholder="Enter current password"
+                        aria-label="Enter current password" />
+                    </div>
+                  </div>
+                  {/* <!-- End Form Group --> */}
+
+                  {/* <!-- Form Group --> */}
+                  <div class="row form-group">
+                    <label for="newPassword" class="col-sm-3 col-form-label input-label">New password</label>
+
+                    <div class="col-sm-9">
+                      <Input type="password" class="js-pwstrength form-control" name="newPassword"
+                        id="newPassword" placeholder="Enter new password" aria-label="Enter new password"
+                        data-hs-pwstrength-options='{
+                             "ui": {
+                               "container": "#changePasswordForm",
+                               "viewports": {
+                                 "progress": "#passwordStrengthProgress",
+                                 "verdict": "#passwordStrengthVerdict"
+                               }
+                             }
+                           }'/>
+
+                      <p id="passwordStrengthVerdict" class="form-text mb-2" />
+
+                      <div id="passwordStrengthProgress"></div>
+                    </div>
+                  </div>
+                  {/* <!-- End Form Group --> */}
+
+                  {/* <!-- Form Group --> */}
+                  <div class="row form-group">
+                    <label for="confirmNewPasswordLabel" class="col-sm-3 col-form-label input-label">Confirm new
+                      password</label>
+
+                    <div class="col-sm-9">
+                      <div class="mb-3">
+                        <Input type="password" class="form-control" name="confirmNewPassword"
+                          id="confirmNewPasswordLabel" placeholder="Confirm your new password"
+                          aria-label="Confirm your new password" />
+                      </div>
+
+                      <h5>Password requirements:</h5>
+
+                      <p class="font-size-sm mb-2">Ensure that these requirements are met:</p>
+
+                      <ul class="font-size-sm">
+                        <li>Minimum 8 characters long - the more, the better</li>
+                        <li>At least one lowercase character</li>
+                        <li>At least one uppercase character</li>
+                        <li>At least one number, symbol, or whitespace character</li>
+                      </ul>
+                    </div>
+                  </div>
+                  {/* <!-- End Form Group --> */}
+
+
+                </form>
+                {/* <!-- End Form --> */}
+              </div>
+              {/* <!-- End Body --> */}
+            </div>
+            {/* <!-- End Card --> */}
+
+            {/* <!-- Card --> */}
+            <div id="deleteAccountSection" class="card mb-3 mb-lg-5">
+              <div class="card-header">
+                <h4 class="card-title">Delete your account</h4>
+              </div>
+
+              {/* <!-- Body --> */}
+              <CardBody>
+                <p class="card-text">When you delete your account, you lose access to Front account services, and we
+                  permanently delete your personal data. You can cancel the deletion for 14 days.</p>
+
+                <FormGroup >
+                  {/* <!-- Custom Checkbox --> */}
+                  <div class="custom-control custom-checkbox">
+                    <Input type="checkbox" class="custom-control-input" id="deleteAccountCheckbox" />
+                    <label class="custom-control-label" for="deleteAccountCheckbox">Confirm that I want to
+                      delete my account.</label>
+                  </div>
+                  {/* <!-- End Custom Checkbox --> */}
+                </FormGroup>
+
+                <div class="d-flex justify-content-end">
+                  <a class="btn btn-white mr-2" href="#">Learn more <i class="tio-open-in-new ml-1"></i></a>
+
+                  <button type="submit" class="btn btn-danger">Delete</button>
+                </div>
               </CardBody>
-            </Card>
-          </Col>
+              {/* <!-- End Body --> */}
+            </div>
+            {/* <!-- End Card --> */}
+
+            {/* <!-- Sticky Block End Point --> */}
+            <div id="stickyBlockEndPoint"></div>
+          </div>
+
+          <div class="col-lg-3">
+            {/* <!-- Navbar --> */}
+            <div class="navbar-vertical navbar-expand-lg mb-lg-5 mt-6">
+              <div id="navbarVerticalNavMenu" class="">
+                {/* <!-- Navbar Nav --> */}
+                <ul id="navbarSettings" class="js-sticky-block js-scrollspy navbar-nav navbar-nav-lg nav-tabs card card-navbar-nav"
+                >
+                  <li class="nav-item">
+                    <a class="nav-link active" href="#content">
+                      <i class="tio-user-outlined nav-icon"></i> Basic information
+                    </a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="#emailSection">
+                      <i class="tio-online nav-icon"></i> Email
+                    </a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="#passwordSection">
+                      <i class="tio-lock-outlined nav-icon"></i> Password
+                    </a>
+                  </li>
+
+                  <li class="nav-item">
+                    <a class="nav-link" href="#deleteAccountSection">
+                      <i class="tio-delete-outlined nav-icon"></i> Delete account
+                    </a>
+                  </li>
+                </ul>
+                {/* <!-- End Navbar Nav --> */}
+              </div>
+            </div>
+            {/* <!-- End Navbar --> */}
+          </div>
         </Row>
       </Container >
     </>

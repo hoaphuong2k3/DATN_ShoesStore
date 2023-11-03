@@ -38,6 +38,7 @@ const ImageUpload = () => {
       <div
         style={{
           marginTop: 8,
+       
         }}
       >
         Upload
@@ -53,6 +54,7 @@ const ImageUpload = () => {
         fileList={fileList}
         onPreview={handlePreview}
         onChange={handleChange}
+        
       >
         {fileList.length >= 1 ? null : uploadButton}
       </Upload>
