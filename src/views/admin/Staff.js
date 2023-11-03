@@ -75,49 +75,6 @@ const Staff = () => {
     fetchData();
   }, [queryParams]);
 
-  const handleCityChange = (e) => {
-    const selectedCityName = e.target.value;
-    setSelectedCity(selectedCityName);
-    const selectedProvince = provinces.find((province) => province.name === selectedCityName);
-    const districts = selectedProvince.districts;
-    setFormData({
-      ...formData,
-      address: {
-        ...formData.address,
-        proviceCode: selectedProvince.code,
-        districtCode: "",
-        communeCode: "",
-      },
-    });
-  };
-
-  const handleDistrictChange = (e) => {
-    const selectedDistrict = e.target.value;
-    setSelectedDistrict(selectedDistrict);
-    const selectedProvince = provinces.find((province) => province.name === selectedCity);
-    const selectedDistrictObj = selectedProvince.districts.find((district) => district.name === selectedDistrict);
-    const wards = selectedDistrictObj.wards;
-    setFormData({
-      ...formData,
-      address: {
-        ...formData.address,
-        districtCode: selectedDistrictObj.code,
-        communeCode: "",
-      },
-    });
-  };
-
-  const handleWardChange = (e) => {
-    const selectedWard = e.target.value;
-    setSelectedWard(selectedWard);
-    setFormData({
-      ...formData,
-      address: {
-        ...formData.address,
-        communeCode: selectedWard,
-      },
-    });
-  };
 
   const handlePageChange = ({ selected }) => {
     setQueryParams(prevParams => ({ ...prevParams, page: selected }));
@@ -763,8 +720,17 @@ const Staff = () => {
                           <Input
                             className="form-control-alternative"
                             type="select"
-                            value={selectedCity}
-                            onChange={handleCityChange}
+                            value={formData.address.proviceCode}
+                            onChange={(e) => setFormData({
+                              ...formData,
+                              address: {
+                                ...formData.address,
+                                proviceCode: e.target.value,
+                                districtCode: "",
+                                communeCode: "",
+                              },
+
+                            })}
                           >
                             <option value="">Chọn Tỉnh / Thành</option>
                             {provinces.map((province) => (
@@ -783,14 +749,21 @@ const Staff = () => {
                           <Input
                             className="form-control-alternative"
                             type="select"
-                            value={selectedDistrict}
-                            onChange={handleDistrictChange}
-                            disabled={!selectedCity}
+                            value={formData.address.districtCode}
+                            onChange={(e) => setFormData({
+                              ...formData,
+                              address: {
+                                ...formData.address,
+                                districtCode: e.target.value,
+                                communeCode: "",
+                              },
+                            })}
+                            disabled={!formData.address.proviceCode}
                           >
                             <option value="">Chọn Quận / Huyện</option>
-                            {selectedCity &&
+                            {formData.address.proviceCode &&
                               provinces
-                                .find((province) => province.name === selectedCity)
+                                .find((province) => province.name === formData.address.proviceCode)
                                 .districts.map((district) => (
                                   <option key={district.code} value={district.name}>
                                     {district.name}
@@ -807,15 +780,21 @@ const Staff = () => {
                           <Input
                             className="form-control-alternative"
                             type="select"
-                            value={selectedWard}
-                            onChange={handleWardChange}
-                            disabled={!selectedDistrict}
+                            value={formData.address.communeCode}
+                            onChange={(e) => setFormData({
+                              ...formData,
+                              address: {
+                                ...formData.address,
+                                communeCode: e.target.value,
+                              },
+                            })}
+                            disabled={!formData.address.districtCode}
                           >
                             <option value="">Chọn Phường / Xã</option>
-                            {selectedDistrict &&
+                            {formData.address.districtCode &&
                               provinces
-                                .find((province) => province.name === selectedCity)
-                                .districts.find((district) => district.name === selectedDistrict)
+                                .find((province) => province.name === formData.address.proviceCode)
+                                .districts.find((district) => district.name === formData.address.districtCode)
                                 .wards.map((ward) => (
                                   <option key={ward.code} value={ward.name}>
                                     {ward.name}
