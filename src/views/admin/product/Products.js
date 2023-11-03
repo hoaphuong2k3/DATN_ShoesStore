@@ -97,7 +97,7 @@ const Products = () => {
   };
   const handlePageClick = (event) => {
     setPage(+event.selected);
-    getAll(+event.selected + 1);
+    getAll();
   }
   const onChangeSize = (e) => {
     setSize(+e.target.value);
@@ -106,13 +106,13 @@ const Products = () => {
     setSearch({ ...search, [e.target.name]: e.target.value });
   };
   useEffect(() => {
-    getAll(page, size);
+    getAll();
   }, [search]);
   const searchShoes = () => {
-    getAll(page, size);
+    getAll();
   };
   useEffect(() => {
-    getAll(page, size);
+    getAll();
   }, [size, page]);
 
   useEffect(() => {
@@ -176,11 +176,21 @@ const Products = () => {
       setListCushion(res.data);
     }
   }
-
+  //Sort
+  const [sort, setSort] = useState('');
+  const [sortStyle, setSortStyle] = useState('');
+  const onClickSort = (a, b) => {
+    setSort(a);
+    setSortStyle(b);
+  }
+  useEffect(() => {
+    getAll();
+  }, [sort, sortStyle]);
+  //End Sort
   //getAll
-  const getAll = async (page, size) => {
+  const getAll = async () => {
     try {
-      let res = await getAllShoes(page, size, search);
+      let res = await getAllShoes(page, size, search, sort, sortStyle);
       if (res && res.data && res.data.content) {
         setListShoes(res.data.content);
         console.log(res.data);
@@ -220,6 +230,8 @@ const Products = () => {
     }
   }
   //End Delete
+
+
 
 
   return (
@@ -759,21 +771,61 @@ const Products = () => {
 
                         </th>
                         <th>STT</th>
-                        <th>Mã <i class="fa-solid fa-arrow-up"></i>
-                        <i class="fa-solid fa-arrow-down"></i></th>
-                        <th>Tên</th>
-                        <th>Hãng</th>
-                        <th>Xuất xứ</th>
-                        <th>Thiết kế</th>
-                        <th>Loại da</th>
-                        <th>Mũi giày</th>
-                        <th>Đế giày</th>
-                        <th>Lót giày</th>
-                        <th>Đệm giày</th>
-                        <th>Số lượng</th>
-                        <th>Số CTSP</th>
-                        <th>Giá Min</th>
-                        <th>Giá Max</th>
+                        <th>Mã <i class="fa-solid fa-arrow-up" onClick={() => onClickSort('code', 'asc')} />
+                          <i class="fa-solid fa-arrow-down" onClick={() => onClickSort('code', 'desc')} />
+                        </th>
+                        <th>Tên
+                        <i class="fa-solid fa-arrow-up" onClick={() => onClickSort('name', 'asc')} />
+                          <i class="fa-solid fa-arrow-down" onClick={() => onClickSort('name', 'desc')} />
+                        </th>
+                        <th>Hãng
+                        <i class="fa-solid fa-arrow-up" onClick={() => onClickSort('brand', 'asc')} />
+                          <i class="fa-solid fa-arrow-down" onClick={() => onClickSort('brand', 'desc')} />
+                        </th>
+                        <th>Xuất xứ
+                        <i class="fa-solid fa-arrow-up" onClick={() => onClickSort('origin', 'asc')} />
+                          <i class="fa-solid fa-arrow-down" onClick={() => onClickSort('origin', 'desc')} />
+                        </th>
+                        <th>Thiết kế
+                        <i class="fa-solid fa-arrow-up" onClick={() => onClickSort('designStyle', 'asc')} />
+                          <i class="fa-solid fa-arrow-down" onClick={() => onClickSort('designStyle', 'desc')} />
+                        </th>
+                        <th>Loại da
+                        <i class="fa-solid fa-arrow-up" onClick={() => onClickSort('skinType', 'asc')} />
+                          <i class="fa-solid fa-arrow-down" onClick={() => onClickSort('skinType', 'desc')} />
+                        </th>
+                        <th>Mũi giày
+                        <i class="fa-solid fa-arrow-up" onClick={() => onClickSort('toe', 'asc')} />
+                          <i class="fa-solid fa-arrow-down" onClick={() => onClickSort('toe', 'desc')} />
+                        </th>
+                        <th>Đế giày
+                        <i class="fa-solid fa-arrow-up" onClick={() => onClickSort('sole', 'asc')} />
+                          <i class="fa-solid fa-arrow-down" onClick={() => onClickSort('sole', 'desc')} />
+                        </th>
+                        <th>Lót giày
+                        <i class="fa-solid fa-arrow-up" onClick={() => onClickSort('lining', 'asc')} />
+                          <i class="fa-solid fa-arrow-down" onClick={() => onClickSort('lining', 'desc')} />
+                        </th>
+                        <th>Đệm giày
+                        <i class="fa-solid fa-arrow-up" onClick={() => onClickSort('cushion', 'asc')} />
+                          <i class="fa-solid fa-arrow-down" onClick={() => onClickSort('cushion', 'desc')} />
+                        </th>
+                        <th>Số lượng
+                        <i class="fa-solid fa-arrow-up" onClick={() => onClickSort('totalQuantity', 'asc')} />
+                          <i class="fa-solid fa-arrow-down" onClick={() => onClickSort('totalQuantity', 'desc')} />
+                        </th>
+                        <th>Số CTSP
+                        <i class="fa-solid fa-arrow-up" onClick={() => onClickSort('totalRecord', 'asc')} />
+                          <i class="fa-solid fa-arrow-down" onClick={() => onClickSort('totalRecord', 'desc')} />
+                        </th>
+                        <th>Giá Min
+                        <i class="fa-solid fa-arrow-up" onClick={() => onClickSort('priceMin', 'asc')} />
+                          <i class="fa-solid fa-arrow-down" onClick={() => onClickSort('priceMin', 'desc')} />
+                        </th>
+                        <th>Giá Max
+                        <i class="fa-solid fa-arrow-up" onClick={() => onClickSort('priceMax', 'asc')} />
+                          <i class="fa-solid fa-arrow-down" onClick={() => onClickSort('priceMax', 'desc')} />
+                        </th>
 
                         <th colSpan={2}>Thao tác</th>
                       </tr>

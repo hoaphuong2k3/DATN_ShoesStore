@@ -357,21 +357,22 @@ const ListShoesDetail = () => {
                                         <Row>
                                             <Col lg="2">
                                                 <label className="form-control-label">Hãng:  </label>
+                                                <label>{dataShoesById.brandName}</label>
                                             </Col>
                                             <Col lg="2">
-                                                <label>{dataShoesById.brandId}</label>
+                                                <label>{dataShoesById.brandName}</label>
                                             </Col>
                                             <Col lg="2">
                                                 <label className="form-control-label">Xuất xứ:   </label>
                                             </Col>
-                                            <Col lg="2">
-                                                <label>{dataShoesById.originId}</label>
+                                            <Col lg="2" className="text-left">
+                                                <label>{dataShoesById.originName}</label>
                                             </Col>
                                             <Col lg="2">
                                                 <label className="form-control-label">Thiết kế:  </label>
                                             </Col>
                                             <Col lg="2">
-                                                <label>{dataShoesById.designStyleId}</label>
+                                                <label>{dataShoesById.designStyleName}</label>
                                             </Col>
                                         </Row>
                                         <Row>
@@ -379,19 +380,19 @@ const ListShoesDetail = () => {
                                                 <label className="form-control-label">Loại da:  </label>
                                             </Col>
                                             <Col lg="2">
-                                                <label>{dataShoesById.skinTypeId}</label>
+                                                <label>{dataShoesById.skinTypeName}</label>
                                             </Col>
                                             <Col lg="2">
                                                 <label className="form-control-label">Mũi giày:   </label>
                                             </Col>
                                             <Col lg="2">
-                                                <label>{dataShoesById.toeId}</label>
+                                                <label>{dataShoesById.toeName}</label>
                                             </Col>
                                             <Col lg="2">
                                                 <label className="form-control-label">Đế giày:  </label>
                                             </Col>
                                             <Col lg="2">
-                                                <label>{dataShoesById.soleId}</label>
+                                                <label>{dataShoesById.soleName}</label>
                                             </Col>
                                         </Row>
                                         <Row>
@@ -399,13 +400,13 @@ const ListShoesDetail = () => {
                                                 <label className="form-control-label">Lót giày:  </label>
                                             </Col>
                                             <Col lg="2">
-                                                <label>{dataShoesById.liningId}</label>
+                                                <label>{dataShoesById.liningName}</label>
                                             </Col>
                                             <Col lg="2">
                                                 <label className="form-control-label">Đệm giày:   </label>
                                             </Col>
                                             <Col lg="2">
-                                                <label>{dataShoesById.cushionId}</label>
+                                                <label>{dataShoesById.cushionName}</label>
                                             </Col>
                                         </Row>
                                         <Row>

@@ -1,16 +1,7 @@
-import React, { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { findShoes } from "services/Product2Service";
-import { getAllShoesDetail } from "services/ShoesDetailService.js";
-import { Link } from "react-router-dom";
-import { getAllColorId, getAllSizeId, getAllColor, getAllSize } from "services/ProductAttributeService";
+import React from "react";
 // reactstrap components
-import {
-    Card, CardHeader, CardBody, Container, Row, Col, FormGroup, Input, Button, Form, CardTitle, Label, Table
-} from "reactstrap";
-import { toast } from 'react-toastify';
-import Switch from 'react-input-switch';
-import axios from "axios";
+import {Card, CardHeader, CardBody, Container, Row, Col, FormGroup, Input, CardTitle} from "reactstrap";
+
 // core components
 import Header from "components/Headers/UserHeader3.js";
 
@@ -26,7 +17,7 @@ const Account = () => {
                             <CardHeader className="bg-transparent">
                                 <Row>
                                     <Col lg={3}>
-                                        <img src={`https://s3-ap-southeast-1.amazonaws.com/imageshoestore/`} width={40} height={40} />
+                                        <img src={`https://s3-ap-southeast-1.amazonaws.com/imageshoestore/`} alt="" width={40} height={40} />
                                     </Col>
                                     <Col lg={9}>
                                         <div>Username</div>

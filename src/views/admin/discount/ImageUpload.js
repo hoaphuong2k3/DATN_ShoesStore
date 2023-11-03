@@ -1,22 +1,17 @@
 import React, { useState } from 'react';
-import { PlusOutlined } from '@ant-design/icons';
-import { Modal, Upload } from 'antd';
-
-const getBase64 = (file) =>
-  new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = () => resolve(reader.result);
-    reader.onerror = (error) => reject(error);
-  });
+import { FaCamera } from 'react-icons/fa'; 
 
 const ImageUpload = () => {
-  const [previewOpen, setPreviewOpen] = useState(false);
-  const [previewImage, setPreviewImage] = useState('');
-  const [previewTitle, setPreviewTitle] = useState('');
-  const [fileList, setFileList] = useState([]);
+  const [file, setFile] = useState(null);
 
-  const handleCancel = () => setPreviewOpen(false);
+  const handleFileChange = (e) => {
+    const selectedFile = e.target.files[0];
+    if (selectedFile) {
+      setFile(selectedFile);
+    }
+  };
+
+  const imageUrl = file ? URL.createObjectURL(file) : null;
 
   const handlePreview = async (file) => {
     if (!file.url && !file.preview) {
