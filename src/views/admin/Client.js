@@ -1,7 +1,7 @@
 import axios from "axios";
 import React, { useState, useEffect, useRef } from "react";
 // reactstrap components
-import { Card, CardHeader, CardBody, Container, Row, Col, Form, FormGroup, Input, Button, Table, CardFooter, CardTitle, Label, Modal, ModalHeader, ModalFooter, ModalBody } from "reactstrap";
+import { Card, CardHeader, CardBody, Container, Row, Col, Form, FormGroup, Input, Button, Table, CardFooter, CardTitle, Label, Modal, ModalHeader, ModalFooter, ModalBody, Badge } from "reactstrap";
 import Select from "react-select";
 import ReactPaginate from 'react-paginate';
 import { getAllClient, postNewClient, detailClient, updateClient, deleteClient } from "services/ClientService";
@@ -211,6 +211,23 @@ const Client = () => {
     }
   }
   //Kết thúc hàm update
+
+  //Hàm khóa khách hàng
+  const updateStatus = async (id, status) => {
+    try {
+      await axios.put(`http://localhost:33321/api/client/admin/update-status/${id}?status=${status}`);
+      getAll();
+      toast.success("Cập nhật trạng thái thành công!");
+    } catch (error) {
+      console.error("Error updating staff status:", error);
+    }
+  };
+  const statusMapping = {
+    0: { color: 'success', label: 'Đang hoạt động' },
+    1: { color: 'danger', label: 'Ngừng hoạt động' },
+
+  };
+  //Kết thúc hàm khóa khách hàng
 
   //Xử lý địa chỉ
   const [provinces, setProvinces] = useState([]);
@@ -511,6 +528,7 @@ const Client = () => {
 
                         </th>
                         <th scope="col">STT</th>
+                        <th scope="col">Trạng thái</th>
                         <th scope="col">Họ tên <i class="fa-solid fa-arrow-up"></i><i class="fa-solid fa-arrow-down"></i></th>
                         <th scope="col">Email <i class="fa-solid fa-arrow-up"></i><i class="fa-solid fa-arrow-down"></i></th>
                         <th scope="col">Số điện thoại <i class="fa-solid fa-arrow-up"></i><i class="fa-solid fa-arrow-down"></i></th>
@@ -526,7 +544,7 @@ const Client = () => {
                           Không có dữ liệu
                         </th>
                       }
-                      {Array.isArray(listClient) && listClient.map((item, index) => (
+                      {listClient && listClient.length > 0 && listClient.map((item, index) => (
 
                         <tr key={item.id}>
                           <th className="text-center pb-4" >
@@ -536,7 +554,11 @@ const Client = () => {
 
                           </th>
                           <td className="text-center">{index + 1}</td>
-
+                          <td>
+                            <Badge color={statusMapping[item.status]?.color || statusMapping.default.color}>
+                              {statusMapping[item.status]?.label || statusMapping.default.label}
+                            </Badge>
+                          </td>
                           <td>
                             {item.fullname}
                           </td>
@@ -546,15 +568,25 @@ const Client = () => {
                           <td className="text-center">{item.gender ? "Nữ" : "Nam"}</td>
                           <td>{item.dateOfBirth}</td>
                           <td>
-                            <Button color="info" size="sm" onClick={() => handleRowClick(item.id)}>
+                            <Button color="info" size="sm" onClick={() => handleRowClick(item.id)} disabled={item.status === 1 ? true : false}>
                               <FaEdit />
                             </Button>
-                            <Button color="danger" size="sm" onClick={() => onClickDeleteClient(item.id)}>
+                            <Button color="danger" size="sm" onClick={() => onClickDeleteClient(item.id)} disabled={item.status === 1 ? true : false}>
                               <FaTrash />
                             </Button>
-                            <Button color="danger" size="sm" onClick={() => onClickListAdress(item.id)}>
+                            <Button color="danger" size="sm" onClick={() => onClickListAdress(item.id)} disabled={item.status === 1 ? true : false}>
                               <i class="fa-regular fa-address-book"></i>
                             </Button>
+                            {item.status === 0 &&
+                              <Button color="danger" size="sm" onClick={() => updateStatus(item.id, 1)}>
+                                <i class="fa-solid fa-lock"></i>
+                              </Button>
+                            }
+                            {item.status === 1 &&
+                              <Button color="danger" size="sm" onClick={() => updateStatus(item.id, 0)} >
+                                <i class="fa-solid fa-lock-open fa-flip-horizontal"></i>
+                              </Button>
+                            }
                           </td>
                         </tr>
                       ))}

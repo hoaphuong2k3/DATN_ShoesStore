@@ -176,7 +176,9 @@ const Products = () => {
       setListCushion(res.data);
     }
   }
+//Sort
 
+//End Sort
   //getAll
   const getAll = async (page, size) => {
     try {
@@ -220,6 +222,8 @@ const Products = () => {
     }
   }
   //End Delete
+
+
 
 
   return (
