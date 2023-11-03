@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { FaEdit, FaTrash, FaSearch, FaFileAlt, FaLock, FaLockOpen } from 'react-icons/fa';
+import { FaEdit, FaTrash, FaSearch, FaFileAlt, FaLock, FaLockOpen, FaCamera } from 'react-icons/fa';
 import ReactPaginate from "react-paginate";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -7,10 +7,13 @@ import axiosInstance from "services/custommize-axios";
 import "assets/css/pagination.css";
 // reactstrap components
 import Switch from 'react-input-switch';
-import { Card, CardHeader, CardBody, Container, Row, Col, Form, FormGroup, Input, Button, Table, Modal, ModalBody, ModalFooter, ModalHeader, Badge } from "reactstrap";
+import Carousel from 'react-bootstrap/Carousel';
+import {
+    Card, CardHeader, CardBody, Container, Row, Col, Form, FormGroup,
+    Input, Button, Table, Modal, ModalBody, ModalFooter, ModalHeader, Badge, Label
+} from "reactstrap";
 
 import Header from "components/Headers/Header.js";
-import ImageUpload from "views/admin/discount/ImageUpload.js";
 
 const Promotion = () => {
 
@@ -26,6 +29,8 @@ const Promotion = () => {
         resetGift();
         setSecondModal(true);
     }
+
+    const [file, setFile] = useState(null);
     const [value, setValue] = useState('no');
     const [discounts, setDiscounts] = useState([]);
     const [freeGift, setfreeGift] = useState([]);
@@ -33,6 +38,8 @@ const Promotion = () => {
     const [totalPages, setTotalPages] = useState(0);
     const [selectAll, setSelectAll] = useState(false);
     const [selectedItems, setSelectedItems] = useState([]);
+    const [selectedGiftId, setSelectedGiftId] = useState(null);
+    const [clickedOnce, setClickedOnce] = useState(false);
 
     const [queryParams, setQueryParams] = useState({
         page: 0,
@@ -50,9 +57,8 @@ const Promotion = () => {
 
     const [queryParams2, setQueryParams2] = useState({
         page: 0,
-        size: 5,
+        size: 10,
     });
-
 
     //loads table
     const fetchData = async () => {
@@ -132,7 +138,6 @@ const Promotion = () => {
         setSelectAll(!selectAll);
     };
 
-
     const [formData, setFormData] = useState({
         id: null,
         code: "",
@@ -159,8 +164,23 @@ const Promotion = () => {
             giftId: discount.giftId,
             typePeriod: discount.typePeriod,
         });
+        setSelectedGiftId(discount.giftId);
         setModal(true);
     };
+
+    const handleImageClick = (giftId) => {
+        if (selectedGiftId === giftId) {
+         
+          setSelectedGiftId(null);
+          setClickedOnce(false);
+        } else {
+        
+          setSelectedGiftId(giftId);
+          setClickedOnce(true);
+        }
+      };
+
+
     //reset
     const resetForm = () => {
         setFormData({
@@ -173,6 +193,7 @@ const Promotion = () => {
             giftId: "",
             typePeriod: 0,
         });
+        setSelectedGiftId(null);
     };
     //save Promotion
     const saveDiscount = async () => {
@@ -193,7 +214,7 @@ const Promotion = () => {
                     startDate: formData.startDate,
                     endDate: formData.endDate,
                     status: formData.status,
-                    giftId: formData.giftId,
+                    giftId: selectedGiftId,
                     typePeriod: formData.typePeriod,
                 },
             });
@@ -243,6 +264,35 @@ const Promotion = () => {
     };
 
     // FreeGift //
+    const handleFileChange = (e) => {
+        const selectedFile = e.target.files[0];
+        if (selectedFile) {
+            setFile(selectedFile);
+        }
+    };
+    //UploadImage
+    const imageUrl = file ? URL.createObjectURL(file) : null;
+    const imageSize = '110px';
+    const imageStyle = {
+        width: imageSize,
+        height: imageSize,
+    };
+    const buttonStyle = {
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        color: '#000',
+        padding: '8px',
+        cursor: 'pointer',
+        border: '1px dashed gray',
+        width: imageSize,
+        height: imageSize,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+    };
+
     const [formData2, setFormData2] = useState({
         id: null,
         name: "",
@@ -254,8 +304,14 @@ const Promotion = () => {
     const handleRowClick2 = async (id) => {
         try {
             const response = await axiosInstance.patch(`/free-gift/detail/${id}`);
-            setFormData2(response.data);
-            setSecondModal(true);
+            const { name, quantity, status, image } = response.data;
+            setFormData2({ id, name, quantity, status });
+            if (image) {
+                // Hiển thị hình ảnh
+                const blob = await fetch(`data:image/jpeg;base64,${image}`).then((res) => res.blob());
+                const file = new File([blob], "image.jpg", { type: "image/jpeg" });
+                setFile(file);
+            }
         } catch (error) {
             console.error("Lỗi khi lấy dữ liệu:", error);
         }
@@ -263,23 +319,41 @@ const Promotion = () => {
     //reset
     const resetGift = () => {
         setFormData2({
+            id: null,
             name: "",
             image: "",
             quantity: "",
             status: "",
         });
+        setFile(null);
     };
     //save FreeGift
     const saveGift = async (e) => {
         e.preventDefault();
         try {
-            if (formData2.id) {
-                await axiosInstance.put(`/free-gift/update`, formData2);
-                toast.success("Cập nhật thành công!");
-            } else {
-                await axiosInstance.post(`/free-gift/create`, formData2);
-                toast.success("Thêm mới thành công!");
+            let imageFormData = new FormData();
+            if (file) {
+                imageFormData.append('file', file);
             }
+
+            let freeGiftResponse;
+            if (formData2.id) {
+                freeGiftResponse = await axiosInstance.put(`/free-gift/update`, formData2);
+            } else {
+                freeGiftResponse = await axiosInstance.post(`/free-gift/create`, formData2);
+            }
+
+            const freeGiftId = freeGiftResponse.data.id;
+
+            if (file) {
+                await axiosInstance.post(`/free-gift/image/${freeGiftId}`, imageFormData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data'
+                    }
+                });
+            }
+
+            toast.success(formData2.id ? "Cập nhật thành công!" : "Thêm mới thành công!");
             fetchData();
             resetGift();
         } catch (error) {
@@ -299,6 +373,7 @@ const Promotion = () => {
                 .then(response => {
                     fetchData();
                     toast.success("Xóa thành công");
+                    resetGift();
                 })
                 .catch(error => {
                     console.error('Lỗi khi xóa dữ liệu:', error);
@@ -306,6 +381,7 @@ const Promotion = () => {
         }
     };
     //========//
+
 
     return (
         <>
@@ -569,13 +645,13 @@ const Promotion = () => {
 
                                                             <td style={{ position: "sticky", zIndex: '1', right: '0', background: "#fff" }}>
                                                                 {discount.status === 0 &&
-                                                                    <Button color="link" size="sm"><FaLockOpen color="green" /></Button>
+                                                                    <Button color="link" size="sm"><FaLockOpen /></Button>
                                                                 }
                                                                 {(discount.status === 1 || discount.status === 2) &&
-                                                                    <Button color="link" size="sm"><FaLock color="green" /></Button>
+                                                                    <Button color="link" size="sm"><FaLock /></Button>
                                                                 }
-                                                                <Button color="link" size="sm" onClick={() => handleRowClick(discount)}><FaEdit color="orange" /></Button>
-                                                                <Button color="link" size="sm" onClick={() => deleteDiscount(discount.id)}> <FaTrash color="red" /></Button>
+                                                                <Button color="link" size="sm" onClick={() => handleRowClick(discount)}><FaEdit /></Button>
+                                                                <Button color="link" size="sm" onClick={() => deleteDiscount(discount.id)}> <FaTrash /></Button>
                                                             </td>
 
                                                         </tr>
@@ -728,71 +804,39 @@ const Promotion = () => {
                                                                     </FormGroup>
                                                                 </Col>
 
-                                                                {/* <Col lg="6">
-                                                            <FormGroup>
-                                                                <label
-                                                                    className="form-control-label"
-                                                                    htmlFor="input-price">
-                                                                    Khách hàng
-                                                                </label>
-                                                                <div style={{ display: "flex" }}>
-                                                                    
-                                                                    <div className="custom-control custom-radio">
-                                                                        <Input
-                                                                            className="custom-control-alternative"
-                                                                            name="client"
-                                                                            type="checkbox"
-                                                                        />Đồng
-                                                                    </div>
-                                                                    <div className="custom-control custom-radio">
-                                                                        <Input
-                                                                            className="custom-control-alternative"
-                                                                            name="client"
-                                                                            type="checkbox"
-                                                                        />Bạc
-                                                                    </div>
-                                                                    <div className="custom-control custom-radio">
-                                                                        <Input
-                                                                            className="custom-control-alternative"
-                                                                            name="client"
-                                                                            type="checkbox"
-                                                                        />Vàng
-                                                                    </div>
-                                                                </div>
-                                                                <div style={{ display: "flex" }}>
-                                                                    
-                                                                    <div className="custom-control custom-radio">
-                                                                        <Input
-                                                                            className="custom-control-alternative"
-                                                                            name="client"
-                                                                            type="checkbox"
-                                                                        />Kim cương
-                                                                    </div>
-                                                                    <div className="custom-control custom-radio">
-                                                                        <Input
-                                                                            className="custom-control-alternative"
-                                                                            name="client"
-                                                                            type="checkbox"
-                                                                        />Khách lẻ
-                                                                    </div>
-                                                                </div>
-                                                            </FormGroup>
-                                                        </Col> */}
-
                                                                 <Col lg="12">
                                                                     <FormGroup>
-                                                                        <label
-                                                                            className="form-control-label"
-                                                                        >
+                                                                        <label className="form-control-label">
                                                                             Quà tặng kèm:
-                                                                            <Button className="ml-2" size="sm" onClick={handleModal2}>+</Button>
+                                                                             <Button className="ml-2" size="sm" onClick={handleModal2}>+</Button>
                                                                         </label>
-                                                                        <Input
-                                                                            className="form-control-alternative"
-                                                                            type="select"
-                                                                            value={formData.giftId}
-                                                                            onChange={(e) => setFormData({ ...formData, giftId: e.target.value })}
-                                                                        />
+                                                                        <Carousel interval={null}>
+                                                                            {freeGift.map((gift, index) => (
+                                                                                <Carousel.Item key={gift.id}>
+                                                                                    <div style={{ display: 'flex', justifyContent: 'space-around' }}>
+                                                                                        {freeGift.slice(index, index + 3).map((gift) => (
+                                                                                            <div
+                                                                                                key={gift.id}
+                                                                                                style={{
+                                                                                                    textAlign: 'center',
+                                                                                                    flex: '0 0 33.33%',
+                                                                                                    color: selectedGiftId === gift.id ? 'red' : 'black'
+                                                                                                }}
+                                                                                                onClick={() => handleImageClick(gift.id)}
+                                                                                            >
+                                                                                                <img
+                                                                                                    src={`data:image/jpeg;base64,${gift.image}`}
+                                                                                                    alt={gift.name}
+                                                                                                    width="100"
+                                                                                                    height="100"
+                                                                                                />
+                                                                                                <p style={{ fontSize: 13 }}>{gift.name}</p>
+                                                                                            </div>
+                                                                                        ))}
+                                                                                    </div>
+                                                                                </Carousel.Item>
+                                                                            ))}
+                                                                        </Carousel>
                                                                     </FormGroup>
                                                                 </Col>
                                                             </>
@@ -860,8 +904,19 @@ const Promotion = () => {
 
                                                 <Row>
                                                     <Col lg="6" className="d-flex justify-content-center" >
-                                                        <div>
-                                                            <ImageUpload />
+                                                        <div
+                                                            style={{ position: 'relative', width: imageSize, height: imageSize }}
+                                                        >
+                                                            {imageUrl && <img alt="preview" src={imageUrl} style={imageStyle} />}
+                                                            <Label htmlFor="file-input" style={buttonStyle}>
+                                                                <FaCamera size={15} />
+                                                            </Label>
+                                                            <Input
+                                                                type="file"
+                                                                id="file-input"
+                                                                style={{ display: 'none' }}
+                                                                onChange={handleFileChange}
+                                                            />
                                                         </div>
                                                     </Col>
                                                     <Col>
@@ -911,9 +966,9 @@ const Promotion = () => {
                                                                     <td>{gift.code}</td>
                                                                     <td>
                                                                         <span className="avatar avatar-sm rounded-circle">
-                                                                        <img src={`data:image/jpeg;base64,${gift.image}`} alt="" />
+                                                                            <img src={`data:image/jpeg;base64,${gift.image}`} alt="" />
                                                                         </span>
-                                                                       
+
                                                                     </td>
                                                                     <td>{gift.name}</td>
                                                                     <td>{gift.quantity}</td>
@@ -928,22 +983,20 @@ const Promotion = () => {
                                                     </Table>
                                                 </Row>
 
-
-
-
                                             </Form>
                                         </ModalBody>
                                         <ModalFooter>
 
-                                            <Button color="primary" onClick={saveGift} size="sm">
+                                            <Button color="primary" outline onClick={saveGift} size="sm">
                                                 {formData2.id ? "Cập nhật" : "Thêm mới"}
                                             </Button>
-                                            <Button color="primary" onClick={resetGift} size="sm">
+                                            <Button color="primary" outline onClick={resetGift} size="sm">
                                                 Reset
                                             </Button>
-                                            <Button color="danger" size="sm" onClick={toggleSecondModal}>
+                                            <Button color="danger" outline size="sm" onClick={toggleSecondModal}>
                                                 Đóng
                                             </Button>
+
                                         </ModalFooter>
                                     </Modal>
 

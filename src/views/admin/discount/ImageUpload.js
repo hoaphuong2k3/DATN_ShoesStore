@@ -18,7 +18,6 @@ const ImageUpload = () => {
   const imageStyle = {
     width: imageSize,
     height: imageSize,
-    // borderRadius: '50%', 
   };
 
   const buttonStyle = {
@@ -26,10 +25,8 @@ const ImageUpload = () => {
     top: '50%',
     left: '50%',
     transform: 'translate(-50%, -50%)',
-    // backgroundColor: 'transparent', 
     color: '#000',
     padding: '8px',
-    // borderRadius: '50%',
     cursor: 'pointer',
     border:  '1px dashed gray',
     width: imageSize,
