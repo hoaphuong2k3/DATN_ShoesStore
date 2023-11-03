@@ -1,7 +1,7 @@
 import axios from 'services/custommize-axios.js';
 
-const getAllShoes = (page, size, search) => {
-  return axios.post(`/admin/shoes/search?page=${page}&size=${size}`, search)
+const getAllShoes = (page, size, search,sort,sortStyle) => {
+  return axios.post(`/admin/shoes/search?page=${page}&size=${size}&sort=${sort},${sortStyle}`, search)
 }
 
 const postNewShoes = (shoes) => {
