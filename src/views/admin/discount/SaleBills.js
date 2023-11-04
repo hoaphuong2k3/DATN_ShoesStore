@@ -471,15 +471,15 @@ const SaleBills = () => {
                                     <td>{format(new Date(discount.startDate), 'yyyy-MM-dd HH:mm', { locale: vi })}</td>
                                     <td>{format(new Date(discount.endDate), 'yyyy-MM-dd HH:mm', { locale: vi })}</td>
 
-                                    <td style={{ position: "sticky", zIndex: '1', right: '0', background: "#f6f9fc" }}>
+                                    <td style={{ position: "sticky", zIndex: '1', right: '0', background: "#fff" }}>
                                         {discount.status === 0 &&
-                                            <Button color="link" size="sm"><FaLockOpen color="green" /></Button>
+                                            <Button color="link" size="sm"><FaLockOpen /></Button>
                                         }
                                         {(discount.status === 1 || discount.status === 2) &&
-                                            <Button color="link" size="sm"><FaLock color="green" /></Button>
+                                            <Button color="link" size="sm"><FaLock /></Button>
                                         }
-                                        <Button color="link" size="sm" onClick={() => handleRowClick(discount)}><FaEdit color="orange" /></Button>
-                                        <Button color="link" size="sm" onClick={() => deleteDiscount(discount.id)}> <FaTrash color="red" /></Button>
+                                        <Button color="link" size="sm" onClick={() => handleRowClick(discount)}><FaEdit /></Button>
+                                        <Button color="link" size="sm" onClick={() => deleteDiscount(discount.id)}> <FaTrash /></Button>
                                     </td>
 
                                 </tr>
