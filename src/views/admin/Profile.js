@@ -14,41 +14,27 @@ import {
 } from "reactstrap";
 import Select from "react-select";
 import axiosInstance from "services/custommize-axios";
+import { ToastContainer, toast } from "react-toastify";
+import { FaEdit, FaTrash, FaSearch, FaFileAlt } from 'react-icons/fa';
+
 // core components
 import ProfileHeader from "components/Headers/ProfileHeader";
-import ImageUpload from "views/admin/discount/ImageUpload.js";
+// import ImageUpload from "views/admin/discount/ImageUpload.js";
 
 const Profile = () => {
 
 
   const [provinces, setProvinces] = useState([]);
-  const [selectedCity, setSelectedCity] = useState("");
-  const [selectedDistrict, setSelectedDistrict] = useState("");
-  const [selectedWard, setSelectedWard] = useState("");
-  const [admins, setAdmins] = useState({
-    id: "",
-    username: "",
-    fullname: "",
-    gender: false,
-    dateOfBirth: "",
-    email: "",
-    phoneNumber: "",
-    // address: {
-    proviceCode: "",
-    districtCode: "",
-    communeCode: "",
-    addressDetail: "",
-    isDeleted: true,
-    // },
-    status: "",
-  });
+
+  const [admins, setAdmins] = useState([]);
+
 
   const fetchData = async () => {
     try {
       const provincesResponse = await axios.get("https://provinces.open-api.vn/api/?depth=3");
       setProvinces(provincesResponse.data);
 
-      const response = await axiosInstance.get("/staff/detail/6");
+      const response = await axiosInstance.get("/staff/detail/10");
       setAdmins(response.data);
       console.log(response.data);
     } catch (error) {
@@ -59,6 +45,57 @@ const Profile = () => {
   useEffect(() => {
     fetchData();
   }, []);
+
+  const [formData, setFormData] = useState({
+    id: '',
+    fullname: '',
+    email: '',
+    dateOfBirth: '',
+    phoneNumber: '',
+    address: {
+      addressDetail: '',
+      proviceCode: '',
+      districtCode: '',
+      communeCode: '',
+      isDeleted: true,
+    },
+  });
+  useEffect(() => {
+    setFormData({
+      id: admins.id,
+      fullname: admins.fullname,
+      email: admins.email,
+      dateOfBirth: admins.dateOfBirth,
+      phoneNumber: admins.phoneNumber,
+      address: {
+        addressDetail: admins.addressDetail,
+        proviceCode: admins.proviceCode,
+        districtCode: admins.districtCode,
+        communeCode: admins.communeCode,
+        isDeleted: true,
+      },
+    });
+  }, [admins]);
+
+  //Add
+
+  const saveAdmin = async () => {
+    try {
+      await axiosInstance.put('/staff/update', formData);
+      toast.success('Cập nhật thông tin thành công!');
+      fetchData();
+    } catch (error) {
+      console.error('Lỗi rồi trời ơi:', error);
+      if (error.response) {
+        console.error('Response data:', error.response.data);
+        toast.error(error.response.data.message);
+      } else {
+        toast.error('Đã có lỗi xảy ra.');
+      }
+    }
+  };
+
+
 
   return (
     <>
@@ -71,121 +108,140 @@ const Profile = () => {
             <div class="card mb-3 mb-lg-5">
               <div class="card-header d-flex justify-content-between align-items-center">
                 <h2 class="card-title h4">Basic information</h2>
+                <Button color="info" size="sm" className="ml-2 mb-2"
+                  onClick={saveAdmin}><FaEdit />
+                </Button>
                 <div class="ml-auto mt--5">
-                  <ImageUpload className=" bg-light" />
+                  {/* <ImageUpload className=" bg-light" /> */}
                 </div>
               </div>
               {/* <!-- Body --> */}
               <div class="card-body">
                 {/* <!-- Form --> */}
                 <form>
-                  {/* <!-- Form Group --> */}
+                  {/* <!-- Form Group Fullname --> */}
                   <div class="row form-group">
-                    <label for="firstNameLabel" class="col-sm-3 col-form-label input-label">Full name
+                    <label for="firstNameLabel" class="ml-2 col-sm-3 input-label">Họ Tên
                       <i class="tio-help-outlined text-body ml-1" data-toggle="tooltip" data-placement="top"></i>
                     </label>
 
-                    <div class="col-sm-9">
+                    <div class="col-sm-8">
                       <div class="input-group input-group-sm-down-break">
                         <Input type="text" class="form-control" name="fullname"
-                          placeholder="fullname" value={admins.fullname} />
-
+                          placeholder="fullname"
+                          value={formData.fullname}
+                          onChange={(e) => setFormData({ ...formData, fullname: e.target.value })}                          // onChange={(e) => setFormData({ ...formData, fullname: e.target.value })}
+                        />
                       </div>
                     </div>
                   </div>
                   {/* <!-- End Form Group --> */}
 
-                  {/* <!-- Form Group --> */}
+                  {/* <!-- Form Group DateOfBirth--> */}
                   <div class="row form-group">
-                    <label for="emailLabel" class="col-sm-3 col-form-label input-label">Email</label>
+                    <label for="emailLabel" class="ml-2 col-sm-3 input-label">Ngày Sinh</label>
 
-                    <div class="col-sm-9">
-                      <Input type="email" class="form-control" name="email" id="emailLabel"
-                        placeholder="Email" aria-label="Email" value={admins.email} />
+                    <div class="col-sm-8">
+                      <Input type="date" class="form-control" name="email" id="emailLabel"
+                        placeholder="dateOfBirth" aria-label="dateOfBirth"
+                        value={formData.dateOfBirth}
+                        onChange={(e) => setFormData({ ...formData, dateOfBirth: e.target.value })}
+                      />
                     </div>
                   </div>
                   {/* <!-- End Form Group -->
 
-                        <!-- Form Group --> */}
+                  <!-- Form Group Phone --> */}
                   <div class="row form-group">
-                    <label for="phoneLabel" class="col-sm-3 col-form-label input-label">Phone <span
-                      class="input-label-secondary">(Optional)</span></label>
+                    <label for="phoneLabel" class="ml-2 col-sm-3 input-label">Số điện thoại</label>
 
-                    <div class="col-sm-9">
+                    <div class="col-sm-8">
                       <Input type="text" class="js-masked-input form-control" name="phone" id="phoneLabel"
                         placeholder="+x(xxx)xxx-xx-xx"
-                        value={admins.phoneNumber} data-hs-mask-options='{
+                        value={formData.phoneNumber} data-hs-mask-options='{
                              "template": "+0(000)000-00-00"
-                           }'/>
+                           }'
+                        onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
+                      />
                     </div>
                   </div>
                   {/* <!-- End Form Group -->
 
-                        <!-- Form Group --> */}
-                  <div className="pl-lg-4">
-                    <Row>
-                      <Col md="12">
-                        <FormGroup>
-                          <label
-                            className="form-control-label"
-                            htmlFor="input-address"
-                          >
-                            Địa chỉ
-                          </label>
-                          <Input
-                            className="form-control-alternative"
-                            id="input-address"
-                            type="text"
-                            value={admins.addressDetail}
-                          />
-                        </FormGroup>
-                      </Col>
-                    </Row>
-                    <Row>
+                        <!-- Form Group address --> */}
+                  {/* <div className="pl-lg-4"> */}
+                  <div class="row form-group">
+                    <label for="addressLabel" class="ml-2 col-sm-3 input-label">Địa Chỉ</label>
+
+                    <div class="col-sm-8">
+                      <Input type="textarea" class="form-control" name="address"
+                        placeholder="addressDetail"
+                        value={formData.address.addressDetail}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            address: {
+                              ...formData.address,
+                              addressDetail: e.target.value,
+                            },
+                          })
+                        } />
+                    </div>
+                    {/* </div> */}
+                    <Row className="mt-5 ml-3">
+                      {/* Tỉnh thành */}
                       <Col lg="4">
                         <FormGroup>
-                          <label
-                            className="form-control-label"
-                            htmlFor="input-city"
-                          >
-                            Thành Phố / Tỉnh
+                          <label className="input-label" htmlFor="input-city">
+                            Tỉnh / Thành
                           </label>
                           <Input
                             className="form-control-alternative"
                             type="select"
-                            value={selectedCity}
-                            onChange={(e) => setSelectedCity(e.target.value)}
+                            value={formData.address.proviceCode}
+                            onChange={(e) => setFormData({
+                              ...formData,
+                              address: {
+                                ...formData.address,
+                                proviceCode: e.target.value,
+                                districtCode: "",
+                                communeCode: "",
+                              },
+
+                            })}
                           >
-                            <option value="">Chọn Thành Phố/Tỉnh</option>
+                            <option value="">Chọn Tỉnh / Thành</option>
                             {provinces.map((province) => (
                               <option key={province.code} value={province.name}>
                                 {province.name}
                               </option>
                             ))}
                           </Input>
-
-
                         </FormGroup>
                       </Col>
+                      {/* quận huyện*/}
                       <Col lg="4">
                         <FormGroup>
-                          <label
-                            className="form-control-label"
-                            htmlFor="input-country"
-                          >
-                            Quận/Huyện
+                          <label className="input-label" htmlFor="input-country">
+                            Quận / Huyện
                           </label>
                           <Input
                             className="form-control-alternative"
                             type="select"
-                            value={selectedDistrict}
-                            onChange={(e) => setSelectedDistrict(e.target.value)}
-                            disabled={!selectedCity}
+                            value={formData.address.districtCode}
+                            onChange={(e) => setFormData({
+                              ...formData,
+                              address: {
+                                ...formData.address,
+                                districtCode: e.target.value,
+                                communeCode: "",
+                              },
+                            })}
+                            disabled={!formData.address.proviceCode}
                           >
-                            <option value="">Chọn Quận/Huyện</option>
-                            {selectedCity &&
+                            <option value="">Chọn Quận / Huyện</option>
+                            {formData.address.proviceCode &&
                               provinces
-                                .find((province) => province.name === selectedCity)
+                                .find((province) => province.name === formData.address.proviceCode)
                                 .districts.map((district) => (
                                   <option key={district.code} value={district.name}>
                                     {district.name}
@@ -194,24 +250,30 @@ const Profile = () => {
                           </Input>
                         </FormGroup>
                       </Col>
+                      {/* phường xã */}
                       <Col lg="4">
                         <FormGroup>
-                          <label
-                            className="form-control-label" >
-                            Phường/Xã
+                          <label className="input-label">
+                            Phường / Xã
                           </label>
                           <Input
                             className="form-control-alternative"
                             type="select"
-                            value={selectedWard}
-                            onChange={(e) => setSelectedWard(e.target.value)}
-                            disabled={!selectedDistrict}
+                            value={formData.address.communeCode}
+                            onChange={(e) => setFormData({
+                              ...formData,
+                              address: {
+                                ...formData.address,
+                                communeCode: e.target.value,
+                              },
+                            })}
+                            disabled={!formData.address.districtCode}
                           >
-                            <option value="">Chọn Phường/Xã</option>
-                            {selectedDistrict &&
+                            <option value="">Chọn Phường / Xã</option>
+                            {formData.address.districtCode &&
                               provinces
-                                .find((province) => province.name === selectedCity)
-                                .districts.find((district) => district.name === selectedDistrict)
+                                .find((province) => province.name === formData.address.proviceCode)
+                                .districts.find((district) => district.name === formData.address.districtCode)
                                 .wards.map((ward) => (
                                   <option key={ward.code} value={ward.name}>
                                     {ward.name}
@@ -224,7 +286,6 @@ const Profile = () => {
                   </div>
                   {/* <!-- End Form Group --> */}
 
-
                 </form>
                 {/* <!-- End Form --> */}
               </div>
@@ -232,7 +293,7 @@ const Profile = () => {
             </div>
             {/* <!-- End Card --> */}
 
-            {/* <!-- Card --> */}
+            {/* <!-- Card email --> */}
             <div id="emailSection" class="card mb-3 mb-lg-5">
               <div class="card-header">
                 <h3 class="card-title h4">Email</h3>
@@ -246,17 +307,19 @@ const Profile = () => {
                 <Form>
                   {/* <!-- Form Group --> */}
                   <div class="row form-group">
-                    <label for="newEmailLabel" class="col-sm-3 col-form-label input-label">New email
+                    <label for="newEmailLabel" class="col-sm-3 input-label">New email
                       address</label>
 
                     <div class="col-sm-9">
                       <Input type="email" class="form-control" name="newEmail" id="newEmailLabel"
-                        placeholder="Enter new email address" aria-label="Enter new email address" />
+                        placeholder="Enter new email address" aria-label="Enter new email address"
+                        value={formData.email}
+                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+
+                      />
                     </div>
                   </div>
                   {/* <!-- End Form Group --> */}
-
-
                 </Form>
                 {/* <!-- End Form --> */}
               </div>

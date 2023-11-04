@@ -32,9 +32,7 @@ const Staff = () => {
   const [totalPages, setTotalPages] = useState(0);
   // ADDRESS
   const [provinces, setProvinces] = useState([]);
-  const [selectedCity, setSelectedCity] = useState("");
-  const [selectedDistrict, setSelectedDistrict] = useState("");
-  const [selectedWard, setSelectedWard] = useState("");
+
 
 
   const [queryParams, setQueryParams] = useState({
@@ -712,6 +710,7 @@ const Staff = () => {
                           />
                         </FormGroup>
                       </Col>
+                      {/* // tỉnh thành */}
                       <Col lg="4">
                         <FormGroup>
                           <label className="form-control-label" htmlFor="input-city">
@@ -741,6 +740,7 @@ const Staff = () => {
                           </Input>
                         </FormGroup>
                       </Col>
+                      {/* quận huyện*/}
                       <Col lg="4">
                         <FormGroup>
                           <label className="form-control-label" htmlFor="input-country">
@@ -772,6 +772,7 @@ const Staff = () => {
                           </Input>
                         </FormGroup>
                       </Col>
+                      {/* phường xã */}
                       <Col lg="4">
                         <FormGroup>
                           <label className="form-control-label">
@@ -803,6 +804,7 @@ const Staff = () => {
                           </Input>
                         </FormGroup>
                       </Col>
+                      {/* detail */}
                       <Col className="pl-lg-4">
                         <FormGroup>
                           <label className="form-control-label" htmlFor="addressDetail">

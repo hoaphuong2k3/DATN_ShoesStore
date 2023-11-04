@@ -29,7 +29,7 @@ const ImageUpload = () => {
 
   const uploadButton = (
     <div>
-      <PlusOutlined />
+      {/* <PlusOutlined /> */}
       <div
         style={{
           marginTop: 8,
