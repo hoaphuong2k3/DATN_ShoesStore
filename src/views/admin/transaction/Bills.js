@@ -4,6 +4,7 @@ import { Card, CardBody, Container, TabContent, TabPane, Nav, NavItem, NavLink, 
 
 // core components
 import Header from "components/Headers/Header.js";
+
 import Confirm from "views/admin/transaction/Confirm.js";
 import Waitting from "views/admin/transaction/Waitting.js";
 import Shipping from "views/admin/transaction/Shipping.js";
@@ -39,8 +40,8 @@ class Bills extends React.Component {
 
     return (
       <>
-        <Header />
-        <Container className="mt--7" fluid>
+        {/* <Header /> */}
+        <Container className="pt-5 pt-md-7" fluid>
           <Row>
             <div className="col">
               <Card className="shadow">

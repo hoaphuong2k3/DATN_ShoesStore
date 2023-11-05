@@ -385,9 +385,9 @@ const Promotion = () => {
 
     return (
         <>
-            <Header />
+            {/* <Header /> */}
             {/* Page content */}
-            <Container className="mt--7" fluid>
+            <Container className="pt-5 pt-md-7" fluid>
                 <Row>
                     <Col>
                         {/* Tabs with icons */}
@@ -397,7 +397,7 @@ const Promotion = () => {
 
                                     <Row className="align-items-center">
                                         <div className="col">
-                                            <h3 className="mb-0">Đợt giảm giá</h3>
+                                            <h3 className="heading-small text-muted mb-0">Đợt giảm giá</h3>
                                         </div>
                                     </Row>
                                 </CardHeader>
