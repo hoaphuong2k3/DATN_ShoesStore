@@ -5,53 +5,53 @@ import { vi } from 'date-fns/locale';
 
 // reactstrap components
 import { Row, Col, Button, Table, Input, FormGroup, InputGroup, InputGroupAddon, InputGroupText, Modal, ModalBody, ModalFooter, ModalHeader, Label, Form } from "reactstrap";
-import { FaRegEdit, FaSearch } from 'react-icons/fa';
+import { FaRegEdit, FaSearch, FaMinus, FaPlus } from 'react-icons/fa';
 
 const Waitting = () => {
     const [modal, setModal] = useState(false);
+    const [confirm, setConfirm] = useState([]);
+    const [selectedOrderId, setSelectedOrderId] = useState(null);
+    const [orderData, setOrderData] = useState({});
+    const [deliveryData, setDeliveryData] = useState({});
+
     const toggle = () => setModal(!modal);
-    const handleModal = () => {
-        setModal(true);
-    }
 
-    const [confirm, setComfirm] = useState([]);
-    const [totalElements, setTotalElements] = useState(0);
-    const [totalPages, setTotalPages] = useState(0);
-
-    const [queryParams, setQueryParams] = useState({
-        page: 0,
-        size: 10,
-        status: 1,
-        date: "",
-    });
-
-    //loads table
     const fetchData = async () => {
         try {
             const response = await axiosInstance.get("/order/admin", {
-                params: queryParams
+                params: {
+                    page: 0,
+                    size: 10,
+                    status: 1,
+                    date: ""
+                }
             });
-            setComfirm(response.content);
-            setTotalElements(response.totalElements);
-            setTotalPages(response.totalPages);
+            setConfirm(response.content);
         } catch (error) {
             console.error("Lỗi khi lấy dữ liệu:", error);
         }
     };
+
     useEffect(() => {
         fetchData();
-    }, [queryParams]);
+    }, []);
 
-    const handlePageChange = ({ selected }) => {
-        setQueryParams(prevParams => ({ ...prevParams, page: selected }));
-    };
+    const edit = async (id) => {
+        setSelectedOrderId(id);
+        try {
+            const [orderResponse, deliveryResponse, confirmResponse] = await Promise.all([
+                axiosInstance.get(`/order/admin/cart/get-all/${id}`),
+                axiosInstance.get(`/order/admin/delivery/${id}`),
+                // axiosInstance.get(`/order/admin/${id}`)
+            ]);
+            setOrderData(orderResponse);
+            setDeliveryData(deliveryResponse.data);
+            // setConfirm(confirmResponse.data);
 
-    const handleSizeChange = (e) => {
-        const newSize = parseInt(e.target.value);
-        setQueryParams({ ...queryParams, size: newSize, page: 0 });
-    };
-    const calculateIndex = (index) => {
-        return index + 1 + queryParams.page * queryParams.size;
+            setModal(true);
+        } catch (error) {
+            console.error("Lỗi khi lấy dữ liệu hóa đơn:", error);
+        }
     };
 
 
@@ -108,7 +108,7 @@ const Waitting = () => {
                                         <td>{format(new Date(confirm.createdTime), 'dd-MM-yyyy HH:mm', { locale: vi })}</td>
                                         <td>{format(new Date(confirm.updatedTime), 'dd-MM-yyyy HH:mm', { locale: vi })}</td>
                                         <td className="text-center">
-                                            <Button color="link" size="sm" onClick={handleModal}><FaRegEdit /></Button>
+                                            <Button color="link" size="sm" onClick={() => edit(confirm.id)}><FaRegEdit /></Button>
                                         </td>
                                     </tr>
                                 ))}
@@ -129,99 +129,206 @@ const Waitting = () => {
                         toggle={toggle}
                         backdrop={'static'}
                         keyboard={false}
-                        style={{ maxWidth: '700px' }}
+                        style={{ maxWidth: '1200px' }}
                     >
                         <ModalHeader toggle={toggle}>
                             <h3 className="heading-small text-muted mb-0">Chi tiết hóa đơn</h3>
                         </ModalHeader>
                         <ModalBody>
-                            <Form>
-                                <Row>
-                                    <Col md={6}>
+                            <Row style={{ border: "1px solid gray" }}>
+                                <Col md={5} >
+                                    <h3 className="mt-3 heading-small text-muted">Thông tin khách hàng</h3>
+                                    <Form className="m-2" style={{ fontSize: 13 }}>
                                         <FormGroup>
-                                            <Label for="exampleEmail">
-                                                Email
+                                            <Label>
+                                                Mã hóa đơn
                                             </Label>
                                             <Input
-                                                id="exampleEmail" size="sm"
-                                                name="email"
-                                                placeholder="with a placeholder"
-                                                type="email"
-                                                
+                                                size="sm"
+                                                type="text"
+                                                value={deliveryData.code}
+                                                disabled
                                             />
                                         </FormGroup>
-                                    </Col>
-                                    <Col md={6}>
+                                        <Row >
+                                            <Col md={6}>
+                                                <FormGroup>
+                                                    <Label>
+                                                        Khách hàng
+                                                    </Label>
+                                                    <Input
+                                                        size="sm"
+                                                        type="text"
+                                                        value={deliveryData.recipientName}
+                                                    />
+                                                </FormGroup>
+                                            </Col>
+                                            <Col md={6}>
+                                                <FormGroup>
+                                                    <Label>
+                                                        Số điện thoại
+                                                    </Label>
+                                                    <Input
+                                                        size="sm"
+                                                        type="tel"
+                                                        value={deliveryData.recipientPhone}
+                                                    />
+                                                </FormGroup>
+                                            </Col>
+                                        </Row>
                                         <FormGroup>
-                                            <Label for="examplePassword">
-                                                Password
+                                            <Label>
+                                                Địa chỉ
                                             </Label>
                                             <Input
-                                                id="examplePassword" size="sm"
-                                                name="password"
-                                                placeholder="password placeholder"
-                                                type="password"
+                                                size="sm"
+                                                rows="2"
+                                                type="textarea"
+                                                value={deliveryData.deliveryAddress}
                                             />
                                         </FormGroup>
-                                    </Col>
-                                </Row>
-                                <FormGroup>
-                                    <Label for="exampleAddress">
-                                        Address
-                                    </Label>
-                                    <Input
-                                        id="exampleAddress" size="sm"
-                                        name="address"
-                                        placeholder="1234 Main St"
-                                    />
-                                </FormGroup>
-                                <FormGroup>
-                                    <Label for="exampleAddress2">
-                                        Address 2
-                                    </Label>
-                                    <Input
-                                        id="exampleAddress2" size="sm"
-                                        name="address2"
-                                        placeholder="Apartment, studio, or floor"
-                                    />
-                                </FormGroup>
-                                <Row>
-                                    <Col md={6}>
                                         <FormGroup>
-                                            <Label for="exampleCity">
-                                                City
+                                            <Label>
+                                                Tổng tiền sản phẩm
                                             </Label>
-                                            <Input
-                                                id="exampleCity" size="sm"
-                                                name="city"
-                                            />
+                                            <InputGroup size="sm">
+                                                <Input
+                                                    size="sm"
+                                                    type="number"
+                                                />
+                                                <InputGroupAddon addonType="append">
+                                                    <InputGroupText>VNĐ</InputGroupText>
+                                                </InputGroupAddon>
+                                            </InputGroup>
                                         </FormGroup>
-                                    </Col>
-                                    <Col md={4}>
-                                        <FormGroup>
-                                            <Label for="exampleState">
-                                                State
-                                            </Label>
-                                            <Input
-                                                id="exampleState" size="sm"
-                                                name="state"
-                                            />
-                                        </FormGroup>
-                                    </Col>
-                                    <Col md={2}>
-                                        <FormGroup>
-                                            <Label for="exampleZip">
-                                                Zip
-                                            </Label>
-                                            <Input
-                                                id="exampleZip" size="sm"
-                                                name="zip"
-                                            />
-                                        </FormGroup>
-                                    </Col>
-                                </Row>
 
-                            </Form>
+                                        <Row >
+                                            <Col md={6}>
+                                                <FormGroup>
+                                                    <Label>
+                                                        Đợt giảm giá
+                                                    </Label>
+                                                    <InputGroup size="sm">
+                                                        <Input
+                                                            size="sm"
+                                                            type="number"
+                                                        />
+                                                        <InputGroupAddon addonType="append">
+                                                            <InputGroupText>%</InputGroupText>
+                                                        </InputGroupAddon>
+                                                    </InputGroup>
+                                                </FormGroup>
+
+                                            </Col>
+                                            <Col md={6}>
+                                                <FormGroup>
+                                                    <Label>
+                                                        Voucher từ shop
+                                                    </Label>
+                                                    <InputGroup size="sm">
+                                                        <Input
+                                                            size="sm"
+                                                            type="number"
+                                                        />
+                                                        <InputGroupAddon addonType="append">
+                                                            <InputGroupText>%</InputGroupText>
+                                                        </InputGroupAddon>
+                                                    </InputGroup>
+                                                </FormGroup>
+
+                                            </Col>
+                                        </Row>
+
+                                        <Row >
+                                            <Col md={6}>
+                                                <FormGroup>
+                                                    <Label>
+                                                        Phí vận chuyển
+                                                    </Label>
+                                                    <InputGroup size="sm">
+                                                        <Input
+                                                            size="sm"
+                                                            type="number"
+                                                            value={deliveryData.deliveryCost}
+                                                        />
+                                                        <InputGroupAddon addonType="append">
+                                                            <InputGroupText>VNĐ</InputGroupText>
+                                                        </InputGroupAddon>
+                                                    </InputGroup>
+                                                </FormGroup>
+
+                                            </Col>
+                                            <Col md={6}>
+                                                <FormGroup>
+                                                    <img className="my-3 ml-3"
+                                                        width={"80%"}
+                                                        alt="..."
+                                                        src={require("../../../assets/img/theme/giaohangnhanh.webp")}
+                                                    />
+                                                </FormGroup>
+                                            </Col>
+                                        </Row>
+                                        <FormGroup>
+                                            <Label>
+                                                Thành tiền
+                                            </Label>
+                                            <InputGroup size="sm">
+                                                <Input
+                                                    size="sm"
+                                                    type="number"
+                                                />
+                                                <InputGroupAddon addonType="append">
+                                                    <InputGroupText>VNĐ</InputGroupText>
+                                                </InputGroupAddon>
+                                            </InputGroup>
+                                        </FormGroup>
+
+                                        <FormGroup>
+                                            <Label>
+                                                Phương thức thanh toán
+                                            </Label>
+                                            <Input
+                                                size="sm"
+                                                type="text"
+                                            />
+                                        </FormGroup>
+                                    </Form>
+                                </Col>
+
+                                <Col md={7}>
+                                    <h3 className="mt-3 heading-small text-muted">Giỏ hàng</h3>
+                                    <Table hover size="sm">
+                                        <thead className="text-center">
+                                            <tr>
+                                                <th>#</th>
+                                                <th>Sản phẩm</th>
+                                                <th>Số lượng</th>
+                                                <th>Đơn giá</th>
+                                                <th>Thành tiền</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody style={{ color: "#000" }}>
+                                            {Array.isArray(orderData) &&
+                                                orderData.map((product, index) => (
+                                                    <tr key={index}>
+                                                        <td className="text-center">{index + 1}</td>
+                                                        <td>{product.shoesName}</td>
+                                                        <td className="text-center">
+                                                            <button className="mr-3" style={{border: "none", background: "none"}}><FaMinus fontSize={8}/></button>
+                                                            {product.quantity}
+                                                            <button className="ml-3" style={{border: "none",  background: "none"}}><FaPlus fontSize={8}/></button>
+                                                        </td>
+                                                        <td className="text-right">{product.totalPrice}</td>
+                                                        <td className="text-right">{product.quantity * product.totalPrice}</td>
+                                                    </tr>
+                                                ))}
+                                        </tbody>
+                                    </Table>
+                                </Col>
+                            </Row>
+
+
+
                         </ModalBody >
                         <ModalFooter>
                             <div className="text-center">

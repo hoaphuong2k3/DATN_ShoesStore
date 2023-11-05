@@ -7,12 +7,6 @@ import {
   DropdownItem,
   UncontrolledDropdown,
   DropdownToggle,
-  Form,
-  FormGroup,
-  InputGroupAddon,
-  InputGroupText,
-  Input,
-  InputGroup,
   Navbar,
   Nav,
   Container,
@@ -30,15 +24,15 @@ const AdminNavbar = (props) => {
   };
   return (
     <>
-      <Navbar className="navbar-top" expand="md" id="navbar-main">
+      <Navbar className="navbar-top" expand="md" id="navbar-main" style={{background: "#fff"}}>
         <Container fluid>
-          <div className="align-items-center d-none d-md-flex ">
+          {/* <div className="align-items-center d-none d-md-flex ">
             <h5>
               <h6 className="heading-small text-muted mb-4">
                 ADMIN
               </h6>
             </h5>
-          </div>
+          </div> */}
           <Nav className="align-items-center d-none d-md-flex  ml-lg-auto" navbar>
             <UncontrolledDropdown nav>
               <DropdownToggle className="pr-0" nav>
