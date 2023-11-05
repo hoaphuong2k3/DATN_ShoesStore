@@ -728,12 +728,6 @@ const Products = () => {
                     >
                       Xuất PDF
                     </Button>
-                    <Button
-                      className="btn btn-outline-primary"
-                      size="sm"
-                    >
-                      Báo cáo
-                    </Button>
                   </div>
                 </Row>
                 {/*  */}
@@ -775,59 +769,59 @@ const Products = () => {
                           <i class="fa-solid fa-arrow-down" onClick={() => onClickSort('code', 'desc')} />
                         </th>
                         <th>Tên
-                        <i class="fa-solid fa-arrow-up" onClick={() => onClickSort('name', 'asc')} />
+                          <i class="fa-solid fa-arrow-up" onClick={() => onClickSort('name', 'asc')} />
                           <i class="fa-solid fa-arrow-down" onClick={() => onClickSort('name', 'desc')} />
                         </th>
                         <th>Hãng
-                        <i class="fa-solid fa-arrow-up" onClick={() => onClickSort('brand', 'asc')} />
+                          <i class="fa-solid fa-arrow-up" onClick={() => onClickSort('brand', 'asc')} />
                           <i class="fa-solid fa-arrow-down" onClick={() => onClickSort('brand', 'desc')} />
                         </th>
                         <th>Xuất xứ
-                        <i class="fa-solid fa-arrow-up" onClick={() => onClickSort('origin', 'asc')} />
+                          <i class="fa-solid fa-arrow-up" onClick={() => onClickSort('origin', 'asc')} />
                           <i class="fa-solid fa-arrow-down" onClick={() => onClickSort('origin', 'desc')} />
                         </th>
                         <th>Thiết kế
-                        <i class="fa-solid fa-arrow-up" onClick={() => onClickSort('designStyle', 'asc')} />
+                          <i class="fa-solid fa-arrow-up" onClick={() => onClickSort('designStyle', 'asc')} />
                           <i class="fa-solid fa-arrow-down" onClick={() => onClickSort('designStyle', 'desc')} />
                         </th>
                         <th>Loại da
-                        <i class="fa-solid fa-arrow-up" onClick={() => onClickSort('skinType', 'asc')} />
+                          <i class="fa-solid fa-arrow-up" onClick={() => onClickSort('skinType', 'asc')} />
                           <i class="fa-solid fa-arrow-down" onClick={() => onClickSort('skinType', 'desc')} />
                         </th>
                         <th>Mũi giày
-                        <i class="fa-solid fa-arrow-up" onClick={() => onClickSort('toe', 'asc')} />
+                          <i class="fa-solid fa-arrow-up" onClick={() => onClickSort('toe', 'asc')} />
                           <i class="fa-solid fa-arrow-down" onClick={() => onClickSort('toe', 'desc')} />
                         </th>
                         <th>Đế giày
-                        <i class="fa-solid fa-arrow-up" onClick={() => onClickSort('sole', 'asc')} />
+                          <i class="fa-solid fa-arrow-up" onClick={() => onClickSort('sole', 'asc')} />
                           <i class="fa-solid fa-arrow-down" onClick={() => onClickSort('sole', 'desc')} />
                         </th>
                         <th>Lót giày
-                        <i class="fa-solid fa-arrow-up" onClick={() => onClickSort('lining', 'asc')} />
+                          <i class="fa-solid fa-arrow-up" onClick={() => onClickSort('lining', 'asc')} />
                           <i class="fa-solid fa-arrow-down" onClick={() => onClickSort('lining', 'desc')} />
                         </th>
                         <th>Đệm giày
-                        <i class="fa-solid fa-arrow-up" onClick={() => onClickSort('cushion', 'asc')} />
+                          <i class="fa-solid fa-arrow-up" onClick={() => onClickSort('cushion', 'asc')} />
                           <i class="fa-solid fa-arrow-down" onClick={() => onClickSort('cushion', 'desc')} />
                         </th>
                         <th>Số lượng
-                        <i class="fa-solid fa-arrow-up" onClick={() => onClickSort('totalQuantity', 'asc')} />
+                          <i class="fa-solid fa-arrow-up" onClick={() => onClickSort('totalQuantity', 'asc')} />
                           <i class="fa-solid fa-arrow-down" onClick={() => onClickSort('totalQuantity', 'desc')} />
                         </th>
                         <th>Số CTSP
-                        <i class="fa-solid fa-arrow-up" onClick={() => onClickSort('totalRecord', 'asc')} />
+                          <i class="fa-solid fa-arrow-up" onClick={() => onClickSort('totalRecord', 'asc')} />
                           <i class="fa-solid fa-arrow-down" onClick={() => onClickSort('totalRecord', 'desc')} />
                         </th>
                         <th>Giá Min
-                        <i class="fa-solid fa-arrow-up" onClick={() => onClickSort('priceMin', 'asc')} />
+                          <i class="fa-solid fa-arrow-up" onClick={() => onClickSort('priceMin', 'asc')} />
                           <i class="fa-solid fa-arrow-down" onClick={() => onClickSort('priceMin', 'desc')} />
                         </th>
                         <th>Giá Max
-                        <i class="fa-solid fa-arrow-up" onClick={() => onClickSort('priceMax', 'asc')} />
+                          <i class="fa-solid fa-arrow-up" onClick={() => onClickSort('priceMax', 'asc')} />
                           <i class="fa-solid fa-arrow-down" onClick={() => onClickSort('priceMax', 'desc')} />
                         </th>
 
-                        <th colSpan={2}>Thao tác</th>
+                        <th colSpan={3} style={{ position: "sticky", zIndex: '1', right: '0' }} className="text-center">Thao tác</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -861,18 +855,18 @@ const Products = () => {
                               <td>{item.totalRecord}</td>
                               <td>{item.priceMin}</td>
                               <td>{item.priceMax}</td>
-                              <td>
-                                <Button color="danger" to={`/admin/shoesdetail/${item.id}`} tag={Link} size="sm">
+                              <td style={{ position: "sticky", zIndex: '1', right: '0', background: "#fff" }}>
+                                <Button color="gray" to={`/admin/shoesdetail/${item.id}`} tag={Link} size="sm">
                                   <i class="fa-solid fa-eye" />&nbsp;CTSP
                                 </Button>
-                                <Button color="gray" to={`/admin/product/detail/${item.id}`} tag={Link} size="sm">
+                                {/* <Button color="link" to={`/admin/product/detail/${item.id}`} tag={Link} size="sm">
                                   <i class="fa-solid fa-eye"></i>
+                                </Button> */}
+                                <Button color="link" to={`/admin/product/edit/${item.id}`} tag={Link} size="sm">
+                                  <FaEdit color="orange" />
                                 </Button>
-                                <Button color="info" to={`/admin/product/edit/${item.id}`} tag={Link} size="sm">
-                                  <FaEdit />
-                                </Button>
-                                <Button color="danger" size="sm" onClick={() => handleConfirmDelete(item)}>
-                                  <i class="fa-solid fa-trash" />
+                                <Button color="link" size="sm" onClick={() => handleConfirmDelete(item)}>
+                                  <FaTrash color="red" />
                                 </Button>
                               </td>
                             </tr>
