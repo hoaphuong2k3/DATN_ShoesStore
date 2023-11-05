@@ -34,7 +34,7 @@ const Profile = () => {
       const provincesResponse = await axios.get("https://provinces.open-api.vn/api/?depth=3");
       setProvinces(provincesResponse.data);
 
-      const response = await axiosInstance.get("/staff/detail/10");
+      const response = await axiosInstance.get("/staff/detail/12");
       setAdmins(response.data);
       console.log(response.data);
     } catch (error) {
@@ -46,20 +46,7 @@ const Profile = () => {
     fetchData();
   }, []);
 
-  const [formData, setFormData] = useState({
-    id: '',
-    fullname: '',
-    email: '',
-    dateOfBirth: '',
-    phoneNumber: '',
-    address: {
-      addressDetail: '',
-      proviceCode: '',
-      districtCode: '',
-      communeCode: '',
-      isDeleted: true,
-    },
-  });
+  
   useEffect(() => {
     setFormData({
       id: admins.id,
@@ -95,7 +82,48 @@ const Profile = () => {
     }
   };
 
+  const [formData, setFormData] = useState({
+    id: '',
+    fullname: '',
+    email: '',
+    dateOfBirth: '',
+    phoneNumber: '',
+    address: {
+      addressDetail: '',
+      proviceCode: '',
+      districtCode: '',
+      communeCode: '',
+      isDeleted: true,
+    },
+  });
 
+  // changePassword
+  const [formPass, setFormPass] = useState({
+    newPassword: "",
+    confirmPassword: ""
+  });
+
+  const changePassword = async () => {
+    try {
+      const requestBody = {
+        email: formData.email,
+        // phoneNumber: formData.phoneNumber,
+        newPassword: formPass.newPassword,
+        confirmPassword: formPass.confirmPassword,
+      };
+      console.log(requestBody);
+      await axiosInstance.put('/staff/changePassword', requestBody);
+      toast.success('Bạn đã thay đổi mật khẩu thành công!');
+    } catch (error) {
+      console.error('Lỗi rồi trời ơi:', error);
+      if (error.response) {
+        console.error('Response data:', error.response.data);
+        toast.error(error.response.data.message);
+      } else {
+        toast.error('Đã có lỗi xảy ra.');
+      }
+    }
+  };  
 
   return (
     <>
@@ -105,12 +133,10 @@ const Profile = () => {
         <Row>
           <div class="col-lg-9">
             {/* <!-- Card -->  */}
-            <div class="card mb-3 mb-lg-5">
+            <div class="card mb-3 mb-lg-5 small">
               <div class="card-header d-flex justify-content-between align-items-center">
                 <h2 class="card-title h4">Basic information</h2>
-                <Button color="info" size="sm" className="ml-2 mb-2"
-                  onClick={saveAdmin}><FaEdit />
-                </Button>
+
                 <div class="ml-auto mt--5">
                   {/* <ImageUpload className=" bg-light" /> */}
                 </div>
@@ -288,13 +314,16 @@ const Profile = () => {
 
                 </form>
                 {/* <!-- End Form --> */}
+                <div class="d-flex justify-content-end ">
+                  <button type="submit" class="btn btn-primary small" onClick={saveAdmin} >Save changes</button>
+                </div>
               </div>
               {/* <!-- End Body --> */}
             </div>
             {/* <!-- End Card --> */}
 
             {/* <!-- Card email --> */}
-            <div id="emailSection" class="card mb-3 mb-lg-5">
+            <div id="emailSection" class="card mb-3 mb-lg-5 small">
               <div class="card-header">
                 <h3 class="card-title h4">Email</h3>
               </div>
@@ -315,20 +344,23 @@ const Profile = () => {
                         placeholder="Enter new email address" aria-label="Enter new email address"
                         value={formData.email}
                         onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-
                       />
                     </div>
                   </div>
                   {/* <!-- End Form Group --> */}
                 </Form>
                 {/* <!-- End Form --> */}
+                <div class="d-flex justify-content-end ">
+                  <button type="submit" class="btn btn-primary small" onClick={saveAdmin} >Save changes</button>
+                </div>
               </div>
               {/* <!-- End Body --> */}
+              
             </div>
             {/* <!-- End Card --> */}
 
-            {/* <!-- Card --> */}
-            <div id="passwordSection" class="card mb-3 mb-lg-5">
+            {/* <!-- Card Password--> */}
+            <div id="passwordSection" class="card mb-3 mb-lg-5 small">
               <div class="card-header">
                 <h4 class="card-title">Change your password</h4>
               </div>
@@ -337,18 +369,6 @@ const Profile = () => {
               <div class="card-body">
                 {/* <!-- Form --> */}
                 <form id="changePasswordForm">
-                  {/* <!-- Form Group --> */}
-                  <div class="row form-group">
-                    <label for="currentPasswordLabel" class="col-sm-3 col-form-label input-label">Current
-                      password</label>
-
-                    <div class="col-sm-9">
-                      <Input type="password" class="form-control" name="currentPassword"
-                        id="currentPasswordLabel" placeholder="Enter current password"
-                        aria-label="Enter current password" />
-                    </div>
-                  </div>
-                  {/* <!-- End Form Group --> */}
 
                   {/* <!-- Form Group --> */}
                   <div class="row form-group">
@@ -357,15 +377,9 @@ const Profile = () => {
                     <div class="col-sm-9">
                       <Input type="password" class="js-pwstrength form-control" name="newPassword"
                         id="newPassword" placeholder="Enter new password" aria-label="Enter new password"
-                        data-hs-pwstrength-options='{
-                             "ui": {
-                               "container": "#changePasswordForm",
-                               "viewports": {
-                                 "progress": "#passwordStrengthProgress",
-                                 "verdict": "#passwordStrengthVerdict"
-                               }
-                             }
-                           }'/>
+                        onChange={(e) => setFormPass({ ...formPass, newPassword: e.target.value })}
+
+                        />
 
                       <p id="passwordStrengthVerdict" class="form-text mb-2" />
 
@@ -376,14 +390,16 @@ const Profile = () => {
 
                   {/* <!-- Form Group --> */}
                   <div class="row form-group">
-                    <label for="confirmNewPasswordLabel" class="col-sm-3 col-form-label input-label">Confirm new
+                    <label for="confirmPasswordLabel" class="col-sm-3 col-form-label input-label">Confirm new
                       password</label>
 
                     <div class="col-sm-9">
                       <div class="mb-3">
-                        <Input type="password" class="form-control" name="confirmNewPassword"
-                          id="confirmNewPasswordLabel" placeholder="Confirm your new password"
-                          aria-label="Confirm your new password" />
+                        <Input type="password" class="form-control" name="confirmPassword"
+                          id="confirmPasswordLabel" placeholder="Confirm your new password"
+                          aria-label="Confirm your new password" 
+                          onChange={(e) => setFormPass({ ...formPass, confirmPassword: e.target.value })}
+                          />
                       </div>
 
                       <h5>Password requirements:</h5>
@@ -399,17 +415,18 @@ const Profile = () => {
                     </div>
                   </div>
                   {/* <!-- End Form Group --> */}
-
-
                 </form>
                 {/* <!-- End Form --> */}
+                <div class="d-flex justify-content-end ">
+                  <button type="submit" class="btn btn-primary small" onClick={changePassword} >Save changes</button>
+                </div>
               </div>
               {/* <!-- End Body --> */}
             </div>
             {/* <!-- End Card --> */}
 
             {/* <!-- Card --> */}
-            <div id="deleteAccountSection" class="card mb-3 mb-lg-5">
+            <div id="deleteAccountSection" class="card mb-3 mb-lg-5 small">
               <div class="card-header">
                 <h4 class="card-title">Delete your account</h4>
               </div>
@@ -449,6 +466,13 @@ const Profile = () => {
               <div id="navbarVerticalNavMenu" class="">
                 {/* <!-- Navbar Nav --> */}
                 <ul id="navbarSettings" class="js-sticky-block js-scrollspy navbar-nav navbar-nav-lg nav-tabs card card-navbar-nav"
+                data-hs-sticky-block-options='{
+                  "parentSelector": "#navbarVerticalNavMenu",
+                  "breakpoint": "lg",
+                  "startPoint": "#navbarVerticalNavMenu",
+                  "endPoint": "#stickyBlockEndPoint",
+                  "stickyOffsetTop": 20
+                }'
                 >
                   <li class="nav-item">
                     <a class="nav-link active" href="#content">
