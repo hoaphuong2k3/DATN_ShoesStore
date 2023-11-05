@@ -293,16 +293,16 @@ const Staff = () => {
   });
   return (
     <>
-      <Header />
-      <Container className="mt--7" fluid>
+      {/* <Header /> */}
+      <Container className="pt-5 pt-md-7" fluid>
         <Row>
           <Col>
             <div className="col">
               <Card className="shadow">
-                <CardHeader className="bg-transparent m-2">
+                <CardHeader className="bg-transparent">
                   <Row className="align-items-center">
                     <div className="col">
-                      <h3 className="mb-0">Nhân Viên</h3>
+                      <h3 className="heading-small text-muted mb-0">Nhân Viên</h3>
                     </div>
                   </Row>
                 </CardHeader>
@@ -437,12 +437,12 @@ const Staff = () => {
 
                       {/* filter status */}
                       <Col>
-                        <Input type="select" name="status" style={{ width: "150px" }} size="sm" 
-                        value={selectedStatus} 
-                        onChange={(e) => {
-                          const value = e.target.value;
-                          setSelectedStatus(value === '' ? '' : value);
-                        }}>
+                        <Input type="select" name="status" style={{ width: "150px" }} size="sm"
+                          value={selectedStatus}
+                          onChange={(e) => {
+                            const value = e.target.value;
+                            setSelectedStatus(value === '' ? '' : value);
+                          }}>
                           <option value="">Tất cả</option>
                           <option value="0">Ngừng hoạt động</option>
                           <option value="1">Đang hoạt động</option>
