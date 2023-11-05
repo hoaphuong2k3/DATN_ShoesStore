@@ -24,7 +24,8 @@ const SaleBills = () => {
     const [discounts, setDiscounts] = useState([]);
     const [totalElements, setTotalElements] = useState(0);
     const [totalPages, setTotalPages] = useState(0);
-
+    const [selectAll, setSelectAll] = useState(false);
+    const [selectedItems, setSelectedItems] = useState([]);
 
     const [queryParams, setQueryParams] = useState({
         page: 0,
@@ -65,8 +66,6 @@ const SaleBills = () => {
         setQueryParams({ ...queryParams, size: newSize, page: 0 });
     };
 
-
-
     const calculateIndex = (index) => {
         return index + 1 + queryParams.page * queryParams.size;
     };
@@ -90,6 +89,29 @@ const SaleBills = () => {
             isdelete: 0,
         });
     };
+
+    
+    //checkbox
+    const handleCheckboxChange = (id) => {
+        const updatedSelectedItems = [...selectedItems];
+        if (updatedSelectedItems.includes(id)) {
+            updatedSelectedItems.splice(updatedSelectedItems.indexOf(id), 1);
+        } else {
+            updatedSelectedItems.push(id);
+        }
+        setSelectedItems(updatedSelectedItems);
+        setSelectAll(updatedSelectedItems.length === discounts.length);
+    };
+
+    const handleSelectAll = () => {
+        if (selectAll) {
+            setSelectedItems([]);
+        } else {
+            setSelectedItems(discounts.map(discount => discount.id));
+        }
+        setSelectAll(!selectAll);
+    };
+
 
     //click on selected
     const [formData, setFormData] = useState({
@@ -218,6 +240,18 @@ const SaleBills = () => {
         }
     };
 
+     //Update status
+     const 
+     lock = async (id) => {
+        await axiosInstance.patch(`/vouchers/stopVoucher/${id}`);
+        toast.success("Cập nhật thành công");
+        fetchData();
+    };
+    const openlock = async (id) => {
+        await axiosInstance.patch(`/vouchers/setVoucherRun/${id}`);
+        toast.success("Cập nhật thành công");
+        fetchData();
+    };
 
     //delete
     const confirmDelete = () => {
@@ -409,7 +443,7 @@ const SaleBills = () => {
                                 &nbsp;&nbsp;
                             </span>
                         </span>
-                        <Button color="warning" size="sm" onClick={resetFilters}>
+                        <Button color="warning" outline size="sm" onClick={resetFilters}>
                             Làm mới bộ lọc
                         </Button>
                     </Col>
@@ -424,7 +458,7 @@ const SaleBills = () => {
                     </div>
                     <div className="col text-right">
                         <Button
-                            color="primary"
+                            color="primary" outline
                             onClick={handleModal}
                             size="sm"
                         >
@@ -437,32 +471,50 @@ const SaleBills = () => {
                 <Table className="align-items-center table-flush" responsive>
                     <thead className="thead-light text-center">
                         <tr>
-                            <th scope="col">STT</th>
-                            <th scope="col">Trạng thái</th>
-                            <th scope="col">Code</th>
-                            <th scope="col">Tên khuyến mại</th>
-                            <th scope="col">Mô tả</th>
-                            <th scope="col">Hóa đơn <br />tối thiểu</th>
-                            <th scope="col">Giá trị</th>
-                            <th scope="col">Ngày bắt đầu</th>
-                            <th scope="col">Ngày kết thúc</th>
-                            <th scope="col" style={{ position: "sticky", zIndex: '1', right: '0' }}>Thao tác</th>
+                            <th scope="col" style={{ color: "black", position: "sticky", zIndex: '1', left: '0' }}>Trạng thái</th>
+                            <th >
+                                <FormGroup check className="pb-4">
+                                    <Input
+                                        type="checkbox"
+                                        checked={selectAll}
+                                        onChange={handleSelectAll}
+                                    />
+                                </FormGroup>
+                            </th>
+                            <th scope="col" style={{ color: "black" }}>Code</th>
+                            <th scope="col" style={{ color: "black" }}>Tên khuyến mại</th>
+                            <th scope="col" style={{ color: "black" }}>Hóa đơn <br />tối thiểu</th>
+                            <th scope="col" style={{ color: "black" }}>Giá trị</th>
+                            
+                            <th scope="col" style={{ color: "black" }}>Ngày bắt đầu</th>
+                            <th scope="col" style={{ color: "black" }}>Ngày kết thúc</th>
+                            <th scope="col" style={{ color: "black" }}>Mô tả</th>
+                            <th scope="col" style={{ color: "black", position: "sticky", zIndex: '1', right: '0' }}>Thao tác</th>
 
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody style={{color: "black"}}>
                         {Array.isArray(discounts) &&
                             discounts.map((discount, index) => (
                                 <tr key={discount.id}>
-                                    <td>{calculateIndex(index)}</td>
-                                    <td style={{ textAlign: "center" }}>
+                                    <td style={{ position: "sticky", zIndex: '1', left: '0', background: "#fff", textAlign: "center" }}>
                                         <Badge color={statusMapping[discount.status]?.color || statusMapping.default.color}>
                                             {statusMapping[discount.status]?.label || statusMapping.default.label}
                                         </Badge>
                                     </td>
+                                    <td>
+                                        <FormGroup check className="pb-4">
+                                            <Input
+                                                type="checkbox"
+                                                checked={selectedItems.includes(discount.id)}
+                                                onChange={() => handleCheckboxChange(discount.id)}
+                                            />
+
+                                        </FormGroup>
+                                    </td>
                                     <td>{discount.code}</td>
                                     <td>{discount.name}</td>
-                                    <td>{discount.description}</td>
+                           
                                     <td style={{ textAlign: "right" }}>{discount.minPrice} VNĐ</td>
                                     <td style={{ textAlign: "right" }}>
                                         {discount.salePercent ? `${discount.salePercent}%` : ""}
@@ -470,13 +522,13 @@ const SaleBills = () => {
                                     </td>
                                     <td>{format(new Date(discount.startDate), 'yyyy-MM-dd HH:mm', { locale: vi })}</td>
                                     <td>{format(new Date(discount.endDate), 'yyyy-MM-dd HH:mm', { locale: vi })}</td>
-
+                                    <td>{discount.description}</td>
                                     <td style={{ position: "sticky", zIndex: '1', right: '0', background: "#fff" }}>
                                         {discount.status === 0 &&
-                                            <Button color="link" size="sm"><FaLockOpen /></Button>
+                                            <Button color="link" size="sm" ><FaLockOpen onClick={() => lock(discount.id)} /></Button>
                                         }
                                         {(discount.status === 1 || discount.status === 2) &&
-                                            <Button color="link" size="sm"><FaLock /></Button>
+                                            <Button color="link" size="sm" ><FaLock onClick={() => openlock(discount.id)} /></Button>
                                         }
                                         <Button color="link" size="sm" onClick={() => handleRowClick(discount)}><FaEdit /></Button>
                                         <Button color="link" size="sm" onClick={() => deleteDiscount(discount.id)}> <FaTrash /></Button>
@@ -708,7 +760,7 @@ const SaleBills = () => {
                                     </FormGroup>
                                 </Col>
                             </Row>
-                            
+
 
                         </div>
 
@@ -717,13 +769,13 @@ const SaleBills = () => {
                 </ModalBody >
                 <ModalFooter>
                     <div className="text-center">
-                        <Button color="primary" onClick={saveDiscount} size="sm">
+                        <Button color="primary" outline onClick={saveDiscount} size="sm">
                             {formData.id ? "Cập nhật" : "Thêm mới"}
                         </Button>
-                        <Button color="primary" onClick={resetForm} size="sm">
+                        <Button color="primary" outline onClick={resetForm} size="sm">
                             Reset
                         </Button>
-                        <Button color="danger" onClick={toggle} size="sm">
+                        <Button color="danger" outline onClick={toggle} size="sm">
                             Close
                         </Button>
                     </div>
