@@ -988,70 +988,60 @@ const ListShoesDetail = () => {
                                                     </CardTitle>
 
 
+                                                    <Table bordered dark hover responsive striped className="m-4">
+                                                        <thead>
+                                                            <tr>
+                                                                <th >Size</th>
+                                                                <th>Giá</th>
+                                                                <th>Số lượng</th>
+                                                                <th>Trạng Thái</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            {selectedValuesSize.map((value, index) => (
+                                                                <tr key={value.id} >
+                                                                    <td className="col-1">{value.name}</td>
+                                                                    <td className="col-3">
+                                                                        <Input
+                                                                            id={`price_${value.id}`}
+                                                                            name="price"
+                                                                            placeholder="Nhập giá"
+                                                                            value={value.price}
+                                                                            onChange={(e) => onInputChangeAdd(e, value.id)}
 
-                                                    {selectedValuesColor.map((itemColor, index) => (
-                                                        <>
-                                                            <div>{itemColor.name}</div>
-                                                            <Table className="align-items-center table-flush" responsive>
-                                                                <thead className="thead-light">
-                                                                    <tr>
-                                                                        <th >Size</th>
-                                                                        <th>Giá</th>
-                                                                        <th>Số lượng</th>
-                                                                        <th>Trạng Thái</th>
-                                                                    </tr>
-                                                                </thead>
-                                                                {selectedValuesSize.map((value, index) => (
+                                                                        />
+                                                                    </td>
+                                                                    <td className="col-3">
+                                                                        <Input
+                                                                            id={`quantity_${value.id}`}
+                                                                            name="quantity"
+                                                                            placeholder="Nhập số lượng"
+                                                                            value={value.quantity}
+                                                                            onChange={(e) => onInputChangeAdd(e, value.id)}
+                                                                        />
+                                                                    </td>
+                                                                    <td >
+                                                                        <Input id={`status_${value.id}`} type="select" name="status" value={value.status} onChange={(e) => onInputChangeAdd(e, value.id)}
+                                                                        >
+                                                                            <option value='1'>
+                                                                                Đang bán
+                                                                            </option>
+                                                                            <option value='0'>
+                                                                                Ngừng bán
+                                                                            </option>
+                                                                            <option value='2'>
+                                                                                Hết hàng
+                                                                            </option>
 
-                                                                    <tbody>
-                                                                        <tr key={value.id} >
-                                                                            <td className="col-1">{value.name}</td>
-                                                                            <td className="col-3">
-                                                                                <Input
-                                                                                    id={`price_${value.id}`}
-                                                                                    name="price"
-                                                                                    placeholder="Nhập giá"
-                                                                                    value={value.price}
-                                                                                    onChange={(e) => onInputChangeAdd(e, value.id)}
+                                                                        </Input>
+                                                                    </td>
+                                                                </tr>
+                                                            ))}
+                                                        </tbody>
 
-                                                                                />
-                                                                            </td>
-                                                                            <td className="col-3">
-                                                                                <Input
-                                                                                    id={`quantity_${value.id}`}
-                                                                                    name="quantity"
-                                                                                    placeholder="Nhập số lượng"
-                                                                                    value={value.quantity}
-                                                                                    onChange={(e) => onInputChangeAdd(e, value.id)}
-                                                                                />
-                                                                            </td>
-                                                                            <td >
-                                                                                <Input id={`status_${value.id}`} type="select" name="status" value={value.status} onChange={(e) => onInputChangeAdd(e, value.id)}
-                                                                                >
-                                                                                    <option value='1'>
-                                                                                        Đang bán
-                                                                                    </option>
-                                                                                    <option value='0'>
-                                                                                        Ngừng bán
-                                                                                    </option>
-                                                                                    <option value='2'>
-                                                                                        Hết hàng
-                                                                                    </option>
-
-                                                                                </Input>
-                                                                            </td>
-                                                                        </tr>
-                                                                    </tbody>
-
-                                                                ))}
-                                                            </Table>
-                                                        </>
-                                                    ))}
-
-
-
+                                                    </Table>
                                                     <Button>Thêm</Button>
-                                                </CardBody >
+                                                </CardBody>
                                             </Card>
                                         </Col>
                                     </Row>

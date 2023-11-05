@@ -246,7 +246,7 @@ const Client = () => {
   const toggleAddAdress = () => setModalAddAdress(!modalAddAdress);
 
   useEffect(() => {
-    if (modalAdress === false && modalAddAdress === false) {
+    if (modalAdress === true && modalAddAdress === false) {
       resetFormData();
       toggleAdress();
     }

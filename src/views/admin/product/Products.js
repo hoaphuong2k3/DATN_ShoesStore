@@ -1,4 +1,4 @@
-import { React, useState, useEffect } from "react";
+import { React, useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { getAllShoes, deleteShoes } from "services/Product2Service";
 import ReactPaginate from 'react-paginate';
@@ -16,6 +16,7 @@ import {
 import { toast } from 'react-toastify';
 import Switch from 'react-input-switch';
 import Header from "components/Headers/Header.js";
+import axios from "axios";
 
 
 const Products = () => {
@@ -231,6 +232,39 @@ const Products = () => {
   }
   //End Delete
 
+  //Import Excel
+  const fileInputRef = useRef(null);
+
+  const handleFileSelect = () => {
+    fileInputRef.current.click();
+  };
+  const formData = new FormData();
+  const handleFileChange = async (event) => {
+    const selectedFile = event.target.files[0];
+
+    if (selectedFile) {
+      formData.append('file', selectedFile);
+      try {
+        console.log(formData)
+        const response = await axios.post(`http://localhost:33321/api/admin/shoes/import-excel`, formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        });
+        console.log(response);
+        getAll();
+        toast.success("Nhập excel thành công");
+        // navigate("/admin/product");
+      } catch (error) {
+        let errorMessage = "Lỗi từ máy chủ";
+        if (error.response && error.response.data && error.response.data.message) {
+          errorMessage = error.response.data.message;
+        }
+        toast.error(errorMessage);
+      }
+    }
+  };
+  //Kết thúc import excel
 
 
 
@@ -709,10 +743,17 @@ const Products = () => {
                     >
                       Tải mẫu
                     </Button>
+                    <input
+                      type="file"
+                      style={{ display: 'none' }}
+                      ref={fileInputRef}
+                      onChange={handleFileChange}
+                    />
 
                     <Button
                       className="btn btn-outline-primary"
                       size="sm"
+                      onClick={handleFileSelect}
                     >
                       Nhập Excel
                     </Button>
@@ -856,17 +897,17 @@ const Products = () => {
                               <td>{item.priceMin}</td>
                               <td>{item.priceMax}</td>
                               <td style={{ position: "sticky", zIndex: '1', right: '0', background: "#fff" }}>
-                                <Button color="gray" to={`/admin/shoesdetail/${item.id}`} tag={Link} size="sm">
-                                  <i class="fa-solid fa-eye" />&nbsp;CTSP
+                                <Button color="link" to={`/admin/shoesdetail/${item.id}`} tag={Link} size="sm">
+                                  <i class="fa-solid fa-eye" color="primary" />&nbsp;CTSP
                                 </Button>
                                 {/* <Button color="link" to={`/admin/product/detail/${item.id}`} tag={Link} size="sm">
                                   <i class="fa-solid fa-eye"></i>
                                 </Button> */}
                                 <Button color="link" to={`/admin/product/edit/${item.id}`} tag={Link} size="sm">
-                                  <FaEdit color="orange" />
+                                  <FaEdit color="primary" />
                                 </Button>
                                 <Button color="link" size="sm" onClick={() => handleConfirmDelete(item)}>
-                                  <FaTrash color="red" />
+                                  <FaTrash color="primary" />
                                 </Button>
                               </td>
                             </tr>
