@@ -239,19 +239,21 @@ const Client = () => {
       setFormData({ ...formData, idClient: "" });
       setListAddress([])
     }
+    console.log("modalAdress:", modalAdress, modalAddAdress);
   }, [modalAdress]);
 
   const [modalAddAdress, setModalAddAdress] = useState(false);
   const toggleAddAdress = () => setModalAddAdress(!modalAddAdress);
 
   useEffect(() => {
-    if (modalAdress === true && modalAddAdress === false) {
+    if (modalAdress === false && modalAddAdress === false) {
       resetFormData();
       toggleAdress();
     }
     if (modalAddAdress === true) {
       toggleAdress();
     }
+    console.log("modalAddAdress:", modalAdress, modalAddAdress);
   }, [modalAddAdress]);
   const [listAddress, setListAddress] = useState([]);
   const getAllAddress = async () => {
