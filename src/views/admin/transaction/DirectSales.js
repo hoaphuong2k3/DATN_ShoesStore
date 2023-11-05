@@ -3,19 +3,16 @@ import React from "react";
 // reactstrap components
 import { Card, CardHeader, CardBody, Container, Row } from "reactstrap";
 
-import Header from "components/Headers/Header.js";
 
 const Sell = () => {
   return (
     <>
-      <Header />
-      {/* Page content */}
-      <Container className="mt--7" fluid>
+      <Container className="pt-5 pt-md-7" fluid>
         <Row>
           <div className="col">
             <Card className="shadow">
             <CardHeader className="bg-transparent">
-                <h3 className="mb-0">Bán hàng</h3>
+                <h3 className="mb-0 haeding-small text-muted">Bán hàng</h3>
               </CardHeader>
               <CardBody>
                

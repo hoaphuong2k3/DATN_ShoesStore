@@ -9,7 +9,6 @@ import { vi } from 'date-fns/locale';
 // reactstrap components
 import Switch from 'react-input-switch';
 import { Card, CardHeader, CardBody, Container, Row, Col, Form, FormGroup, Input, Button, Table, Modal, ModalBody, ModalFooter, ModalHeader} from "reactstrap";
-import Header from "components/Headers/Header.js";
 
 
 const Delivery = () => {
@@ -172,9 +171,7 @@ const Delivery = () => {
 
     return (
         <>
-            <Header />
-            {/* Page content */}
-            <Container className="mt--7" fluid>
+            <Container className="pt-5 pt-md-7" fluid>
                 <Row>
                     <Col>
                         {/* Tabs with icons */}
@@ -184,7 +181,7 @@ const Delivery = () => {
 
                                     <Row className="align-items-center">
                                         <div className="col">
-                                            <h3 className="mb-0">Phiếu giao hàng</h3>
+                                            <h3 className="heading-small text-muted mb-0">Phiếu giao hàng</h3>
                                         </div>
                                     </Row>
                                 </CardHeader>

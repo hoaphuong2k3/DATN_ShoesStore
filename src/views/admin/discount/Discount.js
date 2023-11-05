@@ -3,7 +3,6 @@ import classnames from "classnames";
 // reactstrap components
 import { Card, CardBody, Container, TabContent, TabPane, Nav, NavItem, NavLink, Row, Col } from "reactstrap";
 
-import Header from "components/Headers/Header.js";
 import SaleProduct from "views/admin/discount/SaleProduct.js";
 import SaleBills from "views/admin/discount/SaleBills.js";
 class Discount extends React.Component {
@@ -31,9 +30,8 @@ class Discount extends React.Component {
         };
         return (
             <>
-                <Header />
-                {/* Page content */}
-                <Container className="mt--7" fluid>
+                
+                <Container className="pt-5 pt-md-7" fluid>
                     <Row>
                         <div className="col">
                             <Card className="shadow">

@@ -477,7 +477,7 @@ const SaleProduct = () => {
                                 &nbsp;&nbsp;
                             </span>
                         </span>
-                        <Button color="warning" size="sm" onClick={resetFilters}>
+                        <Button color="warning" outline size="sm" onClick={resetFilters}>
                             Làm mới bộ lọc
                         </Button>
                     </Col>
@@ -492,7 +492,7 @@ const SaleProduct = () => {
                     </div>
                     <div className="col text-right">
                         <Button
-                            color="primary"
+                            color="primary" outline
                             onClick={handleModal}
                             size="sm"
                         >
@@ -506,28 +506,45 @@ const SaleProduct = () => {
                 <Table className="align-items-center table-flush" responsive>
                     <thead className="thead-light text-center">
                         <tr>
-                            <th scope="col">STT</th>
-                            <th scope="col">Trạng thái</th>
-                            <th scope="col">Code</th>
-                            <th scope="col">Tên khuyến mại</th>
-                            <th scope="col">Mô tả</th>
-                            <th scope="col">Giá trị  <br /> sản phẩm</th>
-                            <th scope="col">Giá trị</th>
-                            <th scope="col">Ngày bắt đầu</th>
-                            <th scope="col">Ngày kết thúc</th>                   
-                            <th scope="col" style={{ position: "sticky", zIndex: '1', right: '0' }}>Thao tác</th>
+                        <th scope="col" style={{ color: "black", position: "sticky", zIndex: '1', left: '0' }}>Trạng thái</th>
+                            <th >
+                                <FormGroup check className="pb-4">
+                                    <Input
+                                        type="checkbox"
+                                        // checked={selectAll}
+                                        // onChange={handleSelectAll}
+                                    />
+                                </FormGroup>
+                            </th>
+                            <th scope="col" style={{ color: "black" }}>Code</th>
+                            <th scope="col" style={{ color: "black" }}>Tên khuyến mại</th>
+                            <th scope="col" style={{ color: "black" }}>Mô tả</th>
+                            <th scope="col" style={{ color: "black" }}>Giá trị  <br /> sản phẩm</th>
+                            <th scope="col" style={{ color: "black" }}>Giá trị</th>
+                            <th scope="col" style={{ color: "black" }}>Ngày bắt đầu</th>
+                            <th scope="col" style={{ color: "black" }}>Ngày kết thúc</th>                   
+                            <th scope="col" style={{color: "black", position: "sticky", zIndex: '1', right: '0' }}>Thao tác</th>
 
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody style={{color:"black"}}>
                         {Array.isArray(discounts) &&
                             discounts.map((discount, index) => (
                                 <tr key={discount.id}>
-                                    <td>{calculateIndex(index)}</td>
-                                    <td style={{ textAlign: "center" }}>
+                                    <td style={{ position: "sticky", zIndex: '1', left: '0', background: "#fff", textAlign: "center" }}>
                                         <Badge color={statusMapping[discount.status]?.color || statusMapping.default.color}>
                                             {statusMapping[discount.status]?.label || statusMapping.default.label}
                                         </Badge>
+                                    </td>
+                                    <td>
+                                        <FormGroup check className="pb-4">
+                                            <Input
+                                                type="checkbox"
+                                                // checked={selectedItems.includes(discount.id)}
+                                                // onChange={() => handleCheckboxChange(discount.id)}
+                                            />
+
+                                        </FormGroup>
                                     </td>
                                     <td>{discount.code}</td>
                                     <td>{discount.name}</td>
@@ -541,13 +558,13 @@ const SaleProduct = () => {
                                     <td>{format(new Date(discount.endDate), 'yyyy-MM-dd HH:mm', { locale: vi })}</td>   
                                     <td style={{ position: "sticky", zIndex: '1', right: '0', background: "#f6f9fc" }}>
                                         {discount.status === 0 &&
-                                            <Button color="link" size="sm"><FaLockOpen color="green" /></Button>
+                                            <Button color="link" size="sm"><FaLockOpen/></Button>
                                         }
                                         {(discount.status === 1 || discount.status === 2) &&
-                                            <Button color="link" size="sm"><FaLock color="green" /></Button>
+                                            <Button color="link" size="sm"><FaLock/></Button>
                                         }
-                                        <Button color="link" size="sm" onClick={() => handleRowClick(discount)}><FaEdit color="orange" /></Button>
-                                        <Button color="link" size="sm" onClick={() => deleteDiscount(discount.id)}> <FaTrash color="red" /></Button>
+                                        <Button color="link" size="sm" onClick={() => handleRowClick(discount)}><FaEdit/></Button>
+                                        <Button color="link" size="sm" onClick={() => deleteDiscount(discount.id)}> <FaTrash/></Button>
                                     </td>
 
                                 </tr>
@@ -916,19 +933,17 @@ const SaleProduct = () => {
                             </Col>
                         </Row>
 
-
-
                     </div>
                 </ModalBody >
                 <ModalFooter>
                     <div className="text-center">
-                        <Button color="primary" onClick={saveDiscount} size="sm">
+                        <Button color="primary" outline onClick={saveDiscount} size="sm">
                             {formData.id ? "Cập nhật" : "Thêm mới"}
                         </Button>
-                        <Button color="primary" onClick={resetForm} size="sm">
+                        <Button color="primary" outline onClick={resetForm} size="sm">
                             Reset
                         </Button>
-                        <Button color="danger" onClick={toggle} size="sm">
+                        <Button color="danger" outline onClick={toggle} size="sm">
                             Close
                         </Button>
                     </div>
