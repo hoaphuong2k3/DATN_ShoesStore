@@ -1,4 +1,4 @@
-import { React, useState, useEffect } from "react";
+import { React, useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { getAllShoes, deleteShoes } from "services/Product2Service";
 import ReactPaginate from 'react-paginate';
@@ -16,6 +16,7 @@ import {
 import { toast } from 'react-toastify';
 import Switch from 'react-input-switch';
 import Header from "components/Headers/Header.js";
+import axios from "axios";
 
 
 const Products = () => {
@@ -231,9 +232,124 @@ const Products = () => {
   }
   //End Delete
 
+  //Import Excel
+  const fileInputRef = useRef(null);
 
+  const handleFileSelect = () => {
+    fileInputRef.current.click();
+  };
+  const formData = new FormData();
+  const handleFileChange = async (event) => {
+    const selectedFile = event.target.files[0];
 
+    if (selectedFile) {
+      formData.append('file', selectedFile);
+      try {
+        console.log(formData)
+        const response = await axios.post(`http://localhost:33321/api/admin/shoes/import-excel`, formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        });
+        console.log(response);
+        getAll();
+        toast.success("Nhập excel thành công");
+        // navigate("/admin/product");
+      } catch (error) {
+        let errorMessage = "Lỗi từ máy chủ";
+        if (error.response && error.response.data && error.response.data.message) {
+          errorMessage = error.response.data.message;
+        }
+        toast.error(errorMessage);
+      }
+    }
+  };
+  //Kết thúc import excel
 
+  //Tải mẫu excel
+
+  const taiMau = async () => {
+    try {
+      const res = await axios.get(`http://localhost:33321/api/admin/shoes/export/pattern`, {
+        responseType: 'blob'
+      });
+
+      const blob = new Blob([res.data], { type: 'application/excel' });
+
+      // Tạo một URL cho Blob và tạo một thẻ a để download
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.style.display = 'none';
+      a.href = url;
+      a.download = 'Template_addShoes.xlsx';
+      document.body.appendChild(a);
+      a.click();
+
+      // Giải phóng tài nguyên
+      window.URL.revokeObjectURL(url);
+
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  //Kết thúc tải mẫu excel
+
+  const xuatExcel = async () => {
+    try {
+      const requestData = listShoes;
+      const res = await axios.post(`http://localhost:33321/api/admin/shoes/export/excel`, requestData, {
+        responseType: 'blob',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      const blob = new Blob([res.data], { type: 'application/excel' });
+
+      // Tạo một URL cho Blob và tạo một thẻ a để download
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.style.display = 'none';
+      a.href = url;
+      a.download = 'Export_Shoes.xlsx';
+      document.body.appendChild(a);
+      a.click();
+
+      // Giải phóng tài nguyên
+      window.URL.revokeObjectURL(url);
+
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  const xuatPDF = async () => {
+    try {
+      const requestData = listShoes;
+      const res = await axios.post(`http://localhost:33321/api/admin/shoes/export/pdf`, requestData, {
+        responseType: 'blob',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      const blob = new Blob([res.data], { type: 'application/pdf' });
+
+      // Tạo một URL cho Blob và tạo một thẻ a để download
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.style.display = 'none';
+      a.href = url;
+      a.download = 'Export_Shoes.pdf';
+      document.body.appendChild(a);
+      a.click();
+
+      // Giải phóng tài nguyên
+      window.URL.revokeObjectURL(url);
+
+    } catch (error) {
+      console.error(error);
+    }
+  };
   return (
     <>
       {/* Page content */}
@@ -706,25 +822,35 @@ const Products = () => {
                       className="btn btn-outline-primary"
                       onClick={(e) => e.preventDefault()}
                       size="sm"
+                      onClick={taiMau}
                     >
                       Tải mẫu
                     </Button>
+                    <input
+                      type="file"
+                      style={{ display: 'none' }}
+                      ref={fileInputRef}
+                      onChange={handleFileChange}
+                    />
 
                     <Button
                       className="btn btn-outline-primary"
                       size="sm"
+                      onClick={handleFileSelect}
                     >
                       Nhập Excel
                     </Button>
                     <Button
                       className="btn btn-outline-primary"
                       size="sm"
+                      onClick={xuatExcel}
                     >
                       Xuất Excel
                     </Button>
                     <Button
                       className="btn btn-outline-primary"
                       size="sm"
+                      onClick={xuatPDF}
                     >
                       Xuất PDF
                     </Button>
@@ -856,17 +982,17 @@ const Products = () => {
                               <td>{item.priceMin}</td>
                               <td>{item.priceMax}</td>
                               <td style={{ position: "sticky", zIndex: '1', right: '0', background: "#fff" }}>
-                                <Button color="gray" to={`/admin/shoesdetail/${item.id}`} tag={Link} size="sm">
-                                  <i class="fa-solid fa-eye" />&nbsp;CTSP
+                                <Button color="link" to={`/admin/shoesdetail/${item.id}`} tag={Link} size="sm">
+                                  <i class="fa-solid fa-eye" color="primary" />&nbsp;CTSP
                                 </Button>
                                 {/* <Button color="link" to={`/admin/product/detail/${item.id}`} tag={Link} size="sm">
                                   <i class="fa-solid fa-eye"></i>
                                 </Button> */}
                                 <Button color="link" to={`/admin/product/edit/${item.id}`} tag={Link} size="sm">
-                                  <FaEdit color="orange" />
+                                  <FaEdit color="primary" />
                                 </Button>
                                 <Button color="link" size="sm" onClick={() => handleConfirmDelete(item)}>
-                                  <FaTrash color="red" />
+                                  <FaTrash color="primary" />
                                 </Button>
                               </td>
                             </tr>

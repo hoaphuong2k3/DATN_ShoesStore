@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import ReactPaginate from 'react-paginate';
-import { postCreateBrands, getAllBrand, updateBrand, deleteBrand } from "services/ProductAttributeService";
+import { postCreateBrands, getAllBrand, updateBrand, deleteBrand, getAllColor, getAllSize } from "services/ProductAttributeService";
 // reactstrap components
 import {
   Card, CardHeader, CardBody, Container, Row, Col, FormGroup, Label, Input, Button, Table, CardTitle,
@@ -31,7 +31,7 @@ const ProductAttributes = () => {
 
 
   const [listCategory, setListCategory] = useState([]);
-
+  const [listColor, setListColor] = useState([]);
   const handleDeleteBrands = async (brand) => {
     try {
       console.log('Delete', brand.id);
@@ -88,7 +88,13 @@ const ProductAttributes = () => {
 
     getCategory();
   }, []);
-
+  const getColor = async () => {
+      let res = await getAllColor();
+      if (res && res.data) {
+          setListColor(res.data);
+      }
+   
+};
   const getCategory = async () => {
     let res = await getAllBrand();
     if (res && res.data) {
