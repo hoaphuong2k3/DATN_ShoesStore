@@ -10,12 +10,13 @@ import {
   Input,
   Container,
   Row,
+  Label,
   Col,
 } from "reactstrap";
 import Select from "react-select";
 import axiosInstance from "services/custommize-axios";
 import { ToastContainer, toast } from "react-toastify";
-import { FaEdit, FaTrash, FaSearch, FaFileAlt } from 'react-icons/fa';
+import { FaEdit, FaTrash, FaSearch, FaFileAlt, FaCamera, FaUser, FaLock, FaEnvelope } from 'react-icons/fa';
 
 // core components
 import ProfileHeader from "components/Headers/ProfileHeader";
@@ -46,12 +47,13 @@ const Profile = () => {
     fetchData();
   }, []);
 
-  
+
   useEffect(() => {
     setFormData({
       id: admins.id,
       fullname: admins.fullname,
       email: admins.email,
+      avatar: admins.avatar,
       dateOfBirth: admins.dateOfBirth,
       phoneNumber: admins.phoneNumber,
       address: {
@@ -62,13 +64,24 @@ const Profile = () => {
         isDeleted: true,
       },
     });
-  }, [admins]);
+    const fetchAvt = async () => {
+      if (admins.avatar) {
+        const blob = await fetch(`data:image/jpeg;base64,${admins.avatar}`).then((res) => res.blob());
+        const file = new File([blob], "image.jpg", { type: "image/jpeg" });
+        setFile(file);
+      }
+      fetchAvt();
+      console.log(admins);
+    };
 
+
+  }, [admins]);
   //Add
 
   const saveAdmin = async () => {
     try {
-      await axiosInstance.put('/staff/update', formData);
+      await axiosInstance.put('/staff/update', formData,);
+      changeAvatar();
       toast.success('Cập nhật thông tin thành công!');
       fetchData();
     } catch (error) {
@@ -85,6 +98,7 @@ const Profile = () => {
   const [formData, setFormData] = useState({
     id: '',
     fullname: '',
+    avatar: null,
     email: '',
     dateOfBirth: '',
     phoneNumber: '',
@@ -97,7 +111,64 @@ const Profile = () => {
     },
   });
 
+  // upload image
+  const [file, setFile] = useState(null);
+
+  const handleFileChange = (e) => {
+    const selectedFile = e.target.files[0];
+    if (selectedFile) {
+      setFile(selectedFile);
+    }
+  };
+  const imageUrl = file ? URL.createObjectURL(file) : null;
+  const imageSize = '150px';
+  const imageStyle = {
+    width: '140px',
+    height: imageSize,
+    borderRadius: '50%',
+  };
+  const buttonStyle = {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    color: '#000',
+    padding: '8px',
+    cursor: 'pointer',
+    border: '1px solid gray',
+    width: '140px',
+    height: imageSize,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: '50%',
+  };
+  const changeAvatar = async () => {
+    try {
+      const image = new FormData();
+      if (file) {
+        image.append('file', file);
+      }
+
+      if (file) {
+        await axiosInstance.put(`/staff/${formData.id}/multipart-file`, image, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        });
+      }
+      fetchData();
+    } catch (error) {
+      console.error('Failed to change avatar', error);
+    }
+  };
+  const AvatarReset = () => {
+    setFile(null);
+  };
+
+
   // changePassword
+
   const [formPass, setFormPass] = useState({
     newPassword: "",
     confirmPassword: ""
@@ -123,7 +194,13 @@ const Profile = () => {
         toast.error('Đã có lỗi xảy ra.');
       }
     }
-  };  
+  };
+
+  // SetActive
+  const [activeLink, setActiveLink] = useState('content');
+  const handleLinkClick = (linkId) => {
+    setActiveLink(linkId);
+  };
 
   return (
     <>
@@ -135,11 +212,7 @@ const Profile = () => {
             {/* <!-- Card -->  */}
             <div class="card mb-3 mb-lg-5 small">
               <div class="card-header d-flex justify-content-between align-items-center">
-                <h2 class="card-title h4">Basic information</h2>
-
-                <div class="ml-auto mt--5">
-                  {/* <ImageUpload className=" bg-light" /> */}
-                </div>
+                <h2 class="card-title h4">Thông tin cơ bản</h2>
               </div>
               {/* <!-- Body --> */}
               <div class="card-body">
@@ -315,7 +388,7 @@ const Profile = () => {
                 </form>
                 {/* <!-- End Form --> */}
                 <div class="d-flex justify-content-end ">
-                  <button type="submit" class="btn btn-primary small" onClick={saveAdmin} >Save changes</button>
+                  <Button type="submit" color="primary" size='sm' onClick={saveAdmin} >Lưu</Button>
                 </div>
               </div>
               {/* <!-- End Body --> */}
@@ -330,14 +403,13 @@ const Profile = () => {
 
               {/* <!-- Body --> */}
               <div class="card-body">
-                <p>Your current email address is <span class="font-weight-bold">mark@example.com</span></p>
+                <p size='sm'>Email của bạn là: <span class="font-weight-bold"> mark@example.com</span></p>
 
                 {/* <!-- Form --> */}
                 <Form>
                   {/* <!-- Form Group --> */}
                   <div class="row form-group">
-                    <label for="newEmailLabel" class="col-sm-3 input-label">New email
-                      address</label>
+                    <label for="newEmailLabel" class="col-sm-3 input-label">Địa chỉ email</label>
 
                     <div class="col-sm-9">
                       <Input type="email" class="form-control" name="newEmail" id="newEmailLabel"
@@ -351,35 +423,35 @@ const Profile = () => {
                 </Form>
                 {/* <!-- End Form --> */}
                 <div class="d-flex justify-content-end ">
-                  <button type="submit" class="btn btn-primary small" onClick={saveAdmin} >Save changes</button>
+                  <Button type="submit" color="primary" size='sm' onClick={saveAdmin} >Lưu</Button>
                 </div>
               </div>
               {/* <!-- End Body --> */}
-              
+
             </div>
             {/* <!-- End Card --> */}
 
             {/* <!-- Card Password--> */}
             <div id="passwordSection" class="card mb-3 mb-lg-5 small">
               <div class="card-header">
-                <h4 class="card-title">Change your password</h4>
+                <h4 class="card-title">Thay đổi mật khẩu</h4>
               </div>
 
-              {/* <!-- Body --> */}
+              {/* <!-- Body ChangePass --> */}
               <div class="card-body">
                 {/* <!-- Form --> */}
                 <form id="changePasswordForm">
 
                   {/* <!-- Form Group --> */}
                   <div class="row form-group">
-                    <label for="newPassword" class="col-sm-3 col-form-label input-label">New password</label>
+                    <label for="newPassword" class="col-sm-3 col-form-label input-label">Mật khẩu mới</label>
 
                     <div class="col-sm-9">
                       <Input type="password" class="js-pwstrength form-control" name="newPassword"
                         id="newPassword" placeholder="Enter new password" aria-label="Enter new password"
                         onChange={(e) => setFormPass({ ...formPass, newPassword: e.target.value })}
 
-                        />
+                      />
 
                       <p id="passwordStrengthVerdict" class="form-text mb-2" />
 
@@ -390,27 +462,24 @@ const Profile = () => {
 
                   {/* <!-- Form Group --> */}
                   <div class="row form-group">
-                    <label for="confirmPasswordLabel" class="col-sm-3 col-form-label input-label">Confirm new
-                      password</label>
+                    <label for="confirmPasswordLabel" class="col-sm-3 col-form-label input-label">Nhập lại mật khẩu</label>
 
                     <div class="col-sm-9">
                       <div class="mb-3">
                         <Input type="password" class="form-control" name="confirmPassword"
                           id="confirmPasswordLabel" placeholder="Confirm your new password"
-                          aria-label="Confirm your new password" 
+                          aria-label="Confirm your new password"
                           onChange={(e) => setFormPass({ ...formPass, confirmPassword: e.target.value })}
-                          />
+                        />
                       </div>
 
-                      <h5>Password requirements:</h5>
-
-                      <p class="font-size-sm mb-2">Ensure that these requirements are met:</p>
-
+                      <h5>Yêu cầu về mật khẩu:</h5>
+                      <p class="font-size-sm mb-2">Đảm bảo các yêu cầu sau được đáp ứng:</p>
                       <ul class="font-size-sm">
-                        <li>Minimum 8 characters long - the more, the better</li>
-                        <li>At least one lowercase character</li>
-                        <li>At least one uppercase character</li>
-                        <li>At least one number, symbol, or whitespace character</li>
+                        <li>Tối thiểu 8 ký tự - càng nhiều càng tốt</li>
+                        <li>Ít nhất một ký tự viết thường</li>
+                        <li>Ít nhất một ký tự viết hoa</li>
+                        <li>Ít nhất một số, ký hiệu hoặc ký tự khoảng trắng</li>
                       </ul>
                     </div>
                   </div>
@@ -418,81 +487,73 @@ const Profile = () => {
                 </form>
                 {/* <!-- End Form --> */}
                 <div class="d-flex justify-content-end ">
-                  <button type="submit" class="btn btn-primary small" onClick={changePassword} >Save changes</button>
+                  <Button type="submit" color="primary" size='sm' onClick={changePassword} >Lưu</Button>
                 </div>
               </div>
               {/* <!-- End Body --> */}
             </div>
             {/* <!-- End Card --> */}
-
-            {/* <!-- Card --> */}
-            <div id="deleteAccountSection" class="card mb-3 mb-lg-5 small">
-              <div class="card-header">
-                <h4 class="card-title">Delete your account</h4>
-              </div>
-
-              {/* <!-- Body --> */}
-              <CardBody>
-                <p class="card-text">When you delete your account, you lose access to Front account services, and we
-                  permanently delete your personal data. You can cancel the deletion for 14 days.</p>
-
-                <FormGroup >
-                  {/* <!-- Custom Checkbox --> */}
-                  <div class="custom-control custom-checkbox">
-                    <Input type="checkbox" class="custom-control-input" id="deleteAccountCheckbox" />
-                    <label class="custom-control-label" for="deleteAccountCheckbox">Confirm that I want to
-                      delete my account.</label>
-                  </div>
-                  {/* <!-- End Custom Checkbox --> */}
-                </FormGroup>
-
-                <div class="d-flex justify-content-end">
-                  <a class="btn btn-white mr-2" href="#">Learn more <i class="tio-open-in-new ml-1"></i></a>
-
-                  <button type="submit" class="btn btn-danger">Delete</button>
-                </div>
-              </CardBody>
-              {/* <!-- End Body --> */}
-            </div>
-            {/* <!-- End Card --> */}
-
-            {/* <!-- Sticky Block End Point --> */}
-            <div id="stickyBlockEndPoint"></div>
           </div>
-
+          <style>
+            {
+              `
+              .nav-item.active::before {
+                content: '';
+                position: absolute;
+                left: 0;
+                top: 0;
+                bottom: 0;
+                width: 3px;
+                background-color: #5c5f83;
+              }
+              `
+            }
+          </style>
           <div class="col-lg-3">
             {/* <!-- Navbar --> */}
-            <div class="navbar-vertical navbar-expand-lg mb-lg-5 mt-6">
+            <div class=" navbar-vertical navbar-expand-lg bg-white mb-lg-2 mt-3 pb-5" style={{ position: 'sticky', top: '5 ', height: '90vh' }}>
               <div id="navbarVerticalNavMenu" class="">
                 {/* <!-- Navbar Nav --> */}
-                <ul id="navbarSettings" class="js-sticky-block js-scrollspy navbar-nav navbar-nav-lg nav-tabs card card-navbar-nav"
-                data-hs-sticky-block-options='{
-                  "parentSelector": "#navbarVerticalNavMenu",
-                  "breakpoint": "lg",
-                  "startPoint": "#navbarVerticalNavMenu",
-                  "endPoint": "#stickyBlockEndPoint",
-                  "stickyOffsetTop": 20
-                }'
+                <ul id="navbarSettings" class=" navbar-nav navbar-nav-lg nav-tabs"
                 >
-                  <li class="nav-item">
-                    <a class="nav-link active" href="#content">
-                      <i class="tio-user-outlined nav-icon"></i> Basic information
-                    </a>
-                  </li>
-                  <li class="nav-item">
-                    <a class="nav-link" href="#emailSection">
-                      <i class="tio-online nav-icon"></i> Email
-                    </a>
-                  </li>
-                  <li class="nav-item">
-                    <a class="nav-link" href="#passwordSection">
-                      <i class="tio-lock-outlined nav-icon"></i> Password
-                    </a>
-                  </li>
+                  {/* Avatar */}
+                  <div class="ml-auto mb-5 mt-3 ">
+                    <Col lg="8" className="d-flex justify-content-center" >
+                      <div
+                        style={{ position: 'relative', width: imageSize, height: imageSize }}
+                      >
+                        {imageUrl && <img alt="preview" src={`data:image/jpeg;base64,${formData.avatar}`} style={imageStyle} />}
+                        <Label htmlFor="file-input" style={buttonStyle}>
+                          <FaCamera size={15} />
+                        </Label>
 
-                  <li class="nav-item">
-                    <a class="nav-link" href="#deleteAccountSection">
-                      <i class="tio-delete-outlined nav-icon"></i> Delete account
+                        <Input
+                          type="file"
+                          id="file-input"
+                          style={{ display: 'none' }}
+                          onChange={handleFileChange}
+                        />
+                      </div>
+                    </Col>
+                    <div class=" ml-3 mt-3 ">
+                      <Button color="primary" size='sm' onClick={saveAdmin} >Cập nhật Ảnh</Button>
+                    </div>
+                  </div>
+                  {/* menu */}
+                  <li className={`nav-item ${activeLink === 'content' ? 'active' : ''}`}>
+                    <a className="nav-link" href="#content" onClick={() => handleLinkClick('content')}>
+                      <FaUser className="nav-icon mr-2" /> Thông tin cơ bản
+                    </a>
+                  </li>
+                  <li className={`nav-item ${activeLink === 'emailSection' ? 'active' : ''}`}>
+                    <a className="nav-link" href="#emailSection" onClick={() => handleLinkClick('emailSection')}>
+                      <FaEnvelope className="nav-icon mr-2" />
+                      Email
+                    </a>
+                  </li>
+                  <li className={`nav-item ${activeLink === 'passwordSection' ? 'active' : ''}`}>
+                    <a className="nav-link" href="#passwordSection" onClick={() => handleLinkClick('passwordSection')}>
+                      <FaLock className="nav-icon mr-2" /> Mật khẩu
                     </a>
                   </li>
                 </ul>

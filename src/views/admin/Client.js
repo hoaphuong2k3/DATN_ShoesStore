@@ -246,7 +246,7 @@ const Client = () => {
   const toggleAddAdress = () => setModalAddAdress(!modalAddAdress);
 
   useEffect(() => {
-    if (modalAdress === false && modalAddAdress === false) {
+    if (modalAdress === true && modalAddAdress === false) {
       resetFormData();
       toggleAdress();
     }
@@ -360,17 +360,17 @@ const Client = () => {
 
   return (
     <>
-      <Header />
+      {/* <Header /> */}
       {/* Page content */}
-      <Container className="mt--7" fluid>
+      <Container className="pt-5 pt-md-7" fluid>
         <Row>
           <Col>
             <div className="col">
               <Card className="shadow">
-                <CardHeader className="bg-transparent m-2">
+              <CardHeader className="bg-transparent">
                   <Row className="align-items-center">
                     <div className="col">
-                      <h3 className="mb-0">Khách Hàng</h3>
+                      <h2 className="heading-small text-dark mb-0">Khách Hàng</h2>
                     </div>
                   </Row>
                 </CardHeader>
@@ -380,7 +380,7 @@ const Client = () => {
                     <h3 className="heading-small text-black mb-0 ml-2">Tìm kiếm</h3>
                   </Row>
                   <hr className="my-4" />
-                  <Form className="search">
+                  <Form>
                     <div className="pl-lg-4">
                       <Row>
                         <Col lg="6">
@@ -536,7 +536,7 @@ const Client = () => {
                         <th scope="col">Số điện thoại <i class="fa-solid fa-arrow-up"></i><i class="fa-solid fa-arrow-down"></i></th>
                         <th scope="col">Giới tính</th>
                         <th scope="col">Ngày sinh <i class="fa-solid fa-arrow-up"></i><i class="fa-solid fa-arrow-down"></i></th>
-                        <th scope="col">Thao tác</th>
+                        <th scope="col" style={{ position: "sticky", zIndex: '1', right: '0' }}>Thao tác</th>
 
                       </tr>
                     </thead>
@@ -564,19 +564,19 @@ const Client = () => {
                           <td>
                             {item.fullname}
                           </td>
-
                           <td>{item.email}</td>
                           <td>{item.phoneNumber}</td>
                           <td className="text-center">{item.gender ? "Nữ" : "Nam"}</td>
                           <td>{item.dateOfBirth}</td>
-                          <td>
+                          <td style={{ position: "sticky", zIndex: '1', right: '0', backgroundColor: '#fff' }}>
                             <Button color="info" size="sm" onClick={() => handleRowClick(item.id)} disabled={item.status === 1 ? true : false}>
                               <FaEdit />
                             </Button>
                             <Button color="danger" size="sm" onClick={() => onClickDeleteClient(item.id)} disabled={item.status === 1 ? true : false}>
                               <FaTrash />
                             </Button>
-                            <Button color="danger" size="sm" onClick={() => onClickListAdress(item.id)} disabled={item.status === 1 ? true : false}>
+                            <Button color="danger" size="sm"
+                             onClick={() => onClickListAdress(item.id)} disabled={item.status === 1 ? true : false}>
                               <i class="fa-regular fa-address-book"></i>
                             </Button>
                             {item.status === 0 &&
@@ -644,8 +644,6 @@ const Client = () => {
                 </CardBody>
               </Card>
             </div>
-
-
 
           </Col>
         </Row>
@@ -776,13 +774,13 @@ const Client = () => {
         </ModalBody>
         <ModalFooter>
           <div className="text-center">
-            <Button color="danger" onClick={(e) => onAddClient(e)}>
+            <Button color="danger" size="sm" onClick={(e) => onAddClient(e)}>
               Thêm
             </Button>{' '}
-            <Button color="primary" onClick={resetClient}>
+            <Button color="primary" size='sm' onClick={resetClient}>
               Reset
             </Button>
-            <Button color="danger" onClick={toggle} >
+            <Button color="danger" size="sm" onClick={toggle} >
               Close
             </Button>
           </div>
@@ -803,14 +801,14 @@ const Client = () => {
           <Form>
             <div className="pl-lg-4">
               <Row>
-                <Col lg="6" className="d-flex justify-content-center align-items-center" >
+                {/* <Col lg="6" className="d-flex justify-content-center align-items-center" >
                   <div style={{ filter: 'grayscale(100%)', border: '1px solid #ccc', width: '140px', height: '190px' }}>
                     <img src={`https://s3-ap-southeast-1.amazonaws.com/imageshoestore`} alt="Ảnh mô tả" width={140} height={190} />
                   </div>
-                </Col>
+                </Col> */}
                 <Col>
                   <Row>
-                    <Col lg="12">
+                    <Col lg="6">
                       <FormGroup>
                         <label className="form-control-label">
                           Số điện thoại
@@ -824,7 +822,7 @@ const Client = () => {
                         />
                       </FormGroup>
                     </Col>
-                    <Col lg="12">
+                    <Col lg="6">
                       <FormGroup>
                         <label className="form-control-label">
                           Email
@@ -921,10 +919,10 @@ const Client = () => {
         </ModalBody>
         <ModalFooter>
           <div className="text-center">
-            <Button color="danger" onClick={(e) => onUpdateClient(e)}>
+            <Button color="danger" size="sm" onClick={(e) => onUpdateClient(e)}>
               Sửa
             </Button>{' '}
-            <Button color="danger" onClick={toggleEdit} >
+            <Button color="danger" size="sm" onClick={toggleEdit} >
               Close
             </Button>
           </div>
