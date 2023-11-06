@@ -73,7 +73,7 @@ const SaleBills = () => {
     const statusMapping = {
         0: { color: 'danger', label: 'Kích hoạt' },
         1: { color: 'success', label: 'Chờ kích hoạt' },
-        2: { color: 'warning', label: 'Đã hủy' },
+        2: { color: 'warning', label: 'Ngừng kích hoạt' },
     };
     //lọc
     const resetFilters = () => {
@@ -241,16 +241,26 @@ const SaleBills = () => {
     };
 
      //Update status
-     const 
-     lock = async (id) => {
+     const lock = async (id) => {
         await axiosInstance.patch(`/vouchers/stopVoucher/${id}`);
         toast.success("Cập nhật thành công");
         fetchData();
     };
+
     const openlock = async (id) => {
-        await axiosInstance.patch(`/vouchers/setVoucherRun/${id}`);
-        toast.success("Cập nhật thành công");
-        fetchData();
+        try {
+            const selectedDiscount = discounts.find(discount => discount.id === id);
+    
+            if (new Date(selectedDiscount.endDate) >= new Date(selectedDiscount.startDate)) {
+                await axiosInstance.patch(`/vouchers/setVoucherRun/${id}`);
+                toast.success("Cập nhật thành công");
+                fetchData();
+            } else {
+                toast.error("Ngày kết thúc phải >= ngày bắt đầu");
+            }
+        } catch (error) {
+            console.error("Lỗi khi cập nhật trạng thái:", error);
+        }
     };
 
     //delete

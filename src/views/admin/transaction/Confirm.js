@@ -4,10 +4,10 @@ import { format, parseISO } from 'date-fns';
 import { vi } from 'date-fns/locale';
 
 // reactstrap components
-import { Row, Col, Button, Table, Input, FormGroup, InputGroup, InputGroupAddon, InputGroupText, Modal, ModalBody, ModalFooter, ModalHeader, Label, Form } from "reactstrap";
+import { Badge, Row, Col, Button, Table, Input, FormGroup, InputGroup, InputGroupAddon, InputGroupText, Modal, ModalBody, ModalFooter, ModalHeader, Label, Form } from "reactstrap";
 import { FaRegEdit, FaSearch, FaMinus, FaPlus, FaTrash } from 'react-icons/fa';
 
-const Confirm = () => {
+const Confirm = ({selectedIdss, setIsProductDeleteds }) => {
     const [modal, setModal] = useState(false);
     const [confirm, setConfirm] = useState([]);
     const [selectedOrderId, setSelectedOrderId] = useState(null);
@@ -15,6 +15,7 @@ const Confirm = () => {
     const [deliveryData, setDeliveryData] = useState({});
     const [selectedIds, setSelectedIds] = useState([]);
     const [isProductDeleted, setIsProductDeleted] = useState(false);
+    const [totalProductPrice, setTotalProductPrice] = useState(0);
 
 
     const toggle = () => setModal(!modal);
@@ -30,6 +31,7 @@ const Confirm = () => {
                 }
             });
             setConfirm(response.content);
+            
         } catch (error) {
             console.error("Lỗi khi lấy dữ liệu:", error);
         }
@@ -37,25 +39,76 @@ const Confirm = () => {
 
     useEffect(() => {
         fetchData();
-    }, []);
+    }, [selectedIdss]);
 
-    const edit = async (id) => {
+
+    const [formData, setFormData] = useState({
+        id: null,
+        code: "",
+        totalMoney: "",
+        paymentMethod: "",
+        deliveryCost: "",
+        percentVoucher: "",
+        priceVoucher: "",
+        percentPeriod: "",
+    });
+
+
+    const handleRowClick = async (id, confirm) => {
         setSelectedOrderId(id);
         try {
-            const [orderResponse, deliveryResponse, confirmResponse] = await Promise.all([
+            const [orderResponse, deliveryResponse] = await Promise.all([
                 axiosInstance.get(`/order/admin/cart/get-all/${id}`),
                 axiosInstance.get(`/order/admin/delivery/${id}`),
-                // axiosInstance.get(`/order/admin/${id}`)
             ]);
+
+            const productPrice = orderResponse.reduce((total, product) => {
+                return total + product.totalPrice;
+            }, 0);
+
+            let calculatedTotalMoney;
+            if (confirm.percentPeriod !== null) {
+                // Nếu percentPeriod không null, tính giảm giá theo đợt và áp dụng voucher (nếu có)
+                if (confirm.priceVoucher !== null) {
+                    calculatedTotalMoney = productPrice - (productPrice * confirm.percentPeriod / 100) - confirm.priceVoucher + deliveryResponse.data.deliveryCost;
+                } else if (confirm.percentVoucher !== null) {
+                    calculatedTotalMoney = productPrice - (productPrice * confirm.percentPeriod / 100 + confirm.percentVoucher / 100) - deliveryResponse.data.deliveryCost;
+                } else {
+                    // Nếu không có voucher, chỉ áp dụng giảm giá theo đợt và phí vận chuyển
+                    calculatedTotalMoney = productPrice - (productPrice * confirm.percentPeriod / 100) + deliveryResponse.data.deliveryCost;
+                }
+            } else {
+                // Nếu percentPeriod là null, không áp dụng giảm giá theo đợt, chỉ áp dụng voucher (nếu có) và phí vận chuyển
+                if (confirm.priceVoucher !== null) {
+                    calculatedTotalMoney = productPrice - confirm.priceVoucher + deliveryResponse.data.deliveryCost;
+                } else if (confirm.percentVoucher !== null) {
+                    calculatedTotalMoney = productPrice - (productPrice * confirm.percentVoucher / 100) + deliveryResponse.data.deliveryCost;
+                } else {
+                    // Nếu không có voucher, chỉ tính phí vận chuyển
+                    calculatedTotalMoney = productPrice + deliveryResponse.data.deliveryCost;
+                }
+            }
+
+            setTotalProductPrice(productPrice);
+            setFormData({
+                id: confirm.id,
+                code: confirm.code,
+                totalMoney: calculatedTotalMoney,
+                paymentMethod: confirm.paymentMethod,
+                deliveryCost: confirm.deliveryCost,
+                percentVoucher: confirm.percentVoucher,
+                priceVoucher: confirm.priceVoucher,
+                percentPeriod: confirm.percentPeriod,
+            });
             setOrderData(orderResponse);
             setDeliveryData(deliveryResponse.data);
-            // setConfirm(confirmResponse.data);
 
             setModal(true);
         } catch (error) {
             console.error("Lỗi khi lấy dữ liệu hóa đơn:", error);
         }
     };
+
 
     const handleCheckboxChange = (id) => {
         if (selectedIds.includes(id)) {
@@ -65,10 +118,22 @@ const Confirm = () => {
         }
     };
 
+    //updateStatus
     const handleConfirm = async () => {
         try {
             await Promise.all(selectedIds.map(async (id) => {
-                await axiosInstance.put(`/order/admin/delivery/change-status/${id}?status=1`);
+                await axiosInstance.put(`/order/admin/update-status/${id}?status=1`);
+            }));
+            fetchData();
+            setIsProductDeleteds(true);
+        } catch (error) {
+            console.error("Lỗi khi cập nhật trạng thái hóa đơn:", error);
+        }
+    };
+    const deleted = async () => {
+        try {
+            await Promise.all(selectedIds.map(async (id) => {
+                await axiosInstance.put(`/order/admin/update-status/${id}?status=-1`);
             }));
             fetchData();
         } catch (error) {
@@ -76,6 +141,26 @@ const Confirm = () => {
         }
     };
 
+    const handleUpdateDelivery = async () => {
+        try {
+            await axiosInstance.put('/order/admin/delivery/update', {
+                id: deliveryData.id, 
+                deliveryAddress: deliveryData.deliveryAddress,
+                recipientPhone: deliveryData.recipientPhone,
+                recipientName: deliveryData.recipientName,
+                deliveryCost: deliveryData.deliveryCost,
+                idOrder: deliveryData.idOrder
+            });
+
+            setModal(false);
+        } catch (error) {
+            // Xử lý lỗi nếu có
+            console.error('Lỗi khi cập nhật:', error);
+        }
+    };
+
+
+    //deleteProduct
     const handleDeleteProduct = async (id) => {
         try {
             await axiosInstance.delete(`/order/admin/cart/delete/${id}`);
@@ -86,13 +171,29 @@ const Confirm = () => {
             console.error("Lỗi khi xóa sản phẩm:", error);
         }
     };
+
+    //updateProduct
+    const updateProductQuantity = async (productId, changeAmount) => {
+        const newQuantity = changeAmount > 0 ? 1 : -1;
+        try {
+            await axiosInstance.put('/order/admin/cart/update', {
+                id: productId,
+                quantity: newQuantity
+            });
+            handleRowClick(selectedOrderId, confirm);
+
+        } catch (error) {
+            console.error('Lỗi khi cập nhật số lượng sản phẩm:', error);
+        }
+    };
     
     useEffect(() => {
         if (isProductDeleted) {
             setModal(true);
             setIsProductDeleted(false);
+            handleRowClick(selectedOrderId, confirm);
         }
-    }, [isProductDeleted]);    
+    }, [isProductDeleted]);
 
     return (
         <>
@@ -138,12 +239,17 @@ const Confirm = () => {
                                             </FormGroup>
                                         </td>
                                         <td>{confirm.code}</td>
-                                        <td>{confirm.nameUser}</td>
-                                        <td></td>
-                                        <td>{confirm.paymentMethods === 0 ? "Tiền mặt" : "Chuyển khoản"}</td>
+                                        <td>{confirm.createdBy}</td>
+                                        <td className="text-right">{confirm.totalMoney.toLocaleString("vi-VN")} VND</td>
+                                        <td className="text-center">
+                                            <Badge color={confirm.paymentMethod === 1 ? "success" : confirm.paymentMethod === 2 ? "primary" : "secondary"}>
+                                                {confirm.paymentMethod === 1 ? "COD" : confirm.paymentMethod === 2 ? "Ví điện tử" : "Không xác định"}
+                                            </Badge>
+                                        </td>
+
                                         <td>{format(new Date(confirm.createdTime), 'dd-MM-yyyy HH:mm', { locale: vi })}</td>
                                         <td className="text-center">
-                                            <Button color="link" size="sm" onClick={() => edit(confirm.id)}><FaRegEdit /></Button>
+                                            <Button color="link" size="sm" onClick={() => handleRowClick(confirm.id, confirm)}><FaRegEdit /></Button>
                                         </td>
                                     </tr>
                                 ))}
@@ -151,7 +257,7 @@ const Confirm = () => {
                     </Table>
 
                     <Row className="mt-3 mr-2 justify-content-end">
-                        <Button color="danger" outline size="sm">
+                        <Button color="danger" outline size="sm" onClick={deleted}>
                             Hủy
                         </Button>
                         <Button color="primary" outline size="sm" onClick={handleConfirm}>
@@ -165,7 +271,7 @@ const Confirm = () => {
                         toggle={toggle}
                         backdrop={'static'}
                         keyboard={false}
-                        style={{ maxWidth: '1200px' }}
+                        style={{ maxWidth: '1100px' }}
                     >
                         <ModalHeader toggle={toggle}>
                             <h3 className="heading-small text-muted mb-0">Chi tiết hóa đơn</h3>
@@ -182,8 +288,8 @@ const Confirm = () => {
                                             <Input
                                                 size="sm"
                                                 type="text"
-                                                value={deliveryData.code}
-                                                disabled
+                                                value={formData.code}
+
                                             />
                                         </FormGroup>
                                         <Row >
@@ -196,6 +302,7 @@ const Confirm = () => {
                                                         size="sm"
                                                         type="text"
                                                         value={deliveryData.recipientName}
+                                                        onChange={(e) => setDeliveryData({ ...deliveryData, recipientName: e.target.value })}
                                                     />
                                                 </FormGroup>
                                             </Col>
@@ -208,6 +315,7 @@ const Confirm = () => {
                                                         size="sm"
                                                         type="tel"
                                                         value={deliveryData.recipientPhone}
+                                                        onChange={(e) => setDeliveryData({ ...deliveryData, recipientPhone: e.target.value })}
                                                     />
                                                 </FormGroup>
                                             </Col>
@@ -221,6 +329,7 @@ const Confirm = () => {
                                                 rows="2"
                                                 type="textarea"
                                                 value={deliveryData.deliveryAddress}
+                                                onChange={(e) => setDeliveryData({ ...deliveryData, deliveryAddress: e.target.value })}
                                             />
                                         </FormGroup>
                                         <FormGroup>
@@ -231,12 +340,14 @@ const Confirm = () => {
                                                 <Input
                                                     size="sm"
                                                     type="number"
+                                                    value={totalProductPrice}
                                                 />
                                                 <InputGroupAddon addonType="append">
                                                     <InputGroupText>VNĐ</InputGroupText>
                                                 </InputGroupAddon>
                                             </InputGroup>
                                         </FormGroup>
+
 
                                         <Row >
                                             <Col md={6}>
@@ -248,6 +359,7 @@ const Confirm = () => {
                                                         <Input
                                                             size="sm"
                                                             type="number"
+                                                            value={formData.percentPeriod}
                                                         />
                                                         <InputGroupAddon addonType="append">
                                                             <InputGroupText>%</InputGroupText>
@@ -265,13 +377,13 @@ const Confirm = () => {
                                                         <Input
                                                             size="sm"
                                                             type="number"
+                                                            value={formData.percentVoucher || formData.priceVoucher || ""}
                                                         />
                                                         <InputGroupAddon addonType="append">
-                                                            <InputGroupText>%</InputGroupText>
+                                                            <InputGroupText>{formData.percentVoucher ? "%" : "VNĐ"}</InputGroupText>
                                                         </InputGroupAddon>
                                                     </InputGroup>
                                                 </FormGroup>
-
                                             </Col>
                                         </Row>
 
@@ -312,6 +424,9 @@ const Confirm = () => {
                                                 <Input
                                                     size="sm"
                                                     type="number"
+                                                    value={formData.totalMoney}
+                                                    onChange={(e) => setFormData({ ...formData, totalMoney: e.target.value })}
+                                                    
                                                 />
                                                 <InputGroupAddon addonType="append">
                                                     <InputGroupText>VNĐ</InputGroupText>
@@ -319,15 +434,16 @@ const Confirm = () => {
                                             </InputGroup>
                                         </FormGroup>
 
-                                        <FormGroup>
-                                            <Label>
-                                                Phương thức thanh toán
+                                        <FormGroup className="d-flex align-items-center mb-3">
+                                            <Label className="mr-2 mb-0">
+                                                Phương thức thanh toán:
                                             </Label>
-                                            <Input
-                                                size="sm"
-                                                type="text"
-                                            />
+                                            <span className="border-0" style={{ fontWeight: "bold" }}>
+                                                {formData.paymentMethod === 1 ? "Thanh toán sau khi nhận hàng" : formData.paymentMethod === 2 ? "Ví điện tử" : ""}
+                                            </span>
                                         </FormGroup>
+
+
                                     </Form>
                                 </Col>
 
@@ -351,12 +467,17 @@ const Confirm = () => {
                                                         <td className="text-center">{index + 1}</td>
                                                         <td>{product.shoesName}</td>
                                                         <td className="text-center">
-                                                            <button className="mr-3" style={{ border: "none", background: "none" }}><FaMinus fontSize={8} /></button>
+                                                            <button className="mr-3" style={{ border: "none", background: "none" }} onClick={() => updateProductQuantity(product.id, -1)}>
+                                                                <FaMinus fontSize={8} />
+                                                            </button>
                                                             {product.quantity}
-                                                            <button className="ml-3" style={{ border: "none", background: "none" }}><FaPlus fontSize={8} /></button>
+                                                            <button className="ml-3" style={{ border: "none", background: "none" }} onClick={() => updateProductQuantity(product.id, 1)}>
+                                                                <FaPlus fontSize={8} />
+                                                            </button>
+
                                                         </td>
+                                                        <td className="text-right">{product.discountPrice}</td>
                                                         <td className="text-right">{product.totalPrice}</td>
-                                                        <td className="text-right">{product.quantity * product.totalPrice}</td>
                                                         <td className="text-right">
                                                             <Button className="pt-0" color="link" size="sm" onClick={() => handleDeleteProduct(product.id)}
                                                             ><FaTrash />
@@ -374,7 +495,7 @@ const Confirm = () => {
                         </ModalBody >
                         <ModalFooter>
                             <div className="text-center">
-                                <Button color="primary" outline size="sm">
+                                <Button color="primary" outline size="sm" onClick={handleUpdateDelivery}>
                                     Cập nhật
                                 </Button>
                                 <Button color="danger" outline onClick={toggle} size="sm">

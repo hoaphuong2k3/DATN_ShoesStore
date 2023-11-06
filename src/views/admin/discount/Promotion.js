@@ -238,10 +238,21 @@ const Promotion = () => {
         fetchData();
     };
     const openlock = async (id) => {
-        await axiosInstance.patch(`/admin/discount-period/restoreDiscountPeriod/${id}`);
-        toast.success("Cập nhật thành công");
-        fetchData();
+        try {
+            const selectedDiscount = discounts.find(discount => discount.id === id);
+    
+            if (new Date(selectedDiscount.endDate) >= new Date(selectedDiscount.startDate)) {
+                await axiosInstance.patch(`/admin/discount-period/setDiscountPeriodRun/${id}`);
+                toast.success("Cập nhật thành công");
+                fetchData();
+            } else {
+                toast.error("Không hợp lệ");
+            }
+        } catch (error) {
+            console.error("Lỗi khi cập nhật trạng thái:", error);
+        }
     };
+    
     //delete Promotion
     const deleteDiscount = (id) => {
         if (window.confirm("Bạn có chắc chắn muốn xóa khuyến mại này không?")) {
@@ -576,7 +587,7 @@ const Promotion = () => {
                                                 Xóa tất cả
                                             </Button>
                                             <Button
-                                                color="primary" outline
+                                                color="primary" 
                                                 onClick={handleModal}
                                                 size="sm"
                                             >
@@ -641,7 +652,7 @@ const Promotion = () => {
                                                         <td style={{ textAlign: "right" }}>
                                                             {discount.typePeriod === 0 ? `${discount.salePercent}%` : ""}
                                                         </td>
-                                                        <td>{discount.giftId}</td>
+                                                        <td>{discount.nameImage}</td>
                                                         <td>{discount.startDate}</td>
                                                         <td>{discount.endDate}</td>
 
@@ -650,7 +661,7 @@ const Promotion = () => {
                                                                 <Button color="link" size="sm" onClick={() => lock(discount.id)} ><FaLockOpen /></Button>
                                                             }
                                                             {(discount.status === 1 || discount.status === 2) &&
-                                                                <Button color="link" size="sm"  ><FaLock /></Button>
+                                                                <Button color="link" size="sm"  onClick={() => openlock(discount.id)} ><FaLock /></Button>
                                                             }
                                                             <Button color="link" size="sm" onClick={() => handleRowClick(discount)}><FaEdit /></Button>
                                                             <Button color="link" size="sm" onClick={() => deleteDiscount(discount.id)}> <FaTrash /></Button>
