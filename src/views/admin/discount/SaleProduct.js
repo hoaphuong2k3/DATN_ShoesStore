@@ -326,10 +326,21 @@ const SaleProduct = () => {
         toast.success("Cập nhật thành công");
         fetchData();
     };
+
     const openlock = async (id) => {
-        await axiosInstance.patch(`/promos/setPromoRun/${id}`);
-        toast.success("Cập nhật thành công");
-        fetchData();
+        try {
+            const selectedDiscount = discounts.find(discount => discount.id === id);
+    
+            if (new Date(selectedDiscount.endDate) >= new Date(selectedDiscount.startDate)) {
+                await axiosInstance.patch(`/promos/setPromoRun/${id}`);
+                toast.success("Cập nhật thành công");
+                fetchData();
+            } else {
+                toast.error("Ngày kết thúc phải >= ngày bắt đầu");
+            }
+        } catch (error) {
+            console.error("Lỗi khi cập nhật trạng thái:", error);
+        }
     };
 
     //delete
