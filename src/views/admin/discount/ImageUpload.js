@@ -47,6 +47,30 @@ const ImageUpload = () => {
       <input type="file" id="file-input" onChange={handleFileChange} style={{ display: 'none' }} />
     </div>
   );
+
+  return (
+    <>
+      <Upload
+        action="https://run.mocky.io/v3/435e224c-44fb-4773-9faf-380c5e6a2188"
+        listType="picture-circle"
+        fileList={fileList}
+        onPreview={handlePreview}
+        onChange={handleChange}
+        
+      >
+        {fileList.length >= 1 ? null : uploadButton}
+      </Upload>
+      <Modal visible={previewOpen} title={previewTitle} footer={null} onCancel={handleCancel}>
+        <img
+          alt="example"
+          style={{
+            width: '100%',
+          }}
+          src={previewImage}
+        />
+      </Modal>
+    </>
+  );
 };
 
 export default ImageUpload;

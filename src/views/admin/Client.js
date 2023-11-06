@@ -5,10 +5,11 @@ import { Card, CardHeader, CardBody, Container, Row, Col, Form, FormGroup, Input
 import Select from "react-select";
 import ReactPaginate from 'react-paginate';
 import { getAllClient, postNewClient, detailClient, updateClient, deleteClient } from "services/ClientService";
-import { FaEdit, FaTrash, FaSearch, FaFileAlt } from 'react-icons/fa';
+import { FaEdit, FaTrash, FaSearch, FaFileAlt, FaCamera } from 'react-icons/fa';
 import Header from "components/Headers/Header.js";
 import Switch from 'react-input-switch';
 import { toast } from 'react-toastify';
+import axiosInstance from "services/custommize-axios";
 
 
 const Client = () => {
@@ -151,6 +152,7 @@ const Client = () => {
     }
   }
   // End hàm add client
+
   //Bắt đầu hàm update
   const [modalEdit, setModalEdit] = useState(false);
   const toggleEdit = () => setModalEdit(!modalEdit);
@@ -164,6 +166,7 @@ const Client = () => {
     gender: false,
     dateOfBirth: "",
   });
+
   const resetEditClient = () => {
     setEditClient({
       id: null,
@@ -180,7 +183,7 @@ const Client = () => {
     const response = await detailClient(id);
     setEditClient({
       id: id,
-      avatar: response.data.avatar,
+      // avatar: response.data.avatar,
       fullname: response.data.fullname,
       phoneNumber: response.data.phoneNumber,
       email: response.data.email,
@@ -188,9 +191,72 @@ const Client = () => {
       gender: response.data.gender,
       dateOfBirth: response.data.dateOfBirth,
     });
+    if (response.data.avatar) {
+      // Hiển thị hình ảnh
+      const blob = await fetch(`data:image/jpeg;base64,${response.data.avatar}`).then((res) => res.blob());
+      const file = new File([blob], "image.jpg", { type: "image/jpeg" });
+      setFile(file);
+    }
     console.log(editClient);
     toggleEdit();
   };
+  // upload image
+  const [file, setFile] = useState(null);
+
+  const handleFileChange = (e) => {
+    const selectedFile = e.target.files[0];
+    if (selectedFile) {
+      setFile(selectedFile);
+    }
+  };
+  const imageUrl = file ? URL.createObjectURL(file) : null;
+  const imageSize = '110px';
+  const imageStyle = {
+    width: imageSize,
+    height: imageSize,
+  };
+  const buttonStyle = {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    color: '#000',
+    padding: '8px',
+    cursor: 'pointer',
+    border: '1px dashed gray',
+    width: imageSize,
+    height: imageSize,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  };
+  const changeAvatar = async () => {
+
+    try {
+      const image = new FormData();
+      if (file) {
+        image.append('file', file);
+      }
+
+      if (file) {
+        await axiosInstance.put(`/user/${editClient.id}/multipart-file`, image, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        });
+      }
+      fetchData();
+    } catch (error) {
+      console.error('Failed to change avatar', error);
+      // Xử lý lỗi (nếu cần)
+    }
+  };
+  const AvatarReset = () => {
+    setFile(null);
+  };
+
+
+
   const onInputChangeDataUpdate = (e) => {
     setEditClient({ ...editClient, [e.target.name]: e.target.value });
   };
@@ -199,9 +265,11 @@ const Client = () => {
     console.log(client);
     try {
       const response = await updateClient(editClient);
+      changeAvatar()
       getAll();
       resetEditClient();
       toggleEdit();
+      toast.success("Cập nhật thành công!");
     } catch (error) {
       let errorMessage = "Lỗi từ máy chủ";
       if (error.response && error.response.data && error.response.data.message) {
@@ -360,17 +428,17 @@ const Client = () => {
 
   return (
     <>
-      <Header />
+      {/* <Header /> */}
       {/* Page content */}
-      <Container className="mt--7" fluid>
+      <Container className="pt-5 pt-md-7" fluid>
         <Row>
           <Col>
             <div className="col">
               <Card className="shadow">
-                <CardHeader className="bg-transparent m-2">
+                <CardHeader className="bg-transparent">
                   <Row className="align-items-center">
                     <div className="col">
-                      <h3 className="mb-0">Khách Hàng</h3>
+                      <h2 className="heading-small text-dark mb-0">Khách Hàng</h2>
                     </div>
                   </Row>
                 </CardHeader>
@@ -380,7 +448,7 @@ const Client = () => {
                     <h3 className="heading-small text-black mb-0 ml-2">Tìm kiếm</h3>
                   </Row>
                   <hr className="my-4" />
-                  <Form className="search">
+                  <Form>
                     <div className="pl-lg-4">
                       <Row>
                         <Col lg="6">
@@ -531,12 +599,13 @@ const Client = () => {
                         </th>
                         <th scope="col">STT</th>
                         <th scope="col">Trạng thái</th>
+                        <th scope="col">Ảnh</th>
                         <th scope="col">Họ tên <i class="fa-solid fa-arrow-up"></i><i class="fa-solid fa-arrow-down"></i></th>
                         <th scope="col">Email <i class="fa-solid fa-arrow-up"></i><i class="fa-solid fa-arrow-down"></i></th>
                         <th scope="col">Số điện thoại <i class="fa-solid fa-arrow-up"></i><i class="fa-solid fa-arrow-down"></i></th>
                         <th scope="col">Giới tính</th>
                         <th scope="col">Ngày sinh <i class="fa-solid fa-arrow-up"></i><i class="fa-solid fa-arrow-down"></i></th>
-                        <th scope="col">Thao tác</th>
+                        <th scope="col" style={{ position: "sticky", zIndex: '1', right: '0' }}>Thao tác</th>
 
                       </tr>
                     </thead>
@@ -562,21 +631,26 @@ const Client = () => {
                             </Badge>
                           </td>
                           <td>
+                            <span className="avatar avatar-sm rounded-circle">
+                            <img src={`data:image/jpeg;base64,${item.avatar}`} alt="" />
+                          </span>
+                          </td>
+                          <td>
                             {item.fullname}
                           </td>
-
                           <td>{item.email}</td>
                           <td>{item.phoneNumber}</td>
                           <td className="text-center">{item.gender ? "Nữ" : "Nam"}</td>
                           <td>{item.dateOfBirth}</td>
-                          <td>
+                          <td style={{ position: "sticky", zIndex: '1', right: '0', backgroundColor: '#fff' }}>
                             <Button color="info" size="sm" onClick={() => handleRowClick(item.id)} disabled={item.status === 1 ? true : false}>
                               <FaEdit />
                             </Button>
                             <Button color="danger" size="sm" onClick={() => onClickDeleteClient(item.id)} disabled={item.status === 1 ? true : false}>
                               <FaTrash />
                             </Button>
-                            <Button color="danger" size="sm" onClick={() => onClickListAdress(item.id)} disabled={item.status === 1 ? true : false}>
+                            <Button color="danger" size="sm"
+                              onClick={() => onClickListAdress(item.id)} disabled={item.status === 1 ? true : false}>
                               <i class="fa-regular fa-address-book"></i>
                             </Button>
                             {item.status === 0 &&
@@ -644,8 +718,6 @@ const Client = () => {
                 </CardBody>
               </Card>
             </div>
-
-
 
           </Col>
         </Row>
@@ -776,13 +848,13 @@ const Client = () => {
         </ModalBody>
         <ModalFooter>
           <div className="text-center">
-            <Button color="danger" onClick={(e) => onAddClient(e)}>
+            <Button color="danger" size="sm" onClick={(e) => onAddClient(e)}>
               Thêm
             </Button>{' '}
-            <Button color="primary" onClick={resetClient}>
+            <Button color="primary" size='sm' onClick={resetClient}>
               Reset
             </Button>
-            <Button color="danger" onClick={toggle} >
+            <Button color="danger" size="sm" onClick={toggle} >
               Close
             </Button>
           </div>
@@ -803,14 +875,26 @@ const Client = () => {
           <Form>
             <div className="pl-lg-4">
               <Row>
-                <Col lg="6" className="d-flex justify-content-center align-items-center" >
-                  <div style={{ filter: 'grayscale(100%)', border: '1px solid #ccc', width: '140px', height: '190px' }}>
-                    <img src={`https://s3-ap-southeast-1.amazonaws.com/imageshoestore`} alt="Ảnh mô tả" width={140} height={190} />
+                <Col lg="4" className="d-flex justify-content-center align-items-center" >
+                  <div
+                    style={{ position: 'relative', width: imageSize, height: imageSize }}
+                  >
+                    {imageUrl && <img alt="preview" src={imageUrl} style={imageStyle} />}
+                    <Label htmlFor="file-input" style={buttonStyle}>
+                      <FaCamera size={15} />
+                      {/* <FaTrash size={15} className="ml-2" onClick={AvatarReset} /> */}
+                    </Label>
+                    <Input
+                      type="file"
+                      id="file-input"
+                      style={{ display: 'none' }}
+                      onChange={handleFileChange}
+                    />
                   </div>
                 </Col>
                 <Col>
                   <Row>
-                    <Col lg="12">
+                    <Col lg="6">
                       <FormGroup>
                         <label className="form-control-label">
                           Số điện thoại
@@ -824,7 +908,7 @@ const Client = () => {
                         />
                       </FormGroup>
                     </Col>
-                    <Col lg="12">
+                    <Col lg="6">
                       <FormGroup>
                         <label className="form-control-label">
                           Email
@@ -842,7 +926,7 @@ const Client = () => {
                 </Col>
               </Row>
               <Row>
-                <Col lg="6">
+                <Col lg="4">
                   <FormGroup>
                     <label className="form-control-label">
                       Tên đăng nhập
@@ -856,7 +940,7 @@ const Client = () => {
                     />
                   </FormGroup>
                 </Col>
-                <Col lg="6">
+                <Col lg="4">
                   <FormGroup>
                     <label className="form-control-label">
                       Giới tính
@@ -887,7 +971,7 @@ const Client = () => {
                     </div>
                   </FormGroup>
                 </Col>
-                <Col lg="6">
+                <Col lg="4">
                   <FormGroup>
                     <label className="form-control-label">
                       Họ tên
@@ -901,7 +985,7 @@ const Client = () => {
                     />
                   </FormGroup>
                 </Col>
-                <Col lg="6">
+                <Col lg="4">
                   <FormGroup>
                     <label className="form-control-label">
                       Ngày sinh
@@ -921,10 +1005,10 @@ const Client = () => {
         </ModalBody>
         <ModalFooter>
           <div className="text-center">
-            <Button color="danger" onClick={(e) => onUpdateClient(e)}>
+            <Button color="danger" size="sm" onClick={(e) => onUpdateClient(e)}>
               Sửa
             </Button>{' '}
-            <Button color="danger" onClick={toggleEdit} >
+            <Button color="danger" size="sm" onClick={toggleEdit} >
               Close
             </Button>
           </div>

@@ -1,6 +1,6 @@
 import axios from "axios";
 import React, { useState, useEffect } from "react";
-import { FaEdit, FaTrash, FaSearch, FaFileAlt } from 'react-icons/fa';
+import { FaEdit, FaTrash, FaSearch, FaFileAlt, FaCamera } from 'react-icons/fa';
 import ReactPaginate from "react-paginate";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -12,7 +12,7 @@ import Header from "components/Headers/Header.js";
 import Switch from 'react-input-switch';
 import {
   Row, Card, Col, Form, FormGroup,
-  Input, Button, Table, Badge, Modal, Container,
+  Input, Button, Table, Badge, Modal, Container, Label,
   ModalBody, ModalFooter, ModalHeader, CardBody, CardHeader, CardFooter
 } from "reactstrap";
 
@@ -32,9 +32,7 @@ const Staff = () => {
   const [totalPages, setTotalPages] = useState(0);
   // ADDRESS
   const [provinces, setProvinces] = useState([]);
-  const [selectedCity, setSelectedCity] = useState("");
-  const [selectedDistrict, setSelectedDistrict] = useState("");
-  const [selectedWard, setSelectedWard] = useState("");
+
 
 
   const [queryParams, setQueryParams] = useState({
@@ -47,7 +45,7 @@ const Staff = () => {
   });
 
 
-  //loads table
+  //load
   const fetchData = async () => {
     try {
       const provincesResponse = await axios.get("https://provinces.open-api.vn/api/?depth=3");
@@ -75,49 +73,6 @@ const Staff = () => {
     fetchData();
   }, [queryParams]);
 
-  const handleCityChange = (e) => {
-    const selectedCityName = e.target.value;
-    setSelectedCity(selectedCityName);
-    const selectedProvince = provinces.find((province) => province.name === selectedCityName);
-    const districts = selectedProvince.districts;
-    setFormData({
-      ...formData,
-      address: {
-        ...formData.address,
-        proviceCode: selectedProvince.code,
-        districtCode: "",
-        communeCode: "",
-      },
-    });
-  };
-
-  const handleDistrictChange = (e) => {
-    const selectedDistrict = e.target.value;
-    setSelectedDistrict(selectedDistrict);
-    const selectedProvince = provinces.find((province) => province.name === selectedCity);
-    const selectedDistrictObj = selectedProvince.districts.find((district) => district.name === selectedDistrict);
-    const wards = selectedDistrictObj.wards;
-    setFormData({
-      ...formData,
-      address: {
-        ...formData.address,
-        districtCode: selectedDistrictObj.code,
-        communeCode: "",
-      },
-    });
-  };
-
-  const handleWardChange = (e) => {
-    const selectedWard = e.target.value;
-    setSelectedWard(selectedWard);
-    setFormData({
-      ...formData,
-      address: {
-        ...formData.address,
-        communeCode: selectedWard,
-      },
-    });
-  };
 
   const handlePageChange = ({ selected }) => {
     setQueryParams(prevParams => ({ ...prevParams, page: selected }));
@@ -158,51 +113,11 @@ const Staff = () => {
     });
   };
 
-  //click on selected
-  const [formData, setFormData] = useState({
-    id: "",
-    username: "",
-    fullname: "",
-    gender: false,
-    dateOfBirth: "",
-    email: "",
-    phoneNumber: "",
-    address: {
-      proviceCode: "",
-      districtCode: "",
-      communeCode: "",
-      addressDetail: "",
-      isDeleted: true,
-    },
-    status: "",
-  });
-
-  const handleRowClick = (admin) => {
-    setFormData({
-      id: admin.id,
-      username: admin.username,
-      fullname: admin.fullname,
-      gender: admin.gender,
-      dateOfBirth: admin.dateOfBirth,
-      email: admin.email,
-      phoneNumber: admin.phoneNumber,
-      status: admin.status,
-      address: {
-        proviceCode: admin.proviceCode,
-        districtCode: admin.districtCode,
-        communeCode: admin.communeCode,
-        addressDetail: admin.addressDetail,
-        isDeleted: true,
-      },
-    });
-    setModal(true);
-  };
-
   //reset
   const resetForm = () => {
     setFormData({
-      id: null,
       username: "",
+      avatar: null,
       fullname: "",
       gender: false,
       dateOfBirth: "",
@@ -219,11 +134,60 @@ const Staff = () => {
     });
   };
 
+  //click on selected
+  const [formData, setFormData] = useState({
+    id: "",
+    username: "",
+    avatar: null,
+    fullname: "",
+    gender: false,
+    dateOfBirth: "",
+    email: "",
+    phoneNumber: "",
+    address: {
+      proviceCode: "",
+      districtCode: "",
+      communeCode: "",
+      addressDetail: "",
+      isDeleted: true,
+    },
+    status: "",
+  });
+
+  const handleRowClick = async (admin) => {
+    setFormData({
+      id: admin.id,
+      username: admin.username,
+      fullname: admin.fullname,
+      gender: admin.gender,
+      // avatar: admin.avatar,
+      dateOfBirth: admin.dateOfBirth,
+      email: admin.email,
+      phoneNumber: admin.phoneNumber,
+      status: admin.status,
+      address: {
+        proviceCode: admin.proviceCode,
+        districtCode: admin.districtCode,
+        communeCode: admin.communeCode,
+        addressDetail: admin.addressDetail,
+        isDeleted: true,
+      },
+    });
+    if (admin.avatar) {
+      // Hiển thị hình ảnh
+      const blob = await fetch(`data:image/jpeg;base64,${admin.avatar}`).then((res) => res.blob());
+      const file = new File([blob], "image.jpg", { type: "image/jpeg" });
+      setFile(file);
+    }
+    setModal(true);
+  };
+
   //Add
   const saveAdmin = async () => {
     try {
       if (formData.id) {
         await axiosInstance.put(`/staff/update`, formData);
+        changeAvatar();
         fetchData();
         toast.success("Cập nhật thành công!");
       } else {
@@ -251,7 +215,6 @@ const Staff = () => {
       setModal(false);
       resetForm();
     } catch (error) {
-      // Xử lý lỗi
       console.error("Error:", error);
       if (error.response) {
         console.error("Response data:", error.response.data);
@@ -261,6 +224,61 @@ const Staff = () => {
       }
     }
   };
+
+  // upload image
+  const [file, setFile] = useState(null);
+
+  const handleFileChange = (e) => {
+    const selectedFile = e.target.files[0];
+    if (selectedFile) {
+      setFile(selectedFile);
+    }
+  };
+  const imageUrl = file ? URL.createObjectURL(file) : null;
+  const imageSize = '110px';
+  const imageStyle = {
+    width: imageSize,
+    height: imageSize,
+  };
+  const buttonStyle = {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    color: '#000',
+    padding: '8px',
+    cursor: 'pointer',
+    border: '1px dashed gray',
+    width: imageSize,
+    height: imageSize,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  };
+  const changeAvatar = async () => {
+    try {
+      const image = new FormData();
+      if (file) {
+        image.append('file', file);
+      }
+
+      if (file) {
+        await axiosInstance.put(`/staff/${formData.id}/multipart-file`, image, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        });
+      }
+      fetchData();
+    } catch (error) {
+      console.error('Failed to change avatar', error);
+      // Xử lý lỗi (nếu cần)
+    }
+  };
+  const AvatarReset = () => {
+    setFile(null);
+  };
+
 
   //delete
   const deleteAdmin = (id) => {
@@ -336,18 +354,20 @@ const Staff = () => {
       return admin.status.toString() === selectedStatus;
     }
   });
+
+
   return (
     <>
-      <Header />
-      <Container className="mt--7" fluid>
+      {/* <Header /> */}
+      <Container className="pt-5 pt-md-7" fluid>
         <Row>
           <Col>
             <div className="col">
               <Card className="shadow">
-                <CardHeader className="bg-transparent m-2">
+                <CardHeader className="bg-transparent">
                   <Row className="align-items-center">
                     <div className="col">
-                      <h3 className="mb-0">Nhân Viên</h3>
+                      <h3 className="heading-small text-dark mb-0">Nhân Viên</h3>
                     </div>
                   </Row>
                 </CardHeader>
@@ -450,7 +470,7 @@ const Staff = () => {
                     </div>
                   </Form>
                   <Row className="mt-2">
-                    <Col lg="6" xl="4" >
+                    <Col lg="6" xl="6">
                       <span>
                         <Switch on="yes" off="no" value={value} onChange={setValue} />
                         <span className="mb-3">
@@ -459,6 +479,8 @@ const Staff = () => {
                           &nbsp;&nbsp;
                         </span>
                       </span>
+                    </Col>
+                    <Col lg="6" xl="6" className="d-flex justify-content-end">
                       <Button color="warning" size="sm" className="mt-3" onClick={resetFilters}>
                         Làm mới bộ lọc
                       </Button>
@@ -482,12 +504,12 @@ const Staff = () => {
 
                       {/* filter status */}
                       <Col>
-                        <Input type="select" name="status" style={{ width: "150px" }} size="sm" 
-                        value={selectedStatus} 
-                        onChange={(e) => {
-                          const value = e.target.value;
-                          setSelectedStatus(value === '' ? '' : value);
-                        }}>
+                        <Input type="select" name="status" style={{ width: "150px" }} size="sm"
+                          value={selectedStatus}
+                          onChange={(e) => {
+                            const value = e.target.value;
+                            setSelectedStatus(value === '' ? '' : value);
+                          }}>
                           <option value="">Tất cả</option>
                           <option value="0">Ngừng hoạt động</option>
                           <option value="1">Đang hoạt động</option>
@@ -518,6 +540,7 @@ const Staff = () => {
                         </th>
                         <th scope="col">STT</th>
                         <th scope="col">Trạng thái</th>
+                        <th scope="col">Ảnh</th>
                         <th scope="col">Họ tên</th>
                         <th scope="col">Ngày sinh</th>
                         <th scope="col">Giới tính</th>
@@ -546,6 +569,11 @@ const Staff = () => {
                                 {statusMapping[admin.status]?.label || statusMapping.default.label}
                               </Badge>
                             </td>
+                            <td>
+                              <span className="avatar avatar-sm rounded-circle">
+                                <img src={`data:image/jpeg;base64,${admin.avatar}`} alt="" />
+                              </span>
+                            </td>
                             <td>{admin.fullname}</td>
                             <td>{admin.dateOfBirth}</td>
                             <td>{admin.gender ? "Nữ" : "Nam"}</td>
@@ -554,8 +582,8 @@ const Staff = () => {
                             <td>{admin.addressDetail}, {admin.communeCode}, {admin.districtCode}, {admin.proviceCode} </td>
 
                             <td style={{ position: "sticky", zIndex: '1', right: '0', backgroundColor: '#fff' }}>
-                              <Button color="info" size="sm" onClick={() => handleRowClick(admin)} disabled={false}><FaEdit /></Button>
-                              <Button color="danger" size="sm" onClick={() => deleteAdmin(admin.id)}><FaTrash /></Button>
+                              <Button color="info" size="sm" onClick={() => handleRowClick(admin)}><FaEdit /></Button>
+                              <Button color="danger" size="sm" onClick={() => deleteAdmin(admin.id)} ><FaTrash /></Button>
                               {admin.status === 0 &&
                                 <Button color="warning" size="sm" onClick={() => updateStatus(admin.id, 1)}>
                                   <i class="fa-solid fa-lock-open fa-flip-horizontal"></i>
@@ -639,24 +667,51 @@ const Staff = () => {
                 <Form>
                   <div className="pl-lg-4">
                     <Row>
-                      <Col lg="4">
-                        <FormGroup>
-                          <label
-                            className="form-control-label"
-                            htmlFor="username"
-                          >
-                            Tên tài khoản:
-                          </label>
-                          <Input
-                            className="form-control-alternative"
-                            id="username"
-                            type="text"
-                            value={formData.username}
-                            onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-                            disabled={formData.id ? true : false}
-                          />
-                        </FormGroup>
-                      </Col>
+                      {
+                        !formData.id && (
+                          <>
+                            <Col lg="4">
+                              <FormGroup>
+                                <label className="form-control-label" htmlFor="username">
+                                  Tên tài khoản:
+                                </label>
+                                <Input
+                                  className="form-control-alternative"
+                                  id="username"
+                                  type="text"
+                                  value={formData.username}
+                                  onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+                                />
+                              </FormGroup>
+                            </Col>
+                          </>
+                        )
+                      }
+                      {
+                        formData.id && (
+                          <>
+                            <Col lg="4" className="d-flex justify-content-center" >
+                              <div
+                                style={{ position: 'relative', width: imageSize, height: imageSize }}
+                              >
+                                {imageUrl && <img alt="preview" src={imageUrl} style={imageStyle} />}
+                                <Label htmlFor="file-input" style={buttonStyle}>
+                                  <FaCamera size={15} />
+                                  {/* <FaTrash size={15} className="ml-2" onClick={AvatarReset}/>  */}
+                                </Label>
+                                
+                                <Input
+                                  type="file"
+                                  id="file-input"
+                                  style={{ display: 'none' }}
+                                  onChange={handleFileChange}
+                                />
+                              </div>
+                            </Col>
+                          </>
+                        )
+                      }
+
                       <Col lg="4">
                         <FormGroup>
                           <label
@@ -755,6 +810,7 @@ const Staff = () => {
                           />
                         </FormGroup>
                       </Col>
+                      {/* // tỉnh thành */}
                       <Col lg="4">
                         <FormGroup>
                           <label className="form-control-label" htmlFor="input-city">
@@ -763,8 +819,17 @@ const Staff = () => {
                           <Input
                             className="form-control-alternative"
                             type="select"
-                            value={selectedCity}
-                            onChange={handleCityChange}
+                            value={formData.address.proviceCode}
+                            onChange={(e) => setFormData({
+                              ...formData,
+                              address: {
+                                ...formData.address,
+                                proviceCode: e.target.value,
+                                districtCode: "",
+                                communeCode: "",
+                              },
+
+                            })}
                           >
                             <option value="">Chọn Tỉnh / Thành</option>
                             {provinces.map((province) => (
@@ -775,6 +840,7 @@ const Staff = () => {
                           </Input>
                         </FormGroup>
                       </Col>
+                      {/* quận huyện*/}
                       <Col lg="4">
                         <FormGroup>
                           <label className="form-control-label" htmlFor="input-country">
@@ -783,14 +849,21 @@ const Staff = () => {
                           <Input
                             className="form-control-alternative"
                             type="select"
-                            value={selectedDistrict}
-                            onChange={handleDistrictChange}
-                            disabled={!selectedCity}
+                            value={formData.address.districtCode}
+                            onChange={(e) => setFormData({
+                              ...formData,
+                              address: {
+                                ...formData.address,
+                                districtCode: e.target.value,
+                                communeCode: "",
+                              },
+                            })}
+                            disabled={!formData.address.proviceCode}
                           >
                             <option value="">Chọn Quận / Huyện</option>
-                            {selectedCity &&
+                            {formData.address.proviceCode &&
                               provinces
-                                .find((province) => province.name === selectedCity)
+                                .find((province) => province.name === formData.address.proviceCode)
                                 .districts.map((district) => (
                                   <option key={district.code} value={district.name}>
                                     {district.name}
@@ -799,6 +872,7 @@ const Staff = () => {
                           </Input>
                         </FormGroup>
                       </Col>
+                      {/* phường xã */}
                       <Col lg="4">
                         <FormGroup>
                           <label className="form-control-label">
@@ -807,15 +881,21 @@ const Staff = () => {
                           <Input
                             className="form-control-alternative"
                             type="select"
-                            value={selectedWard}
-                            onChange={handleWardChange}
-                            disabled={!selectedDistrict}
+                            value={formData.address.communeCode}
+                            onChange={(e) => setFormData({
+                              ...formData,
+                              address: {
+                                ...formData.address,
+                                communeCode: e.target.value,
+                              },
+                            })}
+                            disabled={!formData.address.districtCode}
                           >
                             <option value="">Chọn Phường / Xã</option>
-                            {selectedDistrict &&
+                            {formData.address.districtCode &&
                               provinces
-                                .find((province) => province.name === selectedCity)
-                                .districts.find((district) => district.name === selectedDistrict)
+                                .find((province) => province.name === formData.address.proviceCode)
+                                .districts.find((district) => district.name === formData.address.districtCode)
                                 .wards.map((ward) => (
                                   <option key={ward.code} value={ward.name}>
                                     {ward.name}
@@ -824,6 +904,7 @@ const Staff = () => {
                           </Input>
                         </FormGroup>
                       </Col>
+                      {/* detail */}
                       <Col className="pl-lg-4">
                         <FormGroup>
                           <label className="form-control-label" htmlFor="addressDetail">
@@ -848,7 +929,6 @@ const Staff = () => {
                         </FormGroup>
                       </Col>
                     </Row>
-
                   </div>
                 </Form >
               </ModalBody >
@@ -857,12 +937,15 @@ const Staff = () => {
                   <Button color="primary" onClick={saveAdmin} size="sm">
                     {formData.id ? "Cập nhật" : "Thêm mới"}
                   </Button>
-                  <Button color="primary" onClick={resetForm} size="sm">
-                    Reset
-                  </Button>
+                  {formData.id ? null : (
+                    <Button color="primary" onClick={resetForm} size="sm">
+                      Reset
+                    </Button>
+                  )}
                   <Button color="danger" onClick={toggle} size="sm">
                     Close
                   </Button>
+                  
                 </div>
               </ModalFooter>
 
