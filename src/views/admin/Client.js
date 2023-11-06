@@ -5,7 +5,7 @@ import { Card, CardHeader, CardBody, Container, Row, Col, Form, FormGroup, Input
 import Select from "react-select";
 import ReactPaginate from 'react-paginate';
 import { getAllClient, postNewClient, detailClient, updateClient, deleteClient } from "services/ClientService";
-import { FaEdit, FaTrash, FaSearch, FaFileAlt, FaCamera } from 'react-icons/fa';
+import { FaEdit, FaTrash, FaSearch, FaFileAlt, FaCamera, FaLockOpen, FaLock } from 'react-icons/fa';
 import Header from "components/Headers/Header.js";
 import Switch from 'react-input-switch';
 import { toast } from 'react-toastify';
@@ -210,10 +210,11 @@ const Client = () => {
     }
   };
   const imageUrl = file ? URL.createObjectURL(file) : null;
-  const imageSize = '110px';
+  const imageSize = '140px';
+  const imageHi = '190px';
   const imageStyle = {
     width: imageSize,
-    height: imageSize,
+    height: imageHi,
   };
   const buttonStyle = {
     position: 'absolute',
@@ -225,7 +226,7 @@ const Client = () => {
     cursor: 'pointer',
     border: '1px dashed gray',
     width: imageSize,
-    height: imageSize,
+    height: imageHi,
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -245,7 +246,7 @@ const Client = () => {
           }
         });
       }
-      fetchData();
+      getAll();
     } catch (error) {
       console.error('Failed to change avatar', error);
       // Xử lý lỗi (nếu cần)
@@ -425,7 +426,15 @@ const Client = () => {
     }
   };
   //Kết thúc xử lý địa chỉ
+  const [selectedStatus, setSelectedStatus] = useState('');
 
+  const filterAdmins = listClient.filter((admin) => {
+    if (selectedStatus === '') {
+      return true;
+    } else {
+      return admin.status.toString() === selectedStatus;
+    }
+  });
   return (
     <>
       {/* <Header /> */}
@@ -577,6 +586,18 @@ const Client = () => {
 
                       <h3 className="heading-small text-black mb-0"><FaFileAlt size="16px" className="mr-1" />Danh sách</h3>
                     </div>
+                    <Col>
+                      <Input type="select" name="status" style={{ width: "150px" }} size="sm"
+                        value={selectedStatus}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          setSelectedStatus(value === '' ? '' : value);
+                        }}>
+                        <option value="">Tất cả</option>
+                        <option value="1">Ngừng hoạt động</option>
+                        <option value="0">Đang hoạt động</option>
+                      </Input>
+                    </Col>
                     <div className="col text-right">
                       <Button
                         color="primary"
@@ -615,7 +636,7 @@ const Client = () => {
                           Không có dữ liệu
                         </th>
                       }
-                      {listClient && listClient.length > 0 && listClient.map((item, index) => (
+                      {filterAdmins && filterAdmins.length > 0 && filterAdmins.map((item, index) => (
 
                         <tr key={item.id}>
                           <th className="text-center pb-4" >
@@ -632,8 +653,8 @@ const Client = () => {
                           </td>
                           <td>
                             <span className="avatar avatar-sm rounded-circle">
-                            <img src={`data:image/jpeg;base64,${item.avatar}`} alt="" />
-                          </span>
+                              <img src={`data:image/jpeg;base64,${item.avatar}`} alt="" />
+                            </span>
                           </td>
                           <td>
                             {item.fullname}
@@ -643,26 +664,27 @@ const Client = () => {
                           <td className="text-center">{item.gender ? "Nữ" : "Nam"}</td>
                           <td>{item.dateOfBirth}</td>
                           <td style={{ position: "sticky", zIndex: '1', right: '0', backgroundColor: '#fff' }}>
-                            <Button color="info" size="sm" onClick={() => handleRowClick(item.id)} disabled={item.status === 1 ? true : false}>
-                              <FaEdit />
+                            <Button color="link" size="sm"
+                              onClick={() => onClickListAdress(item.id)}>
+                              <i class="fa-regular fa-address-book" color="primary"></i>
                             </Button>
-                            <Button color="danger" size="sm" onClick={() => onClickDeleteClient(item.id)} disabled={item.status === 1 ? true : false}>
-                              <FaTrash />
-                            </Button>
-                            <Button color="danger" size="sm"
-                              onClick={() => onClickListAdress(item.id)} disabled={item.status === 1 ? true : false}>
-                              <i class="fa-regular fa-address-book"></i>
+                            <Button color="link" size="sm" onClick={() => handleRowClick(item.id)} >
+                              <FaEdit color="orange" />
                             </Button>
                             {item.status === 0 &&
-                              <Button color="danger" size="sm" onClick={() => updateStatus(item.id, 1)}>
-                                <i class="fa-solid fa-lock"></i>
+                              <Button color="link" size="sm" onClick={() => updateStatus(item.id, 1)}>
+                                <FaLock color="green" />
                               </Button>
                             }
                             {item.status === 1 &&
-                              <Button color="danger" size="sm" onClick={() => updateStatus(item.id, 0)} >
-                                <i class="fa-solid fa-lock-open fa-flip-horizontal"></i>
+                              <Button color="link" size="sm" onClick={() => updateStatus(item.id, 0)} >
+                                <FaLockOpen color="green" />
                               </Button>
                             }
+                            <Button color="link" size="sm" onClick={() => onClickDeleteClient(item.id)}>
+                              <FaTrash color="red" />
+                            </Button>
+
                           </td>
                         </tr>
                       ))}
@@ -875,9 +897,10 @@ const Client = () => {
           <Form>
             <div className="pl-lg-4">
               <Row>
-                <Col lg="4" className="d-flex justify-content-center align-items-center" >
+
+                <Col lg="6" className="d-flex justify-content-center align-items-center" >
                   <div
-                    style={{ position: 'relative', width: imageSize, height: imageSize }}
+                    style={{ position: 'relative', width: imageSize, height: imageHi }}
                   >
                     {imageUrl && <img alt="preview" src={imageUrl} style={imageStyle} />}
                     <Label htmlFor="file-input" style={buttonStyle}>
@@ -892,9 +915,10 @@ const Client = () => {
                     />
                   </div>
                 </Col>
+
                 <Col>
                   <Row>
-                    <Col lg="6">
+                    <Col lg="12">
                       <FormGroup>
                         <label className="form-control-label">
                           Số điện thoại
@@ -908,7 +932,7 @@ const Client = () => {
                         />
                       </FormGroup>
                     </Col>
-                    <Col lg="6">
+                    <Col lg="12">
                       <FormGroup>
                         <label className="form-control-label">
                           Email
@@ -926,7 +950,7 @@ const Client = () => {
                 </Col>
               </Row>
               <Row>
-                <Col lg="4">
+                <Col lg="6">
                   <FormGroup>
                     <label className="form-control-label">
                       Tên đăng nhập
@@ -940,7 +964,7 @@ const Client = () => {
                     />
                   </FormGroup>
                 </Col>
-                <Col lg="4">
+                <Col lg="6">
                   <FormGroup>
                     <label className="form-control-label">
                       Giới tính
@@ -971,7 +995,7 @@ const Client = () => {
                     </div>
                   </FormGroup>
                 </Col>
-                <Col lg="4">
+                <Col lg="6">
                   <FormGroup>
                     <label className="form-control-label">
                       Họ tên
@@ -985,7 +1009,7 @@ const Client = () => {
                     />
                   </FormGroup>
                 </Col>
-                <Col lg="4">
+                <Col lg="6">
                   <FormGroup>
                     <label className="form-control-label">
                       Ngày sinh
