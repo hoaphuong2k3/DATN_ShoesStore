@@ -697,7 +697,7 @@ const Staff = () => {
                                 {imageUrl && <img alt="preview" src={imageUrl} style={imageStyle} />}
                                 <Label htmlFor="file-input" style={buttonStyle}>
                                   <FaCamera size={15} />
-                                  <FaTrash size={15} className="ml-2" onClick={AvatarReset}/> 
+                                  {/* <FaTrash size={15} className="ml-2" onClick={AvatarReset}/>  */}
                                 </Label>
                                 
                                 <Input

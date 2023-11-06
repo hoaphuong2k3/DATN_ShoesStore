@@ -35,7 +35,7 @@ const Profile = () => {
       const provincesResponse = await axios.get("https://provinces.open-api.vn/api/?depth=3");
       setProvinces(provincesResponse.data);
 
-      const response = await axiosInstance.get("/staff/detail/12");
+      const response = await axiosInstance.get("/staff/detail/1");
       setAdmins(response.data);
       console.log(response.data);
     } catch (error) {
@@ -151,7 +151,6 @@ const Profile = () => {
       if (file) {
         image.append('file', file);
       }
-
       if (file) {
         await axiosInstance.put(`/staff/${formData.id}/multipart-file`, image, {
           headers: {
@@ -179,8 +178,7 @@ const Profile = () => {
   const changePassword = async () => {
     try {
       const requestBody = {
-        email: formData.email,
-        // phoneNumber: formData.phoneNumber,
+        id: formData.id,
         newPassword: formPass.newPassword,
         confirmPassword: formPass.confirmPassword,
       };
