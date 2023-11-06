@@ -49,11 +49,19 @@ const Profile = () => {
 
 
   useEffect(() => {
+    const fetchAvt = async () => {
+      if (admins.avatar) {
+        const blob = await fetch(`data:image/jpeg;base64,${admins.avatar}`).then((res) => res.blob());
+        const file = new File([blob], "image.jpg", { type: "image/jpeg" });
+        setFile(file);
+      }
+    };
+  
     setFormData({
       id: admins.id,
       fullname: admins.fullname,
       email: admins.email,
-      avatar: admins.avatar,
+      // avatar: admins.avatar,
       dateOfBirth: admins.dateOfBirth,
       phoneNumber: admins.phoneNumber,
       address: {
@@ -64,16 +72,9 @@ const Profile = () => {
         isDeleted: true,
       },
     });
-    const fetchAvt = async () => {
-      if (admins.avatar) {
-        const blob = await fetch(`data:image/jpeg;base64,${admins.avatar}`).then((res) => res.blob());
-        const file = new File([blob], "image.jpg", { type: "image/jpeg" });
-        setFile(file);
-      }
-      fetchAvt();
-      console.log(admins);
-    };
-
+  
+    fetchAvt();
+    console.log(admins);
 
   }, [admins]);
   //Add
@@ -82,8 +83,9 @@ const Profile = () => {
     try {
       await axiosInstance.put('/staff/update', formData,);
       changeAvatar();
-      toast.success('Cập nhật thông tin thành công!');
       fetchData();
+      toast.success('Cập nhật thông tin thành công!');
+
     } catch (error) {
       console.error('Lỗi rồi trời ơi:', error);
       if (error.response) {
@@ -522,7 +524,7 @@ const Profile = () => {
                       <div
                         style={{ position: 'relative', width: imageSize, height: imageSize }}
                       >
-                        {imageUrl && <img alt="preview" src={`data:image/jpeg;base64,${formData.avatar}`} style={imageStyle} />}
+                        {imageUrl && <img alt="preview" src={`data:image/jpeg;base64,${admins.avatar}`} style={imageStyle} />}
                         <Label htmlFor="file-input" style={buttonStyle}>
                           <FaCamera size={15} />
                         </Label>
