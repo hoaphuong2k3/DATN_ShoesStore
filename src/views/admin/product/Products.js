@@ -33,7 +33,7 @@ const Products = () => {
   const [totalPages, setTotalPages] = useState(0);
   const [totalElements, setTotalElenments] = useState(0);
   const [page, setPage] = useState(0);
-  const [size, setSize] = useState(10);
+  const [size, setSize] = useState(5);
   const [search, setSearch] = useState({
     code: "",
     name: "",
@@ -114,8 +114,10 @@ const Products = () => {
   };
   useEffect(() => {
     getAll();
-  }, [size, page]);
-
+  }, [size]);
+  useEffect(() => {
+    getAll();
+  }, [page]);
   useEffect(() => {
     getAll(page, size);
     getlistBrand();
