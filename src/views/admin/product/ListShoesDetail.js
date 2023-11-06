@@ -261,7 +261,7 @@ const ListShoesDetail = () => {
         colorId: "",
         quantity: "",
         price: "",
-        status: "0"
+        status: "1"
     });
 
     const onInputChangeAdd = (e, idSize, idColor) => {
@@ -283,7 +283,7 @@ const ListShoesDetail = () => {
                     colorId: "",
                     quantity: "",
                     price: "",
-                    status: "0", [name]: value, sizeId: idSize, colorId: idColor
+                    status: "1", [name]: value, sizeId: idSize, colorId: idColor
                 });
             }
         } else {
@@ -487,7 +487,7 @@ const ListShoesDetail = () => {
         colorId: "",
         quantity: "",
         price: "",
-        status: "0"
+        status: "1"
     });
     const resetAddOne = () => {
         setAddOne({
@@ -496,7 +496,7 @@ const ListShoesDetail = () => {
             colorId: "",
             quantity: "",
             price: "",
-            status: "0"
+            status: "1"
         })
     }
     const saveAdd = async () => {
