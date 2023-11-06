@@ -14,7 +14,6 @@ const Shipping = () => {
     const [orderData, setOrderData] = useState({});
     const [deliveryData, setDeliveryData] = useState({});
     const [selectedIds, setSelectedIds] = useState([]);
-    const [isProductDeleted, setIsProductDeleted] = useState(false);
     const [totalProductPrice, setTotalProductPrice] = useState(0);
 
 
@@ -99,7 +98,7 @@ const Shipping = () => {
      const handleConfirm = async () => {
         try {
             await Promise.all(selectedIds.map(async (id) => {
-                await axiosInstance.put(`/order/admin/update-status/${id}?status=2`);
+                await axiosInstance.put(`/order/admin/update-status/${id}?status=3`);
             }));
             fetchData();
 
@@ -223,7 +222,7 @@ const Shipping = () => {
                                                         size="sm"
                                                         type="text"
                                                         value={deliveryData.recipientName}
-                                                        onChange={(e) => setDeliveryData({ ...deliveryData, recipientName: e.target.value })}
+                                                        // onChange={(e) => setDeliveryData({ ...deliveryData, recipientName: e.target.value })}
                                                     />
                                                 </FormGroup>
                                             </Col>
@@ -236,7 +235,7 @@ const Shipping = () => {
                                                         size="sm"
                                                         type="tel"
                                                         value={deliveryData.recipientPhone}
-                                                        onChange={(e) => setDeliveryData({ ...deliveryData, recipientPhone: e.target.value })}
+                                                        // onChange={(e) => setDeliveryData({ ...deliveryData, recipientPhone: e.target.value })}
                                                     />
                                                 </FormGroup>
                                             </Col>
@@ -250,7 +249,7 @@ const Shipping = () => {
                                                 rows="2"
                                                 type="textarea"
                                                 value={deliveryData.deliveryAddress}
-                                                onChange={(e) => setDeliveryData({ ...deliveryData, deliveryAddress: e.target.value })}
+                                                // onChange={(e) => setDeliveryData({ ...deliveryData, deliveryAddress: e.target.value })}
                                             />
                                         </FormGroup>
                                         <FormGroup>
@@ -346,7 +345,7 @@ const Shipping = () => {
                                                     size="sm"
                                                     type="number"
                                                     value={formData.totalMoney}
-                                                    onChange={(e) => setFormData({ ...formData, totalMoney: e.target.value })}
+                                                    // onChange={(e) => setFormData({ ...formData, totalMoney: e.target.value })}
 
                                                 />
                                                 <InputGroupAddon addonType="append">
