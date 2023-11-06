@@ -73,7 +73,7 @@ const SaleBills = () => {
     const statusMapping = {
         0: { color: 'danger', label: 'Kích hoạt' },
         1: { color: 'success', label: 'Chờ kích hoạt' },
-        2: { color: 'warning', label: 'Đã hủy' },
+        2: { color: 'warning', label: 'Ngừng kích hoạt' },
     };
     //lọc
     const resetFilters = () => {
@@ -241,8 +241,7 @@ const SaleBills = () => {
     };
 
      //Update status
-     const 
-     lock = async (id) => {
+     const lock = async (id) => {
         await axiosInstance.patch(`/vouchers/stopVoucher/${id}`);
         toast.success("Cập nhật thành công");
         fetchData();

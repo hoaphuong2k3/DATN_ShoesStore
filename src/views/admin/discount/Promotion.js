@@ -238,7 +238,7 @@ const Promotion = () => {
         fetchData();
     };
     const openlock = async (id) => {
-        await axiosInstance.patch(`/admin/discount-period/restoreDiscountPeriod/${id}`);
+        await axiosInstance.patch(`/admin/discount-period/setDiscountPeriodRun/${id}`);
         toast.success("Cập nhật thành công");
         fetchData();
     };
@@ -576,7 +576,7 @@ const Promotion = () => {
                                                 Xóa tất cả
                                             </Button>
                                             <Button
-                                                color="primary" outline
+                                                color="primary" 
                                                 onClick={handleModal}
                                                 size="sm"
                                             >
@@ -650,7 +650,7 @@ const Promotion = () => {
                                                                 <Button color="link" size="sm" onClick={() => lock(discount.id)} ><FaLockOpen /></Button>
                                                             }
                                                             {(discount.status === 1 || discount.status === 2) &&
-                                                                <Button color="link" size="sm"  ><FaLock /></Button>
+                                                                <Button color="link" size="sm"  onClick={() => openlock(discount.id)} ><FaLock /></Button>
                                                             }
                                                             <Button color="link" size="sm" onClick={() => handleRowClick(discount)}><FaEdit /></Button>
                                                             <Button color="link" size="sm" onClick={() => deleteDiscount(discount.id)}> <FaTrash /></Button>

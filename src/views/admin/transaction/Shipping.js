@@ -1,59 +1,120 @@
 import React, { useState, useEffect } from "react";
 import axiosInstance from "services/custommize-axios";
-import { format, parseISO } from 'date-fns';
+import { format } from 'date-fns';
 import { vi } from 'date-fns/locale';
 
 // reactstrap components
-import { Row, Col, Button, Table, Input, FormGroup, InputGroup, InputGroupAddon, InputGroupText, Modal, ModalBody, ModalFooter, ModalHeader, Label, Form } from "reactstrap";
-import { FaRegEdit, FaSearch } from 'react-icons/fa';
+import { Badge, Row, Col, Button, Table, Input, FormGroup, InputGroup, InputGroupAddon, InputGroupText, Modal, ModalBody, ModalFooter, ModalHeader, Label, Form } from "reactstrap";
+import { FaRegEdit, FaSearch} from 'react-icons/fa';
 
-const Waitting = () => {
+const Shipping = () => {
     const [modal, setModal] = useState(false);
+    const [confirm, setConfirm] = useState([]);
+    const [selectedOrderId, setSelectedOrderId] = useState(null);
+    const [orderData, setOrderData] = useState({});
+    const [deliveryData, setDeliveryData] = useState({});
+    const [selectedIds, setSelectedIds] = useState([]);
+    const [isProductDeleted, setIsProductDeleted] = useState(false);
+    const [totalProductPrice, setTotalProductPrice] = useState(0);
+
+
     const toggle = () => setModal(!modal);
-    const handleModal = () => {
-        setModal(true);
-    }
 
-    const [confirm, setComfirm] = useState([]);
-    const [totalElements, setTotalElements] = useState(0);
-    const [totalPages, setTotalPages] = useState(0);
-
-    const [queryParams, setQueryParams] = useState({
-        page: 0,
-        size: 10,
-        status: 2,
-        date: "",
-    });
-
-    //loads table
     const fetchData = async () => {
         try {
             const response = await axiosInstance.get("/order/admin", {
-                params: queryParams
+                params: {
+                    page: 0,
+                    size: 10,
+                    status: 2,
+                    date: ""
+                }
             });
-            setComfirm(response.content);
-            setTotalElements(response.totalElements);
-            setTotalPages(response.totalPages);
+            setConfirm(response.content);
+
         } catch (error) {
             console.error("Lỗi khi lấy dữ liệu:", error);
         }
     };
+
     useEffect(() => {
         fetchData();
-    }, [queryParams]);
+    }, []);
 
-    const handlePageChange = ({ selected }) => {
-        setQueryParams(prevParams => ({ ...prevParams, page: selected }));
+
+    const [formData, setFormData] = useState({
+        id: null,
+        code: "",
+        totalMoney: "",
+        paymentMethod: "",
+        deliveryCost: "",
+        percentVoucher: "",
+        priceVoucher: "",
+        percentPeriod: "",
+    });
+
+
+    const handleRowClick = async (id, confirm) => {
+        setSelectedOrderId(id);
+        try {
+            const [orderResponse, deliveryResponse] = await Promise.all([
+                axiosInstance.get(`/order/admin/cart/get-all/${id}`),
+                axiosInstance.get(`/order/admin/delivery/${id}`),
+            ]);
+
+            const productPrice = orderResponse.reduce((total, product) => {
+                return total + product.totalPrice;
+            }, 0);
+
+            setTotalProductPrice(productPrice);
+            setFormData({
+                id: confirm.id,
+                code: confirm.code,
+                totalMoney: confirm.totalMoney,
+                paymentMethod: confirm.paymentMethod,
+                deliveryCost: confirm.deliveryCost,
+                percentVoucher: confirm.percentVoucher,
+                priceVoucher: confirm.priceVoucher,
+                percentPeriod: confirm.percentPeriod,
+            });
+            setOrderData(orderResponse);
+            setDeliveryData(deliveryResponse.data);
+
+            setModal(true);
+        } catch (error) {
+            console.error("Lỗi khi lấy dữ liệu hóa đơn:", error);
+        }
     };
 
-    const handleSizeChange = (e) => {
-        const newSize = parseInt(e.target.value);
-        setQueryParams({ ...queryParams, size: newSize, page: 0 });
-    };
-    const calculateIndex = (index) => {
-        return index + 1 + queryParams.page * queryParams.size;
+
+    const handleCheckboxChange = (id) => {
+        if (selectedIds.includes(id)) {
+            setSelectedIds(selectedIds.filter((selectedId) => selectedId !== id));
+        } else {
+            setSelectedIds([...selectedIds, id]);
+        }
     };
 
+     //updateStatus
+     const handleConfirm = async () => {
+        try {
+            await Promise.all(selectedIds.map(async (id) => {
+                await axiosInstance.put(`/order/admin/update-status/${id}?status=2`);
+            }));
+            fetchData();
+
+        } catch (error) {
+            console.error("Lỗi khi cập nhật trạng thái hóa đơn:", error);
+        }
+    };
+
+    // useEffect(() => {
+    //     if (isProductDeleted) {
+    //         setModal(true);
+    //         setIsProductDeleted(false);
+    //         handleRowClick(selectedOrderId, confirm);
+    //     }
+    // }, [isProductDeleted]);
 
     return (
         <>
@@ -97,18 +158,22 @@ const Waitting = () => {
                                     <tr key={confirm.id}>
                                         <td className="text-center pt-0">
                                             <FormGroup check>
-                                                <Input type="checkbox" />
+                                                <Input type="checkbox" onChange={() => handleCheckboxChange(confirm.id)} checked={selectedIds.includes(confirm.id)} />
                                             </FormGroup>
                                         </td>
                                         <td>{confirm.code}</td>
-                                        <td>{confirm.nameUser}</td>
-                                        <td></td>
-                                        <td>{confirm.paymentMethods === 0 ? "Tiền mặt" : "Chuyển khoản"}</td>
+                                        <td>{confirm.createdBy}</td>
+                                        <td className="text-right">{confirm.totalMoney.toLocaleString("vi-VN")} VND</td>
+                                        <td className="text-center">
+                                            <Badge color={confirm.paymentMethod === 1 ? "success" : confirm.paymentMethod === 2 ? "primary" : "secondary"}>
+                                                {confirm.paymentMethod === 1 ? "COD" : confirm.paymentMethod === 2 ? "Ví điện tử" : "Không xác định"}
+                                            </Badge>
+                                        </td>
                                         <td>{confirm.updatedBy}</td>
                                         <td>{format(new Date(confirm.createdTime), 'dd-MM-yyyy HH:mm', { locale: vi })}</td>
                                         <td>{format(new Date(confirm.updatedTime), 'dd-MM-yyyy HH:mm', { locale: vi })}</td>
                                         <td className="text-center">
-                                            <Button color="link" size="sm" onClick={handleModal}><FaRegEdit /></Button>
+                                            <Button color="link" size="sm" onClick={() => handleRowClick(confirm.id, confirm)}><FaRegEdit /></Button>
                                         </td>
                                     </tr>
                                 ))}
@@ -116,12 +181,10 @@ const Waitting = () => {
                     </Table>
 
                     <Row className="mt-3 mr-2 justify-content-end">
-                        <Button color="danger" outline size="sm">
-                            Hủy
-                        </Button>
-                        <Button color="primary" outline size="sm">
+                        <Button color="primary" outline size="sm" onClick={handleConfirm}>
                             Xác nhận
                         </Button>
+
                     </Row>
 
                     <Modal
@@ -129,107 +192,215 @@ const Waitting = () => {
                         toggle={toggle}
                         backdrop={'static'}
                         keyboard={false}
-                        style={{ maxWidth: '800px' }}
+                        style={{ maxWidth: '1100px' }}
                     >
                         <ModalHeader toggle={toggle}>
                             <h3 className="heading-small text-muted mb-0">Chi tiết hóa đơn</h3>
                         </ModalHeader>
                         <ModalBody>
-                            <Row className="col-md-6" style={{ border: "1px solid gray" }}>
-                                <h4 className="mt-3">Thông tin khách hàng</h4>
-                                <Form className="m-2">
-                                    <Row >
-                                        <Col md={6}>
-                                            <FormGroup>
-                                                <Label>
-                                                    Mã hóa đơn
-                                                </Label>
-                                                <Input
-                                                    size="sm"                          
-                                                    type="text"
-                                                />
-                                            </FormGroup>
-                                        </Col>
-                                        <Col md={6}>
-                                            <FormGroup>
-                                                <Label>
-                                                    Người nhận
-                                                </Label>
+                            <Row style={{ border: "1px solid gray" }}>
+                                <Col md={5} >
+                                    <h3 className="mt-3 heading-small text-muted">Thông tin khách hàng</h3>
+                                    <Form className="m-2" style={{ fontSize: 13 }}>
+                                        <FormGroup>
+                                            <Label>
+                                                Mã hóa đơn
+                                            </Label>
+                                            <Input
+                                                size="sm"
+                                                type="text"
+                                                value={formData.code}
+
+                                            />
+                                        </FormGroup>
+                                        <Row >
+                                            <Col md={6}>
+                                                <FormGroup>
+                                                    <Label>
+                                                        Khách hàng
+                                                    </Label>
+                                                    <Input
+                                                        size="sm"
+                                                        type="text"
+                                                        value={deliveryData.recipientName}
+                                                        onChange={(e) => setDeliveryData({ ...deliveryData, recipientName: e.target.value })}
+                                                    />
+                                                </FormGroup>
+                                            </Col>
+                                            <Col md={6}>
+                                                <FormGroup>
+                                                    <Label>
+                                                        Số điện thoại
+                                                    </Label>
+                                                    <Input
+                                                        size="sm"
+                                                        type="tel"
+                                                        value={deliveryData.recipientPhone}
+                                                        onChange={(e) => setDeliveryData({ ...deliveryData, recipientPhone: e.target.value })}
+                                                    />
+                                                </FormGroup>
+                                            </Col>
+                                        </Row>
+                                        <FormGroup>
+                                            <Label>
+                                                Địa chỉ
+                                            </Label>
+                                            <Input
+                                                size="sm"
+                                                rows="2"
+                                                type="textarea"
+                                                value={deliveryData.deliveryAddress}
+                                                onChange={(e) => setDeliveryData({ ...deliveryData, deliveryAddress: e.target.value })}
+                                            />
+                                        </FormGroup>
+                                        <FormGroup>
+                                            <Label>
+                                                Tổng tiền sản phẩm
+                                            </Label>
+                                            <InputGroup size="sm">
                                                 <Input
                                                     size="sm"
-                                                    type="text"
+                                                    type="number"
+                                                    value={totalProductPrice}
                                                 />
-                                            </FormGroup>
-                                        </Col>
-                                    </Row>
-                                    <FormGroup>
-                                        <Label>
-                                            Địa chỉ
-                                        </Label>
-                                        <Input
-                                            size="sm"
-                                            type="text"
-                                        />
-                                    </FormGroup>
-                                    <FormGroup>
-                                        <Label for="exampleAddress2">
-                                            Address 2
-                                        </Label>
-                                        <Input
-                                            id="exampleAddress2" size="sm"
-                                            name="address2"
-                                            placeholder="Apartment, studio, or floor"
-                                        />
-                                    </FormGroup>
-                                    <Row>
-                                        <Col md={6}>
-                                            <FormGroup>
-                                                <Label for="exampleCity">
-                                                    City
-                                                </Label>
-                                                <Input
-                                                    id="exampleCity" size="sm"
-                                                    name="city"
-                                                />
-                                            </FormGroup>
-                                        </Col>
-                                        <Col md={4}>
-                                            <FormGroup>
-                                                <Label for="exampleState">
-                                                    State
-                                                </Label>
-                                                <Input
-                                                    id="exampleState" size="sm"
-                                                    name="state"
-                                                />
-                                            </FormGroup>
-                                        </Col>
-                                        <Col md={2}>
-                                            <FormGroup>
-                                                <Label for="exampleZip">
-                                                    Zip
-                                                </Label>
-                                                <Input
-                                                    id="exampleZip" size="sm"
-                                                    name="zip"
-                                                />
-                                            </FormGroup>
-                                        </Col>
-                                    </Row>
+                                                <InputGroupAddon addonType="append">
+                                                    <InputGroupText>VNĐ</InputGroupText>
+                                                </InputGroupAddon>
+                                            </InputGroup>
+                                        </FormGroup>
 
-                                </Form>
+
+                                        <Row >
+                                            <Col md={6}>
+                                                <FormGroup>
+                                                    <Label>
+                                                        Đợt giảm giá
+                                                    </Label>
+                                                    <InputGroup size="sm">
+                                                        <Input
+                                                            size="sm"
+                                                            type="number"
+                                                            value={formData.percentPeriod}
+                                                        />
+                                                        <InputGroupAddon addonType="append">
+                                                            <InputGroupText>%</InputGroupText>
+                                                        </InputGroupAddon>
+                                                    </InputGroup>
+                                                </FormGroup>
+
+                                            </Col>
+                                            <Col md={6}>
+                                                <FormGroup>
+                                                    <Label>
+                                                        Voucher từ shop
+                                                    </Label>
+                                                    <InputGroup size="sm">
+                                                        <Input
+                                                            size="sm"
+                                                            type="number"
+                                                            value={formData.percentVoucher || formData.priceVoucher || ""}
+                                                        />
+                                                        <InputGroupAddon addonType="append">
+                                                            <InputGroupText>{formData.percentVoucher ? "%" : "VNĐ"}</InputGroupText>
+                                                        </InputGroupAddon>
+                                                    </InputGroup>
+                                                </FormGroup>
+                                            </Col>
+                                        </Row>
+
+                                        <Row >
+                                            <Col md={6}>
+                                                <FormGroup>
+                                                    <Label>
+                                                        Phí vận chuyển
+                                                    </Label>
+                                                    <InputGroup size="sm">
+                                                        <Input
+                                                            size="sm"
+                                                            type="number"
+                                                            value={deliveryData.deliveryCost}
+                                                        />
+                                                        <InputGroupAddon addonType="append">
+                                                            <InputGroupText>VNĐ</InputGroupText>
+                                                        </InputGroupAddon>
+                                                    </InputGroup>
+                                                </FormGroup>
+
+                                            </Col>
+                                            <Col md={6}>
+                                                <FormGroup>
+                                                    <img className="my-3 ml-3"
+                                                        width={"80%"}
+                                                        alt="..."
+                                                        src={require("../../../assets/img/theme/giaohangnhanh.webp")}
+                                                    />
+                                                </FormGroup>
+                                            </Col>
+                                        </Row>
+                                        <FormGroup>
+                                            <Label>
+                                                Thành tiền
+                                            </Label>
+                                            <InputGroup size="sm">
+                                                <Input
+                                                    size="sm"
+                                                    type="number"
+                                                    value={formData.totalMoney}
+                                                    onChange={(e) => setFormData({ ...formData, totalMoney: e.target.value })}
+
+                                                />
+                                                <InputGroupAddon addonType="append">
+                                                    <InputGroupText>VNĐ</InputGroupText>
+                                                </InputGroupAddon>
+                                            </InputGroup>
+                                        </FormGroup>
+
+                                        <FormGroup className="d-flex align-items-center mb-3">
+                                            <Label className="mr-2 mb-0">
+                                                Phương thức thanh toán:
+                                            </Label>
+                                            <span className="border-0" style={{ fontWeight: "bold" }}>
+                                                {formData.paymentMethod === 1 ? "Thanh toán sau khi nhận hàng" : formData.paymentMethod === 2 ? "Ví điện tử" : ""}
+                                            </span>
+                                        </FormGroup>
+
+
+                                    </Form>
+                                </Col>
+
+                                <Col md={7}>
+                                    <h3 className="mt-3 heading-small text-muted">Giỏ hàng</h3>
+                                    <Table hover size="sm">
+                                        <thead className="text-center">
+                                            <tr>
+                                                <th>#</th>
+                                                <th>Sản phẩm</th>
+                                                <th>Số lượng</th>
+                                                <th>Đơn giá</th>
+                                                <th>Thành tiền</th>
+                                                <th></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody style={{ color: "#000" }}>
+                                            {Array.isArray(orderData) &&
+                                                orderData.map((product, index) => (
+                                                    <tr key={index}>
+                                                        <td className="text-center">{index + 1}</td>
+                                                        <td>{product.shoesName}</td>
+                                                        <td className="text-center">{product.quantity}</td>
+                                                        <td className="text-right">{product.discountPrice}</td>
+                                                        <td className="text-right">{product.totalPrice}</td>
+
+                                                    </tr>
+                                                ))}
+                                        </tbody>
+                                    </Table>
+                                </Col>
                             </Row>
-
-                            <Row className="col-md-6">
-
-                            </Row>
-
                         </ModalBody >
                         <ModalFooter>
                             <div className="text-center">
-                                <Button color="primary" outline size="sm">
-                                    Cập nhật
-                                </Button>
+
                                 <Button color="danger" outline onClick={toggle} size="sm">
                                     Đóng
                                 </Button>
@@ -243,4 +414,4 @@ const Waitting = () => {
     );
 };
 
-export default Waitting;
+export default Shipping;

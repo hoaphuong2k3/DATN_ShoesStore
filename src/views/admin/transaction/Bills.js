@@ -28,8 +28,9 @@ class Bills extends React.Component {
       });
     }
   }
-  render() {
 
+  render() {
+  
     const navItemStyle = {
       flex: 1,
       textAlign: 'center',

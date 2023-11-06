@@ -256,7 +256,9 @@ const SaleProduct = () => {
             sale: false
 
         });
-        // setSelectedValueType(null);
+        setSelectedShoesIds([]);
+        setSelectedDetailIds([]);
+        setSelectAll(false);
     };
 
     //save
@@ -269,8 +271,6 @@ const SaleProduct = () => {
         try {
             const formattedStartDate = formatDateTime(formData.startDate);
             const formattedEndDate = formatDateTime(formData.endDate);
-            console.log("formData:", formData);
-            console.log("selectedDetailIds:", selectedDetailIds);
 
             if (formData.id) {
                 await axiosInstance.put(`/promos/updatePromos`, {
@@ -306,7 +306,6 @@ const SaleProduct = () => {
                 toast.success("Thêm mới thành công!");
             }
 
-            // Đóng modal và reset form
             setModal(false);
             resetForm();
         } catch (error) {
@@ -319,6 +318,18 @@ const SaleProduct = () => {
                 toast.error("Đã có lỗi xảy ra.");
             }
         }
+    };
+
+     //Update status
+     const lock = async (id) => {
+        await axiosInstance.patch(`/promos/stopPromos/${id}`);
+        toast.success("Cập nhật thành công");
+        fetchData();
+    };
+    const openlock = async (id) => {
+        await axiosInstance.patch(`/promos/setPromoRun/${id}`);
+        toast.success("Cập nhật thành công");
+        fetchData();
     };
 
     //delete
@@ -558,10 +569,10 @@ const SaleProduct = () => {
                                     <td>{format(new Date(discount.endDate), 'yyyy-MM-dd HH:mm', { locale: vi })}</td>   
                                     <td style={{ position: "sticky", zIndex: '1', right: '0', background: "#f6f9fc" }}>
                                         {discount.status === 0 &&
-                                            <Button color="link" size="sm"><FaLockOpen/></Button>
+                                            <Button color="link" size="sm"><FaLockOpen onClick={() => lock(discount.id)}/></Button>
                                         }
                                         {(discount.status === 1 || discount.status === 2) &&
-                                            <Button color="link" size="sm"><FaLock/></Button>
+                                            <Button color="link" size="sm"><FaLock onClick={() => openlock(discount.id)}/></Button>
                                         }
                                         <Button color="link" size="sm" onClick={() => handleRowClick(discount)}><FaEdit/></Button>
                                         <Button color="link" size="sm" onClick={() => deleteDiscount(discount.id)}> <FaTrash/></Button>
@@ -864,7 +875,7 @@ const SaleProduct = () => {
                                         <h3 className="heading-small text-black mb-0">Chi tiết sản phẩm</h3>
                                     </div>
                                     <div className="col-4 text-right">
-                                        <Input type="text" size="sm" placeholder="Mã hoặc tên sản phẩm" style={{ fontSize: 11 }} />
+                                        <Input type="select" size="sm" style={{ fontSize: 11 }} />
                                     </div>
                                 </Row>
                                 <Table bordered hover responsive>
