@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { findShoes } from "services/Product2Service";
 import { getAllShoesDetail } from "services/ShoesDetailService.js";
 import { Link } from "react-router-dom";
+import ReactPaginate from 'react-paginate';
 import { FaEdit, FaTrash, FaSearch, FaFileAlt, FaLock, FaLockOpen } from 'react-icons/fa';
 import { getAllColorId, getAllSizeId, getAllColor, getAllSize } from "services/ProductAttributeService";
 // reactstrap components
@@ -30,7 +31,17 @@ const ListShoesDetail = () => {
     const [listColorById, setListColorById] = useState([]);
     const [listSize, setListSize] = useState([]);
     const [listColor, setListColor] = useState([]);
-    const [dataShoesById, setDataShoesById] = useState([])
+    const [dataShoesById, setDataShoesById] = useState([]);
+    const [totalPages, setTotalPages] = useState(0);
+    const [totalElements, setTotalElenments] = useState(0);
+    const [page, setPage] = useState(0);
+    const [size, setSize] = useState(5);
+    const handlePageClick = (event) => {
+        setPage(+event.selected);
+    }
+    const onChangeSize = (e) => {
+        setSize(+e.target.value);
+    }
     //getData
     const [search, setSearch] = useState({
         code: "",
@@ -82,10 +93,12 @@ const ListShoesDetail = () => {
     //getAll
     const getAll = async () => {
         try {
-            let res = await getAllShoesDetail(id, search);
+            let res = await getAllShoesDetail(id, page, size, search);
             if (res && res.data && res.data.content) {
                 setListShoesDetail(res.data.content);
                 console.log(res);
+                setTotalElenments(res.data.totalElements);
+                setTotalPages(res.data.totalPages);
                 // setListShoes
                 // setTotalUsers(res.total);
                 // setTotalPages(res.total_pages);
@@ -101,7 +114,14 @@ const ListShoesDetail = () => {
         console.log(search);
         getAll();
     }, [search]);
-
+    useEffect(() => {
+        console.log("size", size);
+        getAll();
+    }, [size]);
+    useEffect(() => {
+        console.log("page", page);
+        getAll();
+    }, [page]);
     useEffect(() => {
         getlistColorById();
         getlistSizeById();
@@ -1079,6 +1099,51 @@ const ListShoesDetail = () => {
                                                     </tbody>
                                                 </Table>
                                             </Row>
+                                            <Row className="mt-4">
+                                                <Col lg={6}>
+                                                    <div style={{ fontSize: 14 }}>
+                                                        Đang xem <b>1</b> đến <b>{totalElements < size ? totalElements : size}</b> trong tổng số <b>{totalElements}</b> mục
+                                                    </div>
+                                                </Col>
+                                                <Col style={{ fontSize: 14 }} lg={2}>
+                                                    <Row>
+                                                        <span>Xem </span>&nbsp;
+                                                        <span>
+                                                            <Input type="select" name="status" style={{ width: "60px", fontSize: 14 }} size="sm" onChange={(e) => onChangeSize(e)} className="mt--1">
+                                                                <option value="5">5</option>
+                                                                <option value="10">10</option>
+                                                                <option value="25">25</option>
+                                                                <option value="50">50</option>
+                                                                <option value="100">100</option>
+                                                            </Input>
+                                                        </span>&nbsp;
+                                                        <span> mục</span>
+                                                    </Row>
+
+                                                </Col>
+                                                <Col lg={4} style={{ fontSize: 11 }} className="mt--1">
+                                                    <ReactPaginate
+                                                        breakLabel="..."
+                                                        nextLabel=">"
+                                                        pageRangeDisplayed={1} // Number of pages to display on each side of the selected page
+                                                        pageCount={totalPages} // Total number of pages
+                                                        previousLabel="<"
+                                                        onPageChange={handlePageClick}
+                                                        renderOnZeroPageCount={null}
+                                                        pageClassName="page-item"
+                                                        pageLinkClassName="page-link"
+                                                        previousClassName="page-item"
+                                                        previousLinkClassName="page-link"
+                                                        nextClassName="page-item"
+                                                        nextLinkClassName="page-link"
+                                                        breakClassName="page-item"
+                                                        breakLinkClassName="page-link"
+                                                        containerClassName="pagination"
+                                                        activeClassName="active"
+                                                        marginPagesDisplayed={1}
+                                                    />
+                                                </Col>
+                                            </Row>
                                             {/*  */}
                                         </CardBody>
                                     </Card>
@@ -1179,79 +1244,87 @@ const ListShoesDetail = () => {
                                         </Col>
                                     </Row>
                                     {/*  */}
-                                    <Row>
-                                        <Col lg="12">
-                                            <Card className="shadow m-4">
-                                                <CardBody>
-                                                    {selectedValuesColor.map((itemColor, index) => (
-                                                        <>
-                                                            <div>{itemColor.name}</div>
-                                                            <Table className="align-items-center table-flush" responsive>
-                                                                <thead className="thead-light">
-                                                                    <tr>
-                                                                        <th >Size</th>
+                                    {selectedValuesColor.length > 0 && selectedValuesSize.length > 0 &&
+                                        < Row >
+                                            <Col lg="12">
+                                                <Card className="shadow m-4">
+                                                    <CardBody>
+                                                        {selectedValuesColor.map((itemColor, index) => (
+                                                            <>
+                                                                <Table className="align-items-center table-flush mb-4" responsive >
+                                                                    {/* className="" color='gray' style={{ fontFamily: "Arial" }}> */}
+
+                                                                    <th colSpan={4} className="text-center" style={{ fontFamily: "Open sans", fontSize: "16", background: "rgba(192, 192, 192, 0.2)", borderRadius: "3" }}>
+                                                                        <b>
+                                                                            Các sản phẩm màu {itemColor.name}
+                                                                        </b>
+                                                                    </th>
+
+                                                                    <tr className="text-center">
+                                                                        <th>Size</th>
                                                                         <th>Giá</th>
                                                                         <th>Số lượng</th>
                                                                         <th>Trạng Thái</th>
                                                                     </tr>
-                                                                </thead>
-                                                                {selectedValuesSize.map((value, index) => (
 
-                                                                    <tbody>
-                                                                        <tr key={value.id} >
-                                                                            <td className="col-1">{value.name}</td>
-                                                                            <td className="col-3">
-                                                                                <Input
-                                                                                    id={`price_${value.id}`}
-                                                                                    name="price"
-                                                                                    placeholder="Nhập giá"
-                                                                                    value={value.price}
-                                                                                    onChange={(e) => onInputChangeAdd(e, value.id, itemColor.id)}
+                                                                    {selectedValuesSize.map((value, index) => (
 
-                                                                                />
-                                                                            </td>
-                                                                            <td className="col-3">
-                                                                                <Input
-                                                                                    id={`quantity_${value.id}`}
-                                                                                    name="quantity"
-                                                                                    placeholder="Nhập số lượng"
-                                                                                    value={value.quantity}
-                                                                                    onChange={(e) => onInputChangeAdd(e, value.id, itemColor.id)}
-                                                                                />
-                                                                            </td>
-                                                                            <td >
-                                                                                <Input id={`status_${value.id}`} type="select" name="status" value={value.status}
-                                                                                    onChange={(e) => onInputChangeAdd(e, value.id, itemColor.id)}
-                                                                                >
-                                                                                    <option value='1'>
-                                                                                        Đang bán
-                                                                                    </option>
-                                                                                    <option value='0'>
-                                                                                        Ngừng bán
-                                                                                    </option>
-                                                                                    <option value='2'>
-                                                                                        Hết hàng
-                                                                                    </option>
+                                                                        <tbody>
+                                                                            <tr key={value.id} >
+                                                                                <td className="col-1">{value.name}</td>
+                                                                                <td className="col-3">
+                                                                                    <Input
+                                                                                        id={`price_${value.id}`}
+                                                                                        name="price"
+                                                                                        placeholder="Nhập giá"
+                                                                                        value={value.price}
+                                                                                        onChange={(e) => onInputChangeAdd(e, value.id, itemColor.id)}
 
-                                                                                </Input>
-                                                                            </td>
-                                                                        </tr>
-                                                                    </tbody>
+                                                                                    />
+                                                                                </td>
+                                                                                <td className="col-3">
+                                                                                    <Input
+                                                                                        id={`quantity_${value.id}`}
+                                                                                        name="quantity"
+                                                                                        placeholder="Nhập số lượng"
+                                                                                        value={value.quantity}
+                                                                                        onChange={(e) => onInputChangeAdd(e, value.id, itemColor.id)}
+                                                                                    />
+                                                                                </td>
+                                                                                <td >
+                                                                                    <Input id={`status_${value.id}`} type="select" name="status" value={value.status}
+                                                                                        onChange={(e) => onInputChangeAdd(e, value.id, itemColor.id)}
+                                                                                    >
+                                                                                        <option value='1'>
+                                                                                            Đang bán
+                                                                                        </option>
+                                                                                        <option value='0'>
+                                                                                            Ngừng bán
+                                                                                        </option>
+                                                                                        <option value='2'>
+                                                                                            Hết hàng
+                                                                                        </option>
 
-                                                                ))}
-                                                            </Table>
-                                                        </>
-                                                    ))}
+                                                                                    </Input>
+                                                                                </td>
+                                                                            </tr>
+                                                                        </tbody>
 
+                                                                    ))}
+                                                                </Table >
+                                                            </>
+                                                        ))}
 
-
-                                                    <Button onClick={onClickAddMany}>Thêm</Button>
-                                                </CardBody >
-                                            </Card>
-                                        </Col>
-                                    </Row>
-
-
+                                                        <Row className="text-center">
+                                                            <Col>
+                                                                <Button onClick={onClickAddMany} color="primary">Thêm</Button>
+                                                            </Col>
+                                                        </Row>
+                                                    </CardBody >
+                                                </Card>
+                                            </Col>
+                                        </Row>
+                                    }
                                     {/*  */}
 
                                 </Card>

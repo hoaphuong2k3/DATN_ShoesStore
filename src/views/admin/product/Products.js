@@ -98,7 +98,6 @@ const Products = () => {
   };
   const handlePageClick = (event) => {
     setPage(+event.selected);
-    getAll();
   }
   const onChangeSize = (e) => {
     setSize(+e.target.value);

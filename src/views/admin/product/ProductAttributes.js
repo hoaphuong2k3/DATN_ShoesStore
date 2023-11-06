@@ -22,11 +22,16 @@ const ProductAttributes = () => {
   const toggleEdit = () => setModalEdit(!modalEdit);
   const [dataEdit, setDataEdit] = useState({});
   const [selecttt, setSelecttt] = useState('brand');
-  const [code, setCode] = useState("");
-
-  const [status, setStatus] = useState(1);
   const [page, setPage] = useState(0);
   const [size, setSize] = useState(5);
+  const [totalPages, setTotalPages] = useState(0);
+  const [totalElements, setTotalElenments] = useState(0);
+  const handlePageClick = (event) => {
+    setPage(+event.selected);
+  }
+  const onChangeSize = (e) => {
+    setSize(+e.target.value);
+  }
   const [search, setSearch] = useState({
     "codeOrName": ""
   });
@@ -40,7 +45,7 @@ const ProductAttributes = () => {
       getCategory();
     } else if (selecttt === 'color') {
       try {
-        const response = await axios.delete(`http://localhost:33321/api/admin/color/delete`, {data:[id]});
+        const response = await axios.delete(`http://localhost:33321/api/admin/color/delete`, { data: [id] });
         getColor();
         toast.success("Xóa thành công thành công");
       } catch (error) {
@@ -74,9 +79,7 @@ const ProductAttributes = () => {
   }
   const handleEditBrands = (brand) => {
     setDataEdit(brand);
-    setformData({ ...setformData, name: dataEdit.name });
-    console.log(dataEdit)
-    setCode(dataEdit.code);
+    setformData({ ...setformData, name: brand.name });
     toggleEdit();
   }
   const EditProductAttribites = async () => {
@@ -84,7 +87,7 @@ const ProductAttributes = () => {
       getCategory();
     } else if (selecttt === 'color') {
       try {
-        const response = await axios.put(`http://localhost:33321/api/admin/color/${dataEdit.id}`, formData);
+        await axios.put(`http://localhost:33321/api/admin/color/${dataEdit.id}`, formData);
         toggleEdit();
         getColor();
         setformData({ ...formData, name: "" })
@@ -98,19 +101,6 @@ const ProductAttributes = () => {
         toast.error(errorMessage);
       }
     }
-    // try {
-
-    //   let res = await updateBrand(dataEdit.id, code,);
-    //   console.log(res)
-    //   toggleEdit();
-    //   getCategory();
-    //   setformData({ ...formData, name: "" })
-    //   setCode('');
-    //   toast.success("User added successfully");
-    //   setDataEdit({});
-    // } catch {
-    //   toast.error("error");
-    // }
 
   }
 
@@ -119,20 +109,26 @@ const ProductAttributes = () => {
 
     getCategory();
   }, []);
-  useEffect(() => {
+  const getAll = () => {
     if (selecttt === 'brand') {
       getCategory();
     } else if (selecttt === 'color') {
       getColor();
     }
-
+  }
+  useEffect(() => {
+    getAll();
+  }, [search]);
+  useEffect(() => {
+    getAll();
   }, [selecttt]);
   const getColor = async () => {
     try {
       let res = await getAllColor1(page, size, search);
-      console.log(res)
       if (res && res.data && res.data.content) {
         setList(res.data.content);
+        setTotalElenments(res.data.totalElements);
+        setTotalPages(res.data.totalPages);
       }
     } catch (error) {
       setList([]);
@@ -149,27 +145,33 @@ const ProductAttributes = () => {
     }
   };
 
+  useEffect(() => {
+    getAll();
+  }, [size]);
+  useEffect(() => {
+    getAll();
+  }, [page]);
   return (
     <>
       <Header />
-      {/* Page content */}
-      <Container className="mt--7" fluid>
-        <Row className="mb-4">
+      <Container fluid>
+        <Row className="mb-4 mt--4">
           <div className="col">
             <Card className="shadow">
               <CardHeader className="bg-transparent">
-                <h3 className="mb-0">Thuộc tính sản phẩm</h3>
+                <Row className="align-items-center">
+                  <h3 className="mb-0">Thuộc tính sản phẩm</h3>
+                </Row>
               </CardHeader>
               <CardBody>
                 {/* Start row btn select productAttrinutes */}
                 <Row>
-                  <Col lg="6" xl="3">
-                    <Label for="btn_select_tt">
+                  <Col lg="6" xl="2">
+                    <Label for="btn_select_tt" className="mt-1">
                       Thông tin của:
                     </Label>
-
                   </Col>
-                  <Col lg="6" xl="6">
+                  <Col lg="6" xl="4">
                     <FormGroup>
                       <Input id="btn_select_tt" name="select" type="select"
                         onChange={(event) => setSelecttt(event.target.value)} value={selecttt} >
@@ -196,11 +198,18 @@ const ProductAttributes = () => {
                         </option>
                       </Input>
                     </FormGroup>
-                    <p>Giá trị đã chọn: {selecttt}</p>
                   </Col>
-                  <Col lg="6" xl="3" className="text-center">
-                    <Button color="primary" onClick={toggle}>
-                      Thêm
+                  <Col lg="6" xl="4" className="text-center">
+                    <Input
+                      type="text"
+                      name="code"
+                      value={search.codeOrName}
+                      onChange={(e) => setSearch({ ...search, codeOrName: e.target.value })}
+                      placeholder="Mã hoặc tên thuộc tính" />
+                  </Col>
+                  <Col lg="6" xl="2" className="text-center">
+                    <Button color="primary" onClick={toggle} className="btn btn-outline-primary">
+                      + Thêm mới
                     </Button>
                   </Col>
                 </Row>
@@ -208,114 +217,6 @@ const ProductAttributes = () => {
               </CardBody>
             </Card>
           </div>
-        </Row>
-
-        <Row className="mb-4">
-          <Col className="mb-5 mb-xl-0" xl="12">
-            <Card className=" shadow">
-              <CardBody>
-                <Row>
-                  <div className="col">
-                    <CardTitle
-                      tag="h5"
-                      className="text-uppercase text-muted mb-0"
-                    >
-                      <h3>Tìm kiếm</h3>
-                    </CardTitle>
-
-                  </div>
-                  <Col className="col-auto">
-                    <div className="icon icon-shape bg-danger text-white rounded-circle shadow">
-                      <i className="fas fa-chart-bar" />
-                    </div>
-                  </Col>
-                </Row>
-                {/* start row find  productAttrinutes*/}
-                <Row>
-                  <Col lg="6" xl="6">
-                    <FormGroup row>
-                      <Label for="find_code" xl={3}>
-                        Mã:
-                      </Label>
-                      <Col xl={9}>
-                        <Input
-                          id="find_code"
-                          name="code"
-                          placeholder=" "
-                        />
-                      </Col>
-
-                    </FormGroup>
-                  </Col>
-                  <Col lg="6" xl="6">
-                    <FormGroup row>
-                      <Label for="find_name" xl={3}>
-                        Tên:
-                      </Label>
-                      <Col xl={9}>
-                        <Input
-                          id="find_name"
-                          name="name"
-                          placeholder=""
-                        />
-                      </Col>
-                    </FormGroup>
-                  </Col>
-                  <Col lg="6" xl="6">
-                    <FormGroup row>
-                      <Label for="find_createdAt" xl={3}>
-                        Người tạo:
-                      </Label>
-                      <Col xl={9}>
-                        <Input
-                          id="find_createdAt"
-                          name="name"
-                          placeholder=""
-                        />
-                      </Col>
-                    </FormGroup>
-                  </Col>
-                  <Col lg="6" xl="6">
-                    <FormGroup row>
-                      <Label for="find_createdDate" xl={3}>
-                        Người tạo:
-                      </Label>
-                      <Col xl={4}>
-                        <Input
-                          id="find_createdDate"
-                          name="date"
-                          placeholder="date placeholder"
-                          type="date"
-                        />
-                      </Col>
-                      <Col xl={5}>
-                        <Input
-                          id="find_createdDate"
-                          name="date"
-                          placeholder="date placeholder"
-                          type="date"
-                        />
-                      </Col>
-
-                    </FormGroup>
-                  </Col>
-                  <Col lg="6" xl="12" className="text-center">
-                    <Button color="warning" onClick={toggle}>
-                      <i class="fa-solid fa-magnifying-glass" /> &nbsp;
-                      Tìm kiếm
-                    </Button>
-                    <Button color="primary" onClick={toggle}>
-                      Làm mới bộ lọc
-                    </Button>
-                  </Col>
-                </Row>
-
-
-
-                {/* end row find  productAttrinutes*/}
-              </CardBody>
-            </Card>
-          </Col>
         </Row>
         <Row className="mb-4">
           <Col lg="6" xl="12">
@@ -331,11 +232,8 @@ const ProductAttributes = () => {
 
                     </CardTitle>
                   </div>
-                  <Col className="col-auto">
-                    <div className="icon icon-shape bg-danger text-white rounded-circle shadow">
-                      <i className="fas fa-chart-bar" />
-                    </div>
-                  </Col>
+
+
                 </Row>
                 {/*  */}
 
@@ -400,7 +298,51 @@ const ProductAttributes = () => {
 
                   </tbody>
                 </Table>
+                <Row className="mt-4">
+                  <Col lg={6}>
+                    <div style={{ fontSize: 14 }}>
+                      Đang xem <b>1</b> đến <b>{totalElements < size ? totalElements : size}</b> trong tổng số <b>{totalElements}</b> mục
+                    </div>
+                  </Col>
+                  <Col style={{ fontSize: 14 }} lg={2}>
+                    <Row>
+                      <span>Xem </span>&nbsp;
+                      <span>
+                        <Input type="select" name="status" style={{ width: "60px", fontSize: 14 }} size="sm" onChange={(e) => onChangeSize(e)} className="mt--1">
+                          <option value="5">5</option>
+                          <option value="10">10</option>
+                          <option value="25">25</option>
+                          <option value="50">50</option>
+                          <option value="100">100</option>
+                        </Input>
+                      </span>&nbsp;
+                      <span> mục</span>
+                    </Row>
 
+                  </Col>
+                  <Col lg={4} style={{ fontSize: 11 }} className="mt--1">
+                    <ReactPaginate
+                      breakLabel="..."
+                      nextLabel=">"
+                      pageRangeDisplayed={1} // Number of pages to display on each side of the selected page
+                      pageCount={totalPages} // Total number of pages
+                      previousLabel="<"
+                      onPageChange={handlePageClick}
+                      renderOnZeroPageCount={null}
+                      pageClassName="page-item"
+                      pageLinkClassName="page-link"
+                      previousClassName="page-item"
+                      previousLinkClassName="page-link"
+                      nextClassName="page-item"
+                      nextLinkClassName="page-link"
+                      breakClassName="page-item"
+                      breakLinkClassName="page-link"
+                      containerClassName="pagination"
+                      activeClassName="active"
+                      marginPagesDisplayed={1}
+                    />
+                  </Col>
+                </Row>
 
                 {/*  */}
               </CardBody>
@@ -444,7 +386,7 @@ const ProductAttributes = () => {
         </ModalBody>
         <ModalFooter>
           <div className="text-center">
-            <Button color="primary" size="sm" onClick={() => handleProductAttribites()}>
+            <Button color="primary" onClick={() => handleProductAttribites()}>
               Thêm
             </Button>{' '}
           </div>
