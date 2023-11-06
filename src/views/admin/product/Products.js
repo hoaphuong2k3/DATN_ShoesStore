@@ -266,8 +266,90 @@ const Products = () => {
   };
   //Kết thúc import excel
 
+  //Tải mẫu excel
 
+  const taiMau = async () => {
+    try {
+      const res = await axios.get(`http://localhost:33321/api/admin/shoes/export/pattern`, {
+        responseType: 'blob'
+      });
 
+      const blob = new Blob([res.data], { type: 'application/excel' });
+
+      // Tạo một URL cho Blob và tạo một thẻ a để download
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.style.display = 'none';
+      a.href = url;
+      a.download = 'Template_addShoes.xlsx';
+      document.body.appendChild(a);
+      a.click();
+
+      // Giải phóng tài nguyên
+      window.URL.revokeObjectURL(url);
+
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  //Kết thúc tải mẫu excel
+
+  const xuatExcel = async () => {
+    try {
+      const requestData = listShoes;
+      const res = await axios.post(`http://localhost:33321/api/admin/shoes/export/excel`, requestData, {
+        responseType: 'blob',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      const blob = new Blob([res.data], { type: 'application/excel' });
+
+      // Tạo một URL cho Blob và tạo một thẻ a để download
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.style.display = 'none';
+      a.href = url;
+      a.download = 'Export_Shoes.xlsx';
+      document.body.appendChild(a);
+      a.click();
+
+      // Giải phóng tài nguyên
+      window.URL.revokeObjectURL(url);
+
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  const xuatPDF = async () => {
+    try {
+      const requestData = listShoes;
+      const res = await axios.post(`http://localhost:33321/api/admin/shoes/export/pdf`, requestData, {
+        responseType: 'blob',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      const blob = new Blob([res.data], { type: 'application/pdf' });
+
+      // Tạo một URL cho Blob và tạo một thẻ a để download
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.style.display = 'none';
+      a.href = url;
+      a.download = 'Export_Shoes.pdf';
+      document.body.appendChild(a);
+      a.click();
+
+      // Giải phóng tài nguyên
+      window.URL.revokeObjectURL(url);
+
+    } catch (error) {
+      console.error(error);
+    }
+  };
   return (
     <>
       {/* Page content */}
@@ -740,6 +822,7 @@ const Products = () => {
                       className="btn btn-outline-primary"
                       onClick={(e) => e.preventDefault()}
                       size="sm"
+                      onClick={taiMau}
                     >
                       Tải mẫu
                     </Button>
@@ -760,12 +843,14 @@ const Products = () => {
                     <Button
                       className="btn btn-outline-primary"
                       size="sm"
+                      onClick={xuatExcel}
                     >
                       Xuất Excel
                     </Button>
                     <Button
                       className="btn btn-outline-primary"
                       size="sm"
+                      onClick={xuatPDF}
                     >
                       Xuất PDF
                     </Button>

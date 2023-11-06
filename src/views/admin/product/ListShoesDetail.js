@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { findShoes } from "services/Product2Service";
 import { getAllShoesDetail } from "services/ShoesDetailService.js";
@@ -7,12 +7,13 @@ import { FaEdit, FaTrash, FaSearch, FaFileAlt, FaLock, FaLockOpen } from 'react-
 import { getAllColorId, getAllSizeId, getAllColor, getAllSize } from "services/ProductAttributeService";
 // reactstrap components
 import {
-    Card, CardBody, Container, Row, Col, FormGroup, Input, Button, Form, CardTitle, Label, Table, Badge
+    Card, CardBody, Container, Row, Col, FormGroup, Input, Button, Form, CardTitle, Label, Table, Badge, Modal, ModalHeader, ModalFooter, ModalBody
 } from "reactstrap";
 import { toast } from 'react-toastify';
 import Header from "components/Headers/Header.js";
 import Switch from 'react-input-switch';
 import axios from "axios";
+import { SoundTwoTone } from "@ant-design/icons";
 
 const ListShoesDetail = () => {
     const [value, setValue] = useState('no');
@@ -229,116 +230,80 @@ const ListShoesDetail = () => {
         initializeCheckboxesColor();
     }, [listColor]);
 
-    //End Cbb selected color
-    const [valueSelectedColor, setValueSelectedColor] = useState(+'');
-    const [listvalueSelectedColor, setListValuesSelectedColor] = useState([]);
-    const onInputChangeSelectedColor = (value) => {
-        setValueSelectedColor(+value);
-    }
-    useEffect(() => {
-        console.log(listvalueSelectedColor);
-    }, [listvalueSelectedColor]);
 
+    //Xử lý thêm chi tiết sản phẩm
+    const [listAddMany, setListAddMany] = useState([]);
     useEffect(() => {
-        if (listvalueSelectedColor.length > 0) {
-            const existingItem = listvalueSelectedColor.find(item => item.name === valueSelectedColor);
-            if (existingItem) {
-                setList(existingItem.data);
+        console.log("trc khi selectedValuesColor:", selectedValuesColor);
+        if (listAddMany.length > 0) {
+            if (selectedValuesColor.length === 0 || selectedValuesSize.length === 0) {
+                setListAddMany([]);
             } else {
-                setListValuesSelectedColor([...listvalueSelectedColor, { name: valueSelectedColor, data: [] }]);
-                setList([]);
-            }
-        }
-    }, [valueSelectedColor]);
-
-
-    useEffect(() => {
-        console.log("trc khi:", selectedValuesColor);
-        if (listvalueSelectedColor.length === 0) {
-            if (selectedValuesColor.length > 0) {
-                console.log("trc khi selectedValuesColor:", listvalueSelectedColor);
-                setValueSelectedColor(selectedValuesColor[0].id);
-                setListValuesSelectedColor([...listvalueSelectedColor, { name: selectedValuesColor[0].id, data: [] }]);
-            }
-        } else {
-            if (selectedValuesColor.length === 0) {
-                setListValuesSelectedColor([]);
-            } else {
-                setListValuesSelectedColor(listvalueSelectedColor.filter(itemB => selectedValuesColor.some(itemA => itemA.id === itemB.name)));
+                setListAddMany(listAddMany.filter(itemB => selectedValuesColor.some(itemA => itemA.id === itemB.colorId)));
             }
         }
     }, [selectedValuesColor]);
-    //Xử lý size
-    const [valueSelectedSize, setValueSelectedSize] = useState(+'');
-    const [listvalueSelectedSize, setListValuesSelectedSize] = useState([]);
     useEffect(() => {
-        if (selectedValuesSize.length === 0) {
-            if (listvalueSelectedColor && listvalueSelectedColor.length > 0) {
-                const updatedArray = listvalueSelectedColor.map(item => {
-                    return {
-                        ...item,
-                        data: []
-                    };
-                });
-                setListValuesSelectedColor(updatedArray);
-            }
-        } else {
-            if (listvalueSelectedColor && listvalueSelectedColor.length > 0) {
-                const updatedArray = listvalueSelectedColor.map(item => {
-                    return {
-                        ...item,
-                        data: item.data.filter(itemB => selectedValuesSize.some(itemA => itemA.id === itemB.sizeId))
-                    };
-                });
-                setListValuesSelectedColor(updatedArray);
+        console.log("trc khi selectedValuesSize:", selectedValuesSize);
+        if (listAddMany.length > 0) {
+            if (selectedValuesColor.length === 0 || selectedValuesSize.length === 0) {
+                console.log("trc khi selectedValuesSize selectedValuesColor.length === 0 || selectedValuesSize.length === 0:", selectedValuesSize);
+                setListAddMany([]);
+            } else {
+                console.log("trc khi selectedValuesSize else:", selectedValuesSize);
+                setListAddMany(listAddMany.filter(itemB => selectedValuesSize.some(itemA => itemA.id === itemB.sizeId)));
             }
         }
     }, [selectedValuesSize]);
-    //Kết thúc xử lý size
+
     const [shoesdetail, setShoesDetail] = useState({
         sizeId: "",
         colorId: "",
         quantity: "",
         price: "",
-        status: ""
+        status: "0"
     });
-    const [list, setList] = useState([]);
 
-    const onInputChangeAdd = async (e, id) => {
-
+    const onInputChangeAdd = (e, idSize, idColor) => {
         const { name, value } = e.target;
-        selectedValuesSize.map((item) => {
-            if (item.id === id) {
-                setShoesDetail({ ...shoesdetail, [name]: value, sizeId: id, colorId: valueSelectedColor }); // Cập nhật list với giá trị mới
+        if (listAddMany.length > 0) {
+            const existingItem = listAddMany.find(item => item && item.sizeId === idSize && item.colorId === idColor);
+            console.log("existingItem", existingItem);
+            if (existingItem) {
+                setShoesDetail({
+                    ...shoesdetail, sizeId: existingItem.sizeId,
+                    colorId: existingItem.colorId,
+                    quantity: existingItem.quantity,
+                    price: existingItem.price,
+                    status: existingItem.status, [name]: value, sizeId: idSize, colorId: idColor
+                });
+            } else {
+                setShoesDetail({
+                    ...shoesdetail, sizeId: "",
+                    colorId: "",
+                    quantity: "",
+                    price: "",
+                    status: "0", [name]: value, sizeId: idSize, colorId: idColor
+                });
             }
-        });
-
-    };
-    // const [valueSize,setValueSize]ư
-    // const onClickValue = (value) =>{
-
-    // }
-    useEffect(() => {
-        console.log("list", list);
-        if (listvalueSelectedColor && listvalueSelectedColor.length > 0) {
-            setListValuesSelectedColor((prevArray) => prevArray.map((item) => {
-                if (item.name === valueSelectedColor) {
-                    return { ...item, data: list };
-                }
-                return item;
-            }));
+        } else {
+            setShoesDetail({ ...shoesdetail, [name]: value, sizeId: idSize, colorId: idColor });
         }
-    }, [list]);
+    };
+
+    useEffect(() => {
+        console.log('list', listAddMany);
+    }, [listAddMany]);
 
     useEffect(() => {
         console.log(shoesdetail);
-        console.log('list', list);
-        if (list.length > 0) {
-            const existingItem = list.find(item => item && item.sizeId === shoesdetail.sizeId);
+        console.log('list', listAddMany);
+        if (listAddMany.length > 0) {
+            const existingItem = listAddMany.find(item => item && item.sizeId === shoesdetail.sizeId && item.colorId === shoesdetail.colorId);
             console.log("existingItem", existingItem);
             if (existingItem) {
-                const updatedArray = list.map(item => {
-                    if (item && item.sizeId === shoesdetail.sizeId) {
+                const updatedArray = listAddMany.map(item => {
+                    if (item && item.sizeId === shoesdetail.sizeId && item.colorId === shoesdetail.colorId) {
                         return {
                             ...item, sizeId: shoesdetail.sizeId, colorId: shoesdetail.colorId, quantity: shoesdetail.quantity, price: shoesdetail.price, status: shoesdetail.status
 
@@ -347,16 +312,29 @@ const ListShoesDetail = () => {
                     return item;
                 });
                 console.log("updatedArray", updatedArray);
-                setList(updatedArray);
+                setListAddMany(updatedArray);
             } else {
-                setList([...list, shoesdetail]);
+                setListAddMany([...listAddMany, shoesdetail]);
             }
         } else {
-            setList([shoesdetail]);
+            setListAddMany([shoesdetail]);
         }
     }, [shoesdetail]);
     //Kêt thúc conmbobox
-
+    const onClickAddMany = async () => {
+        console.log({ 'shoesDetailCreateRequests': [...listAddMany] });
+        try {
+            await axios.post(`http://localhost:33321/api/admin/shoesdetail/${id}`, { 'shoesDetailCreateRequests': [...listAddMany] });
+            getAll();
+            toast.success("Thêm thành công!");
+        } catch (error) {
+            let errorMessage = "Lỗi từ máy chủ";
+            if (error.response && error.response.data && error.response.data.message) {
+                errorMessage = error.response.data.message;
+            }
+            toast.error(errorMessage);
+        }
+    };
     //Khóa
     const lock = async (id) => {
         await axios.put(`http://localhost:33321/api/admin/shoesdetail/stop-business/${id}`);
@@ -385,7 +363,97 @@ const ListShoesDetail = () => {
             const a = document.createElement('a');
             a.style.display = 'none';
             a.href = url;
-            a.download = 'shoes_export.xlsx';
+            a.download = 'shoesdetail_export.xlsx';
+            document.body.appendChild(a);
+            a.click();
+
+            // Giải phóng tài nguyên
+            window.URL.revokeObjectURL(url);
+
+        } catch (error) {
+            console.error(error);
+        }
+    };
+    //Import Excel
+    const fileInputRef = useRef(null);
+
+    const handleFileSelect = () => {
+        fileInputRef.current.click();
+    };
+    const formData = new FormData();
+    const handleFileChange = async (event) => {
+        const selectedFile = event.target.files[0];
+
+        if (selectedFile) {
+            formData.append('file', selectedFile);
+            try {
+                console.log(formData)
+                const response = await axios.post(`http://localhost:33321/api/admin/shoesdetail/import-excel`, formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    },
+                });
+                console.log(response);
+                getAll();
+                toast.success("Nhập excel thành công");
+                // navigate("/admin/product");
+            } catch (error) {
+                let errorMessage = "Lỗi từ máy chủ";
+                if (error.response && error.response.data && error.response.data.message) {
+                    errorMessage = error.response.data.message;
+                }
+                toast.error(errorMessage);
+            }
+        }
+    };
+    //Kết thúc import excel
+
+    //Tải mẫu excel
+
+    const taiMau = async () => {
+        try {
+            const res = await axios.get(`http://localhost:33321/api/admin/shoesdetail/export/pattern`, {
+                responseType: 'blob'
+            });
+
+            const blob = new Blob([res.data], { type: 'application/excel' });
+
+            // Tạo một URL cho Blob và tạo một thẻ a để download
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.style.display = 'none';
+            a.href = url;
+            a.download = 'Template_addShoesDetail.xlsx';
+            document.body.appendChild(a);
+            a.click();
+
+            // Giải phóng tài nguyên
+            window.URL.revokeObjectURL(url);
+
+        } catch (error) {
+            console.error(error);
+        }
+    };
+    //Kết thúc tải mẫu excel
+
+    const xuatPDF = async () => {
+        try {
+            const requestData = ListShoesDetail;
+            const res = await axios.post(`http://localhost:33321/api/admin/shoesdetail/export/pdf`, requestData, {
+                responseType: 'blob',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            const blob = new Blob([res.data], { type: 'application/pdf' });
+
+            // Tạo một URL cho Blob và tạo một thẻ a để download
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.style.display = 'none';
+            a.href = url;
+            a.download = 'Export_ShoesDetail.pdf';
             document.body.appendChild(a);
             a.click();
 
@@ -397,6 +465,134 @@ const ListShoesDetail = () => {
         }
     };
     //End exportexcel
+
+    // Thêm mới 1 ctsp
+    const [modalAdd, setModalAdd] = useState(false);
+    const toggle = () => setModalAdd(!modalAdd);
+    const [modalEdit, setModalEdit] = useState(false);
+    const toggleEdit = () => setModalEdit(!modalEdit);
+    useEffect(() => {
+        if (modalAdd === false) {
+            resetAddOne();
+        }
+    }, [modalAdd]);
+    useEffect(() => {
+        if (modalEdit === false) {
+            resetAddOne();
+        }
+    }, [modalEdit]);
+    const [addone, setAddOne] = useState({
+        id: "",
+        sizeId: "",
+        colorId: "",
+        quantity: "",
+        price: "",
+        status: "0"
+    });
+    const resetAddOne = () => {
+        setAddOne({
+            id: "",
+            sizeId: "",
+            colorId: "",
+            quantity: "",
+            price: "",
+            status: "0"
+        })
+    }
+    const saveAdd = async () => {
+        try {
+            await axios.post(`http://localhost:33321/api/admin/shoesdetail/${id}`, {
+                'shoesDetailCreateRequests': [{
+                    sizeId: addone.sizeId,
+                    colorId: addone.colorId,
+                    quantity: addone.quantity,
+                    price: addone.price,
+                    status: addone.status
+                }]
+            });
+            toggle();
+            getAll();
+            toast.success("Thêm thành công!");
+        } catch (error) {
+            let errorMessage = "Lỗi từ máy chủ";
+            if (error.response && error.response.data && error.response.data.message) {
+                errorMessage = error.response.data.message;
+            }
+            toast.error(errorMessage);
+        }
+    };
+    const openEdit = async (id) => {
+        try {
+            const res = await axios.get(`http://localhost:33321/api/admin/shoesdetail/${id}`);
+            console.log("res:", res);
+            setAddOne({
+                id: res.data.data.id,
+                sizeId: res.data.data.sizeId,
+                colorId: res.data.data.colorId,
+                quantity: res.data.data.quantity,
+                price: res.data.data.price,
+                status: res.data.data.status
+            })
+            toggleEdit();
+        } catch (error) {
+            let errorMessage = "Lỗi từ máy chủ";
+            if (error.response && error.response.data && error.response.data.message) {
+                errorMessage = error.response.data.message;
+            }
+            toast.error(errorMessage);
+        }
+
+    }
+    const saveEdit = async () => {
+        try {
+            await axios.put(`http://localhost:33321/api/admin/shoesdetail/${addone.id}`, {
+                sizeId: addone.sizeId,
+                colorId: addone.colorId,
+                quantity: addone.quantity,
+                price: addone.price
+            });
+            toggleEdit();
+            getAll();
+            toast.success("Cập nhật thành công!");
+        } catch (error) {
+            let errorMessage = "Lỗi từ máy chủ";
+            if (error.response && error.response.data && error.response.data.message) {
+                errorMessage = error.response.data.message;
+            }
+            toast.error(errorMessage);
+        }
+    };
+
+    //Kết thúc thêm mới 1 ctsp
+    //Start Delete
+    const [deleteshoes, setDeleteShoes] = useState([]);
+    const [iddeleteshoes, setIdDeleteShoes] = useState([]);
+    const [modalConfirmDelete, setModalConfirmDelete] = useState(false);
+    const toggleDelete = () => setModalConfirmDelete(!modalConfirmDelete);
+    const handleConfirmDelete = (shoes) => {
+        setDeleteShoes(shoes);
+        setIdDeleteShoes([...iddeleteshoes, shoes.id])
+        toggleDelete();
+    }
+    const handleDelete = async () => {
+        try {
+            console.log(iddeleteshoes);
+            axios.delete(`http://localhost:33321/api/admin/shoesdetail/delete`, { data: iddeleteshoes });
+            getAll();
+            setIdDeleteShoes([]);
+            toggleDelete();
+            toast.success("Xóa thành công ");
+        } catch (error) {
+            setIdDeleteShoes([]);
+            toggleDelete();
+            let errorMessage = "Lỗi từ máy chủ";
+            if (error.response && error.response.data && error.response.data.message) {
+                errorMessage = error.response.data.message;
+            }
+            toast.error(errorMessage);
+        }
+    }
+    //End Delete
     return (
         <>
             <Header />
@@ -432,7 +628,6 @@ const ListShoesDetail = () => {
                                         <Row>
                                             <Col lg="2">
                                                 <label className="form-control-label">Hãng:  </label>
-                                                <label>{dataShoesById.brandName}</label>
                                             </Col>
                                             <Col lg="2">
                                                 <label>{dataShoesById.brandName}</label>
@@ -753,7 +948,7 @@ const ListShoesDetail = () => {
                                                     <Button
                                                         className="btn btn-outline-primary"
                                                         size="sm"
-                                                        to="/admin/product/add" tag={Link}
+                                                        onClick={toggle}
                                                     >
                                                         Thêm mới
                                                     </Button>
@@ -761,13 +956,21 @@ const ListShoesDetail = () => {
                                                         className="btn btn-outline-primary"
                                                         onClick={(e) => e.preventDefault()}
                                                         size="sm"
+                                                        onClick={taiMau}
                                                     >
                                                         Tải mẫu
                                                     </Button>
+                                                    <input
+                                                        type="file"
+                                                        style={{ display: 'none' }}
+                                                        ref={fileInputRef}
+                                                        onChange={handleFileChange}
+                                                    />
 
                                                     <Button
                                                         className="btn btn-outline-primary"
                                                         size="sm"
+                                                        onClick={handleFileSelect}
                                                     >
                                                         Nhập Excel
                                                     </Button>
@@ -781,6 +984,7 @@ const ListShoesDetail = () => {
                                                     <Button
                                                         className="btn btn-outline-primary"
                                                         size="sm"
+                                                        onClick={xuatPDF}
                                                     >
                                                         Xuất PDF
                                                     </Button>
@@ -806,13 +1010,14 @@ const ListShoesDetail = () => {
 
                                                             </th>
                                                             <th>STT</th>
+                                                            <th>Trạng thái</th>
                                                             <th>Mã</th>
                                                             <th>Màu</th>
                                                             <th>Size</th>
                                                             <th>Số lượng</th>
                                                             <th>Giá gốc</th>
                                                             <th>Giá KM</th>
-                                                            <th>Trạng thái</th>
+
                                                             <th colSpan={2} style={{ position: "sticky", zIndex: '1', right: '0' }}>Thao tác</th>
                                                         </tr>
                                                     </thead>
@@ -833,21 +1038,24 @@ const ListShoesDetail = () => {
                                                                             </FormGroup>
                                                                         </td>
                                                                         <th scope="row"> {index + 1}</th>
+                                                                        <td>
+                                                                            <Badge color={statusMapping[item.status]?.color || statusMapping.default.color}>
+                                                                                {statusMapping[item.status]?.label || statusMapping.default.label}
+                                                                            </Badge>
+                                                                        </td>
                                                                         <td>{item.code}</td>
                                                                         <td>{item.color}</td>
                                                                         <td>{item.size}</td>
                                                                         <td>{item.quantity}</td>
                                                                         <td>{item.price}</td>
                                                                         <td>{item.discountPrice}</td>
-                                                                        <td>
-                                                                            <Badge color={statusMapping[item.status]?.color || statusMapping.default.color}>
-                                                                                {statusMapping[item.status]?.label || statusMapping.default.label}
-                                                                            </Badge>
-                                                                        </td>
                                                                         <td style={{ position: "sticky", zIndex: '1', right: '0', background: "#fff" }}>
                                                                             {/* <Button color="danger" to={`/admin/product/edit/${item.id}`} tag={Link} size="sm" disabled={item.status === 0 ? true : false}>
                                                                         <i class="fa-solid fa-pen" />
                                                                     </Button> */}
+                                                                            <Button color="link" size="sm" disabled={item.status === 0 ? true : false} onClick={() => openEdit(item.id)}>
+                                                                                <FaEdit color="primary" />
+                                                                            </Button>
                                                                             {item.status === 0 &&
                                                                                 <Button color="link" size="sm" onClick={() => openlock(item.id)}>
                                                                                     <FaLockOpen color="green" />
@@ -858,7 +1066,7 @@ const ListShoesDetail = () => {
                                                                                     <FaLock color="green" />
                                                                                 </Button>
                                                                             }
-                                                                            <Button color="link" size="sm" disabled={item.status === 0 ? true : false}>
+                                                                            <Button color="link" size="sm" disabled={item.status === 0 ? true : false} onClick={() => handleConfirmDelete(item)}>
                                                                                 <FaTrash color="red" />
                                                                             </Button>
                                                                         </td>
@@ -975,20 +1183,6 @@ const ListShoesDetail = () => {
                                         <Col lg="12">
                                             <Card className="shadow m-4">
                                                 <CardBody>
-                                                    <CardTitle>
-                                                        <Input id="btn_select_tt" type="select" name="sizeId" className="col-2 mt-4"
-                                                            onChange={(e) => onInputChangeSelectedColor(e.target.value)}
-                                                        >
-                                                            {selectedValuesColor.map((value, index) => (
-                                                                <option value={value.id} key={value.id}>
-                                                                    {value.name}
-                                                                </option>
-                                                            ))}
-                                                        </Input>
-                                                    </CardTitle>
-
-
-
                                                     {selectedValuesColor.map((itemColor, index) => (
                                                         <>
                                                             <div>{itemColor.name}</div>
@@ -1012,7 +1206,7 @@ const ListShoesDetail = () => {
                                                                                     name="price"
                                                                                     placeholder="Nhập giá"
                                                                                     value={value.price}
-                                                                                    onChange={(e) => onInputChangeAdd(e, value.id)}
+                                                                                    onChange={(e) => onInputChangeAdd(e, value.id, itemColor.id)}
 
                                                                                 />
                                                                             </td>
@@ -1022,11 +1216,12 @@ const ListShoesDetail = () => {
                                                                                     name="quantity"
                                                                                     placeholder="Nhập số lượng"
                                                                                     value={value.quantity}
-                                                                                    onChange={(e) => onInputChangeAdd(e, value.id)}
+                                                                                    onChange={(e) => onInputChangeAdd(e, value.id, itemColor.id)}
                                                                                 />
                                                                             </td>
                                                                             <td >
-                                                                                <Input id={`status_${value.id}`} type="select" name="status" value={value.status} onChange={(e) => onInputChangeAdd(e, value.id)}
+                                                                                <Input id={`status_${value.id}`} type="select" name="status" value={value.status}
+                                                                                    onChange={(e) => onInputChangeAdd(e, value.id, itemColor.id)}
                                                                                 >
                                                                                     <option value='1'>
                                                                                         Đang bán
@@ -1050,7 +1245,7 @@ const ListShoesDetail = () => {
 
 
 
-                                                    <Button>Thêm</Button>
+                                                    <Button onClick={onClickAddMany}>Thêm</Button>
                                                 </CardBody >
                                             </Card>
                                         </Col>
@@ -1068,6 +1263,320 @@ const ListShoesDetail = () => {
                 </Row >
 
             </Container >
+            <Modal
+                isOpen={modalAdd}
+                toggle={toggle}
+                backdrop={'static'}
+                keyboard={false}
+                style={{ maxWidth: '500px' }}
+            >
+                <ModalHeader toggle={toggle}>
+                    <h3 className="heading-small text-muted mb-0">Thêm mới</h3>
+                </ModalHeader>
+                <ModalBody>
+                    <Form>
+                        <div className="pl-lg-4">
+                            <Row>
+                                <Col lg="6">
+                                    <FormGroup>
+                                        <label
+                                            className="form-control-label"
+                                            htmlFor="input-email"
+                                        >
+                                            Màu
+                                        </label>
+                                        <Input id="btn_select_tt" type="select" name="sizeId" value={addone.colorId}
+                                            onChange={(e) => setAddOne({
+                                                ...addone,
+                                                colorId: e.target.value
+                                            })}>
+                                            <option value=" "> -- Chọn --  </option>
+                                            {listColor && listColor.length > 0 &&
+                                                listColor.map((item, index) => {
+                                                    return (
+                                                        <option value={item.id} key={item.id} >
+                                                            {item.name}
+                                                        </option>
+                                                    )
+
+                                                })
+                                            }
+                                        </Input>
+                                    </FormGroup>
+                                </Col>
+                                <Col lg="6">
+                                    <FormGroup>
+                                        <label
+                                            className="form-control-label"
+                                            htmlFor="input-email"
+                                        >
+                                            Size
+                                        </label>
+                                        <Input id="btn_select_tt" type="select" name="sizeId" value={addone.sizeId}
+                                            onChange={(e) => setAddOne({
+                                                ...addone,
+                                                sizeId: e.target.value
+                                            })}>
+                                            <option value=" "> -- Chọn --  </option>
+                                            {listSize && listSize.length > 0 &&
+                                                listSize.map((item, index) => {
+                                                    return (
+                                                        <option value={item.id} key={item.id} >
+                                                            {item.name}
+                                                        </option>
+                                                    )
+
+                                                })
+                                            }
+                                        </Input>
+                                    </FormGroup>
+                                </Col>
+                                <Col lg="6">
+                                    <FormGroup>
+                                        <label className="form-control-label">
+                                            Giá
+                                        </label>
+                                        <Input
+                                            className="form-control-alternative"
+                                            type="text"
+                                            value={addone.price}
+                                            onChange={(e) =>
+                                                setAddOne({
+                                                    ...addone,
+                                                    price: e.target.value
+                                                })}
+                                        />
+                                    </FormGroup>
+                                </Col>
+                                <Col lg="6">
+                                    <FormGroup>
+                                        <label className="form-control-label">
+                                            Số lượng
+                                        </label>
+                                        <Input
+                                            className="form-control-alternative"
+                                            type="text"
+                                            value={addone.quantity}
+                                            onChange={(e) =>
+                                                setAddOne({
+                                                    ...addone,
+                                                    quantity: e.target.value
+                                                })}
+                                        />
+                                    </FormGroup>
+                                </Col>
+                                <Col lg="12">
+                                    <FormGroup>
+                                        <label className="form-control-label">
+                                            Trạng thái
+                                        </label>
+                                        <Input type="select" name="status" value={addone.status}
+                                            onChange={(e) =>
+                                                setAddOne({
+                                                    ...addone,
+                                                    status: e.target.value
+                                                })}
+                                        >
+                                            <option value='1'>
+                                                Đang bán
+                                            </option>
+                                            <option value='0'>
+                                                Ngừng bán
+                                            </option>
+                                            <option value='2'>
+                                                Hết hàng
+                                            </option>
+
+                                        </Input>
+                                    </FormGroup>
+                                </Col>
+
+                            </Row>
+                        </div>
+                    </Form>
+                </ModalBody>
+                <ModalFooter>
+                    <div className="text-center">
+                        <Button color="primary" size="sm" onClick={(e) => saveAdd(e)}>
+                            Thêm mới
+                        </Button>{' '}
+                        <Button color="primary" size="sm" onClick={resetAddOne}>
+                            Reset
+                        </Button>
+                        <Button color="danger" size="sm" onClick={toggle} >
+                            Close
+                        </Button>
+                    </div>
+                </ModalFooter>
+            </Modal >
+            <Modal
+                isOpen={modalEdit}
+                toggle={toggleEdit}
+                backdrop={'static'}
+                keyboard={false}
+                style={{ maxWidth: '500px' }}
+            >
+                <ModalHeader toggle={toggleEdit}>
+                    <h3 className="heading-small text-muted mb-0">Cập nhật</h3>
+                </ModalHeader>
+                <ModalBody>
+                    <Form>
+                        <div className="pl-lg-4">
+                            <Row>
+                                <Col lg="6">
+                                    <FormGroup>
+                                        <label
+                                            className="form-control-label"
+                                            htmlFor="input-email"
+                                        >
+                                            Màu
+                                        </label>
+                                        <Input id="btn_select_tt" type="select" name="sizeId" value={addone.colorId}
+                                            disabled
+                                            onChange={(e) => setAddOne({
+                                                ...addone,
+                                                colorId: e.target.value
+
+                                            })}>
+                                            <option value=" "> -- Chọn --  </option>
+                                            {listColor && listColor.length > 0 &&
+                                                listColor.map((item, index) => {
+                                                    return (
+                                                        <option value={item.id} key={item.id} >
+                                                            {item.name}
+                                                        </option>
+                                                    )
+
+                                                })
+                                            }
+                                        </Input>
+                                    </FormGroup>
+                                </Col>
+                                <Col lg="6">
+                                    <FormGroup>
+                                        <label
+                                            className="form-control-label"
+                                            htmlFor="input-email"
+                                        >
+                                            Size
+                                        </label>
+                                        <Input id="btn_select_tt" type="select" name="sizeId" value={addone.sizeId} disabled
+                                            onChange={(e) => setAddOne({
+                                                ...addone,
+                                                sizeId: e.target.value
+                                            })}>
+                                            <option value=" "> -- Chọn --  </option>
+                                            {listSize && listSize.length > 0 &&
+                                                listSize.map((item, index) => {
+                                                    return (
+                                                        <option value={item.id} key={item.id} >
+                                                            {item.name}
+                                                        </option>
+                                                    )
+
+                                                })
+                                            }
+                                        </Input>
+                                    </FormGroup>
+                                </Col>
+                                <Col lg="6">
+                                    <FormGroup>
+                                        <label className="form-control-label">
+                                            Giá
+                                        </label>
+                                        <Input
+                                            className="form-control-alternative"
+                                            type="text"
+                                            value={addone.price}
+                                            onChange={(e) =>
+                                                setAddOne({
+                                                    ...addone,
+                                                    price: e.target.value
+                                                })}
+                                        />
+                                    </FormGroup>
+                                </Col>
+                                <Col lg="6">
+                                    <FormGroup>
+                                        <label className="form-control-label">
+                                            Số lượng
+                                        </label>
+                                        <Input
+                                            className="form-control-alternative"
+                                            type="text"
+                                            value={addone.quantity}
+                                            onChange={(e) =>
+                                                setAddOne({
+                                                    ...addone,
+                                                    quantity: e.target.value
+                                                })}
+                                        />
+                                    </FormGroup>
+                                </Col>
+                                <Col lg="12">
+                                    <FormGroup>
+                                        <label className="form-control-label">
+                                            Trạng thái
+                                        </label>
+                                        <Input type="select" name="status" value={addone.status}
+                                            onChange={(e) =>
+                                                setAddOne({
+                                                    ...addone,
+                                                    status: e.target.value
+                                                })}
+                                        >
+                                            <option value='1'>
+                                                Đang bán
+                                            </option>
+                                            <option value='0'>
+                                                Ngừng bán
+                                            </option>
+                                            <option value='2'>
+                                                Hết hàng
+                                            </option>
+
+                                        </Input>
+                                    </FormGroup>
+                                </Col>
+
+                            </Row>
+                        </div>
+                    </Form>
+                </ModalBody>
+                <ModalFooter>
+                    <div className="text-center">
+                        <Button color="primary" size="sm" onClick={(e) => saveEdit(e)}>
+                            Cập nhật
+                        </Button>{' '}
+                        <Button color="danger" size="sm" onClick={toggleEdit} >
+                            Close
+                        </Button>
+                    </div>
+                </ModalFooter>
+            </Modal >
+            <Modal
+                isOpen={modalConfirmDelete}
+                toggle={toggleDelete}
+                backdrop={'static'}
+                keyboard={false}
+            >
+                <ModalHeader>
+                    Thông báo
+                </ModalHeader>
+                <ModalBody>
+                    <h3>Bạn có muốn xóa giày mã {deleteshoes.code} giày này không ?</h3>
+                </ModalBody>
+                <ModalFooter>
+                    <div className="text-center">
+                        <Button color="danger" onClick={() => handleDelete()}>
+                            Xóa
+                        </Button>{' '}
+                        <Button color="danger" onClick={toggleDelete}>
+                            Hủy
+                        </Button>{' '}
+                    </div>
+                </ModalFooter>
+            </Modal>
         </>
     );
 };

@@ -761,6 +761,7 @@ const ListShoesDetail = () => {
                                                         className="btn btn-outline-primary"
                                                         onClick={(e) => e.preventDefault()}
                                                         size="sm"
+                                                        
                                                     >
                                                         Tải mẫu
                                                     </Button>
