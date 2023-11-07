@@ -1,6 +1,6 @@
 import axios from "axios";
 import React, { useState, useEffect } from "react";
-import { FaEdit, FaTrash, FaSearch, FaFileAlt, FaCamera } from 'react-icons/fa';
+import { FaEdit, FaTrash, FaSearch, FaFileAlt, FaCamera ,FaLock, FaLockOpen} from 'react-icons/fa';
 import ReactPaginate from "react-paginate";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -97,8 +97,8 @@ const Staff = () => {
   };
 
   const statusMapping = {
-    0: { color: 'danger', label: 'Ngừng hoạt động' },
-    1: { color: 'success', label: 'Đang hoạt động' },
+    0: { color: 'danger', label: 'Nghỉ làm' },
+    1: { color: 'success', label: 'Đang làm' },
 
   };
   //lọc
@@ -107,7 +107,7 @@ const Staff = () => {
       page: 0,
       size: 5,
       fullname: '',
-      phoneNumber: '',
+      phonenumber: '',
       email: '',
       gender: '',
     });
@@ -160,7 +160,7 @@ const Staff = () => {
       username: admin.username,
       fullname: admin.fullname,
       gender: admin.gender,
-      // avatar: admin.avatar,
+      avatar: admin.avatar,
       dateOfBirth: admin.dateOfBirth,
       email: admin.email,
       phoneNumber: admin.phoneNumber,
@@ -511,8 +511,8 @@ const Staff = () => {
                             setSelectedStatus(value === '' ? '' : value);
                           }}>
                           <option value="">Tất cả</option>
-                          <option value="0">Ngừng hoạt động</option>
-                          <option value="1">Đang hoạt động</option>
+                          <option value="0">Nghỉ làm</option>
+                          <option value="1">Đang làm</option>
                         </Input>
                       </Col>
                     </div>
@@ -539,8 +539,9 @@ const Staff = () => {
                           </FormGroup>
                         </th>
                         <th scope="col">STT</th>
-                        <th scope="col">Trạng thái</th>
                         <th scope="col">Ảnh</th>
+                        <th scope="col">Trạng thái</th>
+                        
                         <th scope="col">Họ tên</th>
                         <th scope="col">Ngày sinh</th>
                         <th scope="col">Giới tính</th>
@@ -565,15 +566,16 @@ const Staff = () => {
                             </td>
                             <td>{calculateIndex(index)}</td>
                             <td>
-                              <Badge color={statusMapping[admin.status]?.color || statusMapping.default.color}>
-                                {statusMapping[admin.status]?.label || statusMapping.default.label}
-                              </Badge>
-                            </td>
-                            <td>
                               <span className="avatar avatar-sm rounded-circle">
                                 <img src={`data:image/jpeg;base64,${admin.avatar}`} alt="" />
                               </span>
                             </td>
+                            <td>
+                              <Badge color={statusMapping[admin.status]?.color || statusMapping.default.color}>
+                                {statusMapping[admin.status]?.label || statusMapping.default.label}
+                              </Badge>
+                            </td>
+                            
                             <td>{admin.fullname}</td>
                             <td>{admin.dateOfBirth}</td>
                             <td>{admin.gender ? "Nữ" : "Nam"}</td>
@@ -582,16 +584,16 @@ const Staff = () => {
                             <td>{admin.addressDetail}, {admin.communeCode}, {admin.districtCode}, {admin.proviceCode} </td>
 
                             <td style={{ position: "sticky", zIndex: '1', right: '0', backgroundColor: '#fff' }}>
-                              <Button color="info" size="sm" onClick={() => handleRowClick(admin)}><FaEdit /></Button>
-                              <Button color="danger" size="sm" onClick={() => deleteAdmin(admin.id)} ><FaTrash /></Button>
+                              <Button color="link" size="sm" onClick={() => handleRowClick(admin)}><FaEdit color="primary" /></Button>
+                              <Button color="link" size="sm" onClick={() => deleteAdmin(admin.id)} ><FaTrash color="red" /></Button>
                               {admin.status === 0 &&
-                                <Button color="warning" size="sm" onClick={() => updateStatus(admin.id, 1)}>
-                                  <i class="fa-solid fa-lock-open fa-flip-horizontal"></i>
+                                <Button color="link"  size="sm" onClick={() => updateStatus(admin.id, 1)}>
+                                  <FaLockOpen color="green" />
                                 </Button>
                               }
                               {admin.status === 1 &&
-                                <Button color="warning" size="sm" onClick={() => updateStatus(admin.id, 0)} >
-                                  <i class="fa-solid fa-lock"></i>
+                                <Button color="link" size="sm" onClick={() => updateStatus(admin.id, 0)} >
+                                <FaLock color="green" />
                                 </Button>
                               }
                             </td>
