@@ -3,11 +3,13 @@ import { ToastContainer, toast } from "react-toastify";
 
 import { FaQrcode, FaSearch, FaUserPlus } from 'react-icons/fa';
 import { TbShoppingBagPlus } from 'react-icons/tb';
-import { Row, Col, Button, Card, CardBody, CardHeader, Table, InputGroup, Input, Form, FormGroup, Label } from "reactstrap";
+import Switch from 'react-input-switch';
+import { Row, Col, Button, Card, CardBody, CardHeader, Table, InputGroup, Input, Form, FormGroup, Label, InputGroupAddon, InputGroupText } from "reactstrap";
 
 const OrderHeader = () => {
 
     const [hasCustomerData, setHasCustomerData] = useState(false);
+    const [showShippingForm, setShowShippingForm] = useState(false);
     const products = [];
 
 
@@ -52,60 +54,194 @@ const OrderHeader = () => {
                 </Card>
             </Col>
 
-            <Col lg={6}>
-                <Card>
-                    <CardHeader>
-                        <Row>
-                            <Col sm={5} style={{display:"flex"}}>
-                                <h4>Khách hàng</h4>
-                                {!hasCustomerData && <p style={{fontSize: 14, marginLeft:10}}>Khách lẻ</p>}
-                            </Col>
-                            <Col sm={7} style={{display:"flex"}}>
-                                <InputGroup size="sm" style={{ width: 200 }}>
-                                <Input type="text" placeholder="Tìm kiếm khách hàng" />
-                            </InputGroup> 
-                                <Button className="mb-5" size="sm" color="link"><FaUserPlus className="m-1" /></Button>
-                            </Col>
-                        </Row>
+            <Row className="col">
+                <Col lg={7}>
 
-                    </CardHeader>
+                    <Col lg="12">
+                        <Card>
+                            <CardHeader>
+                                <Row >
+                                    <Col sm={7} style={{ display: "flex" }}>
+                                        <h4>Khách hàng</h4>
+                                        {/* {!hasCustomerData && <p style={{ fontSize: 13, marginLeft: 12, padding: 7, background: "gray", color: "#fff", borderRadius: "50%" }}>Khách lẻ</p>} */}
+                                    </Col>
+                                    <Col sm={5} style={{ display: "flex" }}>
+                                        <InputGroup size="sm" style={{ width: 200 }}>
+                                            <Input type="search" placeholder="Tìm kiếm khách hàng" />
+                                        </InputGroup>
+                                        <FaUserPlus className="m-2" />
+                                    </Col>
+                                </Row>
+                            </CardHeader>
 
-                    {/* {hasCustomerData && ( */}
-                    <CardBody style={{ fontSize: 14 }}>
-                        <Form>
-                            <FormGroup row>
-                                <Label sm={4}>Tên khách hàng:</Label>
-                                <Col sm={8}>
-                                    <Input type="text" size="sm" />
-                                </Col>
-                            </FormGroup>
-                            <FormGroup row>
-                                <Label sm={4}>Email:</Label>
-                                <Col sm={8}>
-                                    <Input type="email" size="sm" />
-                                </Col>
-                            </FormGroup>
-                            <FormGroup row>
-                                <Label sm={4}>Số điện thoại:</Label>
-                                <Col sm={8}>
-                                    <Input type="tel" size="sm" />
-                                </Col>
-                            </FormGroup>
-                        </Form>
-                    </CardBody>
-                    {/* )} */}
-                </Card>
-            </Col>
+                            {/* {hasCustomerData && ( */}
+                            <CardBody style={{ fontSize: 14 }}>
+                                <Form>
+                                    <Row className="mb-1">
+                                        <Label className="col">Tên khách hàng:</Label>
+                                        <Col className="text-right">
+                                            <h5>Phan Thị Hoa Phượng</h5>
+                                        </Col>
+                                    </Row>
+                                    <Row className="mb-1">
+                                        <Label className="col">Email:</Label>
+                                        <Col className="text-right">
+                                            <h5>hoaphuong190723@gmail.com</h5>
+                                        </Col>
+                                    </Row>
+                                    <Row>
+                                        <Label className="col">Số điện thoại:</Label>
+                                        <Col className="text-right">
+                                            <h5>0397509321</h5>
+                                        </Col>
+                                    </Row>
+                                </Form>
+                            </CardBody>
+                            {/* )}  */}
+                        </Card>
+                    </Col>
 
-            <Col lg={6}>
-                <Card>
-                    <CardHeader className="h4">Thanh toán</CardHeader>
-                    <CardBody>
+                    {showShippingForm && (
+                    <Col lg="12" className="mt-3">
+                        <Card>
+                            <CardHeader className="h4">Thông tin giao hàng</CardHeader>
+                            <CardBody style={{ fontSize: 14 }}>
+                                <Form>
 
-                    </CardBody>
+                                    <Row>
+                                        <Col lg="6">
+                                            <FormGroup>
+                                                <Label>Người nhận</Label>
+                                                <Input type="text" size="sm" />
+                                            </FormGroup>
+                                        </Col>
+                                        <Col lg="6">
+                                            <FormGroup>
+                                                <Label>Số điện thoại</Label>
+                                                <Input type="tel" size="sm" />
+                                            </FormGroup>
+                                        </Col>
+                                    </Row>
 
-                </Card>
-            </Col>
+                                    <Row>
+                                        <Col lg="4">
+                                            <FormGroup>
+                                                <Label>Tỉnh/thành phố</Label>
+                                                <Input type="select" size="sm" />
+                                            </FormGroup>
+                                        </Col>
+                                        <Col lg="4">
+                                            <FormGroup>
+                                                <Label>Quận/huyện</Label>
+                                                <Input type="select" size="sm" />
+                                            </FormGroup>
+                                        </Col>
+                                        <Col lg="4">
+                                            <FormGroup>
+                                                <Label>Xã/phường</Label>
+                                                <Input type="select" size="sm" />
+                                            </FormGroup>
+                                        </Col>
+                                    </Row>
+
+                                    <Row>
+                                        <Col lg="12">
+                                            <FormGroup>
+                                                <Label>Địa chỉ</Label>
+                                                <Input rows="2" type="textarea" size="sm" />
+                                            </FormGroup>
+                                        </Col>
+                                    </Row>
+                                </Form>
+                            </CardBody>
+
+                        </Card>
+                    </Col>
+                    )}
+
+                </Col>
+
+                <Col lg={5}>
+
+                    <Card>
+                        <CardHeader>
+                            <Row className="col" style={{ justifyContent: "space-between" }}>
+                                <h4>Thanh toán</h4>
+                                <Switch className="mt-1" on="yes" off="no" checked={showShippingForm} onChange={() => setShowShippingForm(!showShippingForm)} />
+                            </Row>
+                        </CardHeader>
+                        <CardBody style={{ fontSize: 14 }}>
+                            <Form>
+                                <FormGroup row>
+                                    <Col lg={12}>
+                                        <InputGroup size="sm">
+                                            <Input type="search" placeholder="Tìm kiếm voucher..." />
+                                            <InputGroupAddon addonType="append">
+                                                <InputGroupText>
+                                                    <FaSearch />
+                                                </InputGroupText>
+                                            </InputGroupAddon>
+                                        </InputGroup>
+                                    </Col>
+
+                                </FormGroup>
+                                <Row className="mb-1">
+                                    <Label className="col">Tổng tiền hàng:</Label>
+                                    <Col className="text-right">
+                                        <h5>0</h5>
+                                    </Col>
+                                </Row>
+                                <Row className="mb-1">
+                                    <Label className="col">Đợt giảm giá:</Label>
+                                    <Col className="text-right">
+                                        <h5>0</h5>
+                                    </Col>
+                                </Row>
+                                <Row className="mb-1">
+                                    <Label className="col">Voucher của shop:</Label>
+                                    <Col className="text-right">
+                                        <h5>0</h5>
+                                    </Col>
+                                </Row>
+                                <Row className="mb-1">
+                                    <Label className="col">Phí vận chuyển:</Label>
+                                    <Col className="text-right">
+                                        <h5>0</h5>
+                                    </Col>
+                                </Row>
+                                <Row className="mb-1">
+                                    <Label className="col">Giảm phí vận chuyển:</Label>
+                                    <Col className="text-right">
+                                        <h5>0</h5>
+                                    </Col>
+                                </Row>
+                                <Row className="mb-1">
+                                    <Label className="col h5" style={{fontSize:14}}>Thành tiền:</Label>
+                                    <Col className="text-right">
+                                        <h5 style={{ color: "red" }}>0</h5>
+                                    </Col>
+                                </Row>
+                                <Row className="mb-1">
+                                    <Col lg="12">
+                                        <InputGroup size="sm">
+                                            <Input type="number" placeholder="Nhập số tiền khách đưa" />
+                                        </InputGroup>
+                                    </Col>
+                                </Row>
+                                <Row className="mb-1">
+                                    <Label className="col">Tiền thừa:</Label>
+                                    <Col className="text-right">
+                                        <h5 style={{ color: "red" }}>0</h5>
+                                    </Col>
+                                </Row>
+                            </Form>
+                        </CardBody>
+
+                    </Card>
+                </Col>
+            </Row>
+
+
         </Row>
     );
 };
