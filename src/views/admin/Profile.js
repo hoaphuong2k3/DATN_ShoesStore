@@ -24,10 +24,12 @@ import ProfileHeader from "components/Headers/ProfileHeader";
 
 const Profile = () => {
 
+  // const [userInfo, setUserInfo] = useState(null);
+  const storedUserId = localStorage.getItem('userId');
 
   const [provinces, setProvinces] = useState([]);
 
-  const [admins, setAdmins] = useState([]);
+  const [admins, setAdmins] = useState(null);
 
 
   const fetchData = async () => {
@@ -35,8 +37,10 @@ const Profile = () => {
       const provincesResponse = await axios.get("https://provinces.open-api.vn/api/?depth=3");
       setProvinces(provincesResponse.data);
 
-      const response = await axiosInstance.get("/staff/detail/1");
+      const response = await axiosInstance.get(`/staff/detail/${storedUserId}`);
       setAdmins(response.data);
+      
+    console.log(storedUserId);
       console.log(response.data);
     } catch (error) {
       console.error("Error fetching data: ", error);
@@ -45,39 +49,72 @@ const Profile = () => {
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [storedUserId]);
 
+
+  // useEffect(() => {
+  //   const fetchAvt = async () => {
+  //     if (admins.avatar) {
+  //       const blob = await fetch(`data:image/jpeg;base64,${admins.avatar}`).then((res) => res.blob());
+  //       const file = new File([blob], "image.jpg", { type: "image/jpeg" });
+  //       setFile(file);
+  //     }
+  //   };
+  
+  //   setFormData({
+  //     id: storedUserId,
+  //     fullname: admins.fullname,
+  //     email: admins.email,
+  //     // avatar: admins.avatar,
+  //     dateOfBirth: admins.dateOfBirth,
+  //     phoneNumber: admins.phoneNumber,
+  //     address: {
+  //       addressDetail: admins.addressDetail,
+  //       proviceCode: admins.proviceCode,
+  //       districtCode: admins.districtCode,
+  //       communeCode: admins.communeCode,
+  //       isDeleted: true,
+  //     },
+  //   });
+  
+  //   fetchAvt();
+  //   console.log(admins);
+
+  // }, [admins]);
+
+  //Add
 
   useEffect(() => {
     const fetchAvt = async () => {
-      if (admins.avatar) {
+      if (admins && admins.avatar) {
         const blob = await fetch(`data:image/jpeg;base64,${admins.avatar}`).then((res) => res.blob());
         const file = new File([blob], "image.jpg", { type: "image/jpeg" });
         setFile(file);
       }
     };
   
-    setFormData({
-      id: admins.id,
-      fullname: admins.fullname,
-      email: admins.email,
-      // avatar: admins.avatar,
-      dateOfBirth: admins.dateOfBirth,
-      phoneNumber: admins.phoneNumber,
-      address: {
-        addressDetail: admins.addressDetail,
-        proviceCode: admins.proviceCode,
-        districtCode: admins.districtCode,
-        communeCode: admins.communeCode,
-        isDeleted: true,
-      },
-    });
+    const updateFormData = () => {
+      setFormData((prevFormData) => ({
+        ...prevFormData,
+        id: storedUserId,
+        fullname: admins ? admins.fullname : '',
+        email: admins ? admins.email : '',
+        dateOfBirth: admins ? admins.dateOfBirth : '',
+        phoneNumber: admins ? admins.phoneNumber : '',
+        address: {
+          addressDetail: admins ? admins.addressDetail : '',
+          proviceCode: admins ? admins.proviceCode : '',
+          districtCode: admins ? admins.districtCode : '',
+          communeCode: admins ? admins.communeCode : '',
+          isDeleted: true,
+        },
+      }));
+    };
   
+    updateFormData();
     fetchAvt();
-    console.log(admins);
-
+  
   }, [admins]);
-  //Add
 
   const saveAdmin = async () => {
     try {
@@ -98,7 +135,7 @@ const Profile = () => {
   };
 
   const [formData, setFormData] = useState({
-    id: '',
+    id: storedUserId,
     fullname: '',
     avatar: null,
     email: '',
@@ -152,7 +189,7 @@ const Profile = () => {
         image.append('file', file);
       }
       if (file) {
-        await axiosInstance.put(`/staff/${formData.id}/multipart-file`, image, {
+        await axiosInstance.put(`/staff/${storedUserId}/multipart-file`, image, {
           headers: {
             'Content-Type': 'multipart/form-data'
           }
@@ -178,7 +215,7 @@ const Profile = () => {
   const changePassword = async () => {
     try {
       const requestBody = {
-        id: formData.id,
+        id: storedUserId,
         newPassword: formPass.newPassword,
         confirmPassword: formPass.confirmPassword,
       };

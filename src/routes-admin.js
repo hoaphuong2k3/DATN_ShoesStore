@@ -5,7 +5,7 @@ import ProductAttributes from "views/admin/product/ProductAttributes.js";
 import Promo from "views/admin/discount/Promotion.js";
 import Staff from "views/admin/Staff.js";
 import Client from "views/admin/Client.js";
-import Profile from "views/admin/Profile.js";
+import Profile from "views/admin/Profile";
 import Statistical from "views/admin/Statistical.js";
 import AddProduct from "views/admin/product/AddProduct";
 import EditProduct from "views/admin/product/EditProduct";
