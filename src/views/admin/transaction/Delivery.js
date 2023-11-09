@@ -337,7 +337,7 @@ const Delivery = () => {
 
                                                 <Col lg="9">
                                                     <InputGroup size="sm">
-                                                        <Input type="search" placeholder="Tìm kiếm hóa đơn..." />
+                                                        <Input type="search" placeholder="Tìm kiếm mã, tên hóa đơn..." />
                                                         <InputGroupAddon addonType="append">
                                                             <InputGroupText>
                                                                 <FaSearch />
@@ -661,10 +661,20 @@ const Delivery = () => {
                                     type="date" size="sm"
                                 />
                             </FormGroup>
+                            <FormGroup check>
+                                <label
+                                    style={{ fontSize: 13, fontWeight: "bold" }}>
+                                    <Input type="checkbox" id="checkbox2" />
+                                    Có quà tặng không?
+                                </label>
+                            </FormGroup>
                         </Form>
                     </ModalBody>
                     <ModalFooter>
 
+                        <Button color="primary" outline size="sm" >
+                            Làm mới
+                        </Button>
                         <Button color="danger" outline size="sm" onClick={toggleSecondModal}>
                             Đóng
                         </Button>
