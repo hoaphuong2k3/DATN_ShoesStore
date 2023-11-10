@@ -3,8 +3,9 @@ import { useParams, useNavigate } from "react-router-dom";
 import { updateShoes, findShoes } from "services/Product2Service";
 import { getAllBrand, getAllOrigin, getAllDesignStyle, getAllSkinType, getAllToe, getAllSole, getAllLining, getAllCushion } from "services/ProductAttributeService";
 // reactstrap components
+import { FaCamera } from 'react-icons/fa';
 import {
-    Card, CardHeader, CardBody, Container, Row, Col, FormGroup, Input, Button, Form
+    Card, CardHeader, CardBody, Container, Row, Col, FormGroup, Input, Button, Form, Label
 } from "reactstrap";
 import { toast } from 'react-toastify';
 import Header from "components/Headers/Header.js";
@@ -28,11 +29,16 @@ const EditProduct = () => {
 
     const [dataEdit, setDataEdit] = useState([])
     //getData
+    const [imageUrl, setimageUrl] = useState();
     const getData = async () => {
         try {
             let res = await findShoes(id);
             if (res && res.data) {
                 setDataEdit(res.data);
+            }
+
+            if (res.data.imgURI) {
+                setimageUrl(`https://s3-ap-southeast-1.amazonaws.com/imageshoestore/${res.data.imgURI}`);
             }
         } catch (error) {
             let errorMessage = "Lỗi từ máy chủ";
@@ -87,21 +93,53 @@ const EditProduct = () => {
 
     };
 
-    //Img
-    const [selectedImage, setSelectedImage] = useState(null);
+    // upload image
+    const [file, setFile] = useState(new File([""], { type: "text/plain" }));
 
-    const handleImageChange = (e) => {
-        const file = e.target.files[0];
-        setSelectedImage(file);
+    const handleFileChange = (e) => {
+        const selectedFile = e.target.files[0];
+        if (selectedFile) {
+            setFile(selectedFile);
+        }
     };
 
+    useEffect(() => {
+        setimageUrl(file ? URL.createObjectURL(file) : new File([""], { type: "text/plain" }))
+    }, [file]);
+    const imageSize = '220px';
+    const imageHi = '220px';
+    const imageStyle = {
+        width: imageSize,
+        height: imageHi,
+    };
+    const buttonStyle = {
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        color: '#000',
+        padding: '8px',
+        cursor: 'pointer',
+        border: '1px dashed gray',
+        width: imageSize,
+        height: imageHi,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+    };
+    const AvatarReset = () => {
+        setFile(null);
+    };
+    //Img
     const onSubmit = async (e) => {
 
         e.preventDefault();
 
         const shoesDataJson = JSON.stringify(shoes);
 
-        formData.append('file', selectedImage);
+        if (file) {
+            formData.append('file', file);
+        }
         formData.append('data', shoesDataJson);
 
         try {
@@ -169,12 +207,11 @@ const EditProduct = () => {
     //End Hiển Thi Combobox
     return (
         <>
-            <Header />
             {/* Page content */}
-            <Container className="mt--7" fluid>
+            <Container fluid>
                 <Row className="mb-4">
                     <div className="col">
-                        <Card className="shadow">
+                        <Card className="shadow mt-7">
                             <CardHeader className="bg-transparent">
                                 <h3 className="mb-0">Sản phẩm </h3>
                             </CardHeader>
@@ -445,18 +482,20 @@ const EditProduct = () => {
                                                 </Row>
                                             </Col>
                                             <Col lg="4">
-                                                <label className="form-control-label">Thêm ảnh</label>
-                                                <div className="box-image">
-                                                    {/* <img src={''} /> */}
-                                                </div>
-                                                <div >
-                                                    <input type="file" accept="image/*" onChange={handleImageChange} />
-                                                    {selectedImage && (
-                                                        <div>
-                                                            <p>Selected Image:</p>
-                                                            <img src={URL.createObjectURL(selectedImage)} alt="Selected" />
-                                                        </div>
-                                                    )}
+                                                <label className="form-control-label">Ảnh</label>
+                                                <div
+                                                    style={{ position: 'relative', width: imageSize, height: imageHi }}
+                                                >
+                                                    {imageUrl && <img src={imageUrl} style={imageStyle} />}
+                                                    <Label htmlFor="file-input" style={buttonStyle}>
+                                                        <FaCamera size={15} />
+                                                    </Label>
+                                                    <Input
+                                                        type="file"
+                                                        id="file-input"
+                                                        style={{ display: 'none' }}
+                                                        onChange={handleFileChange}
+                                                    />
                                                 </div>
                                             </Col>
                                         </Row>

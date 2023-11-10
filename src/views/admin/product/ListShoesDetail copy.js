@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { findShoes } from "services/Product2Service";
 import { getAllShoesDetail } from "services/ShoesDetailService.js";
 import { Link } from "react-router-dom";
+import NumberFormat from 'react-number-format';
 import { FaEdit, FaTrash, FaSearch, FaFileAlt, FaLock, FaLockOpen } from 'react-icons/fa';
 import { getAllColorId, getAllSizeId, getAllColor, getAllSize } from "services/ProductAttributeService";
 // reactstrap components
@@ -761,7 +762,7 @@ const ListShoesDetail = () => {
                                                         className="btn btn-outline-primary"
                                                         onClick={(e) => e.preventDefault()}
                                                         size="sm"
-                                                        
+
                                                     >
                                                         Tải mẫu
                                                     </Button>
@@ -1003,7 +1004,9 @@ const ListShoesDetail = () => {
                                                                 <tr key={value.id} >
                                                                     <td className="col-1">{value.name}</td>
                                                                     <td className="col-3">
-                                                                        <Input
+                                                                        <NumberFormat
+                                                                            thousandSeparator={true}
+                                                                            format="#.###"
                                                                             id={`price_${value.id}`}
                                                                             name="price"
                                                                             placeholder="Nhập giá"
