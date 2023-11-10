@@ -197,140 +197,10 @@ const Delivery = () => {
                                 <CardBody>
                                     <div className="col">
 
-                                        <Row className="align-items-center">
-                                            <FaSearch />
-                                            <h3 className="heading-small text-black mb-0 ml-1">Tìm kiếm</h3>
-                                        </Row>
-                                        <hr className="my-4" />
-                                        <Form>
-                                            <div className="pl-lg-4">
-                                                <Row>
-                                                    <Col lg="6">
-                                                        <FormGroup>
-                                                            <label
-                                                                className="form-control-label"
-                                                                htmlFor="code"
-                                                            >
-                                                                Mã phiếu giao:
-                                                            </label>
-                                                            <Input
-                                                                className="form-control-alternative"
-                                                                id="code"
-                                                                type="text"
-                                                                value={queryParams.code}
-                                                                onChange={(e) => setQueryParams({ ...queryParams, code: e.target.value })}
-                                                            />
-                                                        </FormGroup>
-                                                    </Col>
-                                                    <Col lg="6">
-                                                        <FormGroup>
-                                                            <label
-                                                                className="form-control-label"
-                                                                htmlFor="name"
-                                                            >
-                                                                Tên Khách hàng:
-                                                            </label>
-                                                            <Input
-                                                                className="form-control-alternative"
-                                                                id="name"
-                                                                type="text"
-                                                                value={queryParams.name}
-                                                                onChange={(e) => setQueryParams({ ...queryParams, name: e.target.value })}
-                                                            />
-                                                        </FormGroup>
-                                                    </Col>
-
-                                                </Row>
-
-                                                {value === 'yes' &&
-                                                    <Row>
-
-                                                        <Col lg="4">
-                                                            <FormGroup>
-                                                                <label
-                                                                    className="form-control-label"
-                                                                    htmlFor="startDate"
-                                                                >
-                                                                    Trạng thái:
-                                                                </label>
-                                                                <Input
-                                                                    className="form-control-alternative"
-                                                                    type="select"
-                                                                    value={queryParams.status}
-                                                                    onChange={(e) => setQueryParams({ ...queryParams, status: e.target.value })}
-                                                                >
-                                                                    <option value="">Tất cả</option>
-                                                                    <option value="-1">Đã hủy</option>
-                                                                    <option value="0">Chờ vận chuyển</option>
-                                                                    <option value="1">Đang vận chuyển</option>
-                                                                    <option value="2">Giao thành công</option>
-                                                                </Input>
-                                                            </FormGroup>
-                                                        </Col>
-                                                        <Col lg="4">
-                                                            <FormGroup>
-
-                                                                <label
-                                                                    className="form-control-label"
-                                                                    htmlFor="startDate"
-                                                                >
-                                                                    Ngày vận chuyển:
-                                                                </label>
-                                                                <Input
-                                                                    className="form-control-alternative"
-                                                                    id="startDate"
-                                                                    type="date"
-                                                                    value={queryParams.shipDate}
-                                                                    onChange={(e) => setQueryParams({ ...queryParams, shipDate: e.target.value })}
-                                                                />
-                                                            </FormGroup>
-                                                        </Col>
-                                                        <Col lg="4">
-                                                            <FormGroup>
-
-                                                                <label
-                                                                    className="form-control-label"
-                                                                    htmlFor="startDate"
-                                                                >
-                                                                    Ngày tạo phiếu:
-                                                                </label>
-                                                                <Input
-                                                                    className="form-control-alternative"
-                                                                    id="startDate"
-                                                                    type="date"
-                                                                    value={queryParams.fromDate}
-                                                                    onChange={(e) => setQueryParams({ ...queryParams, fromDate: e.target.value })}
-                                                                />
-                                                            </FormGroup>
-                                                        </Col>
-
-                                                    </Row>
-                                                }
-                                            </div>
-                                        </Form>
-
-                                        <Row className="mt-2">
-                                            <Col lg="6" xl="4" >
-                                                <span>
-                                                    <Switch on="yes" off="no" value={value} onChange={setValue} />
-                                                    <span>
-                                                        &nbsp;&nbsp;
-                                                        Tìm kiếm nâng cao
-                                                        &nbsp;&nbsp;
-                                                    </span>
-                                                </span>
-                                                <Button color="warning" size="sm" onClick={resetFilters}>
-                                                    Làm mới bộ lọc
-                                                </Button>
-                                            </Col>
-                                        </Row>
-
-                                        <hr className="my-4" />
-
-                                        <Row className="align-items-center my-4">
+                                        <Row className="align-items-center mb-3">
                                             <div className="col" style={{ display: "flex" }}>
-                                                <Col lg="3">
-                                                    <Button color="primary" outline size="sm" onClick={handleModal2}>
+                                                <Col lg="3" className="text-left">
+                                                    <Button color="warning" outline size="sm" onClick={handleModal2}>
                                                         <FaFilter size="16px" className="mr-1" />Bộ lọc
                                                     </Button>
                                                 </Col>
@@ -567,120 +437,135 @@ const Delivery = () => {
                                         </ModalFooter>
 
                                     </Modal >
+
+
+                                    <Modal
+                                        isOpen={secondModal}
+                                        toggle={toggleSecondModal}
+                                        style={{ maxWidth: '350px', right: 'unset', left: 0, position: 'fixed', marginLeft: '252px', marginRight: 0, top: "-27px" }}
+                                        backdrop={false}
+                                    >
+                                        <ModalHeader toggle={toggleSecondModal}>
+                                            <h3 className="heading-small text-muted mb-0">Bộ lọc tìm kiếm</h3>
+                                        </ModalHeader>
+                                        <ModalBody style={{ paddingTop: 0, paddingBottom: 0 }}>
+                                            <Form >
+                                                <FormGroup>
+                                                    <label style={{ fontSize: 13 }}
+                                                        className="form-control-label"
+                                                    >
+                                                        Loại khuyến mại
+                                                    </label>
+                                                    <Input
+                                                        className="form-control-alternative"
+                                                        type="select" size="sm"
+                                                    >
+                                                        <option value="">Tất cả</option>
+                                                        <option value="0">Order</option>
+                                                        <option value="1">FreeShip</option>
+                                                    </Input>
+                                                </FormGroup>
+                                                <FormGroup>
+
+                                                    <Row>
+                                                        <Col xl="6">
+                                                            <label style={{ fontSize: 13 }}
+                                                                className="form-control-label"
+                                                            >
+                                                                Hóa đơn từ
+                                                            </label>
+                                                            <Input
+                                                                className="form-control-alternative"
+                                                                type="number" size="sm"
+                                                            />
+                                                        </Col>
+
+                                                        <Col xl="6">
+                                                            <label style={{ fontSize: 13 }}
+                                                                className="form-control-label"
+                                                            >
+                                                                đến
+                                                            </label>
+                                                            <Input
+                                                                className="form-control-alternative"
+                                                                type="number" size="sm"
+                                                            />
+                                                        </Col>
+                                                    </Row>
+                                                </FormGroup>
+                                                <FormGroup>
+                                                    <label style={{ fontSize: 13 }}
+                                                        className="form-control-label"
+                                                    >
+                                                        Trạng thái
+                                                    </label>
+                                                    <Input
+                                                        className="form-control-alternative"
+                                                        type="select" size="sm"
+                                                    >
+                                                        <option value="">Tất cả</option>
+                                                        <option value="0">Đang kích hoạt</option>
+                                                        <option value="1">Chờ kích hoạt</option>
+                                                        <option value="2">Ngừng kích hoạt</option>
+                                                    </Input>
+                                                </FormGroup>
+                                                <FormGroup>
+                                                    <label style={{ fontSize: 13 }}
+                                                        className="form-control-label"
+                                                    >
+                                                        Ngày bắt đầu
+                                                    </label>
+                                                    <Input
+                                                        className="form-control-alternative"
+                                                        type="date" size="sm"
+                                                    />
+                                                </FormGroup>
+                                                <FormGroup>
+                                                    <label style={{ fontSize: 13 }}
+                                                        className="form-control-label"
+                                                    >
+                                                        Ngày kết thúc
+                                                    </label>
+                                                    <Input
+                                                        className="form-control-alternative"
+                                                        type="date" size="sm"
+                                                    />
+                                                </FormGroup>
+                                                <FormGroup check>
+                                                    <label
+                                                        style={{ fontSize: 13, fontWeight: "bold" }}>
+                                                        <Input type="checkbox" id="checkbox2" />
+                                                        Có quà tặng không?
+                                                    </label>
+                                                </FormGroup>
+                                            </Form>
+                                        </ModalBody>
+                                        <ModalFooter>
+                                            <div className="row w-100">
+                                                <div className="col-4">
+                                                    <Button color="primary" outline size="sm" block>
+                                                        Làm mới
+                                                    </Button>
+                                                </div>
+                                                <div className="col-4">
+                                                    <Button color="primary" outline size="sm" block>
+                                                        Lọc
+                                                    </Button>
+                                                </div>
+                                                <div className="col-4">
+                                                    <Button color="danger" outline size="sm" block onClick={toggleSecondModal}>
+                                                        Đóng
+                                                    </Button>
+                                                </div>
+                                            </div>
+                                        </ModalFooter>
+
+                                    </Modal>
                                 </CardBody>
                             </Card>
                         </div>
                     </Col>
                 </Row>
-                <ToastContainer />
-
-                <Modal isOpen={secondModal} toggle={toggleSecondModal} style={{ maxWidth: '350px', left: "-23%" }}>
-                    <ModalHeader toggle={toggleSecondModal}>
-                        <h3 className="heading-small text-muted mb-0">Bộ lọc tìm kiếm</h3>
-                    </ModalHeader>
-                    <ModalBody style={{ paddingTop: 0, paddingBottom: 0 }}>
-                        <Form >
-                            <FormGroup>
-                                <label style={{ fontSize: 13 }}
-                                    className="form-control-label"
-                                >
-                                    Loại khuyến mại
-                                </label>
-                                <Input
-                                    className="form-control-alternative"
-                                    type="select" size="sm"
-                                >
-                                    <option value="">Tất cả</option>
-                                    <option value="0">Order</option>
-                                    <option value="1">FreeShip</option>
-                                </Input>
-                            </FormGroup>
-                            <FormGroup>
-
-                                <Row>
-                                    <Col xl="6">
-                                        <label style={{ fontSize: 13 }}
-                                            className="form-control-label"
-                                        >
-                                            Hóa đơn từ
-                                        </label>
-                                        <Input
-                                            className="form-control-alternative"
-                                            type="number" size="sm"
-                                        />
-                                    </Col>
-
-                                    <Col xl="6">
-                                        <label style={{ fontSize: 13 }}
-                                            className="form-control-label"
-                                        >
-                                            đến
-                                        </label>
-                                        <Input
-                                            className="form-control-alternative"
-                                            type="number" size="sm"
-                                        />
-                                    </Col>
-                                </Row>
-                            </FormGroup>
-                            <FormGroup>
-                                <label style={{ fontSize: 13 }}
-                                    className="form-control-label"
-                                >
-                                    Trạng thái
-                                </label>
-                                <Input
-                                    className="form-control-alternative"
-                                    type="select" size="sm"
-                                >
-                                    <option value="">Tất cả</option>
-                                    <option value="0">Đang kích hoạt</option>
-                                    <option value="1">Chờ kích hoạt</option>
-                                    <option value="2">Ngừng kích hoạt</option>
-                                </Input>
-                            </FormGroup>
-                            <FormGroup>
-                                <label style={{ fontSize: 13 }}
-                                    className="form-control-label"
-                                >
-                                    Ngày bắt đầu
-                                </label>
-                                <Input
-                                    className="form-control-alternative"
-                                    type="date" size="sm"
-                                />
-                            </FormGroup>
-                            <FormGroup>
-                                <label style={{ fontSize: 13 }}
-                                    className="form-control-label"
-                                >
-                                    Ngày kết thúc
-                                </label>
-                                <Input
-                                    className="form-control-alternative"
-                                    type="date" size="sm"
-                                />
-                            </FormGroup>
-                            <FormGroup check>
-                                <label
-                                    style={{ fontSize: 13, fontWeight: "bold" }}>
-                                    <Input type="checkbox" id="checkbox2" />
-                                    Có quà tặng không?
-                                </label>
-                            </FormGroup>
-                        </Form>
-                    </ModalBody>
-                    <ModalFooter>
-
-                        <Button color="primary" outline size="sm" >
-                            Làm mới
-                        </Button>
-                        <Button color="danger" outline size="sm" onClick={toggleSecondModal}>
-                            Đóng
-                        </Button>
-
-                    </ModalFooter>
-                </Modal>
             </Container>
         </>
     );
