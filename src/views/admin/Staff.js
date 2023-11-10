@@ -519,6 +519,7 @@ const Staff = () => {
                     <div className="col text-right">
                       <Button
                         color="primary"
+                        outline
                         onClick={handleModal}
                         size="sm"
                       >
@@ -584,16 +585,16 @@ const Staff = () => {
                             <td>{admin.addressDetail}, {admin.communeCode}, {admin.districtCode}, {admin.proviceCode} </td>
 
                             <td style={{ position: "sticky", zIndex: '1', right: '0', backgroundColor: '#fff' }}>
-                              <Button color="link" size="sm" onClick={() => handleRowClick(admin)}><FaEdit color="primary" /></Button>
-                              <Button color="link" size="sm" onClick={() => deleteAdmin(admin.id)} ><FaTrash color="red" /></Button>
+                              <Button color="link" size="sm" onClick={() => handleRowClick(admin)}><FaEdit/></Button>
+                              <Button color="link" size="sm" onClick={() => deleteAdmin(admin.id)} ><FaTrash/></Button>
                               {admin.status === 0 &&
                                 <Button color="link"  size="sm" onClick={() => updateStatus(admin.id, 1)}>
-                                  <FaLockOpen color="green" />
+                                  <FaLockOpen/>
                                 </Button>
                               }
                               {admin.status === 1 &&
                                 <Button color="link" size="sm" onClick={() => updateStatus(admin.id, 0)} >
-                                <FaLock color="green" />
+                                <FaLock/>
                                 </Button>
                               }
                             </td>
@@ -936,15 +937,15 @@ const Staff = () => {
               </ModalBody >
               <ModalFooter>
                 <div className="text-center">
-                  <Button color="primary" onClick={saveAdmin} size="sm">
+                  <Button color="primary" outline onClick={saveAdmin} size="sm">
                     {formData.id ? "Cập nhật" : "Thêm mới"}
                   </Button>
                   {formData.id ? null : (
-                    <Button color="primary" onClick={resetForm} size="sm">
+                    <Button color="primary" outline onClick={resetForm} size="sm">
                       Reset
                     </Button>
                   )}
-                  <Button color="danger" onClick={toggle} size="sm">
+                  <Button color="danger" outline onClick={toggle} size="sm">
                     Close
                   </Button>
                   
