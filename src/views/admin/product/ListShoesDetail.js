@@ -1086,7 +1086,7 @@ const ListShoesDetail = () => {
                                                                                     <FaLock color="green" />
                                                                                 </Button>
                                                                             }
-                                                                            <Button color="link" size="sm" disabled={item.status === 0 ? true : false} onClick={() => handleConfirmDelete(item)}>
+                                                                            <Button color="link" size="sm" onClick={() => handleConfirmDelete(item)}>
                                                                                 <FaTrash color="red" />
                                                                             </Button>
                                                                         </td>
