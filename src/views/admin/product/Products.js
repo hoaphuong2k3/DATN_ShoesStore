@@ -984,7 +984,7 @@ const Products = () => {
                               <td>{item.priceMax}</td>
                               <td style={{ position: "sticky", zIndex: '1', right: '0', background: "#fff" }}>
                                 <Button color="link" to={`/admin/shoesdetail/${item.id}`} tag={Link} size="sm">
-                                  <i class="fa-solid fa-eye" color="primary" />&nbsp;CTSP
+                                  <i class="fa-solid fa-eye" color="primary" />
                                 </Button>
                                 {/* <Button color="link" to={`/admin/product/detail/${item.id}`} tag={Link} size="sm">
                                   <i class="fa-solid fa-eye"></i>

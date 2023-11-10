@@ -153,11 +153,10 @@ const ProductAttributes = () => {
   }, [page]);
   return (
     <>
-      <Header />
       <Container fluid>
-        <Row className="mb-4 mt--4">
+        <Row className="mb-4">
           <div className="col">
-            <Card className="shadow">
+            <Card className="shadow  mt-7">
               <CardHeader className="bg-transparent">
                 <Row className="align-items-center">
                   <h3 className="mb-0">Thuộc tính sản phẩm</h3>
