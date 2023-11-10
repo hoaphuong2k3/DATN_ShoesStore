@@ -4,6 +4,7 @@ import ReactPaginate from "react-paginate";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import axiosInstance from "services/custommize-axios";
+import { isToday } from 'date-fns';
 import "assets/css/pagination.css";
 // reactstrap components
 import Switch from 'react-input-switch';
@@ -241,7 +242,8 @@ const Promotion = () => {
         try {
             const selectedDiscount = discounts.find(discount => discount.id === id);
     
-            if (new Date(selectedDiscount.endDate) >= new Date(selectedDiscount.startDate)) {
+            if (new Date(selectedDiscount.endDate) >= new Date(selectedDiscount.startDate) &&
+            isToday(new Date(selectedDiscount.startDate))) {
                 await axiosInstance.patch(`/admin/discount-period/setDiscountPeriodRun/${id}`);
                 toast.success("Cập nhật thành công");
                 fetchData();

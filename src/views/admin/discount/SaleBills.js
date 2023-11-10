@@ -6,7 +6,7 @@ import "react-toastify/dist/ReactToastify.css";
 import axiosInstance from "services/custommize-axios";
 import { format, parseISO } from 'date-fns';
 import { vi } from 'date-fns/locale';
-
+import { isToday } from 'date-fns';
 // reactstrap components
 import Switch from 'react-input-switch';
 import { Row, Col, Form, FormGroup, Input, Button, Table, Badge, Modal, ModalBody, ModalFooter, ModalHeader } from "reactstrap";
@@ -90,7 +90,7 @@ const SaleBills = () => {
         });
     };
 
-    
+
     //checkbox
     const handleCheckboxChange = (id) => {
         const updatedSelectedItems = [...selectedItems];
@@ -190,6 +190,27 @@ const SaleBills = () => {
             const formattedStartDate = formatDateTime(formData.startDate);
             const formattedEndDate = formatDateTime(formData.endDate);
 
+            if (!formattedStartDate || !formattedEndDate) {
+                toast.error("Ngày bắt đầu và ngày kết thúc không được để trống");
+                return;
+            }
+
+            // Kiểm tra ngày bắt đầu có phải từ ngày hôm nay không
+            const startDateTime = new Date(formattedStartDate);
+            const today = new Date();
+            if (!isToday(startDateTime)) {
+                toast.error("Ngày bắt đầu phải từ ngày hôm nay hoặc sau ngày hôm nay");
+                return;
+            }
+
+            // Kiểm tra ngày kết thúc có lớn hơn ngày bắt đầu không
+            const endDateTime = new Date(formattedEndDate);
+            if (endDateTime <= startDateTime) {
+                toast.error("Ngày kết thúc phải lớn hơn ngày bắt đầu");
+                return;
+            }
+
+
             if (formData.id) {
                 await axiosInstance.put(`/vouchers/updateVoucher`, {
                     id: formData.id,
@@ -240,8 +261,8 @@ const SaleBills = () => {
         }
     };
 
-     //Update status
-     const lock = async (id) => {
+    //Update status
+    const lock = async (id) => {
         await axiosInstance.patch(`/vouchers/stopVoucher/${id}`);
         toast.success("Cập nhật thành công");
         fetchData();
@@ -250,13 +271,14 @@ const SaleBills = () => {
     const openlock = async (id) => {
         try {
             const selectedDiscount = discounts.find(discount => discount.id === id);
-    
-            if (new Date(selectedDiscount.endDate) >= new Date(selectedDiscount.startDate)) {
+
+            if (new Date(selectedDiscount.endDate) >= new Date(selectedDiscount.startDate) &&
+                isToday(new Date(selectedDiscount.startDate))) {
                 await axiosInstance.patch(`/vouchers/setVoucherRun/${id}`);
                 toast.success("Cập nhật thành công");
                 fetchData();
             } else {
-                toast.error("Ngày kết thúc phải >= ngày bắt đầu");
+                toast.error("Không hợp lệ");
             }
         } catch (error) {
             console.error("Lỗi khi cập nhật trạng thái:", error);
@@ -495,7 +517,7 @@ const SaleBills = () => {
                             <th scope="col" style={{ color: "black" }}>Tên khuyến mại</th>
                             <th scope="col" style={{ color: "black" }}>Hóa đơn <br />tối thiểu</th>
                             <th scope="col" style={{ color: "black" }}>Giá trị</th>
-                            
+
                             <th scope="col" style={{ color: "black" }}>Ngày bắt đầu</th>
                             <th scope="col" style={{ color: "black" }}>Ngày kết thúc</th>
                             <th scope="col" style={{ color: "black" }}>Mô tả</th>
@@ -503,7 +525,7 @@ const SaleBills = () => {
 
                         </tr>
                     </thead>
-                    <tbody style={{color: "black"}}>
+                    <tbody style={{ color: "black" }}>
                         {Array.isArray(discounts) &&
                             discounts.map((discount, index) => (
                                 <tr key={discount.id}>
@@ -524,7 +546,7 @@ const SaleBills = () => {
                                     </td>
                                     <td>{discount.code}</td>
                                     <td>{discount.name}</td>
-                           
+
                                     <td style={{ textAlign: "right" }}>{discount.minPrice} VNĐ</td>
                                     <td style={{ textAlign: "right" }}>
                                         {discount.salePercent ? `${discount.salePercent}%` : ""}

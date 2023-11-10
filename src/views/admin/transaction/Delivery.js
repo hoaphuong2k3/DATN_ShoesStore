@@ -1,14 +1,17 @@
 import React, { useState, useEffect } from "react";
-import { FaEdit, FaTrash, FaSearch, FaFileAlt } from 'react-icons/fa';
+import { FaEdit, FaTrash, FaSearch, FaFileAlt, FaFilter } from 'react-icons/fa';
 import ReactPaginate from "react-paginate";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import axiosInstance from "services/custommize-axios";
-import { format} from 'date-fns';
+import { format } from 'date-fns';
 import { vi } from 'date-fns/locale';
 // reactstrap components
 import Switch from 'react-input-switch';
-import { Card, CardHeader, CardBody, Container, Row, Col, Form, FormGroup, Input, Button, Table, Modal, ModalBody, ModalFooter, ModalHeader} from "reactstrap";
+import {
+    Card, CardHeader, CardBody, Container, Row, Col, Form, FormGroup, Input, InputGroup, InputGroupAddon, InputGroupText,
+    Button, Table, Modal, ModalBody, ModalFooter, ModalHeader, Label
+} from "reactstrap";
 
 
 const Delivery = () => {
@@ -18,6 +21,12 @@ const Delivery = () => {
     const handleModal = () => {
         resetForm();
         setModal(true);
+    }
+
+    const [secondModal, setSecondModal] = useState(false);
+    const toggleSecondModal = () => setSecondModal(!secondModal);
+    const handleModal2 = () => {
+        setSecondModal(true);
     }
 
     const [value, setValue] = useState('no');
@@ -320,12 +329,26 @@ const Delivery = () => {
 
                                         <Row className="align-items-center my-4">
                                             <div className="col" style={{ display: "flex" }}>
+                                                <Col lg="3">
+                                                    <Button color="primary" outline size="sm" onClick={handleModal2}>
+                                                        <FaFilter size="16px" className="mr-1" />Bộ lọc
+                                                    </Button>
+                                                </Col>
 
-                                                <h3 className="heading-small text-black mb-0"><FaFileAlt size="16px" className="mr-1" />Danh sách</h3>
+                                                <Col lg="9">
+                                                    <InputGroup size="sm">
+                                                        <Input type="search" placeholder="Tìm kiếm mã, tên hóa đơn..." />
+                                                        <InputGroupAddon addonType="append">
+                                                            <InputGroupText>
+                                                                <FaSearch />
+                                                            </InputGroupText>
+                                                        </InputGroupAddon>
+                                                    </InputGroup>
+                                                </Col>
                                             </div>
                                             <div className="col text-right">
                                                 <Button
-                                                    color="primary"
+                                                    color="primary" outline
                                                     onClick={handleModal}
                                                     size="sm"
                                                 >
@@ -550,6 +573,114 @@ const Delivery = () => {
                     </Col>
                 </Row>
                 <ToastContainer />
+
+                <Modal isOpen={secondModal} toggle={toggleSecondModal} style={{ maxWidth: '350px', left: "-23%" }}>
+                    <ModalHeader toggle={toggleSecondModal}>
+                        <h3 className="heading-small text-muted mb-0">Bộ lọc tìm kiếm</h3>
+                    </ModalHeader>
+                    <ModalBody style={{ paddingTop: 0, paddingBottom: 0 }}>
+                        <Form >
+                            <FormGroup>
+                                <label style={{ fontSize: 13 }}
+                                    className="form-control-label"
+                                >
+                                    Loại khuyến mại
+                                </label>
+                                <Input
+                                    className="form-control-alternative"
+                                    type="select" size="sm"
+                                >
+                                    <option value="">Tất cả</option>
+                                    <option value="0">Order</option>
+                                    <option value="1">FreeShip</option>
+                                </Input>
+                            </FormGroup>
+                            <FormGroup>
+
+                                <Row>
+                                    <Col xl="6">
+                                        <label style={{ fontSize: 13 }}
+                                            className="form-control-label"
+                                        >
+                                            Hóa đơn từ
+                                        </label>
+                                        <Input
+                                            className="form-control-alternative"
+                                            type="number" size="sm"
+                                        />
+                                    </Col>
+
+                                    <Col xl="6">
+                                        <label style={{ fontSize: 13 }}
+                                            className="form-control-label"
+                                        >
+                                            đến
+                                        </label>
+                                        <Input
+                                            className="form-control-alternative"
+                                            type="number" size="sm"
+                                        />
+                                    </Col>
+                                </Row>
+                            </FormGroup>
+                            <FormGroup>
+                                <label style={{ fontSize: 13 }}
+                                    className="form-control-label"
+                                >
+                                    Trạng thái
+                                </label>
+                                <Input
+                                    className="form-control-alternative"
+                                    type="select" size="sm"
+                                >
+                                    <option value="">Tất cả</option>
+                                    <option value="0">Đang kích hoạt</option>
+                                    <option value="1">Chờ kích hoạt</option>
+                                    <option value="2">Ngừng kích hoạt</option>
+                                </Input>
+                            </FormGroup>
+                            <FormGroup>
+                                <label style={{ fontSize: 13 }}
+                                    className="form-control-label"
+                                >
+                                    Ngày bắt đầu
+                                </label>
+                                <Input
+                                    className="form-control-alternative"
+                                    type="date" size="sm"
+                                />
+                            </FormGroup>
+                            <FormGroup>
+                                <label style={{ fontSize: 13 }}
+                                    className="form-control-label"
+                                >
+                                    Ngày kết thúc
+                                </label>
+                                <Input
+                                    className="form-control-alternative"
+                                    type="date" size="sm"
+                                />
+                            </FormGroup>
+                            <FormGroup check>
+                                <label
+                                    style={{ fontSize: 13, fontWeight: "bold" }}>
+                                    <Input type="checkbox" id="checkbox2" />
+                                    Có quà tặng không?
+                                </label>
+                            </FormGroup>
+                        </Form>
+                    </ModalBody>
+                    <ModalFooter>
+
+                        <Button color="primary" outline size="sm" >
+                            Làm mới
+                        </Button>
+                        <Button color="danger" outline size="sm" onClick={toggleSecondModal}>
+                            Đóng
+                        </Button>
+
+                    </ModalFooter>
+                </Modal>
             </Container>
         </>
     );
