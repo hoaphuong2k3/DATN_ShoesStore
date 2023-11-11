@@ -9,6 +9,9 @@ import {
   FaLock,
   FaLockOpen,
   FaFilter,
+  FaTimesCircle,
+  FaUndoAlt,
+  FaTimes,
 } from "react-icons/fa";
 import ReactPaginate from "react-paginate";
 import { ToastContainer, toast } from "react-toastify";
@@ -53,7 +56,7 @@ const Staff = () => {
   const [modalFilter, setModalFilter] = useState(false);
   const toggleFilter = () => {
     setModalFilter(!modalFilter);
-    fetchData();
+    // fetchData();
   };
   const handleModalFilter = () => {
     // resetForm();
@@ -114,15 +117,6 @@ const Staff = () => {
   const handleSizeChange = (e) => {
     const newSize = parseInt(e.target.value);
     setQueryParams({ ...queryParams, size: newSize, page: 0 });
-  };
-
-  const handleFullnameChange = (e) => {
-    setQueryParams({ ...queryParams, fullname: e.target.value });
-  };
-
-  const handleGenderChange = (e) => {
-    const genderValue = e.target.value == "true";
-    setQueryParams({ ...queryParams, gender: genderValue });
   };
 
   const calculateIndex = (index) => {
@@ -396,20 +390,19 @@ const Staff = () => {
     return true;
   });
 
-
   // Lọc
   const handleFilter = () => {
     // const fullname = document.getElementById("fullname").value;
     const phonenumber = document.getElementById("phoneNumber").value;
     const email = document.getElementById("email").value;
     const genderMale = document.getElementById("genderMale");
-  const genderFemale = document.getElementById("genderFemale");
-  let gender = "";
-  if (genderMale.checked) {
-    gender = "false";
-  } else if (genderFemale.checked) {
-    gender = "true";
-  }
+    const genderFemale = document.getElementById("genderFemale");
+    let gender = "";
+    if (genderMale.checked) {
+      gender = "false";
+    } else if (genderFemale.checked) {
+      gender = "true";
+    }
 
     setQueryParams({
       ...queryParams,
@@ -432,21 +425,20 @@ const Staff = () => {
               <Card className="shadow">
                 <CardHeader className="bg-transparent">
                   <Row className="align-items-center">
-                    <div className="col">
+                    <div className="col d-flex">
                       <h3 className="heading-small text-dark mb-0">
                         Nhân Viên
                       </h3>
                       <div className="col text-right">
-                      <Button
-                        color="primary"
-                        outline
-                        onClick={handleModal}
-                        size="sm"
-                      >
-                        + Thêm mới
-                      </Button>
-                    </div>
-
+                        <Button
+                          color="primary"
+                          outline
+                          onClick={handleModal}
+                          size="sm"
+                        >
+                          + Thêm mới
+                        </Button>
+                      </div>
                     </div>
                   </Row>
                 </CardHeader>
@@ -454,7 +446,7 @@ const Staff = () => {
                   <Row className="align-items-center my-4">
                     <div className="col" style={{ display: "flex" }}>
                       <Button
-                        color="warning"
+                        color="success"
                         outline
                         size="sm"
                         onClick={handleModalFilter}
@@ -468,7 +460,7 @@ const Staff = () => {
                         size="sm"
                         onClick={resetFilters}
                       >
-                        <FaFilter size="16px" className="mr-1" />
+                        <FaTimes size="16px" className="mr-1" />
                         Xóa bộ lọc
                       </Button>
                       <Col>
@@ -1109,7 +1101,7 @@ const Staff = () => {
               isOpen={modalFilter}
               toggle={toggleFilter}
               style={{
-                maxWidth: "400px",
+                maxWidth: "600px",
                 right: "unset",
                 left: 0,
                 position: "fixed",
@@ -1257,7 +1249,13 @@ const Staff = () => {
               <ModalFooter>
                 <div className="row w-100">
                   <Col className="lg-6">
-                    <Button color="primary" outline size="sm" block onClick={resetFilters}>
+                    <Button
+                      color="primary"
+                      outline
+                      size="sm"
+                      block
+                      onClick={resetFilters}
+                    >
                       Làm mới
                     </Button>
                   </Col>
