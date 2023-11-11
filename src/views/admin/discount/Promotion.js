@@ -51,7 +51,7 @@ const Promotion = () => {
 
     const [queryParams, setQueryParams] = useState({
         page: 0,
-        size: 5,
+        size: 10,
         code: "",
         name: "",
         minPercent: "",
@@ -117,14 +117,30 @@ const Promotion = () => {
         2: { color: 'warning', label: 'Ngừng kích hoạt' }
     };
 
+    //Lọc
     const handleFilter = () => {
-        fetchData(); // Gọi hàm fetchData để lọc dữ liệu
-        toggleThirdModal(); // Đóng modal sau khi lọc
+        // Extract values from modal form fields
+        const typePeriod = document.getElementById("typePeriod").value;
+        const minPercent = document.getElementById("minPercent").value;
+        const maxPercent = document.getElementById("maxPercent").value;
+        const status = document.getElementById("status").value;
+        const fromDate = document.getElementById("fromDate").value;
+        const toDate = document.getElementById("toDate").value;
+        const hasGift = document.getElementById("checkbox2").checked;
+
+        setQueryParams({
+            ...queryParams,
+            typePeriod,
+            minPercent,
+            maxPercent,
+            status,
+            fromDate,
+            toDate,
+            hasGift,
+        });
+        toggleThirdModal();
     };
 
-    //search
-
-    //lọc
     const resetFilters = () => {
         setQueryParams({
             page: 0,
@@ -141,22 +157,23 @@ const Promotion = () => {
     };
 
     //checkbox
-    const handleCheckboxChange = (id) => {
-        const updatedSelectedItems = [...selectedItems];
-        if (updatedSelectedItems.includes(id)) {
-            updatedSelectedItems.splice(updatedSelectedItems.indexOf(id), 1);
+    const [showActions, setShowActions] = useState(false);
+    const handleCheckboxChange = (idDiscount) => {
+        if (selectedItems.includes(idDiscount)) {
+            setSelectedItems(selectedItems.filter((id) => id !== idDiscount));
+            setShowActions(selectedItems.length - 1 > 0);
         } else {
-            updatedSelectedItems.push(id);
+            setSelectedItems([...selectedItems, idDiscount]);
+            setShowActions(true);
         }
-        setSelectedItems(updatedSelectedItems);
-        setSelectAll(updatedSelectedItems.length === discounts.length);
     };
-
     const handleSelectAll = () => {
         if (selectAll) {
             setSelectedItems([]);
+            setShowActions(false);
         } else {
             setSelectedItems(discounts.map(discount => discount.id));
+            setShowActions(true);
         }
         setSelectAll(!selectAll);
     };
@@ -438,172 +455,28 @@ const Promotion = () => {
                             <CardHeader className="bg-transparent">
 
                                 <Row className="align-items-center">
-                                    <div className="col">
-                                        <h3 className="heading-small text-muted mb-0">Đợt giảm giá</h3>
+                                    <div className="col d-flex">
+                                        <h3 className="heading-small text-dark mb-0">
+                                            Đợt giảm giá
+                                        </h3>
+                                        <div className="col text-right">
+                                            <Button
+                                                color="primary"
+                                                outline
+                                                onClick={handleModal}
+                                                size="sm"
+                                            >
+                                                + Thêm mới
+                                            </Button>
+                                        </div>
                                     </div>
                                 </Row>
                             </CardHeader>
                             <CardBody>
                                 <div className="col">
 
-                                    <Row className="align-items-center">
-                                        <FaSearch />
-                                        <h3 className="heading-small text-black mb-0 ml-1">Tìm kiếm</h3>
-                                    </Row>
-                                    <hr className="my-4" />
-                                    <Form>
-                                        <div className="pl-lg-4">
-                                            <Row>
-                                                <Col lg="6">
-                                                    <FormGroup>
-                                                        <label
-                                                            className="form-control-label"
-                                                            htmlFor="code"
-                                                        >
-                                                            Mã Khuyến mại:
-                                                        </label>
-                                                        <Input
-                                                            className="form-control-alternative"
-                                                            id="code"
-                                                            type="text"
-                                                            value={queryParams.code}
-                                                            onChange={(e) => setQueryParams({ ...queryParams, code: e.target.value })}
-                                                        />
-                                                    </FormGroup>
-                                                </Col>
-                                                <Col lg="6">
-                                                    <FormGroup>
-                                                        <label
-                                                            className="form-control-label"
-                                                            htmlFor="name"
-                                                        >
-                                                            Tên Khuyến mại:
-                                                        </label>
-                                                        <Input
-                                                            className="form-control-alternative"
-                                                            id="name"
-                                                            type="text"
-                                                            value={queryParams.name}
-                                                            onChange={(e) => setQueryParams({ ...queryParams, name: e.target.value })}
-                                                        />
-                                                    </FormGroup>
-                                                </Col>
-
-                                            </Row>
-
-                                            {value === 'yes' &&
-                                                <Row>
-
-                                                    <Col lg="2">
-                                                        <FormGroup>
-                                                            <label
-                                                                className="form-control-label"
-                                                                htmlFor="startDate"
-                                                            >
-                                                                Trạng thái:
-                                                            </label>
-                                                            <Input
-                                                                className="form-control-alternative"
-                                                                type="select"
-                                                                value={queryParams.status}
-                                                                onChange={(e) => setQueryParams({ ...queryParams, status: e.target.value })}
-                                                            >
-                                                                <option value="">Tất cả</option>
-                                                                <option value="0">Kích hoạt</option>
-                                                                <option value="1">Chờ kích hoạt</option>
-                                                            </Input>
-                                                        </FormGroup>
-                                                    </Col>
-
-                                                    <Col lg="5">
-                                                        <FormGroup>
-
-                                                            <Row>
-                                                                <Col xl="6">
-                                                                    <label className="form-control-label">
-                                                                        Giá trị từ:
-                                                                    </label>
-                                                                    <Input
-                                                                        className="form-control-alternative"
-                                                                        type="number"
-                                                                    />
-                                                                </Col>
-
-                                                                <Col xl="6">
-                                                                    <label className="form-control-label">
-                                                                        đến:
-                                                                    </label>
-                                                                    <Input
-                                                                        className="form-control-alternative"
-                                                                        type="number"
-                                                                    />
-                                                                </Col>
-                                                            </Row>
-                                                        </FormGroup>
-                                                    </Col>
-                                                    <Col lg="5">
-                                                        <FormGroup>
-                                                            <Row>
-                                                                <Col xl="6">
-                                                                    <label
-                                                                        className="form-control-label"
-                                                                        htmlFor="startDate"
-                                                                    >
-                                                                        Từ ngày:
-                                                                    </label>
-                                                                    <Input
-                                                                        className="form-control-alternative"
-                                                                        id="startDate"
-                                                                        type="date"
-                                                                        value={queryParams.fromDate}
-                                                                        onChange={(e) => setQueryParams({ ...queryParams, fromDate: e.target.value })}
-                                                                    />
-                                                                </Col>
-                                                                <Col xl="6">
-                                                                    <label
-                                                                        className="form-control-label"
-                                                                        htmlFor="endDate"
-                                                                    >
-                                                                        Đến ngày:
-                                                                    </label>
-                                                                    <Input
-                                                                        className="form-control-alternative"
-                                                                        id="endDate"
-                                                                        type="date"
-                                                                        value={queryParams.toDate}
-                                                                        onChange={(e) => setQueryParams({ ...queryParams, toDate: e.target.value })}
-                                                                    />
-                                                                </Col>
-                                                            </Row>
-                                                        </FormGroup>
-                                                    </Col>
-
-                                                </Row>
-                                            }
-                                        </div>
-                                    </Form>
-
-                                    <Row className="mt-2">
-                                        <Col lg="6" xl="4" >
-                                            <span>
-                                                <Switch on="yes" off="no" value={value} onChange={setValue} />
-                                                <span>
-                                                    &nbsp;&nbsp;
-                                                    Tìm kiếm nâng cao
-                                                    &nbsp;&nbsp;
-                                                </span>
-                                            </span>
-                                            <Button color="warning" outline size="sm" onClick={resetFilters}>
-                                                Làm mới bộ lọc
-                                            </Button>
-                                        </Col>
-                                    </Row>
-
-                                    <hr className="my-4" />
-
-                                    <Row className="align-items-center my-4">
-                                        <div className="col" style={{ display: "flex" }}>
-
+                                    <Row className="align-items-center my-3">
+                                        <div className="col d-flex">
                                             <Button color="warning" outline size="sm" onClick={handleModal3}>
                                                 <FaFilter size="16px" className="mr-1" />Bộ lọc
                                             </Button>
@@ -625,24 +498,16 @@ const Promotion = () => {
                                         </div>
 
                                         <div className="col text-right">
-
-                                            <Button
-                                                color="danger" outline
-                                                size="sm"
-                                                onClick={handleDeleteButtonClick}
-                                                disabled={selectedItems.length === 0}
-                                            >
-                                                Xóa tất cả
-                                            </Button>
-                                            <Button
-                                                color="primary"
-                                                onClick={handleModal}
-                                                size="sm"
-                                            >
-                                                + Thêm mới
-                                            </Button>
+                                            {showActions && (
+                                                <Button
+                                                    color="danger" outline
+                                                    size="sm"
+                                                    onClick={handleDeleteButtonClick}
+                                                >
+                                                    Xóa tất cả
+                                                </Button>
+                                            )}
                                         </div>
-
                                     </Row>
 
                                     <Table className="align-items-center table-flush" responsive>
@@ -702,7 +567,7 @@ const Promotion = () => {
                                                             <td>{discount.typePeriod === 0 ? "Order" : "FreeShip"}</td>
                                                             <td>{discount.name}</td>
                                                             <td style={{ textAlign: "right" }}>
-                                                                {discount.typePeriod === 0 ? `${discount.minPrice} VNĐ` : ""}
+                                                                {discount.typePeriod === 0 ? `${discount.minPrice.toLocaleString("vi-VN")} VND` : ""}
                                                             </td>
                                                             <td style={{ textAlign: "right" }}>
                                                                 {discount.typePeriod === 0 ? `${discount.salePercent}%` : ""}
@@ -738,7 +603,7 @@ const Promotion = () => {
                                                 <span>Xem </span>&nbsp;
                                                 <span>
                                                     <Input type="select" name="status" style={{ width: "60px", fontSize: 14 }} size="sm" className="mt--1" onChange={handleSizeChange}>
-                                                        <option value="5">5</option>
+                                                        <option value="10">10</option>
                                                         <option value="25">25</option>
                                                         <option value="50">50</option>
                                                         <option value="100">100</option>
@@ -1092,8 +957,7 @@ const Promotion = () => {
                                                 </label>
                                                 <Input
                                                     className="form-control-alternative"
-                                                    type="select" size="sm"
-                                                    onChange={(e) => setQueryParams({ ...queryParams, typePeriod: e.target.value })}
+                                                    type="select" size="sm" id="typePeriod"
                                                 >
                                                     <option value="">Tất cả</option>
                                                     <option value="0">Order</option>
@@ -1111,8 +975,7 @@ const Promotion = () => {
                                                         </label>
                                                         <Input
                                                             className="form-control-alternative"
-                                                            type="number" size="sm"
-                                                            onChange={(e) => setQueryParams({ ...queryParams, minPercent: e.target.value })}
+                                                            type="number" size="sm" id="minPercent"
                                                         />
                                                     </Col>
 
@@ -1124,8 +987,7 @@ const Promotion = () => {
                                                         </label>
                                                         <Input
                                                             className="form-control-alternative"
-                                                            type="number" size="sm"
-                                                            onChange={(e) => setQueryParams({ ...queryParams, maxPercent: e.target.value })}
+                                                            type="number" size="sm" id="maxPercent"
                                                         />
                                                     </Col>
                                                 </Row>
@@ -1138,8 +1000,7 @@ const Promotion = () => {
                                                 </label>
                                                 <Input
                                                     className="form-control-alternative"
-                                                    type="select" size="sm"
-                                                    onChange={(e) => setQueryParams({ ...queryParams, status: e.target.value })}
+                                                    type="select" size="sm" id="status"
                                                 >
                                                     <option value="">Tất cả</option>
                                                     <option value="0">Đang kích hoạt</option>
@@ -1155,8 +1016,7 @@ const Promotion = () => {
                                                 </label>
                                                 <Input
                                                     className="form-control-alternative"
-                                                    type="date" size="sm"
-                                                    onChange={(e) => setQueryParams({ ...queryParams, fromDate: e.target.value })}
+                                                    type="date" size="sm" id="fromDate"
                                                 />
                                             </FormGroup>
                                             <FormGroup>
@@ -1167,8 +1027,7 @@ const Promotion = () => {
                                                 </label>
                                                 <Input
                                                     className="form-control-alternative"
-                                                    type="date" size="sm"
-                                                    onChange={(e) => setQueryParams({ ...queryParams, toDate: e.target.value })}
+                                                    type="date" size="sm" id="toDate"
                                                 />
                                             </FormGroup>
                                             <FormGroup check>
@@ -1176,8 +1035,6 @@ const Promotion = () => {
                                                     style={{ fontSize: 13, fontWeight: "bold" }}>
                                                     <Input type="checkbox"
                                                         id="checkbox2"
-                                                        checked={queryParams.hasGift}
-                                                        onChange={() => setQueryParams({ ...queryParams, hasGift: !queryParams.hasGift })}
                                                     />
                                                     Có quà tặng không?
                                                 </label>
@@ -1211,7 +1068,7 @@ const Promotion = () => {
 
                 </Row>
                 <ToastContainer />
-            </Container>
+            </Container >
         </>
     );
 }
