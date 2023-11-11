@@ -1,14 +1,15 @@
 import axios from "axios";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 // reactstrap components
-import { Card, CardHeader, CardBody, Container, Row, Col, Form, FormGroup, Input, Button, Table, CardFooter, CardTitle, Label, Modal, ModalHeader, ModalFooter, ModalBody } from "reactstrap";
+import { Card, CardHeader, CardBody, Container, Row, Col, Form, FormGroup, Input, Button, Table, CardFooter, CardTitle, Label, Modal, ModalHeader, ModalFooter, ModalBody, Badge } from "reactstrap";
 import Select from "react-select";
 import ReactPaginate from 'react-paginate';
 import { getAllClient, postNewClient, detailClient, updateClient, deleteClient } from "services/ClientService";
-import { FaEdit, FaTrash, FaSearch, FaFileAlt } from 'react-icons/fa';
+import { FaEdit, FaTrash, FaSearch, FaFileAlt, FaCamera, FaLockOpen, FaLock } from 'react-icons/fa';
 import Header from "components/Headers/Header.js";
 import Switch from 'react-input-switch';
 import { toast } from 'react-toastify';
+import axiosInstance from "services/custommize-axios";
 
 
 const Client = () => {
@@ -151,6 +152,7 @@ const Client = () => {
     }
   }
   // End hàm add client
+
   //Bắt đầu hàm update
   const [modalEdit, setModalEdit] = useState(false);
   const toggleEdit = () => setModalEdit(!modalEdit);
@@ -164,6 +166,7 @@ const Client = () => {
     gender: false,
     dateOfBirth: "",
   });
+
   const resetEditClient = () => {
     setEditClient({
       id: null,
@@ -180,7 +183,7 @@ const Client = () => {
     const response = await detailClient(id);
     setEditClient({
       id: id,
-      avatar: response.data.avatar,
+      // avatar: response.data.avatar,
       fullname: response.data.fullname,
       phoneNumber: response.data.phoneNumber,
       email: response.data.email,
@@ -188,9 +191,73 @@ const Client = () => {
       gender: response.data.gender,
       dateOfBirth: response.data.dateOfBirth,
     });
+    if (response.data.avatar) {
+      // Hiển thị hình ảnh
+      const blob = await fetch(`data:image/jpeg;base64,${response.data.avatar}`).then((res) => res.blob());
+      const file = new File([blob], "image.jpg", { type: "image/jpeg" });
+      setFile(file);
+    }
     console.log(editClient);
     toggleEdit();
   };
+  // upload image
+  const [file, setFile] = useState(null);
+
+  const handleFileChange = (e) => {
+    const selectedFile = e.target.files[0];
+    if (selectedFile) {
+      setFile(selectedFile);
+    }
+  };
+  const imageUrl = file ? URL.createObjectURL(file) : null;
+  const imageSize = '140px';
+  const imageHi = '190px';
+  const imageStyle = {
+    width: imageSize,
+    height: imageHi,
+  };
+  const buttonStyle = {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    color: '#000',
+    padding: '8px',
+    cursor: 'pointer',
+    border: '1px dashed gray',
+    width: imageSize,
+    height: imageHi,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  };
+  const changeAvatar = async () => {
+
+    try {
+      const image = new FormData();
+      if (file) {
+        image.append('file', file);
+      }
+
+      if (file) {
+        await axiosInstance.put(`/user/${editClient.id}/multipart-file`, image, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        });
+      }
+      getAll();
+    } catch (error) {
+      console.error('Failed to change avatar', error);
+      // Xử lý lỗi (nếu cần)
+    }
+  };
+  const AvatarReset = () => {
+    setFile(null);
+  };
+
+
+
   const onInputChangeDataUpdate = (e) => {
     setEditClient({ ...editClient, [e.target.name]: e.target.value });
   };
@@ -199,9 +266,11 @@ const Client = () => {
     console.log(client);
     try {
       const response = await updateClient(editClient);
+      changeAvatar()
       getAll();
       resetEditClient();
       toggleEdit();
+      toast.success("Cập nhật thành công!");
     } catch (error) {
       let errorMessage = "Lỗi từ máy chủ";
       if (error.response && error.response.data && error.response.data.message) {
@@ -212,28 +281,48 @@ const Client = () => {
   }
   //Kết thúc hàm update
 
+  //Hàm khóa khách hàng
+  const updateStatus = async (id, status) => {
+    try {
+      await axios.put(`http://localhost:33321/api/client/admin/update-status/${id}?status=${status}`);
+      getAll();
+      toast.success("Cập nhật trạng thái thành công!");
+    } catch (error) {
+      console.error("Error updating staff status:", error);
+    }
+  };
+  const statusMapping = {
+    0: { color: 'success', label: 'Đang hoạt động' },
+    1: { color: 'danger', label: 'Ngừng hoạt động' },
+
+  };
+  //Kết thúc hàm khóa khách hàng
+
   //Xử lý địa chỉ
   const [provinces, setProvinces] = useState([]);
-  const [selectedCity, setSelectedCity] = useState("");
-  const [selectedDistrict, setSelectedDistrict] = useState("");
-  const [selectedWard, setSelectedWard] = useState("");
-  const [idClient, setIdClient] = useState(null);
   const [modalAdress, setModalAdress] = useState(false);
   const toggleAdress = () => setModalAdress(!modalAdress);
 
   useEffect(() => {
-    if (modalAdress === false) {
-      setIdClient(null);
+    if (modalAdress === false && modalAddAdress === false) {
+      setFormData({ ...formData, idClient: "" });
       setListAddress([])
     }
+    console.log("modalAdress:", modalAdress, modalAddAdress);
   }, [modalAdress]);
+
   const [modalAddAdress, setModalAddAdress] = useState(false);
   const toggleAddAdress = () => setModalAddAdress(!modalAddAdress);
+
+  useEffect(() => {
+    if (modalAddAdress === false) {
+      resetFormData();
+    }
+    console.log("modalAddAdress:", modalAdress, modalAddAdress);
+  }, [modalAddAdress]);
   const [listAddress, setListAddress] = useState([]);
   const getAllAddress = async () => {
-    console.log(idClient)
-    const res = await axios.get(`http://localhost:33321/api/address/${idClient}`);
-    console.log("chek", res);
+    const res = await axios.get(`http://localhost:33321/api/address/${formData.idClient}`);
     if (res && res.data) {
       setListAddress(res.data.content);
       console.log(listAddress);
@@ -244,42 +333,117 @@ const Client = () => {
     const res = await axios.get(`http://localhost:33321/api/address/${id}`);
     console.log(res.data.content)
     setListAddress(res.data.content);
-    setIdClient(id);
+    setFormData({ ...formData, idClient: id });
     toggleAdress();
   };
-  const handleCityChange = (e) => {
-    const selectedCity = e.target.value;
-    setSelectedCity(selectedCity);
-    const selectedProvince = provinces.find((province) => province.name === selectedCity);
-    const districts = selectedProvince.districts;
-  };
-  const handleDistrictChange = (e) => {
-    const selectedDistrict = e.target.value;
-    setSelectedDistrict(selectedDistrict);
-    const selectedProvince = provinces.find((province) => province.name === selectedCity);
-    const selectedDistrictObj = selectedProvince.districts.find((district) => district.name === selectedDistrict);
-    const wards = selectedDistrictObj.wards;
-  };
 
-  const handleWardChange = (e) => {
-    const selectedWard = e.target.value;
-    setSelectedWard(selectedWard);
+  const [formData, setFormData] = useState({
+    id: null,
+    proviceCode: null,
+    districtCode: null,
+    communeCode: null,
+    addressDetail: null,
+    idClient: ""
+  });
+  const resetFormData = () => {
+    setFormData({
+      ...formData,
+      id: null,
+      proviceCode: "",
+      districtCode: "",
+      communeCode: "",
+      addressDetail: ""
+    });
+  }
+  useEffect(() => {
+    console.log("check", formData);
+  }, [formData]);
+
+  const CLickUpdateAddress = (item) => {
+    setFormData({
+      ...formData,
+      id: item.id,
+      proviceCode: item.proviceCode,
+      districtCode: item.districtCode,
+      communeCode: item.communeCode,
+      addressDetail: item.addressDetail
+    });
+    toggleAddAdress();
+  }
+  const saveAddress = async () => {
+    try {
+      if (formData.id) {
+        await axios.put(`http://localhost:33321/api/address/update`, {
+          id: formData.id,
+          proviceCode: formData.proviceCode,
+          districtCode: formData.districtCode,
+          communeCode: formData.communeCode,
+          addressDetail: formData.addressDetail,
+          idClient: formData.idClient
+        });
+        getAllAddress();
+        toast.success("Cập nhật thành công!");
+      } else {
+        await axios.post('http://localhost:33321/api/address/create', {
+          proviceCode: formData.proviceCode,
+          districtCode: formData.districtCode,
+          communeCode: formData.communeCode,
+          addressDetail: formData.addressDetail,
+          idClient: formData.idClient
+        });
+        getAllAddress();
+        toast.success("Thêm mới thành công!");
+      }
+
+      // Đóng modal và reset form
+      toggleAddAdress();
+      resetFormData();
+    } catch (error) {
+      // Xử lý lỗi
+      console.error("Error:", error);
+      if (error.response) {
+        console.error("Response data:", error.response.data);
+        toast.error(error.response.data.message);
+      } else {
+        toast.error("Đã có lỗi xảy ra.");
+      }
+    }
+  };
+  const deleteAddress = (id) => {
+    if (window.confirm("Bạn có chắc chắn muốn xóa không?")) {
+      axios.patch(`http://localhost:33321/api/address/delete/${id}`)
+        .then(response => {
+          getAllAddress();
+          toast.success("Xóa thành công");
+        })
+        .catch(error => {
+          console.error('Lỗi khi xóa dữ liệu:', error);
+        });
+    }
   };
   //Kết thúc xử lý địa chỉ
+  const [selectedStatus, setSelectedStatus] = useState('');
 
+  const filterAdmins = listClient.filter((admin) => {
+    if (selectedStatus === '') {
+      return true;
+    } else {
+      return admin.status.toString() === selectedStatus;
+    }
+  });
   return (
     <>
-      <Header />
+      {/* <Header /> */}
       {/* Page content */}
-      <Container className="mt--7" fluid>
+      <Container className="pt-5 pt-md-7" fluid>
         <Row>
           <Col>
             <div className="col">
               <Card className="shadow">
-                <CardHeader className="bg-transparent m-2">
+                <CardHeader className="bg-transparent">
                   <Row className="align-items-center">
                     <div className="col">
-                      <h3 className="mb-0">Khách Hàng</h3>
+                      <h2 className="heading-small text-dark mb-0">Khách Hàng</h2>
                     </div>
                   </Row>
                 </CardHeader>
@@ -289,7 +453,7 @@ const Client = () => {
                     <h3 className="heading-small text-black mb-0 ml-2">Tìm kiếm</h3>
                   </Row>
                   <hr className="my-4" />
-                  <Form className="search">
+                  <Form>
                     <div className="pl-lg-4">
                       <Row>
                         <Col lg="6">
@@ -418,6 +582,18 @@ const Client = () => {
 
                       <h3 className="heading-small text-black mb-0"><FaFileAlt size="16px" className="mr-1" />Danh sách</h3>
                     </div>
+                    <Col>
+                      <Input type="select" name="status" style={{ width: "150px" }} size="sm"
+                        value={selectedStatus}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          setSelectedStatus(value === '' ? '' : value);
+                        }}>
+                        <option value="">Tất cả</option>
+                        <option value="1">Ngừng hoạt động</option>
+                        <option value="0">Đang hoạt động</option>
+                      </Input>
+                    </Col>
                     <div className="col text-right">
                       <Button
                         color="primary"
@@ -439,12 +615,14 @@ const Client = () => {
 
                         </th>
                         <th scope="col">STT</th>
+                        <th scope="col">Trạng thái</th>
+                        <th scope="col">Ảnh</th>
                         <th scope="col">Họ tên <i class="fa-solid fa-arrow-up"></i><i class="fa-solid fa-arrow-down"></i></th>
                         <th scope="col">Email <i class="fa-solid fa-arrow-up"></i><i class="fa-solid fa-arrow-down"></i></th>
                         <th scope="col">Số điện thoại <i class="fa-solid fa-arrow-up"></i><i class="fa-solid fa-arrow-down"></i></th>
                         <th scope="col">Giới tính</th>
                         <th scope="col">Ngày sinh <i class="fa-solid fa-arrow-up"></i><i class="fa-solid fa-arrow-down"></i></th>
-                        <th scope="col">Thao tác</th>
+                        <th scope="col" style={{ position: "sticky", zIndex: '1', right: '0' }}>Thao tác</th>
 
                       </tr>
                     </thead>
@@ -454,7 +632,7 @@ const Client = () => {
                           Không có dữ liệu
                         </th>
                       }
-                      {Array.isArray(listClient) && listClient.map((item, index) => (
+                      {filterAdmins && filterAdmins.length > 0 && filterAdmins.map((item, index) => (
 
                         <tr key={item.id}>
                           <th className="text-center pb-4" >
@@ -464,25 +642,45 @@ const Client = () => {
 
                           </th>
                           <td className="text-center">{index + 1}</td>
-                          <td>{item.fullname}</td>
                           <td>
-                            <img src={`data:image/png;base64,${item.avatar}`} alt="Image" />
+                            <Badge color={statusMapping[item.status]?.color || statusMapping.default.color}>
+                              {statusMapping[item.status]?.label || statusMapping.default.label}
+                            </Badge>
                           </td>
-
+                          <td>
+                            <span className="avatar avatar-sm rounded-circle">
+                              <img src={`data:image/jpeg;base64,${item.avatar}`} alt="" />
+                            </span>
+                          </td>
+                          <td>
+                            {item.fullname}
+                          </td>
                           <td>{item.email}</td>
                           <td>{item.phoneNumber}</td>
                           <td className="text-center">{item.gender ? "Nữ" : "Nam"}</td>
                           <td>{item.dateOfBirth}</td>
-                          <td>
-                            <Button color="info" size="sm" onClick={() => handleRowClick(item.id)}>
-                              <FaEdit />
+                          <td style={{ position: "sticky", zIndex: '1', right: '0', backgroundColor: '#fff' }}>
+                            <Button color="link" size="sm"
+                              onClick={() => onClickListAdress(item.id)}>
+                              <i class="fa-regular fa-address-book" color="primary"></i>
                             </Button>
-                            <Button color="danger" size="sm" onClick={() => onClickDeleteClient(item.id)}>
-                              <FaTrash />
+                            <Button color="link" size="sm" onClick={() => handleRowClick(item.id)} >
+                              <FaEdit color="orange" />
                             </Button>
-                            <Button color="danger" size="sm" onClick={() => onClickListAdress(item.id)}>
-                              <i class="fa-regular fa-address-book"></i>
+                            {item.status === 0 &&
+                              <Button color="link" size="sm" onClick={() => updateStatus(item.id, 1)}>
+                                <FaLock color="green" />
+                              </Button>
+                            }
+                            {item.status === 1 &&
+                              <Button color="link" size="sm" onClick={() => updateStatus(item.id, 0)} >
+                                <FaLockOpen color="green" />
+                              </Button>
+                            }
+                            <Button color="link" size="sm" onClick={() => onClickDeleteClient(item.id)}>
+                              <FaTrash color="red" />
                             </Button>
+
                           </td>
                         </tr>
                       ))}
@@ -538,8 +736,6 @@ const Client = () => {
                 </CardBody>
               </Card>
             </div>
-
-
 
           </Col>
         </Row>
@@ -670,13 +866,13 @@ const Client = () => {
         </ModalBody>
         <ModalFooter>
           <div className="text-center">
-            <Button color="danger" onClick={(e) => onAddClient(e)}>
+            <Button color="danger" size="sm" onClick={(e) => onAddClient(e)}>
               Thêm
             </Button>{' '}
-            <Button color="primary" onClick={resetClient}>
+            <Button color="primary" size='sm' onClick={resetClient}>
               Reset
             </Button>
-            <Button color="danger" onClick={toggle} >
+            <Button color="danger" size="sm" onClick={toggle} >
               Close
             </Button>
           </div>
@@ -697,11 +893,25 @@ const Client = () => {
           <Form>
             <div className="pl-lg-4">
               <Row>
+
                 <Col lg="6" className="d-flex justify-content-center align-items-center" >
-                  <div style={{ filter: 'grayscale(100%)', border: '1px solid #ccc', width: '140px', height: '190px' }}>
-                    <img src={`https://s3-ap-southeast-1.amazonaws.com/imageshoestore`} alt="Ảnh mô tả" width={140} height={190} />
+                  <div
+                    style={{ position: 'relative', width: imageSize, height: imageHi }}
+                  >
+                    {imageUrl && <img alt="preview" src={imageUrl} style={imageStyle} />}
+                    <Label htmlFor="file-input" style={buttonStyle}>
+                      <FaCamera size={15} />
+                      {/* <FaTrash size={15} className="ml-2" onClick={AvatarReset} /> */}
+                    </Label>
+                    <Input
+                      type="file"
+                      id="file-input"
+                      style={{ display: 'none' }}
+                      onChange={handleFileChange}
+                    />
                   </div>
                 </Col>
+
                 <Col>
                   <Row>
                     <Col lg="12">
@@ -815,10 +1025,10 @@ const Client = () => {
         </ModalBody>
         <ModalFooter>
           <div className="text-center">
-            <Button color="danger" onClick={(e) => onUpdateClient(e)}>
+            <Button color="danger" size="sm" onClick={(e) => onUpdateClient(e)}>
               Sửa
             </Button>{' '}
-            <Button color="danger" onClick={toggleEdit} >
+            <Button color="danger" size="sm" onClick={toggleEdit} >
               Close
             </Button>
           </div>
@@ -834,12 +1044,11 @@ const Client = () => {
         style={{ maxWidth: '500px' }}
       >
         <ModalHeader toggle={toggleAddAdress}>
-          <h3 className="heading-small text-muted mb-0">Địa chỉ khách hàng</h3>
+          <h3 className="heading-small text-muted mb-0">{formData.id ? 'Cập Nhật Địa chỉ khách hàng' : 'Thêm Mới Địa chỉ khách hàng'}</h3>
         </ModalHeader>
         <ModalBody>
           <Form>
             <div className="pl-lg-4">
-
               <Row>
                 <Col lg="12">
                   <FormGroup>
@@ -849,9 +1058,12 @@ const Client = () => {
                     <Input
                       className="form-control-alternative"
                       type="textarea"
-                      name="fullname"
-                      value={editClient.fullname}
-                      onChange={onInputChangeDataUpdate}
+                      value={formData.addressDetail}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          addressDetail: e.target.value
+                        })}
                     />
                   </FormGroup>
                 </Col>
@@ -863,8 +1075,13 @@ const Client = () => {
                     <Input
                       className="form-control-alternative"
                       type="select"
-                      value={selectedCity}
-                      onChange={handleCityChange}
+                      value={formData.proviceCode}
+                      onChange={(e) => setFormData({
+                        ...formData,
+                        proviceCode: e.target.value,
+                        districtCode: null,
+                        communeCode: null
+                      })}
                     >
                       <option value="">Chọn Tỉnh / Thành</option>
                       {provinces.map((province) => (
@@ -883,14 +1100,18 @@ const Client = () => {
                     <Input
                       className="form-control-alternative"
                       type="select"
-                      value={selectedDistrict}
-                      onChange={handleDistrictChange}
-                      disabled={!selectedCity}
+                      value={formData.districtCode}
+                      onChange={(e) => setFormData({
+                        ...formData,
+                        districtCode: e.target.value,
+                        communeCode: ""
+                      })}
+                      disabled={!formData.proviceCode}
                     >
                       <option value="">Chọn Quận / Huyện</option>
-                      {selectedCity &&
+                      {formData.proviceCode &&
                         provinces
-                          .find((province) => province.name === selectedCity)
+                          .find((province) => province.name === formData.proviceCode)
                           .districts.map((district) => (
                             <option key={district.code} value={district.name}>
                               {district.name}
@@ -907,15 +1128,18 @@ const Client = () => {
                     <Input
                       className="form-control-alternative"
                       type="select"
-                      value={selectedWard}
-                      onChange={handleWardChange}
-                      disabled={!selectedDistrict}
+                      value={formData.communeCode}
+                      onChange={(e) => setFormData({
+                        ...formData,
+                        communeCode: e.target.value
+                      })}
+                      disabled={!formData.districtCode}
                     >
                       <option value="">Chọn Phường / Xã</option>
-                      {selectedDistrict &&
+                      {formData.districtCode &&
                         provinces
-                          .find((province) => province.name === selectedCity)
-                          .districts.find((district) => district.name === selectedDistrict)
+                          .find((province) => province.name === formData.proviceCode)
+                          .districts.find((district) => district.name === formData.districtCode)
                           .wards.map((ward) => (
                             <option key={ward.code} value={ward.name}>
                               {ward.name}
@@ -924,20 +1148,23 @@ const Client = () => {
                     </Input>
                   </FormGroup>
                 </Col>
-
-
               </Row>
             </div>
           </Form>
         </ModalBody>
         <ModalFooter>
           <div className="text-center">
-            <Button color="danger" onClick={(e) => onUpdateClient(e)}>
-              Sửa
+            <Button color="danger" onClick={(e) => saveAddress(e)}>
+              {formData.id ? "Cập nhật" : "Thêm mới"}
             </Button>{' '}
-            <Button color="primary" >
-              Reset
-            </Button>
+            {formData.id
+              ?
+              ""
+              :
+              <Button color="primary" onClick={resetFormData}>
+                Reset
+              </Button>
+            }
             <Button color="danger" onClick={toggleAddAdress} >
               Close
             </Button>
@@ -985,14 +1212,14 @@ const Client = () => {
                       <Row>
                         <Col lg="9"  >
                           <div style={{ fontSize: 13 }} className="text-small text-muted mb-0">
-                            {item.addressDetail},&nbsp;{item.proviceCode},&nbsp;{item.districtCode},&nbsp;{item.communeCode}
+                            {item.addressDetail},&nbsp;{item.communeCode},&nbsp;{item.districtCode},&nbsp;{item.proviceCode}
                           </div>
                         </Col>
                         <Col lg="3" className="mr--1">
-                          <Button color="info" size="sm">
+                          <Button color="info" size="sm" onClick={() => CLickUpdateAddress(item)}>
                             <FaEdit />
                           </Button>
-                          <Button color="danger" size="sm" >
+                          <Button color="danger" size="sm" onClick={() => deleteAddress(item.id)}>
                             <FaTrash />
                           </Button>
                         </Col>
@@ -1002,23 +1229,6 @@ const Client = () => {
                   )
                 })
               }
-
-              <Row>
-                <Col lg="9"  >
-                  <div style={{ fontSize: 13 }} className="text-small text-muted mb-0">
-                    Số nhà 16, 17 Phú Kiều, Phường Phúc Diễn, Quận Bắc Từ Liêm, TP Hà Nội
-                  </div>
-                </Col>
-                <Col lg="3" className="mr--1">
-                  <Button color="info" size="sm">
-                    <FaEdit />
-                  </Button>
-                  <Button color="danger" size="sm" >
-                    <FaTrash />
-                  </Button>
-                </Col>
-              </Row>
-              <hr />
             </div>
           </Form>
         </ModalBody>

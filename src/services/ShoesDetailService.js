@@ -1,7 +1,7 @@
 import axios from 'services/custommize-axios.js';
 
-const getAllShoesDetail = (id, search) => {
-  return axios.post(`/admin/shoesdetail/search/${id}`, search)
+const getAllShoesDetail = (id, page, size, search) => {
+  return axios.post(`/admin/shoesdetail/search/${id}?page=${page}&size=${size}`, search)
 }
 
 const getAllShoesDetail2 = (id, page, size, search) => {

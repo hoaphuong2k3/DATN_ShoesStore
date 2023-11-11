@@ -1,18 +1,17 @@
-import React, { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { updateShoes, findShoes } from "services/Product2Service";
+import React, { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
+import ReactPaginate from 'react-paginate';
+import { FaCamera } from 'react-icons/fa';
+import { postNewShoes } from "services/Product2Service";
 import { getAllBrand, getAllOrigin, getAllDesignStyle, getAllSkinType, getAllToe, getAllSole, getAllLining, getAllCushion } from "services/ProductAttributeService";
 // reactstrap components
 import {
-    Card, CardHeader, CardBody, Container, Row, Col, FormGroup, Input, Button, Form
+    Card, CardHeader, CardBody, Container, Row, Col, FormGroup, Input, Button, Form, Label
 } from "reactstrap";
 import { toast } from 'react-toastify';
 import Header from "components/Headers/Header.js";
 
-const DetailProducts = () => {
-
-    const { id } = useParams();
-
+const AddProduct = () => {
 
     const formData = new FormData();
 
@@ -26,37 +25,6 @@ const DetailProducts = () => {
     const [listLining, setListLining] = useState([]);
     const [listCushion, setListCushion] = useState([]);
 
-    const [dataEdit, setDataEdit] = useState([])
-    //getData
-    const getData = async () => {
-        try {
-            let res = await findShoes(id);
-            if (res && res.data) {
-                setDataEdit(res.data);
-                setSelectedImage(res.data.imgURI);
-                console.log(res.data.imgURI);
-                console.log(dataEdit.imgURI);
-            }
-        } catch (error) {
-            let errorMessage = "Lỗi từ máy chủ";
-            if (error.response && error.response.data && error.response.data.message) {
-                errorMessage = error.response.data.message;
-            }
-            toast.error(errorMessage);
-            navigate("/admin/product");
-        }
-    }
-    useEffect(() => {
-        getlistBrand();
-        getListOrigin();
-        getListDesignStyle();
-        getListSkinType();
-        getListToe();
-        getListSole();
-        getListLining();
-        getListCushion();
-        getData();
-    }, []);
     const [shoes, setShoes] = useState({
         name: "",
         brandId: null,
@@ -72,43 +40,55 @@ const DetailProducts = () => {
 
     const onInputChange = (e) => {
 
-        setDataEdit({ ...dataEdit, [e.target.name]: e.target.value });
-        setShoes({
-            name: dataEdit.name,
-            brandId: dataEdit.brandId,
-            originId: dataEdit.originId,
-            designStyleId: dataEdit.designStyleId,
-            skinTypeId: dataEdit.skinTypeId,
-            soleId: dataEdit.soleId,
-            liningId: dataEdit.liningId,
-            toeId: dataEdit.toeId,
-            cushionId: dataEdit.cushionId,
-            description: dataEdit.description
+        setShoes({ ...shoes, [e.target.name]: e.target.value });
+
+    };
+    // upload image
+    const [file, setFile] = useState(new File([""], { type: "text/plain" }));
+
+    const handleFileChange = (e) => {
+        const selectedFile = e.target.files[0];
+        if (selectedFile) {
+            setFile(selectedFile);
         }
-        );
-        console.log(shoes);
-
     };
-
+    const imageUrl = file ? URL.createObjectURL(file) : new File([""], { type: "text/plain" });
+    const imageSize = '220px';
+    const imageHi = '220px';
+    const imageStyle = {
+        width: imageSize,
+        height: imageHi,
+    };
+    const buttonStyle = {
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        color: '#000',
+        padding: '8px',
+        cursor: 'pointer',
+        border: '1px dashed gray',
+        width: imageSize,
+        height: imageHi,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+    };
+    const AvatarReset = () => {
+        setFile(null);
+    };
     //Img
-    const [selectedImage, setSelectedImage] = useState(null);
-
-    const handleImageChange = (e) => {
-        const file = e.target.files[0];
-        setSelectedImage(file);
-    };
 
     const onSubmit = async (e) => {
 
         e.preventDefault();
-
         const shoesDataJson = JSON.stringify(shoes);
-
-        formData.append('file', selectedImage);
+        if (file) {
+            formData.append('file', file);
+        }
         formData.append('data', shoesDataJson);
-
         try {
-            await updateShoes(id, formData);
+            const response = await postNewShoes(formData);
             navigate("/admin/product");
         } catch (error) {
             let errorMessage = "Lỗi từ máy chủ";
@@ -119,10 +99,20 @@ const DetailProducts = () => {
         }
     };
 
+    useEffect(() => {
+        getlistBrand();
+        getListOrigin();
+        getListDesignStyle();
+        getListSkinType();
+        getListToe();
+        getListSole();
+        getListLining();
+        getListCushion();
+    }, []);
 
-    //Hiển thị combobox
     const getlistBrand = async () => {
         let res = await getAllBrand();
+        console.log(res);
         if (res && res.data) {
             setListBrand(res.data);
         }
@@ -169,44 +159,24 @@ const DetailProducts = () => {
             setListCushion(res.data);
         }
     }
-    //End Hiển Thi Combobox
     return (
         <>
-            <Header />
             {/* Page content */}
-            <Container className="mt--7" fluid>
+            <Container fluid>
                 <Row className="mb-4">
                     <div className="col">
-                        <Card className="shadow">
+                        <Card className="shadow mt-7">
                             <CardHeader className="bg-transparent">
                                 <h3 className="mb-0">Sản phẩm </h3>
                             </CardHeader>
                             <CardBody>
                                 <Form onSubmit={onSubmit}>
                                     <h6 className="heading-small text-muted mb-4">
-                                        Sửa sản phẩm
+                                        Thêm sản phẩm
                                     </h6>
                                     <div className="pl-lg-4">
                                         <Row>
-                                            <Col lg="6">
-                                                <FormGroup>
-                                                    <label
-                                                        className="form-control-label"
-                                                        htmlFor="input-name"
-                                                    >
-                                                        Mã
-                                                    </label>
-                                                    <Input
-                                                        type={"text"}
-                                                        className="form-control-alternative"
-                                                        id="input-name"
-                                                        name="code"
-                                                        value={dataEdit.code}
-                                                        disabled
-                                                    />
-                                                </FormGroup>
-                                            </Col>
-                                            <Col lg="6">
+                                            <Col lg="12">
                                                 <FormGroup>
                                                     <label
                                                         className="form-control-label"
@@ -221,7 +191,7 @@ const DetailProducts = () => {
                                                         placeholder="Nhập tên sản phẩm "
                                                         name="name"
                                                         onChange={(e) => onInputChange(e)}
-                                                        value={dataEdit.name}
+
                                                     />
                                                 </FormGroup>
                                             </Col>
@@ -235,7 +205,7 @@ const DetailProducts = () => {
                                                     >
                                                         Hãng
                                                     </label>
-                                                    <Input id="btn_select_tt" type="select" name="brandId" value={dataEdit.brandId}
+                                                    <Input id="btn_select_tt" type="select" name="brandId"
                                                         onChange={(e) => onInputChange(e)}>
                                                         <option value="" > -- Chọn --  </option>
                                                         {listBrand && listBrand.length > 0 &&
@@ -259,7 +229,7 @@ const DetailProducts = () => {
                                                     >
                                                         Xuất xứ
                                                     </label>
-                                                    <Input id="btn_select_tt" name="originId" type="select" value={dataEdit.originId}
+                                                    <Input id="btn_select_tt" name="originId" type="select"
                                                         onChange={(e) => onInputChange(e)}>
                                                         <option value="" > -- Chọn --  </option>
                                                         {listorigin && listorigin.length > 0 &&
@@ -283,7 +253,7 @@ const DetailProducts = () => {
                                                     >
                                                         Thiết kế
                                                     </label>
-                                                    <Input id="btn_select_tt" name="designStyleId" type="select" value={dataEdit.designStyleId}
+                                                    <Input id="btn_select_tt" name="designStyleId" type="select"
                                                         onChange={(e) => onInputChange(e)} >
                                                         <option value="" > -- Chọn --  </option>
                                                         {listDesignStyle && listDesignStyle.length > 0 &&
@@ -309,7 +279,7 @@ const DetailProducts = () => {
                                                     >
                                                         Loại da
                                                     </label>
-                                                    <Input id="btn_select_tt" name="skinTypeId" type="select" value={dataEdit.skinTypeId}
+                                                    <Input id="btn_select_tt" name="skinTypeId" type="select"
                                                         onChange={(e) => onInputChange(e)} >
                                                         <option value="" > -- Chọn --  </option>
                                                         {listSkinStype && listSkinStype.length > 0 &&
@@ -333,7 +303,7 @@ const DetailProducts = () => {
                                                     >
                                                         Mũi giày
                                                     </label>
-                                                    <Input id="btn_select_tt" name="toeId" type="select" value={dataEdit.toeId}
+                                                    <Input id="btn_select_tt" name="toeId" type="select"
                                                         onChange={(e) => onInputChange(e)} >
                                                         <option value="" > -- Chọn --  </option>
                                                         {listToe && listToe.length > 0 &&
@@ -357,7 +327,7 @@ const DetailProducts = () => {
                                                     >
                                                         Đế giày
                                                     </label>
-                                                    <Input id="btn_select_tt" name="soleId" type="select" value={dataEdit.soleId}
+                                                    <Input id="btn_select_tt" name="soleId" type="select"
                                                         onChange={(e) => onInputChange(e)} >
                                                         <option value="" > -- Chọn --  </option>
                                                         {listSole && listSole.length > 0 &&
@@ -388,7 +358,7 @@ const DetailProducts = () => {
                                                             >
                                                                 Lót giày
                                                             </label>
-                                                            <Input id="btn_select_tt" name="liningId" type="select" value={dataEdit.liningId}
+                                                            <Input id="btn_select_tt" name="liningId" type="select"
                                                                 onChange={(e) => onInputChange(e)} >
                                                                 <option value="" > -- Chọn --  </option>
                                                                 {listLining && listLining.length > 0 &&
@@ -413,7 +383,7 @@ const DetailProducts = () => {
                                                             >
                                                                 Đệm giày
                                                             </label>
-                                                            <Input id="btn_select_tt" name="cushionId" type="select" value={dataEdit.cushionId}
+                                                            <Input id="btn_select_tt" name="cushionId" type="select"
                                                                 onChange={(e) => onInputChange(e)} >
                                                                 <option value="" > -- Chọn --  </option>
                                                                 {listCushion && listCushion.length > 0 &&
@@ -440,7 +410,6 @@ const DetailProducts = () => {
                                                                 rows="5"
                                                                 type="textarea"
                                                                 name="description"
-                                                                value={dataEdit.description}
                                                                 onChange={(e) => onInputChange(e)}
                                                             />
                                                         </FormGroup>
@@ -448,63 +417,28 @@ const DetailProducts = () => {
                                                 </Row>
                                             </Col>
                                             <Col lg="4">
-                                                <label className="form-control-label">Thêm ảnh</label>
-                                                <div className="box-image">
-                                                    {/* <img src={''} /> */}
-                                                </div>
-                                                <div >
-                                                    <input type="file" accept="image/*" onChange={handleImageChange} />
-                                                    {selectedImage && (
-                                                        <div>
-                                                            <p>Selected Image:</p>
-                                                            <img src={`https://s3-ap-southeast-1.amazonaws.com/imageshoestore/${selectedImage}`} alt="Ảnh mô tả" />
-                                                        </div>
-                                                    )}
+                                                <label className="form-control-label">Ảnh</label>
+                                                <div className="text-center"
+                                                    style={{ position: 'relative', width: imageSize, height: imageHi }}
+                                                >
+                                                    {imageUrl && <img src={imageUrl} style={imageStyle} />}
+                                                    <Label htmlFor="file-input" style={buttonStyle}>
+                                                        <FaCamera size={15} />
+                                                    </Label>
+                                                    <Input
+                                                        type="file"
+                                                        id="file-input"
+                                                        style={{ display: 'none' }}
+                                                        onChange={handleFileChange}
+                                                    />
                                                 </div>
                                             </Col>
                                         </Row>
-                                    </div>
-                                    <div className="pl-lg-4">
-                                        <Row>
-                                            <Col lg="6">
-                                                <FormGroup>
-                                                    <label
-                                                        className="form-control-label"
-                                                        htmlFor="input-username"
-                                                    >
-                                                        Người tạo
-                                                    </label>
-                                                    <Input
-                                                        className="form-control-alternative"
-                                                        type="text"
-                                                        value={dataEdit.createdBy}
-                                                        disabled
-                                                    />
-                                                </FormGroup>
-                                            </Col>
-                                            <Col lg="6">
-                                                <FormGroup>
-                                                    <label
-                                                        className="form-control-label"
-                                                        htmlFor="input-email"
-                                                    >
-                                                        Ngày tạo
-                                                    </label>
-                                                    <Input
-                                                        className="form-control-alternative"
-                                                        type="text"
-                                                        disabled
-                                                        value={dataEdit.createdTime}
-                                                    />
-                                                </FormGroup>
-                                            </Col>
-                                        </Row>
-
                                     </div>
 
                                     <div className="text-center">
                                         <Button color="warning" >
-                                            Sửa
+                                            Thêm
                                         </Button>
                                     </div>
                                     <hr className="my-4" />
@@ -520,5 +454,5 @@ const DetailProducts = () => {
     );
 };
 
-export default DetailProducts;
+export default AddProduct;
 

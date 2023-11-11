@@ -73,6 +73,9 @@ const getAllSize = () => {
 const getAllColor = () => {
     return axios.get(`/admin/color/get-all`)
 }
+const getAllColor1 = (page, size, search) => {
+    return axios.post(`http://localhost:33321/api/admin/color/search?page=${page}&size=${size}`, search)
+  }
 export { getAllBrand, postCreateBrands, updateBrand, deleteBrand ,
     getAllOrigin,
     getAllDesignStyle,
@@ -84,5 +87,6 @@ export { getAllBrand, postCreateBrands, updateBrand, deleteBrand ,
     getAllSizeId,
     getAllColorId,
     getAllSize,
-    getAllColor
+    getAllColor,
+    getAllColor1
 };
