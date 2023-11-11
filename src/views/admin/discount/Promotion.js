@@ -60,6 +60,7 @@ const Promotion = () => {
         toDate: "",
         status: "",
         typePeriod: "",
+        hasGift: false,
         isdelete: 0,
     });
 
@@ -74,12 +75,18 @@ const Promotion = () => {
             const response = await axiosInstance.get("/admin/discount-period/getAll", {
                 params: queryParams
             });
+            const filteredDiscounts = response.content.filter(discount => {
+                if (queryParams.hasGift) {
+                    return discount.nameImage !== null;
+                }
+                return true;
+            });
+
             const response2 = await axiosInstance.get("/free-gift", {
                 params: queryParams2
             });
             setfreeGift(response2.content);
-            setDiscounts(response.content);
-
+            setDiscounts(filteredDiscounts);
             setTotalElements(response.totalElements);
             setTotalPages(response.totalPages);
 
@@ -108,6 +115,11 @@ const Promotion = () => {
         0: { color: 'danger', label: 'Kích hoạt' },
         1: { color: 'success', label: 'Chờ kích hoạt' },
         2: { color: 'warning', label: 'Ngừng kích hoạt' }
+    };
+
+    const handleFilter = () => {
+        fetchData(); // Gọi hàm fetchData để lọc dữ liệu
+        toggleThirdModal(); // Đóng modal sau khi lọc
     };
 
     //search
@@ -661,57 +673,57 @@ const Promotion = () => {
                                         </thead>
                                         <tbody style={{ color: "black" }}>
                                             {Array.isArray(discounts) &&
-                                                 discounts
-                                                 .filter(
-                                                   (discount) =>
-                                                     discount.code.toLowerCase().includes(searchValue.toLowerCase()) ||
-                                                     discount.name.toLowerCase().includes(searchValue.toLowerCase())
-                                                 )
-                                                 .map((discount, index) => (
-                                                    <tr key={discount.id}>
-                                                        <td>
-                                                            <FormGroup check className="pb-4">
-                                                                <Input
-                                                                    type="checkbox"
-                                                                    checked={selectedItems.includes(discount.id)}
-                                                                    onChange={() => handleCheckboxChange(discount.id)}
-                                                                />
+                                                discounts
+                                                    .filter(
+                                                        (discount) =>
+                                                            discount.code.toLowerCase().includes(searchValue.toLowerCase()) ||
+                                                            discount.name.toLowerCase().includes(searchValue.toLowerCase())
+                                                    )
+                                                    .map((discount, index) => (
+                                                        <tr key={discount.id}>
+                                                            <td>
+                                                                <FormGroup check className="pb-4">
+                                                                    <Input
+                                                                        type="checkbox"
+                                                                        checked={selectedItems.includes(discount.id)}
+                                                                        onChange={() => handleCheckboxChange(discount.id)}
+                                                                    />
 
-                                                            </FormGroup>
-                                                        </td>
-                                                        <td>{calculateIndex(index)}</td>
-                                                        <td style={{ position: "sticky", zIndex: '1', left: '0', background: "#fff", textAlign: "center" }}>
-                                                            <Badge color={statusMapping[discount.status]?.color || statusMapping.default.color}>
-                                                                {statusMapping[discount.status]?.label || statusMapping.default.label}
-                                                            </Badge>
-                                                        </td>
+                                                                </FormGroup>
+                                                            </td>
+                                                            <td>{calculateIndex(index)}</td>
+                                                            <td style={{ position: "sticky", zIndex: '1', left: '0', background: "#fff", textAlign: "center" }}>
+                                                                <Badge color={statusMapping[discount.status]?.color || statusMapping.default.color}>
+                                                                    {statusMapping[discount.status]?.label || statusMapping.default.label}
+                                                                </Badge>
+                                                            </td>
 
-                                                        <td>{discount.code}</td>
-                                                        <td>{discount.typePeriod === 0 ? "Order" : "FreeShip"}</td>
-                                                        <td>{discount.name}</td>
-                                                        <td style={{ textAlign: "right" }}>
-                                                            {discount.typePeriod === 0 ? `${discount.minPrice} VNĐ` : ""}
-                                                        </td>
-                                                        <td style={{ textAlign: "right" }}>
-                                                            {discount.typePeriod === 0 ? `${discount.salePercent}%` : ""}
-                                                        </td>
-                                                        <td>{discount.nameImage}</td>
-                                                        <td>{discount.startDate}</td>
-                                                        <td>{discount.endDate}</td>
+                                                            <td>{discount.code}</td>
+                                                            <td>{discount.typePeriod === 0 ? "Order" : "FreeShip"}</td>
+                                                            <td>{discount.name}</td>
+                                                            <td style={{ textAlign: "right" }}>
+                                                                {discount.typePeriod === 0 ? `${discount.minPrice} VNĐ` : ""}
+                                                            </td>
+                                                            <td style={{ textAlign: "right" }}>
+                                                                {discount.typePeriod === 0 ? `${discount.salePercent}%` : ""}
+                                                            </td>
+                                                            <td>{discount.nameImage}</td>
+                                                            <td>{discount.startDate}</td>
+                                                            <td>{discount.endDate}</td>
 
-                                                        <td style={{ position: "sticky", zIndex: '1', right: '0', background: "#fff" }}>
-                                                            {discount.status === 0 &&
-                                                                <Button color="link" size="sm" onClick={() => lock(discount.id)} ><FaLockOpen /></Button>
-                                                            }
-                                                            {(discount.status === 1 || discount.status === 2) &&
-                                                                <Button color="link" size="sm" onClick={() => openlock(discount.id)} ><FaLock /></Button>
-                                                            }
-                                                            <Button color="link" size="sm" onClick={() => handleRowClick(discount)}><FaEdit /></Button>
-                                                            <Button color="link" size="sm" onClick={() => deleteDiscount(discount.id)}> <FaTrash /></Button>
-                                                        </td>
+                                                            <td style={{ position: "sticky", zIndex: '1', right: '0', background: "#fff" }}>
+                                                                {discount.status === 0 &&
+                                                                    <Button color="link" size="sm" onClick={() => lock(discount.id)} ><FaLockOpen /></Button>
+                                                                }
+                                                                {(discount.status === 1 || discount.status === 2) &&
+                                                                    <Button color="link" size="sm" onClick={() => openlock(discount.id)} ><FaLock /></Button>
+                                                                }
+                                                                <Button color="link" size="sm" onClick={() => handleRowClick(discount)}><FaEdit /></Button>
+                                                                <Button color="link" size="sm" onClick={() => deleteDiscount(discount.id)}> <FaTrash /></Button>
+                                                            </td>
 
-                                                    </tr>
-                                                ))}
+                                                        </tr>
+                                                    ))}
                                         </tbody>
                                     </Table>
                                     {/* Hiển thị thanh phân trang */}
@@ -1081,6 +1093,7 @@ const Promotion = () => {
                                                 <Input
                                                     className="form-control-alternative"
                                                     type="select" size="sm"
+                                                    onChange={(e) => setQueryParams({ ...queryParams, typePeriod: e.target.value })}
                                                 >
                                                     <option value="">Tất cả</option>
                                                     <option value="0">Order</option>
@@ -1099,6 +1112,7 @@ const Promotion = () => {
                                                         <Input
                                                             className="form-control-alternative"
                                                             type="number" size="sm"
+                                                            onChange={(e) => setQueryParams({ ...queryParams, minPercent: e.target.value })}
                                                         />
                                                     </Col>
 
@@ -1111,6 +1125,7 @@ const Promotion = () => {
                                                         <Input
                                                             className="form-control-alternative"
                                                             type="number" size="sm"
+                                                            onChange={(e) => setQueryParams({ ...queryParams, maxPercent: e.target.value })}
                                                         />
                                                     </Col>
                                                 </Row>
@@ -1124,6 +1139,7 @@ const Promotion = () => {
                                                 <Input
                                                     className="form-control-alternative"
                                                     type="select" size="sm"
+                                                    onChange={(e) => setQueryParams({ ...queryParams, status: e.target.value })}
                                                 >
                                                     <option value="">Tất cả</option>
                                                     <option value="0">Đang kích hoạt</option>
@@ -1140,6 +1156,7 @@ const Promotion = () => {
                                                 <Input
                                                     className="form-control-alternative"
                                                     type="date" size="sm"
+                                                    onChange={(e) => setQueryParams({ ...queryParams, fromDate: e.target.value })}
                                                 />
                                             </FormGroup>
                                             <FormGroup>
@@ -1151,12 +1168,17 @@ const Promotion = () => {
                                                 <Input
                                                     className="form-control-alternative"
                                                     type="date" size="sm"
+                                                    onChange={(e) => setQueryParams({ ...queryParams, toDate: e.target.value })}
                                                 />
                                             </FormGroup>
                                             <FormGroup check>
                                                 <label
                                                     style={{ fontSize: 13, fontWeight: "bold" }}>
-                                                    <Input type="checkbox" id="checkbox2" />
+                                                    <Input type="checkbox"
+                                                        id="checkbox2"
+                                                        checked={queryParams.hasGift}
+                                                        onChange={() => setQueryParams({ ...queryParams, hasGift: !queryParams.hasGift })}
+                                                    />
                                                     Có quà tặng không?
                                                 </label>
                                             </FormGroup>
@@ -1170,7 +1192,7 @@ const Promotion = () => {
                                                 </Button>
                                             </div>
                                             <div className="col-4">
-                                                <Button color="primary" outline size="sm" block>
+                                                <Button color="primary" outline size="sm" block onClick={handleFilter}>
                                                     Lọc
                                                 </Button>
                                             </div>
