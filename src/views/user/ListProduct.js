@@ -34,12 +34,11 @@ const Product = () => {
     cushionId: null,
     fromPrice: null,
     toPrice: null,
-
   });
 
   const getListShoes = async (page, size) => {
     try {
-      let res = await getAllShoes(page, size, search);
+      let res = await getAllShoes(page, size, search,"","");
       if (res && res.data && res.data.content) {
         setProducts(res.data.content);
         console.log(res.data);
@@ -341,8 +340,7 @@ const Product = () => {
                             <div key={x.id}>
                               <input type="checkbox" className="mr-4 ml-2"
                                 onChange={() => handleCheckboxChange('toeId', x.id)}
-                                checked={search.toeId === x.id}
-                              />
+                                checked={search.toeId === x.id}/>
                               <label className="content-name">{x.name}</label>
                             </div>
                           ))}
@@ -407,7 +405,6 @@ const Product = () => {
                       </div>
                     </div>
                   </div>
-
 
                   <div className="col-md-9 mt-5">
                     <div className="selectItem">
