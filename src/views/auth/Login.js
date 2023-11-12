@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 import { useAuth } from "services/AuthContext.js";
 import { ToastContainer, toast } from "react-toastify";
+import { useLocation } from 'react-router-dom';
 import "react-toastify/dist/ReactToastify.css";
 import {
   Button,
@@ -26,10 +27,62 @@ const Login = () => {
   const [rememberMe, setRememberMe] = useState(false);
   const navigate = useNavigate();
   const { login } = useAuth();
+  const [googleRedirectUri, setGoogleRedirectUri] = useState("");
+  const location = useLocation();
+
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    const code = searchParams.get('code');
+
+    if (code) {
+      // Gọi API từ frontend với mã code
+      callApiWithCode(code);
+    }
+  }, [location.search]);
+
+  const callApiWithCode = async (code) => {
+    try {
+      const response = await axios.post('http://localhost:33321/api/oauth/oauth/google', null, {
+        params: {
+          code: code
+        }
+      });
+
+      const { id, token, authorities, userId } = response.data;
+
+      login({ id, token, authorities, userId }); // Lưu ID, token và vai trò người dùng vào Context
+
+      toast.success("Đăng nhập thành công!");
+
+      // Kiểm tra vai trò người dùng và chuyển hướng đến trang tương ứng
+      if (authorities.some((authority) => authority.authority === "ADMIN") || authorities.some((authority) => authority.authority === "SUPPER_ADMIN")) {
+        navigate("/admin");
+      } else if (authorities.some((authority) => authority.authority === "USER")) {
+        navigate("/shoes");
+      } else {
+        navigate("/");
+      }
+
+    } catch (error) {
+      toast.error(error.response.data.message);
+    }
+  };
+
+  useEffect(() => {
+    const fetchGoogleRedirectUri = async () => {
+      try {
+        const response = await axios.get('http://localhost:33321/api/oauth/googleRedirectUri');
+        setGoogleRedirectUri('http://localhost:8080/oauth2/authorize/google?redirect_uri=' + response.data);
+      } catch (error) {
+        console.error('Error fetching Google Redirect URI:', error);
+      }
+    };
+
+    fetchGoogleRedirectUri();
+  }, []);
 
   const handleLogin = async (e) => {
     e.preventDefault();
-
     try {
       const response = await axios.post("http://localhost:33321/api/oauth/login", {
         username,
@@ -52,12 +105,8 @@ const Login = () => {
         navigate("/");
       }
     } catch (error) {
-
-      if (error.response) {
-        console.error("Response data:", error.response.data);
-        toast.error(error.response.data.message);
-      }
-      toast.error("Đăng nhập thất bại.");
+      console.error("Response data:", error.response.data);
+      toast.error(error.response.data.message);
     }
   };
 
@@ -91,8 +140,8 @@ const Login = () => {
               <Button
                 className="btn-neutral btn-icon"
                 color="default"
-                href="#pablo"
-                onClick={(e) => e.preventDefault()}
+                href={googleRedirectUri}
+
               >
                 <span className="btn-inner--icon">
                   <img
@@ -180,7 +229,7 @@ const Login = () => {
           </Col>
           <Col className="text-right" xs="6">
             <Link className="text-light" to="/register" tag={Link}>
-            <small>Tạo tài khoản mới</small>
+              <small>Tạo tài khoản mới</small>
             </Link>
           </Col>
         </Row>
