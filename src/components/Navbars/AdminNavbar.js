@@ -19,60 +19,37 @@ import {
 const AdminNavbar = (props) => {
   const { logout } = useAuth();
   const navigate = useNavigate();
-
-  const [userData, setUserData] = useState(null);
-  const storedUserId = localStorage.getItem("userId");
-
   const handleLogout = () => {
     logout();
     navigate("/");
   };
 
-  const fetchData = async () => {
-    try {
-      const response = await axios.get(
-        `http://localhost:33321/api/staff/detail/${storedUserId}`
-      );
-      setUserData(response.data);
-      console.log(response.data);
-    } catch (error) {
-      console.error("Error fetching user data: ", error);
-    }
+  const [username, setUsername] = useState("");
+  const [avatar, setAvatar] = useState("");
+
+  useEffect(() => {
+    const storedUserId = localStorage.getItem("userId");
+    const fetchUserDetails = async () => {
+      try {
+        const response = await axios.get(
+          `http://localhost:33321/api/staff/detail/${storedUserId}`
+        );
+        setUsername(response.data.data.username);
+        setAvatar(response.data.data.avatar);
+        console.log(response.data.data.username);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    fetchUserDetails();
+  }, []);
+
+  const imageStyle = {
+    width: "120px",
+    height: "43px",
+    borderRadius: "20%",
   };
-
-  useEffect(() => {
-    fetchData();
-  }, [storedUserId]);
-  // Avatar
-
-  const [file, setFile] = useState(null);
-  const imageUrl = file ? URL.createObjectURL(file) : null;
-  const [formData, setFormData] = useState({
-    username: "",
-    avatar: null,
-  });
-
-  useEffect(() => {
-    const fetchAvt = async () => {
-      // setFormData({
-      //   username: userData.username,
-
-      // })
-      // if(userData.avatar){
-      //   const blob = await fetch(`data:image/jpeg;base64,${userData.avatar}`).then((res) => res.blob());
-      //   const file = new File([blob], "image.jpg", { type: "image/jpeg" });
-      //   setFile(file);
-      //   setFormData({
-      //     ...formData,
-      //     avatar: URL.createObjectURL(file)
-      //   });
-      // }
-
-    }
-
-    fetchAvt();
-    
-  }, [userData]);
 
   return (
     <>
@@ -91,12 +68,18 @@ const AdminNavbar = (props) => {
               <DropdownToggle className="pr-0" nav>
                 <Media className="align-items-center">
                   <span className="avatar avatar-sm rounded-circle">
-                    {imageUrl && <img src={imageUrl} alt="avatar"/>}
+                    <img
+                      src={`data:image/jpeg;base64,${avatar}`}
+                      alt="Avatar"
+                      style={imageStyle}
+                    />
                   </span>
                   <Media className="ml-2 d-none d-lg-block">
-                    <span className="mb-0 text-sm font-weight-bold">
-                      {/* {userData.username} */}
-                    </span>
+                    {username && (
+                      <span className="mb-0 text-sm font-weight-bold">
+                        {username}
+                      </span>
+                    )}
                   </Media>
                 </Media>
               </DropdownToggle>

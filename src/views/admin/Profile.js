@@ -67,7 +67,7 @@ const Profile = () => {
       setFormData((prevFormData) => ({
         ...prevFormData,
         id: storedUserId,
-        // username: admins ? admins.username: '',
+        username: admins ? admins.username: '',
         fullname: admins ? admins.fullname : '',
         email: admins ? admins.email : '',
         dateOfBirth: admins ? admins.dateOfBirth : '',
@@ -107,7 +107,7 @@ const Profile = () => {
 
   const [formData, setFormData] = useState({
     id: storedUserId,
-    // username: '',
+    username: '',
     fullname: '',
     avatar: null,
     email: '',
@@ -228,21 +228,21 @@ const Profile = () => {
                 {/* <!-- Form --> */}
                 <form>
                   {/* Username */}
-                  {/* <div class="row form-group">
+                  <div class="row form-group">
                     <label class="ml-2 col-sm-3 input-label">Tên tài khoản
                       <i class="tio-help-outlined text-body ml-1" data-toggle="tooltip" data-placement="top"></i>
                     </label>
 
                     <div class="col-sm-8">
                       <div class="input-group input-group-sm-down-break">
-                        <Input type="text" class="form-control" name="username"
+                        <Input type="text" disabled class="form-control" name="username"
                           placeholder="username"
                           value={formData.username}
                           onChange={(e) => setFormData({ ...formData, username: e.target.value })}                          // onChange={(e) => setFormData({ ...formData, fullname: e.target.value })}
                         />
                       </div>
                     </div>
-                  </div> */}
+                  </div>
                   {/* <!-- Form Group Fullname --> */}
                   <div class="row form-group">
                     <label for="firstNameLabel" class="ml-2 col-sm-3 input-label">Họ Tên

@@ -1,0 +1,102 @@
+.product-card .sale-box {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #fff;
+  height: 20px;
+  line-height: 20px;
+  padding: 0 10px;
+  background: red;
+  position: absolute;
+  top: 10px; /* Thay đổi vị trí để nằm sát đầu */
+  z-index: 1; /* Thay đổi chỉ số z để nằm dưới ảnh */
+  right: -3px; /* Thay đổi vị trí để nằm sát phải */
+}
+
+.product-card .product-card__inner .product-card__title {
+  font-size: 15px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin: 10px 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.product-card .product-card__inner .product-price {
+  font-size: 14px;
+  font-weight: 500;
+  color: #1c1c1c;
+  margin-top: 10px;
+}
+
+.product-card .product-card__inner .product-price span {
+  margin-left: 6px;
+  text-decoration: line-through;
+  color: #bbb;
+}
+.product-card__image img {
+  max-width: 100%;
+  max-height: 100%;
+}
+.evo-button {
+  position: relative;
+  display: inline-block;
+  padding: 14px 28px;
+  line-height: normal;
+  border: 1px solid #1c1c1c;
+  text-transform: uppercase;
+  font-size: 11px;
+  text-align: center;
+  letter-spacing: 1.5px;
+  font-weight: 400;
+  font-style: normal;
+  background-color: #fff; /* Màu nền trắng */
+  -webkit-transition: color 0.45s cubic-bezier(0.785, 0.135, 0.15, 0.86),
+    border 0.45s cubic-bezier(0.785, 0.135, 0.15, 0.86);
+  transition: color 0.45s cubic-bezier(0.785, 0.135, 0.15, 0.86),
+    border 0.45s cubic-bezier(0.785, 0.135, 0.15, 0.86);
+  z-index: 1;
+  -webkit-tap-highlight-color: initial;
+  color: #000; /* Màu chữ đen */
+}
+
+.evo-button:hover {
+  background-color: #000; /* Màu nền đen khi hover */
+  color: #fff; /* Màu chữ trắng khi hover */
+}
+.title_blog a {
+  color: #1c1c1c;
+  letter-spacing: 3.2px;
+  font-size: 23px;
+  transition: color 0.45s ease;
+  font-family: "Open Sans", sans-serif;
+  font-weight: 350;
+}
+
+.title_blog a:hover {
+  color: #cfc278; /* Màu vàng nhạt */
+}
+.product-single__series {
+    font-size: 13px;
+    text-transform: uppercase;
+    color: #bfbfbf;
+    margin-top: 10px;
+    letter-spacing: 1.5px;
+    margin-bottom: 5px;
+    min-height: 13px;
+}
+.zoom {
+    padding: 0px;
+    transition: transform .3s;
+    width: 200px;
+    height: 200px;
+    margin: auto;
+  }
+  .zoom:hover {
+    -ms-transform: scale(1.0);
+    -webkit-transform: scale(1.0);
+    transform: scale(1.1);
+    border: 1px solid #af9839;
+  }
+
