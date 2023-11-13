@@ -39,7 +39,7 @@ const Product = () => {
 
   const getListShoes = async (page, size) => {
     try {
-      let res = await getAllShoes(page, size, search);
+      let res = await getAllShoes(page, size, search,"","");
       if (res && res.data && res.data.content) {
         setProducts(res.data.content);
         console.log(res.data);
