@@ -30,7 +30,7 @@ class Discount extends React.Component {
         };
         return (
             <>
-                
+
                 <Container className="pt-5 pt-md-7" fluid>
                     <Row>
                         <div className="col">
@@ -40,16 +40,24 @@ class Discount extends React.Component {
                                         <Nav tabs>
                                             <NavItem >
                                                 <NavLink
-                                                    className={classnames({ active: this.state.activeTab === '1' })}
-                                                    onClick={() => { this.toggle('1'); }}
+                                                    style={{
+                                                        fontWeight: this.state.activeTab === '1' ? 'bold' : 'normal', fontSize:14
+                                                    }}
+                                                    onClick={() => {
+                                                        this.toggle('1');
+                                                    }}
                                                 >
                                                     Hóa đơn
                                                 </NavLink>
                                             </NavItem>
                                             <NavItem>
                                                 <NavLink
-                                                    className={classnames({ active: this.state.activeTab === '2' })}
-                                                    onClick={() => { this.toggle('2'); }}
+                                                    style={{
+                                                        fontWeight: this.state.activeTab === '2' ? 'bold' : 'normal', fontSize:14
+                                                    }}
+                                                    onClick={() => {
+                                                        this.toggle('2');
+                                                    }}
                                                 >
                                                     Sản phẩm
                                                 </NavLink>

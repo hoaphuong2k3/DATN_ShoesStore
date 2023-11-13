@@ -104,6 +104,22 @@ const SaleProduct = () => {
     }, [search, sort, sortStyle]);
 
     //loads productDetail
+    const getAll2 = async (id, page, size) => {
+        try {
+            let res = await getAllShoesDetail2(id, page, size, search2);
+            console.log(res.data.content);
+            if (res && res.data && res.data.content) {
+                setListShoesDetail(res.data.content);
+            }
+        } catch (error) {
+            setListShoesDetail([]);
+        }
+    }
+    useEffect(() => {
+        getAll2(page, size);
+    }, [search2]);
+    
+    //loads productDetail
     const handleEditButtonClick = async (shoesId) => {
         try {
             const response = await getAllShoesDetail2(shoesId, page, size, search2);
@@ -171,7 +187,7 @@ const SaleProduct = () => {
     const statusMapping = {
         0: { color: 'danger', label: 'Kích hoạt' },
         1: { color: 'success', label: 'Chờ kích hoạt' },
-        2: { color: 'warning', label: 'Đã hủy' },
+        2: { color: 'warning', label: 'Ngừng kích hoạt' },
     };
 
     //lọc
@@ -229,7 +245,6 @@ const SaleProduct = () => {
         }
         setSelectAll2(!selectAll2);
     };
-
 
     //checkbox product
     const handleSelectAll = () => {
@@ -337,8 +352,8 @@ const SaleProduct = () => {
             });
         }
 
-        setSelectedShoesIds(discount.idShoe || []);
-        setSelectedDetailIds(discount.idShoeDetails || []);
+        // setSelectedShoesIds(discount.idShoe || []);
+        setSelectedDetailIds(discount.idShoe || []);
         setModal(true);
     };
 
@@ -645,7 +660,7 @@ const SaleProduct = () => {
                 toggle={toggle}
                 backdrop={'static'}
                 keyboard={false}
-                style={{ maxWidth: '1200px' }}
+                style={{ maxWidth: '1000px' }}
             >
                 <ModalHeader toggle={toggle}>
                     <h3 className="heading-small text-muted mb-0">{formData.id ? 'Cập Nhật Khuyến mại' : 'Thêm Mới Khuyến mại'}</h3>
@@ -917,7 +932,7 @@ const SaleProduct = () => {
                 toggle={toggleSecondModal}
                 backdrop={'static'}
                 keyboard={false}
-                style={{ maxWidth: '800px' }}
+                style={{ maxWidth: '500px' }}
             >
                 <ModalHeader toggle={toggleSecondModal}>
                     <h3 className="heading-small text-muted mb-0">Chi tiết sản phẩm</h3>
@@ -939,7 +954,6 @@ const SaleProduct = () => {
                                 <th scope="col">Size</th>
                                 <th scope="col">Màu</th>
                                 <th scope="col">Giá gốc</th>
-                                <th scope="col">Giá mới</th>
                                 <th scope="col">Số lượng</th>
                             </tr>
                         </thead>
@@ -959,7 +973,6 @@ const SaleProduct = () => {
                                     <td>{detail.size}</td>
                                     <td>{detail.color}</td>
                                     <td>{detail.price}</td>
-                                    <td></td>
                                     <td>{detail.quantity}</td>
                                 </tr>
                             ))}
