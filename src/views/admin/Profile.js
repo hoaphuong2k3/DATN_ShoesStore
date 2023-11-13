@@ -24,10 +24,12 @@ import ProfileHeader from "components/Headers/ProfileHeader";
 
 const Profile = () => {
 
+  // const [userInfo, setUserInfo] = useState(null);
+  const storedUserId = localStorage.getItem('userId');
 
   const [provinces, setProvinces] = useState([]);
 
-  const [admins, setAdmins] = useState([]);
+  const [admins, setAdmins] = useState(null);
 
 
   const fetchData = async () => {
@@ -35,8 +37,10 @@ const Profile = () => {
       const provincesResponse = await axios.get("https://provinces.open-api.vn/api/?depth=3");
       setProvinces(provincesResponse.data);
 
-      const response = await axiosInstance.get("/staff/detail/1");
+      const response = await axiosInstance.get(`/staff/detail/${storedUserId}`);
       setAdmins(response.data);
+      
+    console.log(storedUserId);
       console.log(response.data);
     } catch (error) {
       console.error("Error fetching data: ", error);
@@ -45,39 +49,43 @@ const Profile = () => {
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [storedUserId]);
 
+
+  //Add
 
   useEffect(() => {
     const fetchAvt = async () => {
-      if (admins.avatar) {
+      if (admins && admins.avatar) {
         const blob = await fetch(`data:image/jpeg;base64,${admins.avatar}`).then((res) => res.blob());
         const file = new File([blob], "image.jpg", { type: "image/jpeg" });
         setFile(file);
       }
     };
   
-    setFormData({
-      id: admins.id,
-      fullname: admins.fullname,
-      email: admins.email,
-      // avatar: admins.avatar,
-      dateOfBirth: admins.dateOfBirth,
-      phoneNumber: admins.phoneNumber,
-      address: {
-        addressDetail: admins.addressDetail,
-        proviceCode: admins.proviceCode,
-        districtCode: admins.districtCode,
-        communeCode: admins.communeCode,
-        isDeleted: true,
-      },
-    });
+    const updateFormData = () => {
+      setFormData((prevFormData) => ({
+        ...prevFormData,
+        id: storedUserId,
+        // username: admins ? admins.username: '',
+        fullname: admins ? admins.fullname : '',
+        email: admins ? admins.email : '',
+        dateOfBirth: admins ? admins.dateOfBirth : '',
+        phoneNumber: admins ? admins.phoneNumber : '',
+        address: {
+          addressDetail: admins ? admins.addressDetail : '',
+          proviceCode: admins ? admins.proviceCode : '',
+          districtCode: admins ? admins.districtCode : '',
+          communeCode: admins ? admins.communeCode : '',
+          isDeleted: true,
+        },
+      }));
+    };
   
+    updateFormData();
     fetchAvt();
-    console.log(admins);
-
+  
   }, [admins]);
-  //Add
 
   const saveAdmin = async () => {
     try {
@@ -98,7 +106,8 @@ const Profile = () => {
   };
 
   const [formData, setFormData] = useState({
-    id: '',
+    id: storedUserId,
+    // username: '',
     fullname: '',
     avatar: null,
     email: '',
@@ -152,7 +161,7 @@ const Profile = () => {
         image.append('file', file);
       }
       if (file) {
-        await axiosInstance.put(`/staff/${formData.id}/multipart-file`, image, {
+        await axiosInstance.put(`/staff/${storedUserId}/multipart-file`, image, {
           headers: {
             'Content-Type': 'multipart/form-data'
           }
@@ -178,7 +187,7 @@ const Profile = () => {
   const changePassword = async () => {
     try {
       const requestBody = {
-        id: formData.id,
+        id: storedUserId,
         newPassword: formPass.newPassword,
         confirmPassword: formPass.confirmPassword,
       };
@@ -218,6 +227,22 @@ const Profile = () => {
               <div class="card-body">
                 {/* <!-- Form --> */}
                 <form>
+                  {/* Username */}
+                  {/* <div class="row form-group">
+                    <label class="ml-2 col-sm-3 input-label">Tên tài khoản
+                      <i class="tio-help-outlined text-body ml-1" data-toggle="tooltip" data-placement="top"></i>
+                    </label>
+
+                    <div class="col-sm-8">
+                      <div class="input-group input-group-sm-down-break">
+                        <Input type="text" class="form-control" name="username"
+                          placeholder="username"
+                          value={formData.username}
+                          onChange={(e) => setFormData({ ...formData, username: e.target.value })}                          // onChange={(e) => setFormData({ ...formData, fullname: e.target.value })}
+                        />
+                      </div>
+                    </div>
+                  </div> */}
                   {/* <!-- Form Group Fullname --> */}
                   <div class="row form-group">
                     <label for="firstNameLabel" class="ml-2 col-sm-3 input-label">Họ Tên

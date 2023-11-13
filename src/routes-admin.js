@@ -10,11 +10,11 @@ import Statistical from "views/admin/Statistical.js";
 import AddProduct from "views/admin/product/AddProduct";
 import EditProduct from "views/admin/product/EditProduct";
 import DetailProducts from "views/admin/product/DetailProduct.js";
-import BillDetail from "views/admin/transaction/BillDetail.js";
+// import BillDetail from "views/admin/transaction/BillDetail.js";
 import ListShoesDetail from "views/admin/product/ListShoesDetail.js";
 import Discount from "views/admin/discount/Discount.js";
 import Delivery from "views/admin/transaction/Delivery.js";
-import Sell from "views/admin/transaction/DirectSales.js";
+import Sell from "views/admin/sells/DirectSales.js";
 import Partner from "views/admin/Partner.js";
 var routes = [
   {
@@ -90,11 +90,6 @@ var routes = [
   {
     path: "/product/detail/:id",
     component: <DetailProducts />,
-    layout: "/admin",
-  },
-  {
-    path: "/bill-details/:id",
-    component: <BillDetail />,
     layout: "/admin",
   },
   {
