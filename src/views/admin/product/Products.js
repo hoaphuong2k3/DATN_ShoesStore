@@ -714,110 +714,336 @@ const Products = () => {
       <Modal
         isOpen={thirdModal}
         toggle={toggleThirdModal}
-        style={{ maxWidth: '350px', right: 'unset', left: 0, position: 'fixed', marginLeft: '252px', marginRight: 0, top: "-27px" }}
-        backdrop={false}
+        style={{ maxWidth: '600px', right: 'unset', left: 0, position: 'fixed', marginLeft: '252px', marginRight: 0, top: "-27px" }}
       >
         <ModalHeader toggle={toggleThirdModal}>
           <h3 className="heading-small text-muted mb-0">Bộ lọc tìm kiếm</h3>
         </ModalHeader>
         <ModalBody style={{ paddingTop: 0, paddingBottom: 0 }}>
-          <Form >
-            <FormGroup>
-              <label style={{ fontSize: 13 }}
-                className="form-control-label"
-              >
-                Loại khuyến mại
-              </label>
-              <Input
-                className="form-control-alternative"
-                type="select" size="sm" id="typePeriod"
-              >
-                <option value="">Tất cả</option>
-                <option value="0">Order</option>
-                <option value="1">FreeShip</option>
-              </Input>
-            </FormGroup>
-            <FormGroup>
-
+          <Form>
+            <div className="pl-lg-4">
               <Row>
-                <Col xl="6">
-                  <label style={{ fontSize: 13 }}
-                    className="form-control-label"
-                  >
-                    Hóa đơn từ
-                  </label>
-                  <Input
-                    className="form-control-alternative"
-                    type="number" size="sm" id="minPercent"
-                  />
+                <Col lg="6">
+                  <FormGroup>
+                    <label
+                      className="form-control-label"
+                      htmlFor="input-username"
+                    >
+                      Người tạo
+                    </label>
+                    <Input
+                      className="form-control-alternative"
+                      id="find_createdAt"
+                      name="createdBy"
+                      value={search.createdBy}
+                      size="sm"
+                      onChange={(e) => onInputChange(e)}
+                      placeholder="Nhập người tạo"
+
+                    />
+
+                  </FormGroup>
+                </Col>
+                <Col lg="6" xl="6">
+                  <FormGroup>
+                    <Label for="find_createdDate" className="form-control-label">
+                      Ngày tạo:
+                    </Label>
+                    <Row>
+                      <Col xl={6}>
+                        <Input
+                          type="date"
+                          className="form-control-alternative"
+                          id="find_createdDate"
+                          name="fromDateStr"
+                          size="sm"
+                          value={search.fromDateStr}
+                          onChange={(e) => onInputChange(e)}
+                        />
+                      </Col>
+                      <Col xl={6}>
+                        <Input
+                          type="date"
+                          className="form-control-alternative"
+                          id="find_createdDate"
+                          name="toDateStr"
+                          value={search.toDateStr}
+                          size="sm"
+                          onChange={(e) => onInputChange(e)}
+                        />
+
+                      </Col>
+                    </Row>
+
+                  </FormGroup>
+                </Col>
+                <Col lg="3">
+                  <FormGroup>
+                    <label
+                      className="form-control-label"
+                      htmlFor="input-city"
+                    >
+                      Hãng
+                    </label>
+                    <Input id="btn_select_tt" type="select" name="brandId" value={search.brandId}
+                      className="form-control-alternative"
+                      size="sm"
+                      onChange={(e) => onInputChange(e)}>
+                      <option value=" "> -- Chọn --  </option>
+                      {listBrand && listBrand.length > 0 &&
+                        listBrand.map((item, index) => {
+                          return (
+                            <option value={item.id} key={item.id} >
+                              {item.name}
+                            </option>
+                          )
+
+                        })
+                      }
+                    </Input>
+                  </FormGroup>
+                </Col>
+                <Col lg="3">
+                  <FormGroup>
+                    <label
+                      className="form-control-label"
+                      htmlFor="input-country"
+                    >
+                      Xuất xứ
+                    </label>
+                    <Input id="btn_select_tt" name="originId" type="select" value={search.originId}
+                      className="form-control-alternative"
+                      size="sm"
+                      onChange={(e) => onInputChange(e)}>
+                      <option value="" > -- Chọn --  </option>
+                      {listorigin && listorigin.length > 0 &&
+                        listorigin.map((item, index) => {
+                          return (
+                            <option value={item.id} key={item.id}>
+                              {item.name}
+                            </option>
+                          )
+
+                        })
+                      }
+                    </Input>
+                  </FormGroup>
+                </Col>
+                <Col lg="3">
+                  <FormGroup>
+                    <label
+                      className="form-control-label"
+                      htmlFor="input-country"
+                    >
+                      Thiết kế
+                    </label>
+                    <Input id="btn_select_tt" name="designStyleId" type="select" value={search.designStyleId}
+                      onChange={(e) => onInputChange(e)} className="form-control-alternative" size="sm">
+                      <option value="" > -- Chọn --  </option>
+                      {listDesignStyle && listDesignStyle.length > 0 &&
+                        listDesignStyle.map((item, index) => {
+                          return (
+                            <option value={item.id} key={item.id}>
+                              {item.name}
+                            </option>
+                          )
+
+                        })
+                      }
+                    </Input>
+                  </FormGroup>
                 </Col>
 
-                <Col xl="6">
-                  <label style={{ fontSize: 13 }}
-                    className="form-control-label"
-                  >
-                    đến
-                  </label>
-                  <Input
-                    className="form-control-alternative"
-                    type="number" size="sm" id="maxPercent"
-                  />
+                <Col lg="3">
+                  <FormGroup>
+                    <label
+                      className="form-control-label"
+                      htmlFor="input-first-name"
+                    >
+                      Loại da
+                    </label>
+                    <Input id="btn_select_tt" name="skinTypeId" type="select" value={search.skinTypeId}
+                      onChange={(e) => onInputChange(e)} className="form-control-alternative" size="sm">
+                      <option value="" > -- Chọn --  </option>
+                      {listSkinStype && listSkinStype.length > 0 &&
+                        listSkinStype.map((item, index) => {
+                          return (
+                            <option value={item.id} key={item.id}>
+                              {item.name}
+                            </option>
+                          )
+
+                        })
+                      }
+                    </Input>
+                  </FormGroup>
+                </Col>
+                <Col lg="3">
+                  <FormGroup>
+                    <label
+                      className="form-control-label"
+                      htmlFor="input-last-name"
+                    >
+                      Mũi giày
+                    </label>
+                    <Input id="btn_select_tt" name="toeId" type="select" value={search.toeId}
+                      onChange={(e) => onInputChange(e)} className="form-control-alternative" size="sm">
+                      <option value="" > -- Chọn --  </option>
+                      {listToe && listToe.length > 0 &&
+                        listToe.map((item, index) => {
+                          return (
+                            <option value={item.id} key={item.id}>
+                              {item.name}
+                            </option>
+                          )
+
+                        })
+                      }
+                    </Input>
+                  </FormGroup>
+                </Col>
+                <Col lg="3">
+                  <FormGroup>
+                    <label
+                      className="form-control-label"
+                      htmlFor="input-last-name"
+                    >
+                      Đế giày
+                    </label>
+                    <Input id="btn_select_tt" name="soleId" type="select" value={search.soleId}
+                      onChange={(e) => onInputChange(e)} className="form-control-alternative" size="sm">
+                      <option value="" > -- Chọn --  </option>
+                      {listSole && listSole.length > 0 &&
+                        listSole.map((item, index) => {
+                          return (
+                            <option value={item.id} key={item.id}>
+                              {item.name}
+                            </option>
+                          )
+
+                        })
+                      }
+                    </Input>
+                  </FormGroup>
+                </Col>
+                <Col lg="3">
+                  <FormGroup>
+                    <label
+                      className="form-control-label"
+                      htmlFor="input-last-name"
+                    >
+                      Lót giày
+                    </label>
+                    <Input id="btn_select_tt" name="liningId" type="select" value={search.liningId}
+                      onChange={(e) => onInputChange(e)} className="form-control-alternative" size="sm">
+                      <option value="" > -- Chọn --  </option>
+                      {listLining && listLining.length > 0 &&
+                        listLining.map((item, index) => {
+                          return (
+                            <option value={item.id} key={item.id}>
+                              {item.name}
+                            </option>
+                          )
+
+                        })
+                      }
+                    </Input>
+                  </FormGroup>
+                </Col>
+
+                <Col lg="3">
+                  <FormGroup>
+                    <label
+                      className="form-control-label"
+                      htmlFor="input-last-name"
+                    >
+                      Đệm giày
+                    </label>
+                    <Input id="btn_select_tt" name="cushionId" type="select" value={search.cushionId}
+                      onChange={(e) => onInputChange(e)} className="form-control-alternative" size="sm">
+                      <option value=" "> -- Chọn --  </option>
+                      {listCushion && listCushion.length > 0 &&
+                        listCushion.map((item, index) => {
+                          return (
+                            <option value={item.id} key={item.id}>
+                              {item.name}
+                            </option>
+                          )
+
+                        })
+                      }
+                    </Input>
+                  </FormGroup>
+                </Col>
+
+                <Col lg="6" xl="6">
+                  <FormGroup>
+                    <Label for="find_code" className="form-control-label">
+                      Số lượng:
+                    </Label>
+                    <Row>
+                      <Col xl={5}>
+                        <Input size="sm"
+                          className="form-control-alternative"
+                          id="find_code"
+                          name="fromQuantity"
+                          value={search.fromQuantity}
+                          onChange={(e) => onInputChange(e)}
+                        />
+                      </Col>
+                      <Label for="find_code" xl={1} className="form-control-label text-center">
+                        <i class="fa-solid fa-arrow-right"></i>
+                      </Label>
+                      <Col xl={5}>
+                        <Input size="sm"
+                          className="form-control-alternative"
+                          id="find_code"
+                          name="toQuantity"
+                          value={search.toQuantity}
+                          onChange={(e) => onInputChange(e)}
+                        />
+                      </Col>
+                    </Row>
+                  </FormGroup>
+                </Col>
+                <Col lg="6" xl="6">
+                  <FormGroup>
+                    <Label for="find_code" className="form-control-label">
+                      Giá:
+                    </Label>
+                    <Row>
+                      <Col xl={5}>
+                        <Input size="sm"
+                          className="form-control-alternative"
+                          id="find_code"
+                          name="fromPrice"
+                          value={search.fromPrice}
+                          onChange={(e) => onInputChange(e)}
+                        />
+                      </Col>
+                      <Label for="find_code" xl={2} className="form-control-label text-center">
+                        <i class="fa-solid fa-arrow-right"></i>
+                      </Label>
+                      <Col xl={5}>
+                        <Input size="sm"
+                          className="form-control-alternative"
+                          id="find_code"
+                          name="toPrice"
+                          value={search.toPrice}
+                          onChange={(e) => onInputChange(e)}
+                        />
+                      </Col>
+                    </Row>
+                  </FormGroup>
                 </Col>
               </Row>
-            </FormGroup>
-            <FormGroup>
-              <label style={{ fontSize: 13 }}
-                className="form-control-label"
-              >
-                Trạng thái
-              </label>
-              <Input
-                className="form-control-alternative"
-                type="select" size="sm" id="status"
-              >
-                <option value="">Tất cả</option>
-                <option value="0">Đang kích hoạt</option>
-                <option value="1">Chờ kích hoạt</option>
-                <option value="2">Ngừng kích hoạt</option>
-              </Input>
-            </FormGroup>
-            <FormGroup>
-              <label style={{ fontSize: 13 }}
-                className="form-control-label"
-              >
-                Ngày bắt đầu
-              </label>
-              <Input
-                className="form-control-alternative"
-                type="date" size="sm" id="fromDate"
-              />
-            </FormGroup>
-            <FormGroup>
-              <label style={{ fontSize: 13 }}
-                className="form-control-label"
-              >
-                Ngày kết thúc
-              </label>
-              <Input
-                className="form-control-alternative"
-                type="date" size="sm" id="toDate"
-              />
-            </FormGroup>
-            <FormGroup check>
-              <label
-                style={{ fontSize: 13, fontWeight: "bold" }}>
-                <Input type="checkbox"
-                  id="checkbox2"
-                />
-                Có quà tặng không?
-              </label>
-            </FormGroup>
+            </div>
           </Form>
         </ModalBody>
         <ModalFooter>
           <div className="row w-100">
             <div className="col-4">
-              <Button color="primary" outline size="sm" block>
+              <Button color="primary" outline size="sm" block onClick={resetSearch}>
                 Làm mới
               </Button>
             </div>
