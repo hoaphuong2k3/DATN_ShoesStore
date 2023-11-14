@@ -9,7 +9,7 @@ import { updateData } from './actions';
 import { Badge, Row, Col, Button, Table, Input, FormGroup, InputGroup, InputGroupAddon, InputGroupText, Modal, ModalBody, ModalFooter, ModalHeader, Label, Form } from "reactstrap";
 import { FaRegEdit, FaSearch, FaMinus, FaPlus, FaTrash } from 'react-icons/fa';
 
-const Confirm = () => {
+const Confirm = ({ updateData }) => {
     const [modal, setModal] = useState(false);
     const [confirm, setConfirm] = useState([]);
     const [selectedOrderId, setSelectedOrderId] = useState(null);
@@ -47,7 +47,7 @@ const Confirm = () => {
                 }
             });
             setConfirm(response.content);
-
+            return response.content;
         } catch (error) {
             console.error("Lỗi khi lấy dữ liệu:", error);
         }
@@ -166,7 +166,8 @@ const Confirm = () => {
             await Promise.all(selectedIds.map(async (id) => {
                 await axiosInstance.put(`/order/admin/update-status/${id}?status=1`);
             }));
-            fetchData();
+            const newData = await fetchData();
+            updateData(2, newData);
         } catch (error) {
             console.error("Lỗi khi cập nhật trạng thái hóa đơn:", error);
         }
@@ -176,7 +177,8 @@ const Confirm = () => {
             await Promise.all(selectedIds.map(async (id) => {
                 await axiosInstance.put(`/order/admin/update-status/${id}?status=-1`);
             }));
-            fetchData();
+            const newData = await fetchData();
+            updateData(6, newData);
         } catch (error) {
             console.error("Lỗi khi cập nhật trạng thái hóa đơn:", error);
         }
@@ -222,22 +224,13 @@ const Confirm = () => {
                 idOrder: deliveryData.idOrder
             });
 
+            const updatedMoneyValue = Math.floor(formData.totalMoney);
+            await axiosInstance.put(`/order/admin/update/total-money/${formData.id}?money=${updatedMoneyValue}`);
+            fetchData();
             setModal(false);
         } catch (error) {
             // Xử lý lỗi nếu có
             console.error('Lỗi khi cập nhật:', error);
-        }
-    };
-
-    //deleteProduct
-    const handleDeleteProduct = async (id) => {
-        try {
-            await axiosInstance.delete(`/order/admin/cart/delete/${id}`);
-            const updatedOrderData = orderData.filter(product => product.id !== id);
-            setOrderData(updatedOrderData);
-            setIsProductDeleted(true);
-        } catch (error) {
-            console.error("Lỗi khi xóa sản phẩm:", error);
         }
     };
 
@@ -279,7 +272,17 @@ const Confirm = () => {
         }
     };
 
-
+    //deleteProduct
+    const handleDeleteProduct = async (id) => {
+        try {
+            await axiosInstance.delete(`/order/admin/cart/delete/${id}`);
+            const updatedOrderData = orderData.filter(product => product.id !== id);
+            setOrderData(updatedOrderData);
+            setIsProductDeleted(true);
+        } catch (error) {
+            console.error("Lỗi khi xóa sản phẩm:", error);
+        }
+    };
     useEffect(() => {
         if (isProductDeleted) {
             setModal(true);
@@ -720,4 +723,8 @@ const Confirm = () => {
     );
 };
 
-export default Confirm;
+const mapDispatchToProps = (dispatch) => ({
+    updateData: (tabId, newData) => dispatch(updateData(tabId, newData)),
+});
+
+export default connect(null, mapDispatchToProps)(Confirm);

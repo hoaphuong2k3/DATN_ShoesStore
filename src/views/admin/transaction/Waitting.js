@@ -221,6 +221,10 @@ const Waitting = () => {
                 idOrder: deliveryData.idOrder
             });
 
+            const updatedMoneyValue = Math.floor(formData.totalMoney);
+            await axiosInstance.put(`/order/admin/update/total-money/${formData.id}?money=${updatedMoneyValue}`);
+            fetchData();
+            
             setModal(false);
         } catch (error) {
             // Xử lý lỗi nếu có

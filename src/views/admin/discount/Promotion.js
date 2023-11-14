@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { FaEdit, FaTrash, FaSearch, FaFileAlt, FaLock, FaLockOpen, FaCamera, FaFilter } from 'react-icons/fa';
+import { FaSort } from "react-icons/fa6";
 import ReactPaginate from "react-paginate";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -524,14 +525,14 @@ const Promotion = () => {
                                                 </th>
                                                 <th scope="col" style={{ color: "black" }}>STT</th>
                                                 <th scope="col" style={{ color: "black", position: "sticky", zIndex: '1', left: '0' }}>Trạng thái</th>
-                                                <th scope="col" style={{ color: "black" }}>Mã</th>
-                                                <th scope="col" style={{ color: "black" }}>Loại</th>
-                                                <th scope="col" style={{ color: "black" }}>Tên khuyến mại</th>
-                                                <th scope="col" style={{ color: "black" }}>Hóa đơn <br />tối thiểu </th>
-                                                <th scope="col" style={{ color: "black" }}>Giá trị</th>
+                                                <th scope="col" style={{ color: "black" }}>Mã<FaSort style={{cursor: "pointer"}}/></th>
+                                                <th scope="col" style={{ color: "black" }}>Loại<FaSort style={{cursor: "pointer"}}/></th>
+                                                <th scope="col" style={{ color: "black" }}>Tên khuyến mại<FaSort style={{cursor: "pointer"}}/></th>
+                                                <th scope="col" style={{ color: "black" }}>Hóa đơn <br />tối thiểu<FaSort style={{cursor: "pointer"}}/></th>
+                                                <th scope="col" style={{ color: "black" }}>Giá trị <FaSort style={{cursor: "pointer"}}/></th>
                                                 <th scope="col" style={{ color: "black" }}>Quà tặng</th>
-                                                <th scope="col" style={{ color: "black" }}>Ngày bắt đầu</th>
-                                                <th scope="col" style={{ color: "black" }}>Ngày kết thúc</th>
+                                                <th scope="col" style={{ color: "black" }}>Ngày bắt đầu<FaSort style={{cursor: "pointer"}}/></th>
+                                                <th scope="col" style={{ color: "black" }}>Ngày kết thúc<FaSort style={{cursor: "pointer"}}/></th>
                                                 <th scope="col" style={{ color: "black", position: "sticky", zIndex: '1', right: '0' }}>Thao tác</th>
 
                                             </tr>
@@ -573,8 +574,8 @@ const Promotion = () => {
                                                                 {discount.typePeriod === 0 ? `${discount.salePercent}%` : ""}
                                                             </td>
                                                             <td>{discount.nameImage}</td>
-                                                            <td>{discount.startDate}</td>
-                                                            <td>{discount.endDate}</td>
+                                                            <td style={{ textAlign: "center" }}>{discount.startDate}</td>
+                                                            <td style={{ textAlign: "center" }}>{discount.endDate}</td>
 
                                                             <td style={{ position: "sticky", zIndex: '1', right: '0', background: "#fff" }}>
                                                                 {discount.status === 0 &&
