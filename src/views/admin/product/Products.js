@@ -2,7 +2,7 @@ import { React, useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { getAllShoes, deleteShoes } from "services/Product2Service";
 import ReactPaginate from 'react-paginate';
-import { FaEdit, FaTrash, FaSearch, FaFileAlt } from 'react-icons/fa';
+import { FaEdit, FaTrash, FaSearch, FaFileAlt, FaFilter } from 'react-icons/fa';
 import { getAllBrand, getAllOrigin, getAllDesignStyle, getAllSkinType, getAllToe, getAllSole, getAllLining, getAllCushion } from "services/ProductAttributeService";
 // reactstrap components
 import {
@@ -11,7 +11,7 @@ import {
   Modal,
   ModalHeader,
   ModalBody,
-  ModalFooter, Form
+  ModalFooter, Form, InputGroup, InputGroupAddon, InputGroupText
 } from "reactstrap";
 import { toast } from 'react-toastify';
 import Switch from 'react-input-switch';
@@ -96,6 +96,9 @@ const Products = () => {
       createdBy: ""
     })
   };
+  const [thirdModal, setThirdModal] = useState(false);
+  const toggleThirdModal = () => setThirdModal(!thirdModal);
+
   const handlePageClick = (event) => {
     setPage(+event.selected);
   }
@@ -213,6 +216,7 @@ const Products = () => {
     setIdDeleteShoes([...iddeleteshoes, shoes.id])
     toggle();
   }
+
   const handleDelete = async () => {
     try {
       console.log(iddeleteshoes);
@@ -231,6 +235,55 @@ const Products = () => {
       toast.error(errorMessage);
     }
   }
+
+  const [showActions, setShowActions] = useState(false);
+  const [selectAll, setSelectAll] = useState(false);
+  const [selectedItems, setSelectedItems] = useState([]);
+  const handleCheckboxChange = (idProduct) => {
+    if (selectedItems.includes(idProduct)) {
+      setSelectedItems(selectedItems.filter((id) => id !== idProduct));
+      setShowActions(selectedItems.length - 1 > 0);
+    } else {
+      setSelectedItems([...selectedItems, idProduct]);
+      setShowActions(true);
+    }
+  };
+  const handleSelectAll = () => {
+    if (selectAll) {
+      setSelectedItems([]);
+      setShowActions(false);
+    } else {
+      setSelectedItems(listShoes.map(listShoes => listShoes.id));
+      setShowActions(true);
+    }
+    setSelectAll(!selectAll);
+  };
+  useEffect(() => {
+    console.log(selectedItems);
+  }, [selectedItems]);
+  useEffect(() => {
+    console.log(iddeleteshoes);
+  }, [iddeleteshoes]);
+
+  const handleDeleteButtonClick = async () => {
+    if (selectedItems.length > 0) {
+      if (window.confirm("Bạn có chắc chắn muốn xóa các sản phẩm đã chọn không?")) {
+        try {
+          await deleteShoes({ data: selectedItems });
+          getAll();
+          setSelectedItems([]);
+          toast.success("Xóa thành công ");
+        } catch (error) {
+          let errorMessage = "Lỗi từ máy chủ";
+          if (error.response && error.response.data && error.response.data.message) {
+            errorMessage = error.response.data.message;
+          }
+          toast.error(errorMessage);
+        }
+
+      }
+    }
+  };
   //End Delete
 
   //Import Excel
@@ -354,540 +407,113 @@ const Products = () => {
   return (
     <>
       {/* Page content */}
-      <Container fluid>
-        <Row className="mb-4">
+      <Container className="pt-5 pt-md-7" fluid>
+
+        <Row>
           <div className="col">
             <Card className="shadow">
               <CardHeader className="bg-transparent">
+
                 <Row className="align-items-center">
-                  <div className="col-2">
-                    <h3 className="mb-0">Sản phẩm</h3>
-                  </div>
-                  <div className="col-10 text-right">
-                    <Button
-                      className="btn btn-outline-primary"
-                      size="sm"
-                      to="/admin/product/add" tag={Link}
-                    >
-                      Thêm mới
-                    </Button>
+                  <div className="col d-flex">
+                    <h3 className="heading-small text-dark mb-0">
+                      Sản phẩm
+                    </h3>
+                    <div className="col text-right">
+                      <Button
+                        color="primary"
+                        outline
+                        to="/admin/product/add" tag={Link}
+                        size="sm"
+                      >
+                        + Thêm mới
+                      </Button>
+                      <Button
+                        className="btn btn-outline-primary"
+                        onClick={(e) => e.preventDefault()}
+                        size="sm"
+                        onClick={taiMau}
+                      >
+                        Tải mẫu
+                      </Button>
+                      <input
+                        type="file"
+                        style={{ display: 'none' }}
+                        ref={fileInputRef}
+                        onChange={handleFileChange}
+                      />
+
+                      <Button
+                        className="btn btn-outline-primary"
+                        size="sm"
+                        onClick={handleFileSelect}
+                      >
+                        Nhập Excel
+                      </Button>
+                      <Button
+                        className="btn btn-outline-primary"
+                        size="sm"
+                        onClick={xuatExcel}
+                      >
+                        Xuất Excel
+                      </Button>
+                      <Button
+                        className="btn btn-outline-primary"
+                        size="sm"
+                        onClick={xuatPDF}
+                      >
+                        Xuất PDF
+                      </Button>
+                    </div>
                   </div>
                 </Row>
               </CardHeader>
-            </Card>
-          </div>
-        </Row>
-
-        <Row className="mb-4">
-          <Col className="mb-5 mb-xl-0" xl="12">
-            <Card>
               <CardBody>
-                <Row>
-                  <div className="col">
-                    <CardTitle
-                      tag="h5"
-                      className="text-uppercase text-muted mb-0"
-                    >
-                      <h3>Tìm kiếm</h3>
-                    </CardTitle>
+                <div className="col">
+                  <Row className="align-items-center my-3">
+                    <div className="col d-flex">
+                      <Button color="warning" outline size="sm" >
+                        <FaFilter size="16px" className="mr-1" onClick={toggleThirdModal} />Bộ lọc
+                      </Button>
 
-                  </div>
-                  <Col className="col-auto">
-                    <div className="icon icon-shape bg-danger text-white rounded-circle shadow">
-                      <i className="fas fa-chart-bar" />
-                    </div>
-                  </Col>
-                </Row>
-                <Form>
-                  <div className="pl-lg-4">
-                    <Row>
-                      <Col lg="6">
-                        <FormGroup>
-                          <label
-                            className="form-control-label"
-                            htmlFor="input-username"
-                          >
-                            Mã
-                          </label>
-                          <Input
-                            className="form-control-alternative"
-                            id="input-username"
-                            placeholder="Nhập mã"
-                            type="text"
-                            name="code"
-                            value={search.code}
-                            onChange={(e) => onInputChange(e)}
+                      <Col>
+                        <InputGroup size="sm">
+                          <Input type="search"
+                            placeholder="Tìm kiếm mã, tên voucher..."
+                          // value={searchValue}
+                          // onChange={(e) => setSearchValue(e.target.value)}
                           />
-                        </FormGroup>
+                          <InputGroupAddon addonType="append">
+                            <InputGroupText>
+                              <FaSearch />
+                            </InputGroupText>
+                          </InputGroupAddon>
+                        </InputGroup>
                       </Col>
-                      <Col lg="6">
-                        <FormGroup>
-                          <label
-                            className="form-control-label"
-                            htmlFor="input-email"
-                          >
-                            Tên
-                          </label>
-                          <Input
-                            className="form-control-alternative"
-                            id="input-email"
-                            placeholder="Nhập tên"
-                            type="text"
-                            name="name"
-                            value={search.name}
-                            onChange={(e) => onInputChange(e)}
-                          />
-                        </FormGroup>
-                      </Col>
-                    </Row>
-
-                    {value === 'yes' &&
-                      <Row>
-                        <Col lg="6">
-                          <FormGroup>
-                            <label
-                              className="form-control-label"
-                              htmlFor="input-username"
-                            >
-                              Người tạo
-                            </label>
-                            <Input
-                              className="form-control-alternative"
-                              id="find_createdAt"
-                              name="createdBy"
-                              value={search.createdBy}
-                              onChange={(e) => onInputChange(e)}
-                              placeholder="Nhập người tạo"
-
-                            />
-
-                          </FormGroup>
-                        </Col>
-                        <Col lg="6" xl="6">
-                          <FormGroup>
-                            <Label for="find_createdDate" className="form-control-label">
-                              Ngày tạo:
-                            </Label>
-                            <Row>
-                              <Col xl={6}>
-                                <Input
-                                  type="date"
-                                  className="form-control-alternative"
-                                  id="find_createdDate"
-                                  name="fromDateStr"
-                                  value={search.fromDateStr}
-                                  onChange={(e) => onInputChange(e)}
-                                />
-                              </Col>
-                              <Col xl={6}>
-                                <Input
-                                  type="date"
-                                  className="form-control-alternative"
-                                  id="find_createdDate"
-                                  name="toDateStr"
-                                  value={search.toDateStr}
-                                  onChange={(e) => onInputChange(e)}
-                                />
-
-                              </Col>
-                            </Row>
-
-                          </FormGroup>
-                        </Col>
-                        <Col lg="3">
-                          <FormGroup>
-                            <label
-                              className="form-control-label"
-                              htmlFor="input-city"
-                            >
-                              Hãng
-                            </label>
-                            <Input id="btn_select_tt" type="select" name="brandId" value={search.brandId}
-                              className="form-control-alternative"
-                              onChange={(e) => onInputChange(e)}>
-                              <option value=" "> -- Chọn --  </option>
-                              {listBrand && listBrand.length > 0 &&
-                                listBrand.map((item, index) => {
-                                  return (
-                                    <option value={item.id} key={item.id} >
-                                      {item.name}
-                                    </option>
-                                  )
-
-                                })
-                              }
-                            </Input>
-                          </FormGroup>
-                        </Col>
-                        <Col lg="3">
-                          <FormGroup>
-                            <label
-                              className="form-control-label"
-                              htmlFor="input-country"
-                            >
-                              Xuất xứ
-                            </label>
-                            <Input id="btn_select_tt" name="originId" type="select" value={search.originId}
-                              className="form-control-alternative"
-                              onChange={(e) => onInputChange(e)}>
-                              <option value="" > -- Chọn --  </option>
-                              {listorigin && listorigin.length > 0 &&
-                                listorigin.map((item, index) => {
-                                  return (
-                                    <option value={item.id} key={item.id}>
-                                      {item.name}
-                                    </option>
-                                  )
-
-                                })
-                              }
-                            </Input>
-                          </FormGroup>
-                        </Col>
-                        <Col lg="3">
-                          <FormGroup>
-                            <label
-                              className="form-control-label"
-                              htmlFor="input-country"
-                            >
-                              Thiết kế
-                            </label>
-                            <Input id="btn_select_tt" name="designStyleId" type="select" value={search.designStyleId}
-                              onChange={(e) => onInputChange(e)} className="form-control-alternative">
-                              <option value="" > -- Chọn --  </option>
-                              {listDesignStyle && listDesignStyle.length > 0 &&
-                                listDesignStyle.map((item, index) => {
-                                  return (
-                                    <option value={item.id} key={item.id}>
-                                      {item.name}
-                                    </option>
-                                  )
-
-                                })
-                              }
-                            </Input>
-                          </FormGroup>
-                        </Col>
-
-                        <Col lg="3">
-                          <FormGroup>
-                            <label
-                              className="form-control-label"
-                              htmlFor="input-first-name"
-                            >
-                              Loại da
-                            </label>
-                            <Input id="btn_select_tt" name="skinTypeId" type="select" value={search.skinTypeId}
-                              onChange={(e) => onInputChange(e)} className="form-control-alternative">
-                              <option value="" > -- Chọn --  </option>
-                              {listSkinStype && listSkinStype.length > 0 &&
-                                listSkinStype.map((item, index) => {
-                                  return (
-                                    <option value={item.id} key={item.id}>
-                                      {item.name}
-                                    </option>
-                                  )
-
-                                })
-                              }
-                            </Input>
-                          </FormGroup>
-                        </Col>
-                        <Col lg="3">
-                          <FormGroup>
-                            <label
-                              className="form-control-label"
-                              htmlFor="input-last-name"
-                            >
-                              Mũi giày
-                            </label>
-                            <Input id="btn_select_tt" name="toeId" type="select" value={search.toeId}
-                              onChange={(e) => onInputChange(e)} className="form-control-alternative">
-                              <option value="" > -- Chọn --  </option>
-                              {listToe && listToe.length > 0 &&
-                                listToe.map((item, index) => {
-                                  return (
-                                    <option value={item.id} key={item.id}>
-                                      {item.name}
-                                    </option>
-                                  )
-
-                                })
-                              }
-                            </Input>
-                          </FormGroup>
-                        </Col>
-                        <Col lg="3">
-                          <FormGroup>
-                            <label
-                              className="form-control-label"
-                              htmlFor="input-last-name"
-                            >
-                              Đế giày
-                            </label>
-                            <Input id="btn_select_tt" name="soleId" type="select" value={search.soleId}
-                              onChange={(e) => onInputChange(e)} className="form-control-alternative">
-                              <option value="" > -- Chọn --  </option>
-                              {listSole && listSole.length > 0 &&
-                                listSole.map((item, index) => {
-                                  return (
-                                    <option value={item.id} key={item.id}>
-                                      {item.name}
-                                    </option>
-                                  )
-
-                                })
-                              }
-                            </Input>
-                          </FormGroup>
-                        </Col>
-                        <Col lg="3">
-                          <FormGroup>
-                            <label
-                              className="form-control-label"
-                              htmlFor="input-last-name"
-                            >
-                              Lót giày
-                            </label>
-                            <Input id="btn_select_tt" name="liningId" type="select" value={search.liningId}
-                              onChange={(e) => onInputChange(e)} className="form-control-alternative">
-                              <option value="" > -- Chọn --  </option>
-                              {listLining && listLining.length > 0 &&
-                                listLining.map((item, index) => {
-                                  return (
-                                    <option value={item.id} key={item.id}>
-                                      {item.name}
-                                    </option>
-                                  )
-
-                                })
-                              }
-                            </Input>
-                          </FormGroup>
-                        </Col>
-
-                        <Col lg="3">
-                          <FormGroup>
-                            <label
-                              className="form-control-label"
-                              htmlFor="input-last-name"
-                            >
-                              Đệm giày
-                            </label>
-                            <Input id="btn_select_tt" name="cushionId" type="select" value={search.cushionId}
-                              onChange={(e) => onInputChange(e)} className="form-control-alternative" >
-                              <option value=" "> -- Chọn --  </option>
-                              {listCushion && listCushion.length > 0 &&
-                                listCushion.map((item, index) => {
-                                  return (
-                                    <option value={item.id} key={item.id}>
-                                      {item.name}
-                                    </option>
-                                  )
-
-                                })
-                              }
-                            </Input>
-                          </FormGroup>
-                        </Col>
-
-                        <Col lg="6" xl="6">
-                          <FormGroup>
-                            <Label for="find_code" className="form-control-label">
-                              Số lượng:
-                            </Label>
-                            <Row>
-                              <Col xl={5}>
-                                <Input
-                                  className="form-control-alternative"
-                                  id="find_code"
-                                  name="fromQuantity"
-                                  placeholder="Nhập số lượng"
-                                  value={search.fromQuantity}
-                                  onChange={(e) => onInputChange(e)}
-                                />
-                              </Col>
-                              <Label for="find_code" xl={1} className="form-control-label text-center">
-                                <i class="fa-solid fa-arrow-right"></i>
-                              </Label>
-                              <Col xl={5}>
-                                <Input
-                                  className="form-control-alternative"
-                                  id="find_code"
-                                  name="toQuantity"
-                                  placeholder="Nhập số lượng"
-                                  value={search.toQuantity}
-                                  onChange={(e) => onInputChange(e)}
-                                />
-                              </Col>
-                            </Row>
-                          </FormGroup>
-                        </Col>
-                        <Col lg="6" xl="6">
-                          <FormGroup>
-                            <Label for="find_code" className="form-control-label">
-                              Giá:
-                            </Label>
-                            <Row>
-                              <Col xl={5}>
-                                <Input
-                                  className="form-control-alternative"
-                                  id="find_code"
-                                  name="fromPrice"
-                                  placeholder="Nhập giá"
-                                  value={search.fromPrice}
-                                  onChange={(e) => onInputChange(e)}
-                                />
-                              </Col>
-                              <Label for="find_code" xl={2} className="form-control-label text-center">
-                                <i class="fa-solid fa-arrow-right"></i>
-                              </Label>
-                              <Col xl={5}>
-                                <Input
-                                  className="form-control-alternative"
-                                  id="find_code"
-                                  name="toPrice"
-                                  placeholder="Nhập giá"
-                                  value={search.toPrice}
-                                  onChange={(e) => onInputChange(e)}
-                                />
-                              </Col>
-                            </Row>
-                          </FormGroup>
-                        </Col>
-                      </Row>
-                    }
-                  </div>
-                </Form>
-
-
-
-
-                <Row className="mt-2">
-                  <Col lg="6" xl="4" >
-                    <span>
-                      <Switch on="yes" off="no" value={value} onChange={setValue} />
-
-                      <span>
-                        &nbsp;&nbsp;
-                        Tìm kiếm nâng cao
-                        &nbsp;&nbsp;
-                      </span>
-                    </span>
-                  </Col>
-                  <Col lg="6" xl="8">
-                    <Button color="warning" onClick={searchShoes}>
-                      <i class="fa-solid fa-magnifying-glass" /> &nbsp;
-                      Tìm kiếm
-                    </Button>
-                    <Button color="primary" onClick={resetSearch}>
-                      Làm mới bộ lọc
-                    </Button>
-                  </Col>
-                </Row>
-
-                {/* end row find  productAttrinutes*/}
-              </CardBody>
-            </Card>
-          </Col>
-        </Row>
-        <Row className="mb-4">
-          <Col lg="6" xl="12">
-            <Card className="card-stats mb-4 mb-xl-0">
-              <CardBody>
-                <Row className="align-items-center mb-2">
-
-                  <CardTitle
-                    tag="h5"
-                    className=" col-2 text-uppercase text-muted mb-0"
-                  >
-                    <h3> DANH SÁCH</h3>
-
-                  </CardTitle>
-
-                  <div className="col text-right" style={{ display: "flex" }}>
-                    <Col>
-                      <Input type="select" name="status" style={{ width: "150px" }} size="sm" onChange={(e) => onInputChange(e)} >
-                        <option value=" ">Tất cả</option>
-                        <option value=" ">Tất cả</option>
-                      </Input>
-                    </Col>
-                    <Button
-                      className="btn btn-outline-primary"
-                      size="sm"
-                      to="/admin/product/add" tag={Link}
-                    >
-                      Thêm mới
-                    </Button>
-                    <Button
-                      className="btn btn-outline-primary"
-                      onClick={(e) => e.preventDefault()}
-                      size="sm"
-                      onClick={taiMau}
-                    >
-                      Tải mẫu
-                    </Button>
-                    <input
-                      type="file"
-                      style={{ display: 'none' }}
-                      ref={fileInputRef}
-                      onChange={handleFileChange}
-                    />
-
-                    <Button
-                      className="btn btn-outline-primary"
-                      size="sm"
-                      onClick={handleFileSelect}
-                    >
-                      Nhập Excel
-                    </Button>
-                    <Button
-                      className="btn btn-outline-primary"
-                      size="sm"
-                      onClick={xuatExcel}
-                    >
-                      Xuất Excel
-                    </Button>
-                    <Button
-                      className="btn btn-outline-primary"
-                      size="sm"
-                      onClick={xuatPDF}
-                    >
-                      Xuất PDF
-                    </Button>
-                  </div>
-                </Row>
-                {/*  */}
-                {/* <div class="row">
-                  <div class="col-sm-6 text-left">
-                  </div>
-                  <div class="col-sm-6 text-right">
-                    <div class="dt-buttons btn-group" style={{ fontSize: 11 }}>
-                      <button class="btn btn-primary buttons-print" tabindex="0" aria-controls="DataTables_Table_0" type="button" size="sm">
-                        <i class="fa-solid fa-plus"></i>
-                      </button>
-                      <button class="btn btn-primary buttons-copy buttons-html5" tabindex="0" aria-controls="DataTables_Table_0" type="button" size="sm">
-                        <span>Tải mẫu</span>
-                      </button>
-                      <button class="btn btn-primary buttons-excel buttons-html5" tabindex="0" aria-controls="DataTables_Table_0" type="button" size="sm">
-                        <span>Nhập<i class="fa-solid fa-file-excel" style={{color:"green"}}></i></span>
-                      </button>
-                      <button class="btn btn-primary buttons-csv buttons-html5" tabindex="0" aria-controls="DataTables_Table_0" type="button" size="sm">
-                        <span>Xuất<i class="fa-solid fa-file-excel" style={{color:"green"}}></i></span>
-                      </button>
-                      <button class="btn btn-primary buttons-pdf buttons-html5" tabindex="0" aria-controls="DataTables_Table_0" type="button" size="sm">
-                        <span>PDF</span>
-                      </button>
                     </div>
-                  </div>
-                </div> */}
-                <Row>
+
+                    <div className="col text-right">
+                      {showActions && (
+                        <Button
+                          color="danger" outline
+                          size="sm"
+                          onClick={handleDeleteButtonClick}
+                        >
+                          Xóa tất cả
+                        </Button>
+                      )}
+                    </div>
+                  </Row>
                   <Table className="align-items-center table-flush" responsive>
                     <thead className="thead-light">
                       <tr>
-                        <th className="text-center pb-4" >
-                          <FormGroup check>
-                            <Input type="checkbox" />
+                        <th>
+                          <FormGroup check className="pb-4">
+                            <Input
+                              type="checkbox"
+                              checked={selectAll}
+                              onChange={handleSelectAll}
+                            />
                           </FormGroup>
 
                         </th>
@@ -963,9 +589,15 @@ const Products = () => {
                           return (
                             <tr key={item.id} >
                               <td className="text-center">
-                                <FormGroup check>
-                                  <Input type="checkbox" />
+                                <FormGroup check className="pb-4">
+                                  <Input
+                                    type="checkbox"
+                                    checked={selectedItems.includes(item.id)}
+                                    onChange={() => handleCheckboxChange(item.id)}
+                                  />
+
                                 </FormGroup>
+
                               </td>
                               <th scope="row"> {index + 1}</th>
                               <td>{item.code}</td>
@@ -1004,56 +636,56 @@ const Products = () => {
 
                     </tbody>
                   </Table>
-                </Row>
-                <Row className="mt-4">
-                  <Col lg={6}>
-                    <div style={{ fontSize: 14 }}>
-                      Đang xem <b>1</b> đến <b>{totalElements < size ? totalElements : size}</b> trong tổng số <b>{totalElements}</b> mục
-                    </div>
-                  </Col>
-                  <Col style={{ fontSize: 14 }} lg={2}>
-                    <Row>
-                      <span>Xem </span>&nbsp;
-                      <span>
-                        <Input type="select" name="status" style={{ width: "60px", fontSize: 14 }} size="sm" onChange={(e) => onChangeSize(e)} className="mt--1">
-                          <option value="5">5</option>
-                          <option value="10">10</option>
-                          <option value="25">25</option>
-                          <option value="50">50</option>
-                          <option value="100">100</option>
-                        </Input>
-                      </span>&nbsp;
-                      <span> mục</span>
-                    </Row>
 
-                  </Col>
-                  <Col lg={4} style={{ fontSize: 11 }} className="mt--1">
-                    <ReactPaginate
-                      breakLabel="..."
-                      nextLabel=">"
-                      pageRangeDisplayed={1} // Number of pages to display on each side of the selected page
-                      pageCount={totalPages} // Total number of pages
-                      previousLabel="<"
-                      onPageChange={handlePageClick}
-                      renderOnZeroPageCount={null}
-                      pageClassName="page-item"
-                      pageLinkClassName="page-link"
-                      previousClassName="page-item"
-                      previousLinkClassName="page-link"
-                      nextClassName="page-item"
-                      nextLinkClassName="page-link"
-                      breakClassName="page-item"
-                      breakLinkClassName="page-link"
-                      containerClassName="pagination"
-                      activeClassName="active"
-                      marginPagesDisplayed={1}
-                    />
-                  </Col>
-                </Row>
-                {/*  */}
+                  <Row className="mt-4">
+                    <Col lg={6}>
+                      <div style={{ fontSize: 14 }}>
+                        Đang xem <b>1</b> đến <b>{totalElements < size ? totalElements : size}</b> trong tổng số <b>{totalElements}</b> mục
+                      </div>
+                    </Col>
+                    <Col style={{ fontSize: 14 }} lg={2}>
+                      <Row>
+                        <span>Xem </span>&nbsp;
+                        <span>
+                          <Input type="select" name="status" style={{ width: "60px", fontSize: 14 }} size="sm" onChange={(e) => onChangeSize(e)} className="mt--1">
+                            <option value="5">5</option>
+                            <option value="10">10</option>
+                            <option value="25">25</option>
+                            <option value="50">50</option>
+                            <option value="100">100</option>
+                          </Input>
+                        </span>&nbsp;
+                        <span> mục</span>
+                      </Row>
+
+                    </Col>
+                    <Col lg={4} style={{ fontSize: 11 }} className="mt--1">
+                      <ReactPaginate
+                        breakLabel="..."
+                        nextLabel=">"
+                        pageRangeDisplayed={1} // Number of pages to display on each side of the selected page
+                        pageCount={totalPages} // Total number of pages
+                        previousLabel="<"
+                        onPageChange={handlePageClick}
+                        renderOnZeroPageCount={null}
+                        pageClassName="page-item"
+                        pageLinkClassName="page-link"
+                        previousClassName="page-item"
+                        previousLinkClassName="page-link"
+                        nextClassName="page-item"
+                        nextLinkClassName="page-link"
+                        breakClassName="page-item"
+                        breakLinkClassName="page-link"
+                        containerClassName="pagination"
+                        activeClassName="active"
+                        marginPagesDisplayed={1}
+                      />
+                    </Col>
+                  </Row>
+                </div>
               </CardBody>
             </Card>
-          </Col>
+          </div>
         </Row>
       </Container >
       <Modal
@@ -1078,6 +710,130 @@ const Products = () => {
             </Button>{' '}
           </div>
         </ModalFooter>
+      </Modal>
+      <Modal
+        isOpen={thirdModal}
+        toggle={toggleThirdModal}
+        style={{ maxWidth: '350px', right: 'unset', left: 0, position: 'fixed', marginLeft: '252px', marginRight: 0, top: "-27px" }}
+        backdrop={false}
+      >
+        <ModalHeader toggle={toggleThirdModal}>
+          <h3 className="heading-small text-muted mb-0">Bộ lọc tìm kiếm</h3>
+        </ModalHeader>
+        <ModalBody style={{ paddingTop: 0, paddingBottom: 0 }}>
+          <Form >
+            <FormGroup>
+              <label style={{ fontSize: 13 }}
+                className="form-control-label"
+              >
+                Loại khuyến mại
+              </label>
+              <Input
+                className="form-control-alternative"
+                type="select" size="sm" id="typePeriod"
+              >
+                <option value="">Tất cả</option>
+                <option value="0">Order</option>
+                <option value="1">FreeShip</option>
+              </Input>
+            </FormGroup>
+            <FormGroup>
+
+              <Row>
+                <Col xl="6">
+                  <label style={{ fontSize: 13 }}
+                    className="form-control-label"
+                  >
+                    Hóa đơn từ
+                  </label>
+                  <Input
+                    className="form-control-alternative"
+                    type="number" size="sm" id="minPercent"
+                  />
+                </Col>
+
+                <Col xl="6">
+                  <label style={{ fontSize: 13 }}
+                    className="form-control-label"
+                  >
+                    đến
+                  </label>
+                  <Input
+                    className="form-control-alternative"
+                    type="number" size="sm" id="maxPercent"
+                  />
+                </Col>
+              </Row>
+            </FormGroup>
+            <FormGroup>
+              <label style={{ fontSize: 13 }}
+                className="form-control-label"
+              >
+                Trạng thái
+              </label>
+              <Input
+                className="form-control-alternative"
+                type="select" size="sm" id="status"
+              >
+                <option value="">Tất cả</option>
+                <option value="0">Đang kích hoạt</option>
+                <option value="1">Chờ kích hoạt</option>
+                <option value="2">Ngừng kích hoạt</option>
+              </Input>
+            </FormGroup>
+            <FormGroup>
+              <label style={{ fontSize: 13 }}
+                className="form-control-label"
+              >
+                Ngày bắt đầu
+              </label>
+              <Input
+                className="form-control-alternative"
+                type="date" size="sm" id="fromDate"
+              />
+            </FormGroup>
+            <FormGroup>
+              <label style={{ fontSize: 13 }}
+                className="form-control-label"
+              >
+                Ngày kết thúc
+              </label>
+              <Input
+                className="form-control-alternative"
+                type="date" size="sm" id="toDate"
+              />
+            </FormGroup>
+            <FormGroup check>
+              <label
+                style={{ fontSize: 13, fontWeight: "bold" }}>
+                <Input type="checkbox"
+                  id="checkbox2"
+                />
+                Có quà tặng không?
+              </label>
+            </FormGroup>
+          </Form>
+        </ModalBody>
+        <ModalFooter>
+          <div className="row w-100">
+            <div className="col-4">
+              <Button color="primary" outline size="sm" block>
+                Làm mới
+              </Button>
+            </div>
+            <div className="col-4">
+              <Button color="primary" outline size="sm" block >
+                Lọc
+              </Button>
+            </div>
+            <div className="col-4">
+              <Button color="danger" outline size="sm" block onClick={toggleThirdModal}>
+                Đóng
+              </Button>
+            </div>
+          </div>
+        </ModalFooter>
+
       </Modal>
     </>
   );
