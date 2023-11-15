@@ -10,6 +10,7 @@ import { Badge, Row, Col, Button, Table, Input, FormGroup, InputGroup, InputGrou
 import { FaRegEdit, FaSearch, FaMinus, FaPlus, FaTrash } from 'react-icons/fa';
 
 const Confirm = ({ updateData }) => {
+
     const [modal, setModal] = useState(false);
     const [confirm, setConfirm] = useState([]);
     const [selectedOrderId, setSelectedOrderId] = useState(null);
@@ -18,26 +19,56 @@ const Confirm = ({ updateData }) => {
     const [selectedIds, setSelectedIds] = useState([]);
     const [isProductDeleted, setIsProductDeleted] = useState(false);
     const [totalProductPrice, setTotalProductPrice] = useState(0);
+
     const [provinces, setProvinces] = useState([]);
+    const [districts, setDistricts] = useState([]);
+    const [wards, setWards] = useState([]);
     const [selectedProvince, setSelectedProvince] = useState("");
     const [selectedDistrict, setSelectedDistrict] = useState("");
     const [selectedWard, setSelectedWard] = useState("");
     const [detailedAddress, setDetailedAddress] = useState('');
+
+    const [selectedToDistrictID, setSelectedToDistrictID] = useState("");
+    const [selectedToWardCode, setSelectedToWardCode] = useState("");
+    const [shippingTotal, setShippingTotal] = useState(0);
+    const [hasShippingData, setHasShippingData] = useState(false);
+
     const [selectAllChecked, setSelectAllChecked] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
 
-
-
     const toggle = () => setModal(!modal);
+
+    const fetchDataFromAPI = async (url, stateSetter) => {
+        try {
+            const response = await axios.get(url, {
+                headers: {
+                    'token': '44022259-5cfb-11ee-96dc-de6f804954c9'
+                }
+            });
+            stateSetter(response.data.data);
+        } catch (error) {
+            console.error(`Lỗi khi lấy dữ liệu từ ${url}:`, error);
+        }
+    };
 
     const fetchData = async () => {
 
-        const provincesResponse = await axios.get(
-            "https://provinces.open-api.vn/api/?depth=3"
-        );
-        setProvinces(provincesResponse.data);
+        fetchDataFromAPI('https://online-gateway.ghn.vn/shiip/public-api/master-data/province', setProvinces);
+
+        // Nếu có tỉnh/thành được chọn, thì mới fetch quận/huyện
+        if (selectedProvince) {
+            const districtURL = `https://online-gateway.ghn.vn/shiip/public-api/master-data/district?province_id=${selectedProvince}`;
+            fetchDataFromAPI(districtURL, setDistricts);
+        }
+
+        // Nếu có quận/huyện được chọn, thì mới fetch phường/xã
+        if (selectedDistrict) {
+            const wardURL = `https://online-gateway.ghn.vn/shiip/public-api/master-data/ward?district_id=${selectedDistrict}`;
+            fetchDataFromAPI(wardURL, setWards);
+        }
 
         try {
+
             const response = await axiosInstance.get("/order/admin", {
                 params: {
                     page: 0,
@@ -47,7 +78,6 @@ const Confirm = ({ updateData }) => {
                 }
             });
             setConfirm(response.content);
-            return response.content;
         } catch (error) {
             console.error("Lỗi khi lấy dữ liệu:", error);
         }
@@ -55,7 +85,7 @@ const Confirm = ({ updateData }) => {
 
     useEffect(() => {
         fetchData();
-    }, []);
+    }, [selectedProvince, selectedDistrict]);
 
 
     const [formData, setFormData] = useState({
@@ -68,31 +98,37 @@ const Confirm = ({ updateData }) => {
         percentPeriod: "",
     });
 
-
     //TotalMoney
-    const calculateTotalMoney = (productPrice, deliveryCost, percentPeriod, percentVoucher, priceVoucher) => {
+    const calculateTotalMoney = (productPrice, deliveryCost, percentPeriod, percentVoucher, priceVoucher, hasShipping = false, shippingTotal = 0) => {
         let totalMoney;
 
         if (percentPeriod !== null) {
             if (priceVoucher !== null) {
-                totalMoney = productPrice - (productPrice * percentPeriod / 100) - priceVoucher + Math.floor(deliveryCost);
+                totalMoney = productPrice - (productPrice * percentPeriod / 100) - priceVoucher;
             } else if (percentVoucher !== null) {
-                totalMoney = productPrice - productPrice * ((percentPeriod + percentVoucher) / 100) + Math.floor(deliveryCost);
+                totalMoney = productPrice - productPrice * ((percentPeriod + percentVoucher) / 100);
             } else {
-                totalMoney = productPrice - (productPrice * percentPeriod / 100) + Math.floor(deliveryCost);
+                totalMoney = productPrice - (productPrice * percentPeriod / 100);
             }
         } else {
             if (priceVoucher !== null) {
-                totalMoney = productPrice - priceVoucher + Math.floor(deliveryCost);
+                totalMoney = productPrice - priceVoucher;
             } else if (percentVoucher !== null) {
-                totalMoney = productPrice - (productPrice * percentVoucher / 100) + Math.floor(deliveryCost);
+                totalMoney = productPrice - (productPrice * percentVoucher / 100);
             } else {
-                totalMoney = productPrice + Math.floor(deliveryCost);
+                totalMoney = productPrice;
             }
+        }
+
+        if (hasShipping) {
+            totalMoney = totalMoney + Math.floor(shippingTotal);
+        } else {
+            totalMoney = totalMoney + Math.floor(deliveryCost);
         }
 
         return totalMoney;
     };
+
 
     //detail
     const handleRowClick = async (id, confirm) => {
@@ -130,7 +166,6 @@ const Confirm = ({ updateData }) => {
             setDeliveryData(deliveryResponse.data);
 
             const deliveryAddress = deliveryResponse.data.deliveryAddress;
-
             // Phân tách chuỗi địa chỉ thành các thành phần
             const addressParts = deliveryAddress.split(', ');
             const [selectedProvince, selectedDistrict, selectedWard, detailedAddress] = addressParts.reverse();
@@ -159,6 +194,87 @@ const Confirm = ({ updateData }) => {
             setSelectedIds([...selectedIds, id]);
         }
     };
+
+    //Address and Ship
+    const handleApiCall = async () => {
+
+        const servicesUrl = 'https://online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/available-services';
+        const servicesPayload = {
+            shop_id: '4580194',
+            from_district: 3440,
+            to_district: selectedToDistrictID,
+        };
+
+        try {
+            const servicesResponse = await axios.get(servicesUrl, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'token': '44022259-5cfb-11ee-96dc-de6f804954c9'
+                },
+                params: servicesPayload,
+            });
+
+            const servicesData = servicesResponse.data;
+            console.log(servicesData);
+
+            const selectedService = servicesData.data.find(service => service.service_type_id === 2);
+
+            if (selectedService) {
+                const serviceId = selectedService.service_id;
+                console.log(serviceId);
+                const response = await axios.get('https://online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/fee', {
+                    headers: {
+                        'token': '44022259-5cfb-11ee-96dc-de6f804954c9',
+                        'shop_id': '4580194',
+                        'Content-Type': 'application/json'
+                    },
+                    params: {
+                        service_id: serviceId,
+                        insurance_value: 500000,
+                        coupon: null,
+                        from_district_id: 3440,
+                        to_district_id: selectedToDistrictID,
+                        to_ward_code: selectedToWardCode,
+                        height: 15,
+                        length: 15,
+                        weight: 2000,
+                        width: 15
+                    }
+                });
+                setHasShippingData(true);
+                setShippingTotal(response.data.data.total);
+
+
+                const [orderResponse, deliveryResponse] = await Promise.all([
+                    axiosInstance.get(`/order/admin/cart/get-all/${selectedOrderId}`),
+                    axiosInstance.get(`/order/admin/delivery/${selectedOrderId}`),
+                ]);
+
+                const updatedProductPrice = orderResponse.reduce((total, product) => {
+                    return total + product.totalPrice;
+                }, 0);
+
+                const updatedTotalMoney = calculateTotalMoney(
+                    updatedProductPrice,
+                    deliveryResponse.data.deliveryCost,
+                    formData.percentPeriod,
+                    formData.percentVoucher,
+                    formData.priceVoucher,
+                    true, 
+                    response.data.data.total
+                );
+
+                setTotalProductPrice(updatedProductPrice);
+                setFormData((prevFormData) => ({
+                    ...prevFormData,
+                    totalMoney: updatedTotalMoney,
+                }));
+            }
+        } catch (error) {
+            console.error('Lỗi trong quá trình gọi API:', error);
+        }
+    };
+
 
     //updateStatus
     const handleConfirm = async () => {
@@ -220,7 +336,7 @@ const Confirm = ({ updateData }) => {
                 deliveryAddress: newDeliveryAddress,
                 recipientPhone: deliveryData.recipientPhone,
                 recipientName: deliveryData.recipientName,
-                deliveryCost: deliveryData.deliveryCost,
+                deliveryCost: shippingTotal,
                 idOrder: deliveryData.idOrder
             });
 
@@ -257,7 +373,10 @@ const Confirm = ({ updateData }) => {
                 deliveryResponse.data.deliveryCost,
                 formData.percentPeriod,
                 formData.percentVoucher,
-                formData.priceVoucher
+                formData.priceVoucher,
+                true, 
+                shippingTotal
+
             );
 
             setTotalProductPrice(updatedProductPrice);
@@ -441,15 +560,20 @@ const Confirm = ({ updateData }) => {
                                                         type="select"
                                                         style={{ fontSize: 13 }}
                                                         value={selectedProvince}
-                                                        onChange={(e) => setSelectedProvince(e.target.value)}
+                                                        onChange={(e) => {
+                                                            setSelectedProvince(e.target.value);
+                                                            setSelectedDistrict("");
+                                                            setSelectedWard("");
+                                                        }}
                                                     >
-                                                        <option value="">Tỉnh/thành phố</option>
+                                                        <option value="">Chọn tỉnh/thành phố</option>
                                                         {provinces.map((province) => (
-                                                            <option key={province.code} value={province.name}>
-                                                                {province.name}
+                                                            <option key={province.ProvinceID} value={province.ProvinceID}>
+                                                                {province.ProvinceName}
                                                             </option>
                                                         ))}
                                                     </Input>
+
 
                                                     <Input
                                                         className="mb-2"
@@ -457,18 +581,20 @@ const Confirm = ({ updateData }) => {
                                                         type="select"
                                                         style={{ fontSize: 13 }}
                                                         value={selectedDistrict}
-                                                        onChange={(e) => setSelectedDistrict(e.target.value)}
+                                                        onChange={(e) => {
+                                                            setSelectedDistrict(e.target.value);
+                                                            setSelectedWard("");
+                                                            setSelectedToDistrictID(e.target.value);
+                                                        }}
                                                         disabled={!selectedProvince}
                                                     >
-                                                        <option value="">Quận/huyện</option>
+                                                        <option value="">Chọn quận/huyện</option>
                                                         {selectedProvince &&
-                                                            provinces
-                                                                .find((province) => province.name === selectedProvince)
-                                                                ?.districts.map((district) => (
-                                                                    <option key={district.code} value={district.name}>
-                                                                        {district.name}
-                                                                    </option>
-                                                                ))}
+                                                            districts.map((district) => (
+                                                                <option key={district.DistrictID} value={district.DistrictID}>
+                                                                    {district.DistrictName}
+                                                                </option>
+                                                            ))}
                                                     </Input>
 
                                                     <Input
@@ -477,20 +603,20 @@ const Confirm = ({ updateData }) => {
                                                         type="select"
                                                         style={{ fontSize: 13 }}
                                                         value={selectedWard}
-                                                        onChange={(e) => setSelectedWard(e.target.value)}
+                                                        onChange={(e) => {
+                                                            setSelectedWard(e.target.value);
+                                                            setSelectedToWardCode(e.target.value.toString());
+                                                            handleApiCall();
+                                                        }}
                                                         disabled={!selectedDistrict}
                                                     >
-                                                        <option value="">Xã/phường</option>
-                                                        {selectedProvince &&
-                                                            selectedDistrict &&
-                                                            provinces
-                                                                .find((province) => province.name === selectedProvince)
-                                                                ?.districts.find((district) => district.name === selectedDistrict)
-                                                                ?.wards.map((ward) => (
-                                                                    <option key={ward.code} value={ward.name}>
-                                                                        {ward.name}
-                                                                    </option>
-                                                                ))}
+                                                        <option value="">Chọn xã/phường</option>
+                                                        {selectedDistrict &&
+                                                            wards.map((ward) => (
+                                                                <option key={ward.WardCode} value={ward.WardCode}>
+                                                                    {ward.WardName}
+                                                                </option>
+                                                            ))}
                                                     </Input>
 
                                                 </FormGroup>
@@ -577,7 +703,7 @@ const Confirm = ({ updateData }) => {
                                                         <Input
                                                             size="sm"
                                                             type="number"
-                                                            value={Math.floor(deliveryData.deliveryCost)}
+                                                            value={hasShippingData ? Math.floor(shippingTotal) : Math.floor(deliveryData.deliveryCost)}
                                                             onChange={(e) => setDeliveryData({ ...deliveryData, deliveryCost: e.target.value })}
                                                             readOnly style={{ backgroundColor: "#fff" }}
                                                         />

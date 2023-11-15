@@ -9,35 +9,60 @@ import { updateData } from './actions';
 import { Badge, Row, Col, Button, Table, Input, FormGroup, InputGroup, InputGroupAddon, InputGroupText, Modal, ModalBody, ModalFooter, ModalHeader, Label, Form } from "reactstrap";
 import { FaRegEdit, FaSearch} from 'react-icons/fa';
 
-const Cancel = () => {
+const Cancle = ({ updateData }) => {
+
     const [modal, setModal] = useState(false);
     const [confirm, setConfirm] = useState([]);
     const [selectedOrderId, setSelectedOrderId] = useState(null);
     const [orderData, setOrderData] = useState({});
     const [deliveryData, setDeliveryData] = useState({});
     const [selectedIds, setSelectedIds] = useState([]);
-    const [isProductDeleted, setIsProductDeleted] = useState(false);
     const [totalProductPrice, setTotalProductPrice] = useState(0);
+
     const [provinces, setProvinces] = useState([]);
+    const [districts, setDistricts] = useState([]);
+    const [wards, setWards] = useState([]);
     const [selectedProvince, setSelectedProvince] = useState("");
     const [selectedDistrict, setSelectedDistrict] = useState("");
     const [selectedWard, setSelectedWard] = useState("");
     const [detailedAddress, setDetailedAddress] = useState('');
+
     const [selectAllChecked, setSelectAllChecked] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
 
-
-
     const toggle = () => setModal(!modal);
+
+    const fetchDataFromAPI = async (url, stateSetter) => {
+        try {
+            const response = await axios.get(url, {
+                headers: {
+                    'token': '44022259-5cfb-11ee-96dc-de6f804954c9'
+                }
+            });
+            stateSetter(response.data.data);
+        } catch (error) {
+            console.error(`Lỗi khi lấy dữ liệu từ ${url}:`, error);
+        }
+    };
 
     const fetchData = async () => {
 
-        const provincesResponse = await axios.get(
-            "https://provinces.open-api.vn/api/?depth=3"
-        );
-        setProvinces(provincesResponse.data);
+        fetchDataFromAPI('https://online-gateway.ghn.vn/shiip/public-api/master-data/province', setProvinces);
+
+        // Nếu có tỉnh/thành được chọn, thì mới fetch quận/huyện
+        if (selectedProvince) {
+            const districtURL = `https://online-gateway.ghn.vn/shiip/public-api/master-data/district?province_id=${selectedProvince}`;
+            fetchDataFromAPI(districtURL, setDistricts);
+        }
+
+        // Nếu có quận/huyện được chọn, thì mới fetch phường/xã
+        if (selectedDistrict) {
+            const wardURL = `https://online-gateway.ghn.vn/shiip/public-api/master-data/ward?district_id=${selectedDistrict}`;
+            fetchDataFromAPI(wardURL, setWards);
+        }
 
         try {
+
             const response = await axiosInstance.get("/order/admin", {
                 params: {
                     page: 0,
@@ -47,7 +72,6 @@ const Cancel = () => {
                 }
             });
             setConfirm(response.content);
-
         } catch (error) {
             console.error("Lỗi khi lấy dữ liệu:", error);
         }
@@ -55,7 +79,7 @@ const Cancel = () => {
 
     useEffect(() => {
         fetchData();
-    }, []);
+    }, [selectedProvince, selectedDistrict]);
 
 
     const [formData, setFormData] = useState({
@@ -68,31 +92,37 @@ const Cancel = () => {
         percentPeriod: "",
     });
 
-
     //TotalMoney
-    const calculateTotalMoney = (productPrice, deliveryCost, percentPeriod, percentVoucher, priceVoucher) => {
+    const calculateTotalMoney = (productPrice, deliveryCost, percentPeriod, percentVoucher, priceVoucher, hasShipping = false, shippingTotal = 0) => {
         let totalMoney;
 
         if (percentPeriod !== null) {
             if (priceVoucher !== null) {
-                totalMoney = productPrice - (productPrice * percentPeriod / 100) - priceVoucher + Math.floor(deliveryCost);
+                totalMoney = productPrice - (productPrice * percentPeriod / 100) - priceVoucher;
             } else if (percentVoucher !== null) {
-                totalMoney = productPrice - productPrice * ((percentPeriod + percentVoucher) / 100) + Math.floor(deliveryCost);
+                totalMoney = productPrice - productPrice * ((percentPeriod + percentVoucher) / 100);
             } else {
-                totalMoney = productPrice - (productPrice * percentPeriod / 100) + Math.floor(deliveryCost);
+                totalMoney = productPrice - (productPrice * percentPeriod / 100);
             }
         } else {
             if (priceVoucher !== null) {
-                totalMoney = productPrice - priceVoucher + Math.floor(deliveryCost);
+                totalMoney = productPrice - priceVoucher;
             } else if (percentVoucher !== null) {
-                totalMoney = productPrice - (productPrice * percentVoucher / 100) + Math.floor(deliveryCost);
+                totalMoney = productPrice - (productPrice * percentVoucher / 100);
             } else {
-                totalMoney = productPrice + Math.floor(deliveryCost);
+                totalMoney = productPrice;
             }
+        }
+
+        if (hasShipping) {
+            totalMoney = totalMoney + Math.floor(shippingTotal);
+        } else {
+            totalMoney = totalMoney + Math.floor(deliveryCost);
         }
 
         return totalMoney;
     };
+
 
     //detail
     const handleRowClick = async (id, confirm) => {
@@ -130,7 +160,6 @@ const Cancel = () => {
             setDeliveryData(deliveryResponse.data);
 
             const deliveryAddress = deliveryResponse.data.deliveryAddress;
-
             // Phân tách chuỗi địa chỉ thành các thành phần
             const addressParts = deliveryAddress.split(', ');
             const [selectedProvince, selectedDistrict, selectedWard, detailedAddress] = addressParts.reverse();
@@ -160,13 +189,6 @@ const Cancel = () => {
         }
     };
 
-
-    useEffect(() => {
-        if (isProductDeleted) {
-            setModal(true);
-            setIsProductDeleted(false);
-        }
-    }, [isProductDeleted]);
 
     return (
         <>
@@ -235,6 +257,7 @@ const Cancel = () => {
                                                     {confirm.paymentMethod === 1 ? "COD" : confirm.paymentMethod === 2 ? "Ví điện tử" : "Không xác định"}
                                                 </Badge>
                                             </td>
+
                                             <td>{confirm.updateBy}</td>
                                             <td>{format(new Date(confirm.createdTime), 'dd-MM-yyyy HH:mm', { locale: vi })}</td>
                                             <td>{format(new Date(confirm.updatedTime), 'dd-MM-yyyy HH:mm', { locale: vi })}</td>
@@ -281,8 +304,9 @@ const Cancel = () => {
                                                     <Input
                                                         size="sm"
                                                         type="text"
-                                                        value={deliveryData.recipientName}   
-                                                        readOnly style={{ backgroundColor: "#fff" }}                                                 />
+                                                        value={deliveryData.recipientName}
+                                                        readOnly style={{ backgroundColor: "#fff" }}
+                                                    />
                                                 </FormGroup>
                                             </Col>
                                             <Col md={6}>
@@ -312,13 +336,14 @@ const Cancel = () => {
                                                         style={{ fontSize: 13 }}
                                                         value={selectedProvince}
                                                     >
-                                                        <option value="">Tỉnh/thành phố</option>
+                                                        <option value="">Chọn tỉnh/thành phố</option>
                                                         {provinces.map((province) => (
-                                                            <option key={province.code} value={province.name}>
-                                                                {province.name}
+                                                            <option key={province.ProvinceID} value={province.ProvinceID}>
+                                                                {province.ProvinceName}
                                                             </option>
                                                         ))}
                                                     </Input>
+
 
                                                     <Input
                                                         className="mb-2"
@@ -328,37 +353,30 @@ const Cancel = () => {
                                                         value={selectedDistrict}
                                                         disabled={!selectedProvince}
                                                     >
-                                                        <option value="">Quận/huyện</option>
+                                                        <option value="">Chọn quận/huyện</option>
                                                         {selectedProvince &&
-                                                            provinces
-                                                                .find((province) => province.name === selectedProvince)
-                                                                ?.districts.map((district) => (
-                                                                    <option key={district.code} value={district.name}>
-                                                                        {district.name}
-                                                                    </option>
-                                                                ))}
+                                                            districts.map((district) => (
+                                                                <option key={district.DistrictID} value={district.DistrictID}>
+                                                                    {district.DistrictName}
+                                                                </option>
+                                                            ))}
                                                     </Input>
 
                                                     <Input
                                                         className="mb-2"
                                                         size="sm"
                                                         type="select"
-                                                        style={{ fontSize: 13}}
+                                                        style={{ fontSize: 13 }}
                                                         value={selectedWard}
                                                         disabled={!selectedDistrict}
-                                                        
                                                     >
-                                                        <option value="">Xã/phường</option>
-                                                        {selectedProvince &&
-                                                            selectedDistrict &&
-                                                            provinces
-                                                                .find((province) => province.name === selectedProvince)
-                                                                ?.districts.find((district) => district.name === selectedDistrict)
-                                                                ?.wards.map((ward) => (
-                                                                    <option key={ward.code} value={ward.name}>
-                                                                        {ward.name}
-                                                                    </option>
-                                                                ))}
+                                                        <option value="">Chọn xã/phường</option>
+                                                        {selectedDistrict &&
+                                                            wards.map((ward) => (
+                                                                <option key={ward.WardCode} value={ward.WardCode}>
+                                                                    {ward.WardName}
+                                                                </option>
+                                                            ))}
                                                     </Input>
 
                                                 </FormGroup>
@@ -509,7 +527,6 @@ const Cancel = () => {
                                                 <th>Số lượng</th>
                                                 <th>Đơn giá</th>
                                                 <th>Thành tiền</th>
-                                                
                                             </tr>
                                         </thead>
                                         <tbody style={{ color: "#000" }}>
@@ -536,7 +553,6 @@ const Cancel = () => {
                                                         <td className="text-center">{product.quantity}</td>
                                                         <td className="text-right">{product.discountPrice}</td>
                                                         <td className="text-right">{product.totalPrice}</td>
-                                                        
                                                     </tr>
                                                 ))}
                                         </tbody>
@@ -566,4 +582,4 @@ const mapDispatchToProps = (dispatch) => ({
     updateData: (tabId, newData) => dispatch(updateData(tabId, newData)),
 });
 
-export default connect(null, mapDispatchToProps)(Cancel);
+export default connect(null, mapDispatchToProps)(Cancle);
