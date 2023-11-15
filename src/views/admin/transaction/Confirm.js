@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from "react";
+import axios from "axios";
 import axiosInstance from "services/custommize-axios";
-import { format, parseISO } from 'date-fns';
+import { format } from 'date-fns';
 import { vi } from 'date-fns/locale';
-
+import { connect } from 'react-redux';
+import { updateData } from './actions';
 // reactstrap components
 import { Badge, Row, Col, Button, Table, Input, FormGroup, InputGroup, InputGroupAddon, InputGroupText, Modal, ModalBody, ModalFooter, ModalHeader, Label, Form } from "reactstrap";
 import { FaRegEdit, FaSearch, FaMinus, FaPlus, FaTrash } from 'react-icons/fa';
 
-const Confirm = ({selectedIdss, setIsProductDeleteds }) => {
+const Confirm = ({ updateData }) => {
     const [modal, setModal] = useState(false);
     const [confirm, setConfirm] = useState([]);
     const [selectedOrderId, setSelectedOrderId] = useState(null);
@@ -16,11 +18,25 @@ const Confirm = ({selectedIdss, setIsProductDeleteds }) => {
     const [selectedIds, setSelectedIds] = useState([]);
     const [isProductDeleted, setIsProductDeleted] = useState(false);
     const [totalProductPrice, setTotalProductPrice] = useState(0);
+    const [provinces, setProvinces] = useState([]);
+    const [selectedProvince, setSelectedProvince] = useState("");
+    const [selectedDistrict, setSelectedDistrict] = useState("");
+    const [selectedWard, setSelectedWard] = useState("");
+    const [detailedAddress, setDetailedAddress] = useState('');
+    const [selectAllChecked, setSelectAllChecked] = useState(false);
+    const [searchTerm, setSearchTerm] = useState('');
+
 
 
     const toggle = () => setModal(!modal);
 
     const fetchData = async () => {
+
+        const provincesResponse = await axios.get(
+            "https://provinces.open-api.vn/api/?depth=3"
+        );
+        setProvinces(provincesResponse.data);
+
         try {
             const response = await axiosInstance.get("/order/admin", {
                 params: {
@@ -31,7 +47,7 @@ const Confirm = ({selectedIdss, setIsProductDeleteds }) => {
                 }
             });
             setConfirm(response.content);
-            
+            return response.content;
         } catch (error) {
             console.error("Lỗi khi lấy dữ liệu:", error);
         }
@@ -39,7 +55,7 @@ const Confirm = ({selectedIdss, setIsProductDeleteds }) => {
 
     useEffect(() => {
         fetchData();
-    }, [selectedIdss]);
+    }, []);
 
 
     const [formData, setFormData] = useState({
@@ -47,13 +63,38 @@ const Confirm = ({selectedIdss, setIsProductDeleteds }) => {
         code: "",
         totalMoney: "",
         paymentMethod: "",
-        deliveryCost: "",
         percentVoucher: "",
         priceVoucher: "",
         percentPeriod: "",
     });
 
 
+    //TotalMoney
+    const calculateTotalMoney = (productPrice, deliveryCost, percentPeriod, percentVoucher, priceVoucher) => {
+        let totalMoney;
+
+        if (percentPeriod !== null) {
+            if (priceVoucher !== null) {
+                totalMoney = productPrice - (productPrice * percentPeriod / 100) - priceVoucher + Math.floor(deliveryCost);
+            } else if (percentVoucher !== null) {
+                totalMoney = productPrice - productPrice * ((percentPeriod + percentVoucher) / 100) + Math.floor(deliveryCost);
+            } else {
+                totalMoney = productPrice - (productPrice * percentPeriod / 100) + Math.floor(deliveryCost);
+            }
+        } else {
+            if (priceVoucher !== null) {
+                totalMoney = productPrice - priceVoucher + Math.floor(deliveryCost);
+            } else if (percentVoucher !== null) {
+                totalMoney = productPrice - (productPrice * percentVoucher / 100) + Math.floor(deliveryCost);
+            } else {
+                totalMoney = productPrice + Math.floor(deliveryCost);
+            }
+        }
+
+        return totalMoney;
+    };
+
+    //detail
     const handleRowClick = async (id, confirm) => {
         setSelectedOrderId(id);
         try {
@@ -62,40 +103,25 @@ const Confirm = ({selectedIdss, setIsProductDeleteds }) => {
                 axiosInstance.get(`/order/admin/delivery/${id}`),
             ]);
 
+
             const productPrice = orderResponse.reduce((total, product) => {
                 return total + product.totalPrice;
             }, 0);
 
-            let calculatedTotalMoney;
-            if (confirm.percentPeriod !== null) {
-                // Nếu percentPeriod không null, tính giảm giá theo đợt và áp dụng voucher (nếu có)
-                if (confirm.priceVoucher !== null) {
-                    calculatedTotalMoney = productPrice - (productPrice * confirm.percentPeriod / 100) - confirm.priceVoucher + deliveryResponse.data.deliveryCost;
-                } else if (confirm.percentVoucher !== null) {
-                    calculatedTotalMoney = productPrice - (productPrice * confirm.percentPeriod / 100 + confirm.percentVoucher / 100) - deliveryResponse.data.deliveryCost;
-                } else {
-                    // Nếu không có voucher, chỉ áp dụng giảm giá theo đợt và phí vận chuyển
-                    calculatedTotalMoney = productPrice - (productPrice * confirm.percentPeriod / 100) + deliveryResponse.data.deliveryCost;
-                }
-            } else {
-                // Nếu percentPeriod là null, không áp dụng giảm giá theo đợt, chỉ áp dụng voucher (nếu có) và phí vận chuyển
-                if (confirm.priceVoucher !== null) {
-                    calculatedTotalMoney = productPrice - confirm.priceVoucher + deliveryResponse.data.deliveryCost;
-                } else if (confirm.percentVoucher !== null) {
-                    calculatedTotalMoney = productPrice - (productPrice * confirm.percentVoucher / 100) + deliveryResponse.data.deliveryCost;
-                } else {
-                    // Nếu không có voucher, chỉ tính phí vận chuyển
-                    calculatedTotalMoney = productPrice + deliveryResponse.data.deliveryCost;
-                }
-            }
-
+            const totalMoney = calculateTotalMoney(
+                productPrice,
+                deliveryResponse.data.deliveryCost,
+                confirm.percentPeriod,
+                confirm.percentVoucher,
+                confirm.priceVoucher
+            );
             setTotalProductPrice(productPrice);
+
             setFormData({
                 id: confirm.id,
                 code: confirm.code,
-                totalMoney: calculatedTotalMoney,
+                totalMoney: totalMoney,
                 paymentMethod: confirm.paymentMethod,
-                deliveryCost: confirm.deliveryCost,
                 percentVoucher: confirm.percentVoucher,
                 priceVoucher: confirm.priceVoucher,
                 percentPeriod: confirm.percentPeriod,
@@ -103,12 +129,28 @@ const Confirm = ({selectedIdss, setIsProductDeleteds }) => {
             setOrderData(orderResponse);
             setDeliveryData(deliveryResponse.data);
 
+            const deliveryAddress = deliveryResponse.data.deliveryAddress;
+
+            // Phân tách chuỗi địa chỉ thành các thành phần
+            const addressParts = deliveryAddress.split(', ');
+            const [selectedProvince, selectedDistrict, selectedWard, detailedAddress] = addressParts.reverse();
+            setDetailedAddress(detailedAddress);
+            setSelectedWard(selectedWard);
+            setSelectedDistrict(selectedDistrict);
+            setSelectedProvince(selectedProvince);
+
             setModal(true);
         } catch (error) {
             console.error("Lỗi khi lấy dữ liệu hóa đơn:", error);
         }
     };
 
+    //checkbox
+    const selectAllCheckbox = () => {
+        setSelectAllChecked(!selectAllChecked);
+        const newSelectedIds = confirm.map(item => item.id);
+        setSelectedIds(selectAllChecked ? [] : newSelectedIds);
+    };
 
     const handleCheckboxChange = (id) => {
         if (selectedIds.includes(id)) {
@@ -124,8 +166,8 @@ const Confirm = ({selectedIdss, setIsProductDeleteds }) => {
             await Promise.all(selectedIds.map(async (id) => {
                 await axiosInstance.put(`/order/admin/update-status/${id}?status=1`);
             }));
-            fetchData();
-            setIsProductDeleteds(true);
+            const newData = await fetchData();
+            updateData(2, newData);
         } catch (error) {
             console.error("Lỗi khi cập nhật trạng thái hóa đơn:", error);
         }
@@ -135,23 +177,56 @@ const Confirm = ({selectedIdss, setIsProductDeleteds }) => {
             await Promise.all(selectedIds.map(async (id) => {
                 await axiosInstance.put(`/order/admin/update-status/${id}?status=-1`);
             }));
-            fetchData();
+            const newData = await fetchData();
+            updateData(6, newData);
         } catch (error) {
             console.error("Lỗi khi cập nhật trạng thái hóa đơn:", error);
         }
     };
 
+    //updateDelivery
+    const buildDeliveryAddress = () => {
+        const addressParts = [];
+
+        const detailedAddress = document.getElementById("detailedAddress").value;
+        if (detailedAddress) {
+            addressParts.push(detailedAddress);
+        }
+
+        if (selectedWard) {
+            addressParts.push(selectedWard);
+        }
+
+        if (selectedDistrict) {
+            addressParts.push(selectedDistrict);
+        }
+
+        if (selectedProvince) {
+            addressParts.push(selectedProvince);
+        }
+
+        const deliveryAddress = addressParts.join(", ");
+
+        return deliveryAddress;
+    };
     const handleUpdateDelivery = async () => {
         try {
+            const newDeliveryAddress = buildDeliveryAddress();
+
+            setDeliveryData({ ...deliveryData, deliveryAddress: newDeliveryAddress });
+
             await axiosInstance.put('/order/admin/delivery/update', {
-                id: deliveryData.id, 
-                deliveryAddress: deliveryData.deliveryAddress,
+                id: deliveryData.id,
+                deliveryAddress: newDeliveryAddress,
                 recipientPhone: deliveryData.recipientPhone,
                 recipientName: deliveryData.recipientName,
                 deliveryCost: deliveryData.deliveryCost,
                 idOrder: deliveryData.idOrder
             });
 
+            const updatedMoneyValue = Math.floor(formData.totalMoney);
+            await axiosInstance.put(`/order/admin/update/total-money/${formData.id}?money=${updatedMoneyValue}`);
+            fetchData();
             setModal(false);
         } catch (error) {
             // Xử lý lỗi nếu có
@@ -159,6 +234,43 @@ const Confirm = ({selectedIdss, setIsProductDeleteds }) => {
         }
     };
 
+    //updateProduct
+    const updateProductQuantity = async (productId, changeAmount) => {
+        const newQuantity = changeAmount > 0 ? 1 : -1;
+        try {
+            await axiosInstance.put('/order/admin/cart/update', {
+                id: productId,
+                quantity: newQuantity
+            });
+
+            const [orderResponse, deliveryResponse] = await Promise.all([
+                axiosInstance.get(`/order/admin/cart/get-all/${selectedOrderId}`),
+                axiosInstance.get(`/order/admin/delivery/${selectedOrderId}`),
+            ]);
+
+            const updatedProductPrice = orderResponse.reduce((total, product) => {
+                return total + product.totalPrice;
+            }, 0);
+
+            const updatedTotalMoney = calculateTotalMoney(
+                updatedProductPrice,
+                deliveryResponse.data.deliveryCost,
+                formData.percentPeriod,
+                formData.percentVoucher,
+                formData.priceVoucher
+            );
+
+            setTotalProductPrice(updatedProductPrice);
+            setFormData((prevFormData) => ({
+                ...prevFormData,
+                totalMoney: updatedTotalMoney,
+            }));
+            setOrderData(orderResponse);
+
+        } catch (error) {
+            console.error('Lỗi khi cập nhật số lượng sản phẩm:', error);
+        }
+    };
 
     //deleteProduct
     const handleDeleteProduct = async (id) => {
@@ -171,27 +283,10 @@ const Confirm = ({selectedIdss, setIsProductDeleteds }) => {
             console.error("Lỗi khi xóa sản phẩm:", error);
         }
     };
-
-    //updateProduct
-    const updateProductQuantity = async (productId, changeAmount) => {
-        const newQuantity = changeAmount > 0 ? 1 : -1;
-        try {
-            await axiosInstance.put('/order/admin/cart/update', {
-                id: productId,
-                quantity: newQuantity
-            });
-            handleRowClick(selectedOrderId, confirm);
-
-        } catch (error) {
-            console.error('Lỗi khi cập nhật số lượng sản phẩm:', error);
-        }
-    };
-    
     useEffect(() => {
         if (isProductDeleted) {
             setModal(true);
             setIsProductDeleted(false);
-            handleRowClick(selectedOrderId, confirm);
         }
     }, [isProductDeleted]);
 
@@ -202,7 +297,11 @@ const Confirm = ({selectedIdss, setIsProductDeleteds }) => {
                     <Row className="align-items-center my-4">
                         <Col lg={4} style={{ display: "flex" }}>
                             <InputGroup size="sm">
-                                <Input type="text" placeholder="Tìm kiếm hóa đơn" />
+                                <Input type="search"
+                                    placeholder="Tìm kiếm hóa đơn"
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                />
                                 <InputGroupAddon addonType="append">
                                     <InputGroupText>
                                         <FaSearch color="black" />
@@ -218,41 +317,51 @@ const Confirm = ({selectedIdss, setIsProductDeleteds }) => {
                             <tr>
                                 <th scope="col" className="pt-0">
                                     <FormGroup check>
-                                        <Input type="checkbox" />
+                                        <Input type="checkbox"
+                                            onChange={() => selectAllCheckbox()}
+                                            checked={selectAllChecked}
+                                        />
                                     </FormGroup>
                                 </th>
-                                <th scope="col">Mã hóa đơn</th>
-                                <th scope="col">Khách hàng</th>
-                                <th scope="col">Tổng tiền</th>
-                                <th scope="col">Phương thức</th>
-                                <th scope="col">Ngày mua</th>
-                                <th scope="col">Thao tác</th>
+                                <th scope="col" className="text-dark">Mã hóa đơn</th>
+                                <th scope="col" className="text-dark">Khách hàng</th>
+                                <th scope="col" className="text-dark">Tổng tiền</th>
+                                <th scope="col" className="text-dark">Phương thức</th>
+                                <th scope="col" className="text-dark">Ngày mua</th>
+                                <th scope="col" className="text-dark">Thao tác</th>
                             </tr>
                         </thead>
                         <tbody style={{ color: "black" }}>
                             {Array.isArray(confirm) &&
-                                confirm.map((confirm, index) => (
-                                    <tr key={confirm.id}>
-                                        <td className="text-center pt-0">
-                                            <FormGroup check>
-                                                <Input type="checkbox" onChange={() => handleCheckboxChange(confirm.id)} checked={selectedIds.includes(confirm.id)} />
-                                            </FormGroup>
-                                        </td>
-                                        <td>{confirm.code}</td>
-                                        <td>{confirm.createdBy}</td>
-                                        <td className="text-right">{confirm.totalMoney.toLocaleString("vi-VN")} VND</td>
-                                        <td className="text-center">
-                                            <Badge color={confirm.paymentMethod === 1 ? "success" : confirm.paymentMethod === 2 ? "primary" : "secondary"}>
-                                                {confirm.paymentMethod === 1 ? "COD" : confirm.paymentMethod === 2 ? "Ví điện tử" : "Không xác định"}
-                                            </Badge>
-                                        </td>
+                                confirm
+                                    .filter(
+                                        (confirm) =>
+                                            confirm.code.toLowerCase().includes(searchTerm.toLowerCase())
+                                    )
+                                    .map((confirm, index) => (
+                                        <tr key={confirm.id}>
+                                            <td className="text-center pt-0">
+                                                <FormGroup check>
+                                                    <Input type="checkbox"
+                                                        onChange={() => handleCheckboxChange(confirm.id)}
+                                                        checked={selectedIds.includes(confirm.id)} />
+                                                </FormGroup>
+                                            </td>
+                                            <td>{confirm.code}</td>
+                                            <td>{confirm.createdBy}</td>
+                                            <td className="text-right">{confirm.totalMoney.toLocaleString("vi-VN")} VND</td>
+                                            <td className="text-center">
+                                                <Badge color={confirm.paymentMethod === 1 ? "success" : confirm.paymentMethod === 2 ? "primary" : "secondary"}>
+                                                    {confirm.paymentMethod === 1 ? "COD" : confirm.paymentMethod === 2 ? "Ví điện tử" : "Không xác định"}
+                                                </Badge>
+                                            </td>
 
-                                        <td>{format(new Date(confirm.createdTime), 'dd-MM-yyyy HH:mm', { locale: vi })}</td>
-                                        <td className="text-center">
-                                            <Button color="link" size="sm" onClick={() => handleRowClick(confirm.id, confirm)}><FaRegEdit /></Button>
-                                        </td>
-                                    </tr>
-                                ))}
+                                            <td>{format(new Date(confirm.createdTime), 'dd-MM-yyyy HH:mm', { locale: vi })}</td>
+                                            <td className="text-center">
+                                                <Button color="link" size="sm" onClick={() => handleRowClick(confirm.id, confirm)}><FaRegEdit /></Button>
+                                            </td>
+                                        </tr>
+                                    ))}
                         </tbody>
                     </Table>
 
@@ -276,10 +385,10 @@ const Confirm = ({selectedIdss, setIsProductDeleteds }) => {
                         <ModalHeader toggle={toggle}>
                             <h3 className="heading-small text-muted mb-0">Chi tiết hóa đơn</h3>
                         </ModalHeader>
-                        <ModalBody>
-                            <Row style={{ border: "1px solid gray" }}>
+                        <ModalBody className="pt-0 pb-0">
+                            <Row style={{ border: "1px solid rgba(0, 0, 0, 0.05)", borderRadius: "0.375rem" }}>
                                 <Col md={5} >
-                                    <h3 className="mt-3 heading-small text-muted">Thông tin khách hàng</h3>
+                                    <h3 className="mt-3 heading-small text-dark">Thông tin khách hàng</h3>
                                     <Form className="m-2" style={{ fontSize: 13 }}>
                                         <FormGroup>
                                             <Label>
@@ -289,7 +398,7 @@ const Confirm = ({selectedIdss, setIsProductDeleteds }) => {
                                                 size="sm"
                                                 type="text"
                                                 value={formData.code}
-
+                                                readOnly style={{ backgroundColor: "#fff" }}
                                             />
                                         </FormGroup>
                                         <Row >
@@ -320,18 +429,89 @@ const Confirm = ({selectedIdss, setIsProductDeleteds }) => {
                                                 </FormGroup>
                                             </Col>
                                         </Row>
-                                        <FormGroup>
-                                            <Label>
-                                                Địa chỉ
-                                            </Label>
-                                            <Input
-                                                size="sm"
-                                                rows="2"
-                                                type="textarea"
-                                                value={deliveryData.deliveryAddress}
-                                                onChange={(e) => setDeliveryData({ ...deliveryData, deliveryAddress: e.target.value })}
-                                            />
-                                        </FormGroup>
+                                        <Row >
+                                            <Col md={6}>
+                                                <FormGroup>
+                                                    <Label>
+                                                        Địa chỉ
+                                                    </Label>
+                                                    <Input
+                                                        className="mb-2"
+                                                        size="sm"
+                                                        type="select"
+                                                        style={{ fontSize: 13 }}
+                                                        value={selectedProvince}
+                                                        onChange={(e) => setSelectedProvince(e.target.value)}
+                                                    >
+                                                        <option value="">Tỉnh/thành phố</option>
+                                                        {provinces.map((province) => (
+                                                            <option key={province.code} value={province.name}>
+                                                                {province.name}
+                                                            </option>
+                                                        ))}
+                                                    </Input>
+
+                                                    <Input
+                                                        className="mb-2"
+                                                        size="sm"
+                                                        type="select"
+                                                        style={{ fontSize: 13 }}
+                                                        value={selectedDistrict}
+                                                        onChange={(e) => setSelectedDistrict(e.target.value)}
+                                                        disabled={!selectedProvince}
+                                                    >
+                                                        <option value="">Quận/huyện</option>
+                                                        {selectedProvince &&
+                                                            provinces
+                                                                .find((province) => province.name === selectedProvince)
+                                                                ?.districts.map((district) => (
+                                                                    <option key={district.code} value={district.name}>
+                                                                        {district.name}
+                                                                    </option>
+                                                                ))}
+                                                    </Input>
+
+                                                    <Input
+                                                        className="mb-2"
+                                                        size="sm"
+                                                        type="select"
+                                                        style={{ fontSize: 13 }}
+                                                        value={selectedWard}
+                                                        onChange={(e) => setSelectedWard(e.target.value)}
+                                                        disabled={!selectedDistrict}
+                                                    >
+                                                        <option value="">Xã/phường</option>
+                                                        {selectedProvince &&
+                                                            selectedDistrict &&
+                                                            provinces
+                                                                .find((province) => province.name === selectedProvince)
+                                                                ?.districts.find((district) => district.name === selectedDistrict)
+                                                                ?.wards.map((ward) => (
+                                                                    <option key={ward.code} value={ward.name}>
+                                                                        {ward.name}
+                                                                    </option>
+                                                                ))}
+                                                    </Input>
+
+                                                </FormGroup>
+
+                                            </Col>
+                                            <Col md={6}>
+                                                <FormGroup>
+                                                    <Input className="mt-4"
+                                                        style={{ fontSize: 13 }}
+                                                        size="sm"
+                                                        rows="5"
+                                                        type="textarea"
+                                                        placeholder="Địa chỉ chi tiết..."
+                                                        id="detailedAddress"
+                                                        value={detailedAddress}
+                                                        onChange={(e) => setDetailedAddress(e.target.value)}
+                                                    />
+                                                </FormGroup>
+                                            </Col>
+                                        </Row>
+
                                         <FormGroup>
                                             <Label>
                                                 Tổng tiền sản phẩm
@@ -343,7 +523,7 @@ const Confirm = ({selectedIdss, setIsProductDeleteds }) => {
                                                     value={totalProductPrice}
                                                 />
                                                 <InputGroupAddon addonType="append">
-                                                    <InputGroupText>VNĐ</InputGroupText>
+                                                    <InputGroupText>VND</InputGroupText>
                                                 </InputGroupAddon>
                                             </InputGroup>
                                         </FormGroup>
@@ -380,7 +560,7 @@ const Confirm = ({selectedIdss, setIsProductDeleteds }) => {
                                                             value={formData.percentVoucher || formData.priceVoucher || ""}
                                                         />
                                                         <InputGroupAddon addonType="append">
-                                                            <InputGroupText>{formData.percentVoucher ? "%" : "VNĐ"}</InputGroupText>
+                                                            <InputGroupText>{formData.percentVoucher ? "%" : "VND"}</InputGroupText>
                                                         </InputGroupAddon>
                                                     </InputGroup>
                                                 </FormGroup>
@@ -397,10 +577,12 @@ const Confirm = ({selectedIdss, setIsProductDeleteds }) => {
                                                         <Input
                                                             size="sm"
                                                             type="number"
-                                                            value={deliveryData.deliveryCost}
+                                                            value={Math.floor(deliveryData.deliveryCost)}
+                                                            onChange={(e) => setDeliveryData({ ...deliveryData, deliveryCost: e.target.value })}
+                                                            readOnly style={{ backgroundColor: "#fff" }}
                                                         />
                                                         <InputGroupAddon addonType="append">
-                                                            <InputGroupText>VNĐ</InputGroupText>
+                                                            <InputGroupText>VND</InputGroupText>
                                                         </InputGroupAddon>
                                                     </InputGroup>
                                                 </FormGroup>
@@ -424,12 +606,13 @@ const Confirm = ({selectedIdss, setIsProductDeleteds }) => {
                                                 <Input
                                                     size="sm"
                                                     type="number"
-                                                    value={formData.totalMoney}
+                                                    value={Math.floor(formData.totalMoney)}
                                                     onChange={(e) => setFormData({ ...formData, totalMoney: e.target.value })}
-                                                    
+                                                    readOnly style={{ backgroundColor: "#fff" }}
+
                                                 />
                                                 <InputGroupAddon addonType="append">
-                                                    <InputGroupText>VNĐ</InputGroupText>
+                                                    <InputGroupText>VND</InputGroupText>
                                                 </InputGroupAddon>
                                             </InputGroup>
                                         </FormGroup>
@@ -448,7 +631,7 @@ const Confirm = ({selectedIdss, setIsProductDeleteds }) => {
                                 </Col>
 
                                 <Col md={7}>
-                                    <h3 className="mt-3 heading-small text-muted">Giỏ hàng</h3>
+                                    <h3 className="mt-3 heading-small text-dark">Giỏ hàng</h3>
                                     <Table hover size="sm">
                                         <thead className="text-center">
                                             <tr>
@@ -465,17 +648,46 @@ const Confirm = ({selectedIdss, setIsProductDeleteds }) => {
                                                 orderData.map((product, index) => (
                                                     <tr key={index}>
                                                         <td className="text-center">{index + 1}</td>
-                                                        <td>{product.shoesName}</td>
-                                                        <td className="text-center">
-                                                            <button className="mr-3" style={{ border: "none", background: "none" }} onClick={() => updateProductQuantity(product.id, -1)}>
-                                                                <FaMinus fontSize={8} />
-                                                            </button>
-                                                            {product.quantity}
-                                                            <button className="ml-3" style={{ border: "none", background: "none" }} onClick={() => updateProductQuantity(product.id, 1)}>
-                                                                <FaPlus fontSize={8} />
-                                                            </button>
+                                                        <td>
+                                                            <Row className="col">
+                                                                <Col md={4}>
+                                                                    <span className="avatar avatar-sm rounded-circle">
+                                                                        <img src={`data:image/jpeg;base64,${product.imgUri}`} alt="" />
+                                                                    </span>
+                                                                </Col>
+                                                                <Col md={8}>
+                                                                    <h5>{product.shoesName}</h5>
+                                                                    <small className="mr-1">Màu: {product.colorName}</small>
+                                                                    <small>Size: {product.sizeName}</small>
+
+                                                                </Col>
+                                                            </Row>
 
                                                         </td>
+                                                        <td className="text-center">
+                                                            {formData && formData.paymentMethod === 1 ? (
+                                                                <>
+                                                                    <button
+                                                                        className="mr-3"
+                                                                        style={{ border: "none", background: "none" }}
+                                                                        onClick={() => updateProductQuantity(product.id, -1)}
+                                                                    >
+                                                                        <FaMinus fontSize={8} />
+                                                                    </button>
+                                                                    {product.quantity}
+                                                                    <button
+                                                                        className="ml-3"
+                                                                        style={{ border: "none", background: "none" }}
+                                                                        onClick={() => updateProductQuantity(product.id, 1)}
+                                                                    >
+                                                                        <FaPlus fontSize={8} />
+                                                                    </button>
+                                                                </>
+                                                            ) : formData && formData.paymentMethod === 2 ? (
+                                                                <>{product.quantity}</>
+                                                            ) : null}
+                                                        </td>
+
                                                         <td className="text-right">{product.discountPrice}</td>
                                                         <td className="text-right">{product.totalPrice}</td>
                                                         <td className="text-right">
@@ -511,4 +723,8 @@ const Confirm = ({selectedIdss, setIsProductDeleteds }) => {
     );
 };
 
-export default Confirm;
+const mapDispatchToProps = (dispatch) => ({
+    updateData: (tabId, newData) => dispatch(updateData(tabId, newData)),
+});
+
+export default connect(null, mapDispatchToProps)(Confirm);

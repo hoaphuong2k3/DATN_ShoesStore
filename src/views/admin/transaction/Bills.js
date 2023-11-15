@@ -1,7 +1,8 @@
 import React from 'react';
 import classnames from "classnames";
 import { Card, CardBody, Container, TabContent, TabPane, Nav, NavItem, NavLink, Row, Col } from "reactstrap";
-
+import { connect } from 'react-redux';
+import { updateData } from './actions';
 // core components
 import Confirm from "views/admin/transaction/Confirm.js";
 import Waitting from "views/admin/transaction/Waitting.js";
@@ -28,6 +29,10 @@ class Bills extends React.Component {
       });
     }
   }
+
+  updateData = (tabId, newData) => {
+    this.props.updateData(tabId, newData);
+  };
 
   render() {
   
@@ -96,22 +101,22 @@ class Bills extends React.Component {
                       </NavItem>
                     </Nav>
                     <TabContent activeTab={this.state.activeTab}>
-                      <TabPane tabId="1">
+                      <TabPane tabId="1" updateData={this.updateData}>
                         <Confirm />
                       </TabPane>
-                      <TabPane tabId="2">
+                      <TabPane tabId="2" updateData={this.updateData}>
                         <Waitting />
                       </TabPane>
-                      <TabPane tabId="3">
+                      <TabPane tabId="3" updateData={this.updateData}>
                         <Shipping />
                       </TabPane>
-                      <TabPane tabId="4">
+                      <TabPane tabId="4" updateData={this.updateData}>
                         <Success />
                       </TabPane>
-                      <TabPane tabId="5">
+                      <TabPane tabId="5" updateData={this.updateData}>
                         <Received />
                       </TabPane>
-                      <TabPane tabId="6">
+                      <TabPane tabId="6" updateData={this.updateData}>
                         <Cancel />
                       </TabPane>
                     </TabContent>
@@ -127,4 +132,8 @@ class Bills extends React.Component {
   }
 }
 
-export default Bills;
+const mapDispatchToProps = (dispatch) => ({
+  updateData: (tabId, newData) => dispatch(updateData(tabId, newData)),
+});
+
+export default connect(null, mapDispatchToProps)(Bills);
