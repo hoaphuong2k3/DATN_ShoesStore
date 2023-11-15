@@ -153,7 +153,7 @@ const UserNavbar = () => {
                     <Button className="button-cart" to="/shoes/cart" tag={Link} color="white">
                       <i className="ni ni-cart" />
                       <span className="cart-item-count">
-                        ({cartItems.length})
+                        {cartItems.length}
                       </span>
 
                     </Button>

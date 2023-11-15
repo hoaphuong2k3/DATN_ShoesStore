@@ -172,9 +172,6 @@ const Profile = () => {
       console.error('Failed to change avatar', error);
     }
   };
-  const AvatarReset = () => {
-    setFile(null);
-  };
 
 
   // changePassword
