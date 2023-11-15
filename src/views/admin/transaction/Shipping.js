@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import axios from "axios";
 import axiosInstance from "services/custommize-axios";
 import { format } from 'date-fns';
 import { vi } from 'date-fns/locale';
@@ -14,12 +15,27 @@ const Shipping = () => {
     const [orderData, setOrderData] = useState({});
     const [deliveryData, setDeliveryData] = useState({});
     const [selectedIds, setSelectedIds] = useState([]);
+    const [isProductDeleted, setIsProductDeleted] = useState(false);
     const [totalProductPrice, setTotalProductPrice] = useState(0);
+    const [provinces, setProvinces] = useState([]);
+    const [selectedProvince, setSelectedProvince] = useState("");
+    const [selectedDistrict, setSelectedDistrict] = useState("");
+    const [selectedWard, setSelectedWard] = useState("");
+    const [detailedAddress, setDetailedAddress] = useState('');
+    const [selectAllChecked, setSelectAllChecked] = useState(false);
+    const [searchTerm, setSearchTerm] = useState('');
+
 
 
     const toggle = () => setModal(!modal);
 
     const fetchData = async () => {
+
+        const provincesResponse = await axios.get(
+            "https://provinces.open-api.vn/api/?depth=3"
+        );
+        setProvinces(provincesResponse.data);
+
         try {
             const response = await axiosInstance.get("/order/admin", {
                 params: {
@@ -46,13 +62,38 @@ const Shipping = () => {
         code: "",
         totalMoney: "",
         paymentMethod: "",
-        deliveryCost: "",
         percentVoucher: "",
         priceVoucher: "",
         percentPeriod: "",
     });
 
 
+    //TotalMoney
+    const calculateTotalMoney = (productPrice, deliveryCost, percentPeriod, percentVoucher, priceVoucher) => {
+        let totalMoney;
+
+        if (percentPeriod !== null) {
+            if (priceVoucher !== null) {
+                totalMoney = productPrice - (productPrice * percentPeriod / 100) - priceVoucher + Math.floor(deliveryCost);
+            } else if (percentVoucher !== null) {
+                totalMoney = productPrice - productPrice * ((percentPeriod + percentVoucher) / 100) + Math.floor(deliveryCost);
+            } else {
+                totalMoney = productPrice - (productPrice * percentPeriod / 100) + Math.floor(deliveryCost);
+            }
+        } else {
+            if (priceVoucher !== null) {
+                totalMoney = productPrice - priceVoucher + Math.floor(deliveryCost);
+            } else if (percentVoucher !== null) {
+                totalMoney = productPrice - (productPrice * percentVoucher / 100) + Math.floor(deliveryCost);
+            } else {
+                totalMoney = productPrice + Math.floor(deliveryCost);
+            }
+        }
+
+        return totalMoney;
+    };
+
+    //detail
     const handleRowClick = async (id, confirm) => {
         setSelectedOrderId(id);
         try {
@@ -61,17 +102,25 @@ const Shipping = () => {
                 axiosInstance.get(`/order/admin/delivery/${id}`),
             ]);
 
+
             const productPrice = orderResponse.reduce((total, product) => {
                 return total + product.totalPrice;
             }, 0);
 
+            const totalMoney = calculateTotalMoney(
+                productPrice,
+                deliveryResponse.data.deliveryCost,
+                confirm.percentPeriod,
+                confirm.percentVoucher,
+                confirm.priceVoucher
+            );
             setTotalProductPrice(productPrice);
+
             setFormData({
                 id: confirm.id,
                 code: confirm.code,
-                totalMoney: confirm.totalMoney,
+                totalMoney: totalMoney,
                 paymentMethod: confirm.paymentMethod,
-                deliveryCost: confirm.deliveryCost,
                 percentVoucher: confirm.percentVoucher,
                 priceVoucher: confirm.priceVoucher,
                 percentPeriod: confirm.percentPeriod,
@@ -79,12 +128,28 @@ const Shipping = () => {
             setOrderData(orderResponse);
             setDeliveryData(deliveryResponse.data);
 
+            const deliveryAddress = deliveryResponse.data.deliveryAddress;
+
+            // Phân tách chuỗi địa chỉ thành các thành phần
+            const addressParts = deliveryAddress.split(', ');
+            const [selectedProvince, selectedDistrict, selectedWard, detailedAddress] = addressParts.reverse();
+            setDetailedAddress(detailedAddress);
+            setSelectedWard(selectedWard);
+            setSelectedDistrict(selectedDistrict);
+            setSelectedProvince(selectedProvince);
+
             setModal(true);
         } catch (error) {
             console.error("Lỗi khi lấy dữ liệu hóa đơn:", error);
         }
     };
 
+    //checkbox
+    const selectAllCheckbox = () => {
+        setSelectAllChecked(!selectAllChecked);
+        const newSelectedIds = confirm.map(item => item.id);
+        setSelectedIds(selectAllChecked ? [] : newSelectedIds);
+    };
 
     const handleCheckboxChange = (id) => {
         if (selectedIds.includes(id)) {
@@ -94,26 +159,24 @@ const Shipping = () => {
         }
     };
 
-     //updateStatus
-     const handleConfirm = async () => {
+    //updateStatus
+    const handleConfirm = async () => {
         try {
             await Promise.all(selectedIds.map(async (id) => {
                 await axiosInstance.put(`/order/admin/update-status/${id}?status=3`);
             }));
-            fetchData();
-
+           fetchData();
         } catch (error) {
             console.error("Lỗi khi cập nhật trạng thái hóa đơn:", error);
         }
     };
 
-    // useEffect(() => {
-    //     if (isProductDeleted) {
-    //         setModal(true);
-    //         setIsProductDeleted(false);
-    //         handleRowClick(selectedOrderId, confirm);
-    //     }
-    // }, [isProductDeleted]);
+    useEffect(() => {
+        if (isProductDeleted) {
+            setModal(true);
+            setIsProductDeleted(false);
+        }
+    }, [isProductDeleted]);
 
     return (
         <>
@@ -122,7 +185,11 @@ const Shipping = () => {
                     <Row className="align-items-center my-4">
                         <Col lg={4} style={{ display: "flex" }}>
                             <InputGroup size="sm">
-                                <Input type="text" placeholder="Tìm kiếm hóa đơn" />
+                                <Input type="search"
+                                    placeholder="Tìm kiếm hóa đơn"
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                />
                                 <InputGroupAddon addonType="append">
                                     <InputGroupText>
                                         <FaSearch color="black" />
@@ -138,44 +205,54 @@ const Shipping = () => {
                             <tr>
                                 <th scope="col" className="pt-0">
                                     <FormGroup check>
-                                        <Input type="checkbox" />
+                                        <Input type="checkbox"
+                                            onChange={() => selectAllCheckbox()}
+                                            checked={selectAllChecked}
+                                        />
                                     </FormGroup>
                                 </th>
-                                <th scope="col">Mã hóa đơn</th>
-                                <th scope="col">Khách hàng</th>
-                                <th scope="col">Tổng tiền</th>
-                                <th scope="col">Phương thức</th>
-                                <th scope="col">Nhân viên</th>
-                                <th scope="col">Ngày mua</th>
-                                <th scope="col">Ngày xác nhận</th>
-                                <th scope="col">Thao tác</th>
+                                <th scope="col" className="text-dark">Mã hóa đơn</th>
+                                <th scope="col" className="text-dark">Khách hàng</th>
+                                <th scope="col" className="text-dark">Tổng tiền</th>
+                                <th scope="col" className="text-dark">Phương thức</th>
+                                <th scope="col" className="text-dark">Nhân viên</th>
+                                <th scope="col" className="text-dark">Ngày mua</th>
+                                <th scope="col" className="text-dark">Ngày xác nhận</th>
+                                <th scope="col" className="text-dark">Thao tác</th>
                             </tr>
                         </thead>
                         <tbody style={{ color: "black" }}>
                             {Array.isArray(confirm) &&
-                                confirm.map((confirm, index) => (
-                                    <tr key={confirm.id}>
-                                        <td className="text-center pt-0">
-                                            <FormGroup check>
-                                                <Input type="checkbox" onChange={() => handleCheckboxChange(confirm.id)} checked={selectedIds.includes(confirm.id)} />
-                                            </FormGroup>
-                                        </td>
-                                        <td>{confirm.code}</td>
-                                        <td>{confirm.createdBy}</td>
-                                        <td className="text-right">{confirm.totalMoney.toLocaleString("vi-VN")} VND</td>
-                                        <td className="text-center">
-                                            <Badge color={confirm.paymentMethod === 1 ? "success" : confirm.paymentMethod === 2 ? "primary" : "secondary"}>
-                                                {confirm.paymentMethod === 1 ? "COD" : confirm.paymentMethod === 2 ? "Ví điện tử" : "Không xác định"}
-                                            </Badge>
-                                        </td>
-                                        <td>{confirm.updatedBy}</td>
-                                        <td>{format(new Date(confirm.createdTime), 'dd-MM-yyyy HH:mm', { locale: vi })}</td>
-                                        <td>{format(new Date(confirm.updatedTime), 'dd-MM-yyyy HH:mm', { locale: vi })}</td>
-                                        <td className="text-center">
-                                            <Button color="link" size="sm" onClick={() => handleRowClick(confirm.id, confirm)}><FaRegEdit /></Button>
-                                        </td>
-                                    </tr>
-                                ))}
+                                confirm
+                                    .filter(
+                                        (confirm) =>
+                                            confirm.code.toLowerCase().includes(searchTerm.toLowerCase())
+                                    )
+                                    .map((confirm, index) => (
+                                        <tr key={confirm.id}>
+                                            <td className="text-center pt-0">
+                                                <FormGroup check>
+                                                    <Input type="checkbox"
+                                                        onChange={() => handleCheckboxChange(confirm.id)}
+                                                        checked={selectedIds.includes(confirm.id)} />
+                                                </FormGroup>
+                                            </td>
+                                            <td>{confirm.code}</td>
+                                            <td>{confirm.createdBy}</td>
+                                            <td className="text-right">{confirm.totalMoney.toLocaleString("vi-VN")} VND</td>
+                                            <td className="text-center">
+                                                <Badge color={confirm.paymentMethod === 1 ? "success" : confirm.paymentMethod === 2 ? "primary" : "secondary"}>
+                                                    {confirm.paymentMethod === 1 ? "COD" : confirm.paymentMethod === 2 ? "Ví điện tử" : "Không xác định"}
+                                                </Badge>
+                                            </td>
+                                            <td>{confirm.updateBy}</td>
+                                            <td>{format(new Date(confirm.createdTime), 'dd-MM-yyyy HH:mm', { locale: vi })}</td>
+                                            <td>{format(new Date(confirm.updatedTime), 'dd-MM-yyyy HH:mm', { locale: vi })}</td>
+                                            <td className="text-center">
+                                                <Button color="link" size="sm" onClick={() => handleRowClick(confirm.id, confirm)}><FaRegEdit /></Button>
+                                            </td>
+                                        </tr>
+                                    ))}
                         </tbody>
                     </Table>
 
@@ -183,7 +260,6 @@ const Shipping = () => {
                         <Button color="primary" outline size="sm" onClick={handleConfirm}>
                             Xác nhận
                         </Button>
-
                     </Row>
 
                     <Modal
@@ -196,10 +272,10 @@ const Shipping = () => {
                         <ModalHeader toggle={toggle}>
                             <h3 className="heading-small text-muted mb-0">Chi tiết hóa đơn</h3>
                         </ModalHeader>
-                        <ModalBody>
-                            <Row style={{ border: "1px solid gray" }}>
+                        <ModalBody className="pt-0 pb-0">
+                            <Row style={{ border: "1px solid rgba(0, 0, 0, 0.05)", borderRadius: "0.375rem" }}>
                                 <Col md={5} >
-                                    <h3 className="mt-3 heading-small text-muted">Thông tin khách hàng</h3>
+                                    <h3 className="mt-3 heading-small text-dark">Thông tin khách hàng</h3>
                                     <Form className="m-2" style={{ fontSize: 13 }}>
                                         <FormGroup>
                                             <Label>
@@ -209,7 +285,7 @@ const Shipping = () => {
                                                 size="sm"
                                                 type="text"
                                                 value={formData.code}
-
+                                                readOnly style={{ backgroundColor: "#fff" }}
                                             />
                                         </FormGroup>
                                         <Row >
@@ -221,9 +297,8 @@ const Shipping = () => {
                                                     <Input
                                                         size="sm"
                                                         type="text"
-                                                        value={deliveryData.recipientName}
-                                                        // onChange={(e) => setDeliveryData({ ...deliveryData, recipientName: e.target.value })}
-                                                    />
+                                                        value={deliveryData.recipientName}   
+                                                        readOnly style={{ backgroundColor: "#fff" }}                                                 />
                                                 </FormGroup>
                                             </Col>
                                             <Col md={6}>
@@ -235,23 +310,92 @@ const Shipping = () => {
                                                         size="sm"
                                                         type="tel"
                                                         value={deliveryData.recipientPhone}
-                                                        // onChange={(e) => setDeliveryData({ ...deliveryData, recipientPhone: e.target.value })}
+                                                        readOnly style={{ backgroundColor: "#fff" }}
                                                     />
                                                 </FormGroup>
                                             </Col>
                                         </Row>
-                                        <FormGroup>
-                                            <Label>
-                                                Địa chỉ
-                                            </Label>
-                                            <Input
-                                                size="sm"
-                                                rows="2"
-                                                type="textarea"
-                                                value={deliveryData.deliveryAddress}
-                                                // onChange={(e) => setDeliveryData({ ...deliveryData, deliveryAddress: e.target.value })}
-                                            />
-                                        </FormGroup>
+                                        <Row >
+                                            <Col md={6}>
+                                                <FormGroup>
+                                                    <Label>
+                                                        Địa chỉ
+                                                    </Label>
+                                                    <Input
+                                                        className="mb-2"
+                                                        size="sm"
+                                                        type="select"
+                                                        style={{ fontSize: 13 }}
+                                                        value={selectedProvince}
+                                                    >
+                                                        <option value="">Tỉnh/thành phố</option>
+                                                        {provinces.map((province) => (
+                                                            <option key={province.code} value={province.name}>
+                                                                {province.name}
+                                                            </option>
+                                                        ))}
+                                                    </Input>
+
+                                                    <Input
+                                                        className="mb-2"
+                                                        size="sm"
+                                                        type="select"
+                                                        style={{ fontSize: 13 }}
+                                                        value={selectedDistrict}
+                                                        disabled={!selectedProvince}
+                                                    >
+                                                        <option value="">Quận/huyện</option>
+                                                        {selectedProvince &&
+                                                            provinces
+                                                                .find((province) => province.name === selectedProvince)
+                                                                ?.districts.map((district) => (
+                                                                    <option key={district.code} value={district.name}>
+                                                                        {district.name}
+                                                                    </option>
+                                                                ))}
+                                                    </Input>
+
+                                                    <Input
+                                                        className="mb-2"
+                                                        size="sm"
+                                                        type="select"
+                                                        style={{ fontSize: 13}}
+                                                        value={selectedWard}
+                                                        disabled={!selectedDistrict}
+                                                        
+                                                    >
+                                                        <option value="">Xã/phường</option>
+                                                        {selectedProvince &&
+                                                            selectedDistrict &&
+                                                            provinces
+                                                                .find((province) => province.name === selectedProvince)
+                                                                ?.districts.find((district) => district.name === selectedDistrict)
+                                                                ?.wards.map((ward) => (
+                                                                    <option key={ward.code} value={ward.name}>
+                                                                        {ward.name}
+                                                                    </option>
+                                                                ))}
+                                                    </Input>
+
+                                                </FormGroup>
+
+                                            </Col>
+                                            <Col md={6}>
+                                                <FormGroup>
+                                                    <Input className="mt-4"
+                                                        style={{ fontSize: 13, backgroundColor: "#fff" }}
+                                                        size="sm"
+                                                        rows="5"
+                                                        type="textarea"
+                                                        placeholder="Địa chỉ chi tiết..."
+                                                        id="detailedAddress"
+                                                        value={detailedAddress}
+                                                        readOnly
+                                                    />
+                                                </FormGroup>
+                                            </Col>
+                                        </Row>
+
                                         <FormGroup>
                                             <Label>
                                                 Tổng tiền sản phẩm
@@ -261,9 +405,10 @@ const Shipping = () => {
                                                     size="sm"
                                                     type="number"
                                                     value={totalProductPrice}
+                                                    readOnly style={{ backgroundColor: "#fff" }}
                                                 />
                                                 <InputGroupAddon addonType="append">
-                                                    <InputGroupText>VNĐ</InputGroupText>
+                                                    <InputGroupText>VND</InputGroupText>
                                                 </InputGroupAddon>
                                             </InputGroup>
                                         </FormGroup>
@@ -280,6 +425,7 @@ const Shipping = () => {
                                                             size="sm"
                                                             type="number"
                                                             value={formData.percentPeriod}
+                                                            readOnly style={{ backgroundColor: "#fff" }}
                                                         />
                                                         <InputGroupAddon addonType="append">
                                                             <InputGroupText>%</InputGroupText>
@@ -298,9 +444,10 @@ const Shipping = () => {
                                                             size="sm"
                                                             type="number"
                                                             value={formData.percentVoucher || formData.priceVoucher || ""}
+                                                            readOnly style={{ backgroundColor: "#fff" }}
                                                         />
                                                         <InputGroupAddon addonType="append">
-                                                            <InputGroupText>{formData.percentVoucher ? "%" : "VNĐ"}</InputGroupText>
+                                                            <InputGroupText>{formData.percentVoucher ? "%" : "VND"}</InputGroupText>
                                                         </InputGroupAddon>
                                                     </InputGroup>
                                                 </FormGroup>
@@ -317,10 +464,11 @@ const Shipping = () => {
                                                         <Input
                                                             size="sm"
                                                             type="number"
-                                                            value={deliveryData.deliveryCost}
+                                                            value={Math.floor(deliveryData.deliveryCost)}
+                                                            readOnly style={{ backgroundColor: "#fff" }}
                                                         />
                                                         <InputGroupAddon addonType="append">
-                                                            <InputGroupText>VNĐ</InputGroupText>
+                                                            <InputGroupText>VND</InputGroupText>
                                                         </InputGroupAddon>
                                                     </InputGroup>
                                                 </FormGroup>
@@ -344,12 +492,12 @@ const Shipping = () => {
                                                 <Input
                                                     size="sm"
                                                     type="number"
-                                                    value={formData.totalMoney}
-                                                    // onChange={(e) => setFormData({ ...formData, totalMoney: e.target.value })}
+                                                    value={Math.floor(formData.totalMoney)}
+                                                    readOnly style={{ backgroundColor: "#fff" }}
 
                                                 />
                                                 <InputGroupAddon addonType="append">
-                                                    <InputGroupText>VNĐ</InputGroupText>
+                                                    <InputGroupText>VND</InputGroupText>
                                                 </InputGroupAddon>
                                             </InputGroup>
                                         </FormGroup>
@@ -368,7 +516,7 @@ const Shipping = () => {
                                 </Col>
 
                                 <Col md={7}>
-                                    <h3 className="mt-3 heading-small text-muted">Giỏ hàng</h3>
+                                    <h3 className="mt-3 heading-small text-dark">Giỏ hàng</h3>
                                     <Table hover size="sm">
                                         <thead className="text-center">
                                             <tr>
@@ -377,7 +525,7 @@ const Shipping = () => {
                                                 <th>Số lượng</th>
                                                 <th>Đơn giá</th>
                                                 <th>Thành tiền</th>
-                                                <th></th>
+                                                
                                             </tr>
                                         </thead>
                                         <tbody style={{ color: "#000" }}>
@@ -385,21 +533,38 @@ const Shipping = () => {
                                                 orderData.map((product, index) => (
                                                     <tr key={index}>
                                                         <td className="text-center">{index + 1}</td>
-                                                        <td>{product.shoesName}</td>
+                                                        <td>
+                                                            <Row className="col">
+                                                                <Col md={4}>
+                                                                    <span className="avatar avatar-sm rounded-circle">
+                                                                        <img src={`data:image/jpeg;base64,${product.imgUri}`} alt="" />
+                                                                    </span>
+                                                                </Col>
+                                                                <Col md={8}>
+                                                                    <h5>{product.shoesName}</h5>
+                                                                    <small className="mr-1">Màu: {product.colorName}</small>
+                                                                    <small>Size: {product.sizeName}</small>
+
+                                                                </Col>
+                                                            </Row>
+
+                                                        </td>
                                                         <td className="text-center">{product.quantity}</td>
                                                         <td className="text-right">{product.discountPrice}</td>
                                                         <td className="text-right">{product.totalPrice}</td>
-
+                                                        
                                                     </tr>
                                                 ))}
                                         </tbody>
                                     </Table>
                                 </Col>
                             </Row>
+
+
+
                         </ModalBody >
                         <ModalFooter>
                             <div className="text-center">
-
                                 <Button color="danger" outline onClick={toggle} size="sm">
                                     Đóng
                                 </Button>
@@ -412,5 +577,7 @@ const Shipping = () => {
         </>
     );
 };
+
+
 
 export default Shipping;

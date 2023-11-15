@@ -14,34 +14,40 @@ import UserLayout from "layouts/User.js";
 import "react-toastify/dist/ReactToastify.css";
 import { CartProvider } from "./contexts/Cart";
 import { AuthProvider } from 'services/AuthContext.js';
+import { Provider } from 'react-redux';
+
+import store from './views/admin/transaction/store.js';
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
 root.render(
-  <>
-    <BrowserRouter>
-      <AuthProvider>
-        <CartProvider>
-          <Routes>
-            <Route path="/admin/*" element={<AdminLayout />} />
-            <Route path="/*" element={<AuthLayout />} />
-            <Route path="/shoes/*" element={<UserLayout />} />
-            <Route path="*" element={<Navigate to="/login" replace />} />
-          </Routes>
-        </CartProvider>
-      </AuthProvider>
-    </BrowserRouter>
-    {/* // <DetailSP /> */}
-    <ToastContainer
-      position="top-right"
-      autoClose={5000}
-      hideProgressBar={false}
-      newestOnTop={false}
-      closeOnClick
-      rtl={false}
-      pauseOnFocusLoss
-      draggable
-      pauseOnHover
-      theme="light"
-    />
-  </>
+  <React.StrictMode>
+     <Provider store={store}>
+      <BrowserRouter>
+        <AuthProvider>
+          <CartProvider>
+            <Routes>
+              <Route path="/admin/*" element={<AdminLayout />} />
+              <Route path="/*" element={<AuthLayout />} />
+              <Route path="/shoes/*" element={<UserLayout />} />
+              <Route path="*" element={<Navigate to="/login" replace />} />
+            </Routes>
+          </CartProvider>
+        </AuthProvider>
+      </BrowserRouter>
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />  
+  </Provider>
+  </React.StrictMode>
+ 
+
 );
