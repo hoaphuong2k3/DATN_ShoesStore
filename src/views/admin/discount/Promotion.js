@@ -449,8 +449,6 @@ const Promotion = () => {
         <>
             <Container className="pt-5 pt-md-7" fluid>
                 <Row>
-
-                    {/* Tabs with icons */}
                     <div className="col">
                         <Card className="shadow">
                             <CardHeader className="bg-transparent">

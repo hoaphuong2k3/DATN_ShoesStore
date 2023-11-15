@@ -8,7 +8,6 @@ import { Row, Col, Button, Card, CardBody, CardHeader, Table, InputGroup, Input,
 
 const OrderHeader = () => {
 
-    const [hasCustomerData, setHasCustomerData] = useState(false);
     const [showShippingForm, setShowShippingForm] = useState(false);
     const products = [];
 
@@ -172,21 +171,9 @@ const OrderHeader = () => {
                         </CardHeader>
                         <CardBody style={{ fontSize: 14 }}>
                             <Form>
-                                <FormGroup row>
-                                    <Col lg={12}>
-                                        <InputGroup size="sm">
-                                            <Input type="search" placeholder="Tìm kiếm voucher..." />
-                                            <InputGroupAddon addonType="append">
-                                                <InputGroupText>
-                                                    <FaSearch />
-                                                </InputGroupText>
-                                            </InputGroupAddon>
-                                        </InputGroup>
-                                    </Col>
-
-                                </FormGroup>
+                                
                                 <Row className="mb-1">
-                                    <Label className="col">Tổng tiền hàng:</Label>
+                                    <Label className="col">Tiền hàng:</Label>
                                     <Col className="text-right">
                                         <h5>0</h5>
                                     </Col>
