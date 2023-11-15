@@ -14,13 +14,10 @@ import {
   ModalFooter, Form, InputGroup, InputGroupAddon, InputGroupText
 } from "reactstrap";
 import { toast } from 'react-toastify';
-import Switch from 'react-input-switch';
-import Header from "components/Headers/Header.js";
 import axios from "axios";
 
 
 const Products = () => {
-  const [value, setValue] = useState('no');
   const [listShoes, setListShoes] = useState([]);
   const [listBrand, setListBrand] = useState([]);
   const [listorigin, setListOrigin] = useState([]);
@@ -53,28 +50,6 @@ const Products = () => {
     toDateStr: "",
     createdBy: ""
   });
-  useEffect(() => {
-    if (value === 'no') {
-      setSearch({
-        ...search,
-        brandId: null,
-        originId: null,
-        designStyleId: null,
-        skinTypeId: null,
-        soleId: null,
-        liningId: null,
-        toeId: null,
-        cushionId: null,
-        fromPrice: null,
-        toPrice: null,
-        fromQuantity: null,
-        toQuantity: null,
-        fromDateStr: "",
-        toDateStr: "",
-        createdBy: ""
-      })
-    }
-  }, [value]);
   const resetSearch = () => {
     setSearch({
       code: "",
@@ -98,7 +73,6 @@ const Products = () => {
   };
   const [thirdModal, setThirdModal] = useState(false);
   const toggleThirdModal = () => setThirdModal(!thirdModal);
-
   const handlePageClick = (event) => {
     setPage(+event.selected);
   }
@@ -258,12 +232,6 @@ const Products = () => {
     }
     setSelectAll(!selectAll);
   };
-  useEffect(() => {
-    console.log(selectedItems);
-  }, [selectedItems]);
-  useEffect(() => {
-    console.log(iddeleteshoes);
-  }, [iddeleteshoes]);
 
   const handleDeleteButtonClick = async () => {
     if (selectedItems.length > 0) {
@@ -472,14 +440,14 @@ const Products = () => {
                 <div className="col">
                   <Row className="align-items-center my-3">
                     <div className="col d-flex">
-                      <Button color="warning" outline size="sm" >
-                        <FaFilter size="16px" className="mr-1" onClick={toggleThirdModal} />Bộ lọc
+                      <Button color="warning" outline size="sm" onClick={toggleThirdModal}>
+                        <FaFilter size="16px" className="mr-1" />Bộ lọc
                       </Button>
 
                       <Col>
                         <InputGroup size="sm">
                           <Input type="search"
-                            placeholder="Tìm kiếm mã, tên voucher..."
+                            placeholder="Tìm kiếm mã, tên sản phẩm..."
                           // value={searchValue}
                           // onChange={(e) => setSearchValue(e.target.value)}
                           />
