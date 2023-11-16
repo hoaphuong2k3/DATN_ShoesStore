@@ -26,17 +26,11 @@ const Profile = () => {
 
   // const [userInfo, setUserInfo] = useState(null);
   const storedUserId = localStorage.getItem('userId');
-
-  const [provinces, setProvinces] = useState([]);
-
   const [admins, setAdmins] = useState(null);
 
 
   const fetchData = async () => {
     try {
-      const provincesResponse = await axios.get("https://provinces.open-api.vn/api/?depth=3");
-      setProvinces(provincesResponse.data);
-
       const response = await axiosInstance.get(`/staff/detail/${storedUserId}`);
       setAdmins(response.data);
       
@@ -52,8 +46,73 @@ const Profile = () => {
   }, [storedUserId]);
 
 
-  //Add
+  // ADDRESS
+  const [provinces, setProvinces] = useState([]);
+  const [districts, setDistricts] = useState([]);
+  const [communes, setCommunes] = useState([]);
 
+  useEffect(() => {
+    const fetchAddress = async () => {
+      try {
+        const provincesResponse = await axios.get(
+          "https://provinces.open-api.vn/api/?depth=3"
+        );
+        setProvinces(provincesResponse.data);
+      } catch (error) {
+        console.error("Lỗi khi lấy dữ liệu tỉnh/thành phố:", error);
+      }
+    };
+
+    fetchAddress();
+  }, []);
+
+  const handleProvinceChange = async (e) => {
+    const selectedProvinceCode = e.target.value;
+    setFormData((prevData) => ({
+      ...prevData,
+      address: {
+        ...prevData.address,
+        proviceCode: selectedProvinceCode,
+        districtCode: "",
+        communeCode: "",
+      },
+    }));
+
+    try {
+      const districtsResponse = await axios.get(
+        `https://provinces.open-api.vn/api/p/${selectedProvinceCode}?depth=2`
+      );
+      setDistricts(districtsResponse.data.districts);
+    } catch (error) {
+      console.error("Lỗi khi lấy dữ liệu quận/huyện:", error);
+    }
+  };
+
+  const handleDistrictChange = async (e) => {
+    const selectedDistrictCode = e.target.value;
+    setFormData((prevData) => ({
+      ...prevData,
+      address: {
+        ...prevData.address,
+        districtCode: selectedDistrictCode,
+        communeCode: "",
+      },
+    }));
+
+    try {
+      const communesResponse = await axios.get(
+        `https://provinces.open-api.vn/api/d/${selectedDistrictCode}?depth=2`
+      );
+      setCommunes(communesResponse.data.wards);
+    } catch (error) {
+      console.error("Lỗi khi lấy dữ liệu phường/xã:", error);
+    }
+  };
+
+  // END ADDRESS
+
+
+  //update
   useEffect(() => {
     const fetchAvt = async () => {
       if (admins && admins.avatar) {
@@ -309,30 +368,24 @@ const Profile = () => {
                     </div>
                     {/* </div> */}
                     <Row className="mt-5 ml-3">
-                      {/* Tỉnh thành */}
+                      {/* // tỉnh thành */}
                       <Col lg="4">
                         <FormGroup>
-                          <label className="input-label" htmlFor="input-city">
+                          <label
+                            className="form-control-label"
+                            htmlFor="input-city"
+                          >
                             Tỉnh / Thành
                           </label>
                           <Input
                             className="form-control-alternative"
                             type="select"
                             value={formData.address.proviceCode}
-                            onChange={(e) => setFormData({
-                              ...formData,
-                              address: {
-                                ...formData.address,
-                                proviceCode: e.target.value,
-                                districtCode: "",
-                                communeCode: "",
-                              },
-
-                            })}
+                            onChange={handleProvinceChange}
                           >
                             <option value="">Chọn Tỉnh / Thành</option>
                             {provinces.map((province) => (
-                              <option key={province.code} value={province.name}>
+                              <option key={province.code} value={province.code}>
                                 {province.name}
                               </option>
                             ))}
@@ -342,64 +395,60 @@ const Profile = () => {
                       {/* quận huyện*/}
                       <Col lg="4">
                         <FormGroup>
-                          <label className="input-label" htmlFor="input-country">
+                          <label
+                            className="form-control-label"
+                            htmlFor="input-country"
+                          >
                             Quận / Huyện
                           </label>
                           <Input
                             className="form-control-alternative"
                             type="select"
                             value={formData.address.districtCode}
-                            onChange={(e) => setFormData({
-                              ...formData,
-                              address: {
-                                ...formData.address,
-                                districtCode: e.target.value,
-                                communeCode: "",
-                              },
-                            })}
+                            onChange={handleDistrictChange}
                             disabled={!formData.address.proviceCode}
                           >
                             <option value="">Chọn Quận / Huyện</option>
-                            {formData.address.proviceCode &&
-                              provinces
-                                .find((province) => province.name === formData.address.proviceCode)
-                                .districts.map((district) => (
-                                  <option key={district.code} value={district.name}>
-                                    {district.name}
-                                  </option>
-                                ))}
+                            {
+                              districts.map((district) => (
+                                <option
+                                  key={district.code}
+                                  value={district.code}
+                                >
+                                  {district.name}
+                                </option>
+                              ))}
                           </Input>
                         </FormGroup>
                       </Col>
                       {/* phường xã */}
                       <Col lg="4">
                         <FormGroup>
-                          <label className="input-label">
+                          <label className="form-control-label">
                             Phường / Xã
                           </label>
                           <Input
                             className="form-control-alternative"
                             type="select"
                             value={formData.address.communeCode}
-                            onChange={(e) => setFormData({
-                              ...formData,
-                              address: {
-                                ...formData.address,
-                                communeCode: e.target.value,
-                              },
-                            })}
+                            onChange={(e) => {
+                              setFormData((prevData) => ({
+                                ...prevData,
+                                address: {
+                                  ...prevData.address,
+                                  communeCode: e.target.value,
+                                },
+                              }));
+                            }}
                             disabled={!formData.address.districtCode}
                           >
                             <option value="">Chọn Phường / Xã</option>
-                            {formData.address.districtCode &&
-                              provinces
-                                .find((province) => province.name === formData.address.proviceCode)
-                                .districts.find((district) => district.name === formData.address.districtCode)
-                                .wards.map((ward) => (
-                                  <option key={ward.code} value={ward.name}>
-                                    {ward.name}
-                                  </option>
-                                ))}
+                            {
+                              communes.map((commune) => (
+                                <option key={commune.code} value={commune.code}>
+                                  {commune.name}
+                                </option>
+                              ))}
                           </Input>
                         </FormGroup>
                       </Col>
