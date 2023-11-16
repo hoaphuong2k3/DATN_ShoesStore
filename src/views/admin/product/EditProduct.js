@@ -31,49 +31,19 @@ const EditProduct = () => {
     const [dataEdit, setDataEdit] = useState([])
     //getData
     const [imageUrl, setimageUrl] = useState();
+    const [isChange, setisChange] = useState("")
     const getData = async () => {
         try {
             let res = await findShoes(id);
             if (res && res.data) {
                 setDataEdit(res.data);
+                if (res.data.imgURI) {
+                    setimageUrl(`https://s3-ap-southeast-1.amazonaws.com/imageshoestore/${res.data.imgURI}`);
+                    setisChange("")
+                }
             }
 
-            if (res.data.imgURI) {
-                // try {
-                //     const url = `https://s3-ap-southeast-1.amazonaws.com/imageshoestore/${res.data.imgURI}`
-                //     const response = await axios.get(url, { responseType: 'blob' });
-                //     const file = new File([response.data], 'image.jpg', { type: 'image/jpeg' });
-                //     setFile(file);
-                //     console.log("response", response);
-                // } catch (error) {
-                //     let errorMessage = "Lỗi từ ảnh";
-                //     if (error.response && error.response.data && error.response.data.message) {
-                //         errorMessage = error.response.data.message;
-                //     }
-                //     toast.error(errorMessage);
-                // }
 
-                // const getUrlExtension = (url) => {
-                //     return url
-                //         .split(/[#?]/)[0]
-                //         .split(".")
-                //         .pop()
-                //         .trim();
-                // }
-
-                // const onImageEdit = async (imgUrl) => {
-                //     var imgExt = getUrlExtension(imgUrl);
-
-                //     const response = await fetch(imgUrl);
-                //     const blob = await response.blob();
-                //     const file = new File([blob], "profileImage." + imgExt, {
-                //         type: blob.type,
-                //     });
-                //     setFile(file)
-                // }
-
-                setimageUrl(`https://s3-ap-southeast-1.amazonaws.com/imageshoestore/${res.data.imgURI}`);
-            }
         } catch (error) {
             let errorMessage = "Lỗi từ máy chủ";
             if (error.response && error.response.data && error.response.data.message) {
@@ -134,6 +104,7 @@ const EditProduct = () => {
         const selectedFile = e.target.files[0];
         if (selectedFile) {
             setFile(selectedFile);
+            setisChange(true);
         }
     };
 
@@ -175,6 +146,7 @@ const EditProduct = () => {
             formData.append('file', file);
         }
         formData.append('data', shoesDataJson);
+        formData.append('isChange', isChange);
 
         try {
             await updateShoes(id, formData);
