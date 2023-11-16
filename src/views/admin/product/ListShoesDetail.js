@@ -827,7 +827,7 @@ const ListShoesDetail = () => {
                                                     <Col>
                                                         <InputGroup size="sm">
                                                             <Input type="search"
-                                                                placeholder="Tìm kiếm mã, tên sản phẩm..."
+                                                                placeholder="Tìm kiếm theo mã..."
                                                             />
                                                             <InputGroupAddon addonType="append">
                                                                 <InputGroupText>
