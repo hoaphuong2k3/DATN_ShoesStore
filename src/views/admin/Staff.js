@@ -344,7 +344,8 @@ const Staff = () => {
   const handleCheckboxChange = (idStaff) => {
     if (selectedId.includes(idStaff)) {
       setSelectedId(selectedId.filter((id) => id !== idStaff));
-      setShowActions(false);
+      setShowActions(selectedId.length - 1 > 0);
+      // setShowActions(false);
     } else {
       setSelectedId([...selectedId, idStaff]);
       setShowActions(true);
@@ -670,7 +671,8 @@ const Staff = () => {
                         <b>
                           {queryParams.page * queryParams.size + admins.length}
                         </b>{" "}
-                        trong tổng số <b></b> mục
+                        trong tổng số 
+                        <b> {totalElements}</b> mục
                       </div>
                     </Col>
                     <Col style={{ fontSize: 14 }} lg={2}>
@@ -685,7 +687,7 @@ const Staff = () => {
                             className="mt--1"
                             onChange={handleSizeChange}
                           >
-                            <option value="5">5</option>
+                            <option value="10">10</option>
                             <option value="25">25</option>
                             <option value="50">50</option>
                             <option value="100">100</option>
@@ -1101,7 +1103,7 @@ const Staff = () => {
               isOpen={modalFilter}
               toggle={toggleFilter}
               style={{
-                maxWidth: "600px",
+                width: "380px",
                 right: "unset",
                 left: 0,
                 position: "fixed",
@@ -1248,7 +1250,7 @@ const Staff = () => {
               </ModalBody>
               <ModalFooter>
                 <div className="row w-100">
-                  <Col className="lg-6">
+                  {/* <Col className="lg-6">
                     <Button
                       color="primary"
                       outline
@@ -1258,7 +1260,7 @@ const Staff = () => {
                     >
                       Làm mới
                     </Button>
-                  </Col>
+                  </Col> */}
                   <Col className="lg-3">
                     <Button
                       color="primary"

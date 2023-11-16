@@ -9,21 +9,21 @@ const UserHeader = () => {
         style={{
           minHeight: "800px",
           backgroundImage:
-            "url(" + require("../../assets/img/theme/bannerShoes2.jpg") + ")",
+            "url(" + require("../../assets/img/theme/bannerShoes1.jpg") + ")",
           backgroundSize: "cover",
-          backgroundPosition: "center top",
+          backgroundPosition: "right top",
         }}
       >
        
         {/* Header container */}
-        <Container className="d-flex align-items-center">
-          <Row >
+        <Container fluid className="">
+          <Row className="justify-content-end float-right">
             <Col lg="10" md="10">
             <p className="text-white">XU HƯỚNG MỚI</p>
-              <h1 className="display-1 text-white">Shoes Store 2023</h1>
+              <h1 className="display-1 text-white">Leather Gent 2023</h1>
               <h4 className="text-white">Làm thế nào để trở thành một quý ông?</h4>
               <p className="text-white mt-0 mb-5">
-              Ấn tượng, lịch lãm đầy nam tính cùng với những đôi giày da 2023 của Shoes Store.
+              Ấn tượng, lịch lãm đầy nam tính cùng với những đôi giày da 2023 của Leather Gent.
               </p>
               <Button
                 color="info"

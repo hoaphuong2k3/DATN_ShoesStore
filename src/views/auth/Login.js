@@ -55,7 +55,7 @@ const Login = () => {
       toast.success("Đăng nhập thành công!");
 
       // Kiểm tra vai trò người dùng và chuyển hướng đến trang tương ứng
-      if (authorities.some((authority) => authority.authority === "ADMIN") || authorities.some((authority) => authority.authority === "SUPPER_ADMIN")) {
+      if (authorities.some((authority) => authority.authority === "ADMIN") || authorities.some((authority) => authority.authority === "STAFF")) {
         navigate("/admin");
       } else if (authorities.some((authority) => authority.authority === "USER")) {
         navigate("/shoes");
