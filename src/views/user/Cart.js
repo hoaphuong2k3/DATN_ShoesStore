@@ -15,6 +15,7 @@ import { CartContext } from "contexts/Cart.js";
 const Cart = () => {
   const { fetchData } = useContext(CartContext);
   const [cartData, setCartData] = useState(null);
+  const [selectedItems, setSelectedItems] = useState([]);
 
 
   const formatter = new Intl.NumberFormat('vi-VN', {
@@ -79,6 +80,42 @@ const Cart = () => {
     }
   }
 
+  const handleCheckboxChange = (id) => {
+    setSelectedItems((prevSelectedItems) => {
+      if (prevSelectedItems.includes(id)) {
+        // Nếu đã chọn, loại bỏ khỏi danh sách
+        return prevSelectedItems.filter((item) => item !== id);
+
+      } else {
+        // Nếu chưa chọn, thêm vào danh sách
+        return [...prevSelectedItems, id];
+
+      }
+    });
+  };
+
+  const handleCheckout = async () => {
+    try {
+      const response = await fetch('http://localhost:33321/api/cart/checkout', {
+        method: 'POST', // Sử dụng phương thức POST thay vì GET
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          key: 1,
+          idVoucher: null,
+          listShoesCart: selectedItems,
+        }),
+      });
+  
+      // Xử lý response và chuyển hướng
+    } catch (error) {
+      console.error('Lỗi trong quá trình thanh toán:', error);
+    }
+  };
+  
+  
+
   return (
     <>
       <Header cartItemCount={cartData ? cartData.length : 0} />
@@ -126,7 +163,12 @@ const Cart = () => {
                             <tr className="cart__row table__section" key={index}>
 
                               <td data-label="Checkbox" className="text-center">
-                                <Input type="checkbox" className="checkbox_input" />
+                                <Input
+                                  type="checkbox"
+                                  className="checkbox_input"
+                                  checked={selectedItems.includes(item.id)}
+                                  onChange={() => handleCheckboxChange(item.id)}
+                                />
                                 <style>
                                   {
                                     `
@@ -145,10 +187,10 @@ const Cart = () => {
                               <td data-label="Ảnh Sản phẩm">
                                 <a href="/shoes/product" className="cart__image small col-md-3">
                                   <img
-                                    src={item.anh}
+                                    src={item.image}
                                     alt={item.name}
-                                    width={'200px'}
-                                    height={'200px'}
+                                    width={'70px'}
+                                    height={'70px'}
                                   />
                                 </a>
                               </td>
@@ -249,7 +291,7 @@ const Cart = () => {
                                   </Button>
                                 </div>
                               </td>
-                              
+
                               <td data-label="Tổng giá" className="text-center cart-product-price">
                                 <span className="h3 tongGia">{formatter.format(item.totalPrice)}</span>
                               </td>
@@ -269,11 +311,12 @@ const Cart = () => {
                       <div className="row">
                         <div className="text-right one-third small--one-whole col-md-12">
                           <Button
-                            to="/shoes/checkout"
+                            to=""
                             tag={Link}
                             type="submit"
                             name="checkout"
                             className="ml-auto btnCart"
+                             onClick={() => handleCheckout()}
                           >
                             Mua Hàng
                           </Button>
