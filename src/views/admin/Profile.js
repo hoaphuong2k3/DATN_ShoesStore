@@ -29,10 +29,9 @@ import {
 
 // core components
 import ProfileHeader from "components/Headers/ProfileHeader";
-// import ImageUpload from "views/admin/discount/ImageUpload.js";
 
 const Profile = () => {
-  // const [userInfo, setUserInfo] = useState(null);
+
   const storedUserId = localStorage.getItem("userId");
   const [admins, setAdmins] = useState(null);
 
@@ -150,9 +149,6 @@ const Profile = () => {
         },
       }));
     };
-
-    updateFormData();
-    fetchAvt();
   }, [admins]);
 
   const saveAdmin = async () => {
