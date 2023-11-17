@@ -99,7 +99,7 @@
     transform: scale(1.1);
     border: 1px solid #af9839;
   }
-  
+
   .image-with-text {
     position: relative;
     display: inline-block;
@@ -141,13 +141,14 @@
 }
 
 .image {
-  width: 100%;
+  width: 110%;
   height: auto;
+  /* object-fit: cover; */
   transition: transform 0.3s ease-in-out;
 }
-
 .image:hover {
   transform: scale(1.1);
 }
+
 
   

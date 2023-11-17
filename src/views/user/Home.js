@@ -1,4 +1,7 @@
 import React, { useEffect, useState } from "react";
+import Slider from 'react-slick';
+import 'slick-carousel/slick/slick.css';
+import 'slick-carousel/slick/slick-theme.css';
 import axios from "axios";
 import { Container, Row, Col, Card } from "reactstrap";
 import Header from "components/Headers/UserHeader";
@@ -10,13 +13,23 @@ import anh2 from "assets/img/theme/anh2.jpg";
 import anh3 from "assets/img/theme/anh3.jpg";
 import anh4 from "assets/img/theme/anh4.jpg";
 import oxford from "assets/img/theme/oxford.jpg";
-import oxford2 from "assets/img/theme/bannerShoes.jpg";
+import slideshow1 from "assets/img/theme/bannerShoes.jpg";
 import giay from "assets/img/theme/gia-da-nam-ca-tinh.jpg";
 import giay1 from "assets/img/theme/giay-da-nam-hai-phong-2-1.jpg";
+import slideshow2 from "assets/img/theme/slideshow3.jpg";
 
 import { getAllShoes } from "services/Product2Service";
 
 const Home = () => {
+  const settings = {
+    dots: true, // Hiển thị các chấm chỉ số
+    infinite: true, // Lặp lại slideshow
+    speed: 500, // Tốc độ chuyển đổi slide (ms)
+    slidesToShow: 1, // Số lượng slide hiển thị trên mỗi lần trượt
+    slidesToScroll: 1, // Số lượng slide được trượt khi di chuyển
+    autoplay: true, // Tự động trượt
+    autoplaySpeed: 2000, // Tốc độ trượt (ms)
+  };
   const [products, setProducts] = useState([]);
   const [totalPages, setTotalPages] = useState(0);
   const [totalElements, setTotalElenments] = useState(0);
@@ -72,16 +85,15 @@ const Home = () => {
       <Header />
       <Card>
         <Row>
-          <div className="col-5 ">
-            <Card>
-              <a href="/shoes/product" className="image-with-text image-container">               
-                  <img
-                    src={oxford}
-                    alt="Oxford"
-                    title="Giày da nam Oxford"
-                    className="image"
-                    width={"105%"}
-                  />
+          <div className="col-5 image-container">
+            <Card className="">
+              <a href="/shoes/product" className="image-with-text ">
+                <img
+                  src={oxford}
+                  alt="Oxford"
+                  title="Giày da nam Oxford"
+                  className="image"
+                />
                 <span className="overlay-text">Giày da nam Oxford</span>
                 <span className="overlay-text1">Sang Trọng - Lịch Lãm</span>
               </a>
@@ -90,31 +102,43 @@ const Home = () => {
           <div className="col-7">
             <Card>
               <a href="/shoes/product" className="">
-                <img
-                  src={oxford2}
-                  alt="Giay da"
-                  title="Giay da nam"
-                  width={"100%"}
-                />
-                {/* <span className="overlay-text">Giày da nam Oxford</span> */}
-                <Row className="mt-2">
-                  <div className="col-6">
-                    <img
-                      src={giay}
-                      alt="Giay da"
-                      title="Giay da nam ca tinh"
-                      width={"94%"}
-                    />
-                  </div>
-                  <div className="col-6">
-                    <img
-                      src={giay1}
-                      alt="Giay da"
-                      title="Giay da nam hp"
-                      width={"94%"}
-                    />
-                  </div>
-                </Row>
+              <Slider {...settings}>
+                <div className="">
+                  <img
+                    src={slideshow1}
+                    alt="Giay da"
+                    title="Giay da nam"
+                    width={"100%"}
+                    className="slideshow-image"
+                  />
+                </div>
+                <div className="">
+                  <img
+                    src={slideshow2}
+                    alt="Giay da"
+                    title="Giay da nam"
+                    width={"140%"}
+                    className="slideshow-image"
+                  />
+                </div>
+              </Slider>
+
+                <div className="d-flex">
+                  <img
+                    src={giay}
+                    alt="Giay da"
+                    title="Giay da nam ca tinh"
+                    width={"49%"}
+                    style={{ marginRight: "8px" }}
+                  />
+
+                  <img
+                    src={giay1}
+                    alt="Giay da"
+                    title="Giay da nam hp"
+                    width={"49%"}
+                  />
+                </div>
               </a>
             </Card>
           </div>
