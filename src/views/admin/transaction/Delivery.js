@@ -37,7 +37,7 @@ const Delivery = () => {
 
     const [queryParams, setQueryParams] = useState({
         page: 0,
-        size: 5,
+        size: 1,
         status: "",
     });
 

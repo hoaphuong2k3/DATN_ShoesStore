@@ -1,4 +1,7 @@
 import React, { useEffect, useState } from "react";
+import Slider from 'react-slick';
+import 'slick-carousel/slick/slick.css';
+import 'slick-carousel/slick/slick-theme.css';
 import axios from "axios";
 import { Container, Row, Col, Card } from "reactstrap";
 import Header from "components/Headers/UserHeader";
@@ -9,12 +12,24 @@ import anh1 from "assets/img/theme/anh1.jpg";
 import anh2 from "assets/img/theme/anh2.jpg";
 import anh3 from "assets/img/theme/anh3.jpg";
 import anh4 from "assets/img/theme/anh4.jpg";
-
-
+import oxford from "assets/img/theme/oxford.jpg";
+import slideshow1 from "assets/img/theme/bannerShoes.jpg";
+import giay from "assets/img/theme/gia-da-nam-ca-tinh.jpg";
+import giay1 from "assets/img/theme/giay-da-nam-hai-phong-2-1.jpg";
+import slideshow2 from "assets/img/theme/slideshow3.jpg";
 
 import { getAllShoes } from "services/Product2Service";
 
 const Home = () => {
+  const settings = {
+    dots: true, // Hiển thị các chấm chỉ số
+    infinite: true, // Lặp lại slideshow
+    speed: 500, // Tốc độ chuyển đổi slide (ms)
+    slidesToShow: 1, // Số lượng slide hiển thị trên mỗi lần trượt
+    slidesToScroll: 1, // Số lượng slide được trượt khi di chuyển
+    autoplay: true, // Tự động trượt
+    autoplaySpeed: 2000, // Tốc độ trượt (ms)
+  };
   const [products, setProducts] = useState([]);
   const [totalPages, setTotalPages] = useState(0);
   const [totalElements, setTotalElenments] = useState(0);
@@ -69,6 +84,66 @@ const Home = () => {
     <>
       <Header />
       <Card>
+        <Row>
+          <div className="col-5 image-container">
+            <Card className="">
+              <a href="/shoes/product" className="image-with-text ">
+                <img
+                  src={oxford}
+                  alt="Oxford"
+                  title="Giày da nam Oxford"
+                  className="image"
+                />
+                <span className="overlay-text">Giày da nam Oxford</span>
+                <span className="overlay-text1">Sang Trọng - Lịch Lãm</span>
+              </a>
+            </Card>
+          </div>
+          <div className="col-7">
+            <Card>
+              <a href="/shoes/product" className="">
+              <Slider {...settings}>
+                <div className="">
+                  <img
+                    src={slideshow1}
+                    alt="Giay da"
+                    title="Giay da nam"
+                    width={"100%"}
+                    className="slideshow-image"
+                  />
+                </div>
+                <div className="">
+                  <img
+                    src={slideshow2}
+                    alt="Giay da"
+                    title="Giay da nam"
+                    width={"140%"}
+                    className="slideshow-image"
+                  />
+                </div>
+              </Slider>
+
+                <div className="d-flex">
+                  <img
+                    src={giay}
+                    alt="Giay da"
+                    title="Giay da nam ca tinh"
+                    width={"49%"}
+                    style={{ marginRight: "8px" }}
+                  />
+
+                  <img
+                    src={giay1}
+                    alt="Giay da"
+                    title="Giay da nam hp"
+                    width={"49%"}
+                  />
+                </div>
+              </a>
+            </Card>
+          </div>
+        </Row>
+
         <Container fluid>
           <Row>
             <Container>
@@ -367,75 +442,6 @@ const Home = () => {
                   </a>
                 </Col>
               </div>
-
-              <div className="Loafer">
-                <Col md={12}>
-                  <div className="section_product section_product_best_sell">
-                    <div className="section-head clearfix text-center mt-5">
-                      <h2 className="title_blog m-4 mt-5">
-                        <a href="san-pham-noi-bat" title="Loafer">
-                          <strong>LOAFER</strong>
-                        </a>
-                      </h2>
-                      <div className="viewallcat hidden-xs"></div>
-                    </div>
-                    <div className="product-blocks clearfix row">
-                      {Array.isArray(products) ? (
-                        products.map((product) => (
-                          <div className="col-3">
-                            <Card className="product-card ">
-                              <span className="sale-box">- 22% </span>
-                              <div
-                                key={product.id}
-                                className="product-card__inner "
-                              >
-                                <Link to={`/shoes/productdetail/${product.id}`}>
-                                  <div className="product-card__image zoom">
-                                    <img
-                                      src={`https://s3-ap-southeast-1.amazonaws.com/imageshoestore/${product.imgURI}`}
-                                      alt=""
-                                      className="product-card-image-front img-responsive center-block mt-2 "
-                                    />
-                                  </div>
-                                </Link>
-                                <div className="mt-4 p-3 text-center ">
-                                  <h4 className="product-single__series text-uppercase">
-                                    {product.cushion}
-                                  </h4>
-                                  <h3 className="product-card__title">
-                                    SAVILLE CAPTOE OXFORD - OF32
-                                    {product.name}
-                                  </h3>
-                                  <div className="product-price">
-                                    <strong className="text-danger">
-                                      1.365.000₫
-                                    </strong>
-                                    <span>1.750.000₫</span>
-                                  </div>
-                                </div>
-                              </div>
-                            </Card>
-                          </div>
-                        ))
-                      ) : (
-                        <p>Không có dữ liệu.</p>
-                      )}
-                    </div>
-                  </div>
-                </Col>
-                <Col md={12} className="d-flex justify-content-center">
-                  <a
-                    href="san-pham-noi-bat"
-                    title="Xem tất cả Loafer"
-                    className="evo-button mobile-viewmore mt-6 "
-                  >
-                    Xem tất cả . <strong>LOAFER</strong>
-                  </a>
-                </Col>
-              </div>
-
-              
-            
             </Container>
           </Row>
         </Container>
