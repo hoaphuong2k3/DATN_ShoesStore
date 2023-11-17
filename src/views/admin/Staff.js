@@ -122,8 +122,8 @@ const Staff = () => {
     fetchAddress();
   }, []);
 
-  const handleProvinceChange = async (e) => {
-    const selectedProvinceCode = e.target.value;
+  const handleProvinceChange = async (value) => {
+    const selectedProvinceCode = value;
     setFormData((prevData) => ({
       ...prevData,
       address: {
@@ -144,12 +144,12 @@ const Staff = () => {
     }
   };
 
-  const handleDistrictChange = async (e) => {
-    const selectedDistrictCode = e.target.value;
+  const handleDistrictChange = async (value) => {
+    const selectedDistrictCode = value;
     setFormData((prevData) => ({
       ...prevData,
       address: {
-        ...prevData.address,
+        ...prevData.address, 
         districtCode: selectedDistrictCode,
         communeCode: "",
       },
@@ -239,6 +239,9 @@ const Staff = () => {
   });
 
   const handleRowClick = async (admin) => {
+    handleProvinceChange(admin.proviceCode)
+    handleDistrictChange(admin.districtCode);
+
     setFormData({
       id: admin.id,
       username: admin.username,
@@ -1016,7 +1019,7 @@ const Staff = () => {
                             className="form-control-alternative"
                             type="select"
                             value={formData.address.proviceCode}
-                            onChange={handleProvinceChange}
+                            onChange={(e) => handleProvinceChange(e.target.value)}
                           >
                             <option value="">Chọn Tỉnh / Thành</option>
                             {provinces.map((province) => (
@@ -1040,7 +1043,7 @@ const Staff = () => {
                             className="form-control-alternative"
                             type="select"
                             value={formData.address.districtCode}
-                            onChange={handleDistrictChange}
+                            onChange={(e)=>handleDistrictChange(e.target.value)}
                             disabled={!formData.address.proviceCode}
                           >
                             <option value="">Chọn Quận / Huyện</option>

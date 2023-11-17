@@ -75,7 +75,7 @@
 }
 
 .title_blog a:hover {
-  color: #cfc278; /* Màu vàng nhạt */
+   color: green; /* Màu vàng nhạt */
 }
 .product-single__series {
     font-size: 13px;
@@ -99,5 +99,55 @@
     transform: scale(1.1);
     border: 1px solid #af9839;
   }
+  
+  .image-with-text {
+    position: relative;
+    display: inline-block;
+  }
+  
+  .overlay-text {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    padding-bottom: 50px;
+    color: rgb(27, 27, 63);
+    font-size: 23px;
+    font-weight: 500;
+    text-align: center;
+  }
+  .overlay-text1 {
+    position: absolute;
+    bottom: -25px;
+    left: 0;
+    width: 100%;
+    padding-bottom: 50px;
+    color: rgb(27, 27, 63);
+    font-size: 13px;
+    font-weight: 500;
+    text-align: center;
+  }
+  .overlay-text:hover {
+    color: green;
+  }
+  .overlay-text1:hover {
+    color: green;
+  }
 
 
+.image-container {
+  position: relative;
+  overflow: hidden;
+}
+
+.image {
+  width: 100%;
+  height: auto;
+  transition: transform 0.3s ease-in-out;
+}
+
+.image:hover {
+  transform: scale(1.1);
+}
+
+  
