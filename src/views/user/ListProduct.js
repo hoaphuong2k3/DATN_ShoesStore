@@ -9,6 +9,7 @@ import { getAllBrand, getAllOrigin, getAllDesignStyle, getAllSkinType, getAllToe
 import { getAllShoes } from "services/Product2Service";
 
 const Product = () => {
+  const [errorMessage, setErrorMessage] = useState('');
   const [products, setProducts] = useState([]);
   const [listBrand, setListBrand] = useState([]);
   const [listOrigin, setListOrigin] = useState([]);
@@ -44,13 +45,17 @@ const Product = () => {
         console.log(res.data);
         setTotalElenments(res.data.totalElements);
         setTotalPages(res.data.totalPages);
+
+        // Nếu có kết quả tìm kiếm, xóa thông báo lỗi 
+        setErrorMessage('');
       }
     } catch (error) {
       let errorMessage = "Lỗi từ máy chủ";
       if (error.response && error.response.data && error.response.data.message) {
         errorMessage = error.response.data.message;
       }
-      toast.error(errorMessage);
+      // toast.error(errorMessage);
+      setErrorMessage('Không tìm thấy kết quả tìm kiếm.');
       setProducts([]);
     }
   }
@@ -125,6 +130,9 @@ const Product = () => {
       ...prevSearch,
       [propertyName]: prevSearch[propertyName] === value ? null : value,
     }));
+  };
+  const onPriceChange = (e) => {
+    setSearch({ ...search, [e.target.name]: e.target.value });
   };
 
   // Lọc
@@ -374,32 +382,32 @@ const Product = () => {
                           ))}
                         </div>
                       </div>
+
+                      {/* Price */}
                       <div className='category'>
-                        <Label for="find_code" className="font-weight-bold">
+                        <Label for="find_code" className="font-weight-bold text-dark ml-2">
                           Giá:
                         </Label>
                         <Row>
-                          <Col xl={4}>
+                          <Col xl={5}>
                             <Input
                               className="form-control-alternative"
-                              id="find_code"
                               name="fromPrice"
-                              placeholder="Nhập giá"
-                            // value={search.fromPrice}
-                            // onChange={(e) => onInputChange(e)}
+                              placeholder="Từ"
+                              value={search.fromPrice}
+                              onChange={(e) => onPriceChange(e)}
                             />
                           </Col>
                           <Label for="find_code" xl={1} className="form-control-label text-center">
                             <i class="fa-solid fa-arrow-right"></i>
                           </Label>
-                          <Col xl={4}>
+                          <Col xl={5}>
                             <Input
                               className="form-control-alternative"
-                              id="find_code"
                               name="toPrice"
-                              placeholder="Nhập giá"
-                            // value={search.toPrice}
-                            // onChange={(e) => onInputChange(e)}
+                              placeholder="Đến"
+                              value={search.toPrice}
+                              onChange={(e) => onPriceChange(e)}
                             />
                           </Col>
                         </Row>
@@ -409,7 +417,7 @@ const Product = () => {
 
                   <div className="col-md-9 mt-5">
                     <div className="selectItem">
-                      {/* <p>Lọc:</p> */}
+                    {errorMessage && <p>{errorMessage}</p>}
                       <ul>
                         
                       </ul>

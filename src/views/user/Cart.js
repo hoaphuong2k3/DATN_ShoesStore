@@ -366,6 +366,7 @@ const Cart = () => {
                             to="/shoes/checkout"
                             tag={Link}
                             name="checkout"
+                            type="submit"
                             className="ml-auto btnCart"
                             onClick={() => handleCheckout()}
                           >

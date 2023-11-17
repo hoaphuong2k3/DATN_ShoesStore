@@ -729,12 +729,12 @@ const Profile = () => {
                         {imageUrl && (
                           <img
                             alt="preview"
-                            src={`data:image/jpeg;base64,${admins.avatar}`}
+                            src={imageUrl}
                             style={imageStyle}
                           />
                         )}
                         <Label htmlFor="file-input" style={buttonStyle}>
-                          <FaCamera size={15} />
+                          <FaCamera size={15}/>
                         </Label>
 
                         <Input
