@@ -433,7 +433,7 @@ const Product = () => {
                             <br />
                             <div style={{ fontSize: "medium" }} className="p-2">
                               <Link to={`/shoes/productdetail/${product.id}`} className="text-dark text-decoration-none">
-                                {product.name}
+                              {`${product.name} ${product.cushion} ${product.designStyle} ${product.brand}`}
                               </Link>
                               <p className="font-weight-bold" style={{ color: "rgba(0, 0, 0, 0.705)" }}>
                                 {product.priceMin}đ&nbsp;

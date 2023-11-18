@@ -11,32 +11,36 @@ import {
 } from "reactstrap";
 import { Link } from "react-router-dom";
 import Header from "components/Headers/ProductHeader";
-import { CartContext } from "contexts/Cart.js";
+// import { CartContext } from "contexts/Cart.js";
+import "assets/css/cart.css";
 
 const Cart = () => {
-  const { fetchData } = useContext(CartContext);
+  // const { fetchData } = useContext(CartContext);
   const [cartData, setCartData] = useState(null);
   const [selectedItems, setSelectedItems] = useState([]);
+  const storedUserId = localStorage.getItem("userId");
 
   const formatter = new Intl.NumberFormat("vi-VN", {
     style: "currency",
     currency: "VND",
   });
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetch("http://localhost:33321/api/cart/2");
-        const data = await response.json();
-        setCartData(data.content);
-        console.log(data.content);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
+  const fetchData = async () => {
+    try {
+      const response = await fetch(`http://localhost:33321/api/cart/${storedUserId}`);
+      const data = await response.json();
+      setCartData(data.content);
 
+      console.log(storedUserId);
+      console.log(data.content);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
+  useEffect(() => {
     fetchData();
-  }, [fetchData]);
+  }, [storedUserId]);
 
   const handleRemoveItem = async (idAccount, idShoes) => {
     try {
@@ -56,6 +60,7 @@ const Cart = () => {
     }
   };
 
+  // update quantity
   const handleQuantityChange = async (idAccount, idShoes, quantity) => {
     try {
       const response = await fetch(`http://localhost:33321/api/cart/update`, {
@@ -88,18 +93,23 @@ const Cart = () => {
     } catch (error) {}
   };
 
+  // select list product
   const handleCheckboxChange = (id) => {
     setSelectedItems((prevSelectedItems) => {
       if (prevSelectedItems.includes(id)) {
         // Nếu đã chọn, loại bỏ khỏi danh sách
-        return prevSelectedItems.filter((item) => item !== id);
+        const updatedItems = prevSelectedItems.filter((item) => item !== id);
+        return updatedItems;
       } else {
         // Nếu chưa chọn, thêm vào danh sách
-        return [...prevSelectedItems, id];
+        const updatedItems = [...prevSelectedItems, id];
+        console.log(id);
+        return updatedItems;
       }
     });
   };
 
+  // checkout
   const handleCheckout = async () => {
     try {
       const response = await fetch("http://localhost:33321/api/cart/checkout", {
@@ -108,8 +118,7 @@ const Cart = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          key: 2,
-          idVoucher: null,
+          key: storedUserId,
           listShoesCart: selectedItems,
         }),
       });
@@ -159,9 +168,6 @@ const Cart = () => {
                       <Table className="cart-table full table--responsive">
                         <thead className="cart__row cart__header-labels">
                           <tr>
-                            {/* <th>
-                              <Input type="checkbox" className="checkbox_input" />
-                            </th> */}
                             <th colSpan="3" className="text-center">
                               Thông tin chi tiết sản phẩm
                             </th>
@@ -185,18 +191,7 @@ const Cart = () => {
                                   checked={selectedItems.includes(item.id)}
                                   onChange={() => handleCheckboxChange(item.id)}
                                 />
-                                <style>
-                                  {`
-                                    .checkbox_input {
-                                      transform: scale(1.4); 
-                                      margin-top: 10px;
-                                    }
-                                    
-                                    .tongGia{
-                                      color: red;
-                                    }
-                                  `}
-                                </style>
+
                               </td>
                               <td data-label="Ảnh Sản phẩm">
                                 <a
@@ -232,61 +227,7 @@ const Cart = () => {
                                     </p>
                                   </div>
                                 </div>
-                                <style>
-                                  {`
-                                    .product-info {
-                                      display: flex;
-                                      align-items: center;
-                                    }
-                                    
-                                    .product-name {
-                                      font-size: 18px;
 
-                                      margin-right: 15px;
-                                    }
-                                    
-                                    .product-details {
-                                      display: flex;
-                                      flex-direction: column;
-                                    }
-                                    
-                                    .product-size,
-                                    .product-color {
-                                      font-size: 14px;
-                                      margin: 2px 0;
-                                    }
-                                    .input-group {
-                                      display: flex;
-                                      align-items: center;
-                                    }
-                                    
-                                    .quantity-input {
-                                      border: none;
-                                      outline: none;
-                                      width: 40px;
-                                      height: 30px;
-                                      padding: 0;
-                                      text-align: center;
-                                      font-size: 16px;
-                                      background-color: white;
-                                    }
-                                    
-                                    .input-group-button {
-                                      border: none;
-                                      background-color: #e9ecef;
-                                      color: black;
-                                      width: 30px;
-                                      height: 30px;
-                                      display: flex;
-                                      align-items: center;
-                                      justify-content: center;
-                                      font-size: 15px;
-                                    }   
-                                    .fa {
-                                      pointer-events: none;
-                                    }
-                              `}
-                                </style>
                               </td>
 
                               <td
@@ -297,44 +238,44 @@ const Cart = () => {
                                   {formatter.format(item.price)}
                                 </span>
                               </td>
+
                               <td
                                 data-label="Số lượng"
-                                className="text-center cart-quantity"
+                                className="text-center quantity-input"
                               >
                                 <div className="input-group">
                                   <Button
-                                    className="input-group-button"
-                                    color="primary"
+                                    className="quantity-input__modifier quantity-input__modifier--left"
                                     onClick={() =>
                                       handleQuantityChange(
-                                        -1,
+                                        storedUserId,
                                         item.id,
                                         item.quantity - 1
                                       )
                                     }
                                   >
-                                    <i className="fa fa-minus" />
+                                    &mdash;
+                                    {/* <i className="fa fa-minus" /> */}
                                   </Button>
                                   <Input
                                     size={1}
-                                    className="quantity-input"
+                                    className="quantity-input__screen"
                                     type="text"
                                     aria-valuenow={item.quantity}
                                     value={item.quantity}
-                                    readOnly
+                                    
                                   />
                                   <Button
-                                    className="input-group-button"
-                                    color="primary"
+                                    className="quantity-input__modifier quantity-input__modifier--right"
                                     onClick={() =>
                                       handleQuantityChange(
-                                        1,
+                                        storedUserId,
                                         item.id,
                                         item.quantity + 1
                                       )
                                     }
                                   >
-                                    <i className="fa fa-plus" />
+                                    &#xff0b;
                                   </Button>
                                 </div>
                               </td>
@@ -351,7 +292,7 @@ const Cart = () => {
                                 <Button
                                   className="input-group-text"
                                   color="primary"
-                                  onClick={() => handleRemoveItem(2, item.id)}
+                                  onClick={() => handleRemoveItem(storedUserId, item.id)}
                                 >
                                   Xóa
                                 </Button>

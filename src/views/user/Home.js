@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-import Slider from 'react-slick';
-import 'slick-carousel/slick/slick.css';
-import 'slick-carousel/slick/slick-theme.css';
+import Slider from "react-slick";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
 import axios from "axios";
 import { Container, Row, Col, Card } from "reactstrap";
 import Header from "components/Headers/UserHeader";
@@ -34,7 +34,7 @@ const Home = () => {
   const [totalPages, setTotalPages] = useState(0);
   const [totalElements, setTotalElenments] = useState(0);
   const [page, setPage] = useState(0);
-  const [size, setSize] = useState(4);
+  const [size, setSize] = useState(1);
   const [search, setSearch] = useState({
     name: "",
     brandId: null,
@@ -102,26 +102,27 @@ const Home = () => {
           <div className="col-7">
             <Card>
               <a href="/shoes/product" className="">
-              <Slider {...settings}>
-                <div className="">
-                  <img
-                    src={slideshow1}
-                    alt="Giay da"
-                    title="Giay da nam"
-                    width={"100%"}
-                    className="slideshow-image"
-                  />
-                </div>
-                <div className="">
-                  <img
-                    src={slideshow2}
-                    alt="Giay da"
-                    title="Giay da nam"
-                    width={"140%"}
-                    className="slideshow-image"
-                  />
-                </div>
-              </Slider>
+                
+                <Slider {...settings}>
+                  <div className="">
+                    <img
+                      src={slideshow1}
+                      alt="Giay da"
+                      title="Giay da nam"
+                      width={"100%"}
+                      className="slideshow-image"
+                    />
+                  </div>
+                  <div className="">
+                    <img
+                      src={slideshow2}
+                      alt="Giay da"
+                      title="Giay da nam"
+                      width={"140%"}
+                      className="slideshow-image"
+                    />
+                  </div>
+                </Slider>
 
                 <div className="d-flex">
                   <img
@@ -181,10 +182,14 @@ const Home = () => {
                                   <h4 className="product-single__series text-uppercase">
                                     {product.cushion}
                                   </h4>
-                                  <h3 className="product-card__title">
-                                    SAVILLE CAPTOE OXFORD - OF32
-                                    {product.name}
-                                  </h3>
+                                  <Link
+                                    to={`/shoes/productdetail/${product.id}`}
+                                  >
+                                    <h3 className="product-card__title">
+                                      {/* SAVILLE CAPTOE OXFORD - OF32 */}
+                                      {`${product.name} ${product.cushion} ${product.designStyle} ${product.brand}`}
+                                    </h3>
+                                  </Link>
                                   <div className="product-price">
                                     <strong className="text-danger">
                                       1.365.000₫
@@ -382,7 +387,7 @@ const Home = () => {
                   <div className="section_product section_product_best_sell">
                     <div className="section-head clearfix text-center mt-5">
                       <h2 className="title_blog m-4 mt-5">
-                        <a href="san-pham-noi-bat" title="Espadrilles">
+                        <a href="/shoes/product" title="Espadrilles">
                           <strong>ESPADRILLES</strong>
                         </a>
                       </h2>
@@ -411,10 +416,14 @@ const Home = () => {
                                   <h4 className="product-single__series text-uppercase">
                                     {product.cushion}
                                   </h4>
-                                  <h3 className="product-card__title">
-                                    SAVILLE CAPTOE OXFORD - OF32
-                                    {product.name}
-                                  </h3>
+                                  <Link
+                                    to={`/shoes/productdetail/${product.id}`}
+                                  >
+                                    <h3 className="product-card__title">
+                                      {/* SAVILLE CAPTOE OXFORD - OF32 */}
+                                      {`${product.name} ${product.cushion} ${product.designStyle} ${product.brand}`}
+                                    </h3>
+                                  </Link>
                                   <div className="product-price">
                                     <strong className="text-danger">
                                       1.365.000₫
@@ -440,6 +449,78 @@ const Home = () => {
                   >
                     Xem tất cả . <strong>ESPADRILLES</strong>
                   </a>
+                </Col>
+              </div>
+
+              <div className="Outfit">
+                <Col md={12}>
+                  <div className="section_product section_product_best_sell ml-3">
+                    <div className="section-head clearfix text-center mt-5">
+                      <h2 className="title_blog m-4 mt-5">
+                        <a href="/shoes/product" title="Espadrilles">
+                          <strong>OUTFIT</strong>
+                        </a>
+                      </h2>
+                    </div>
+                    <div className="outfit-content ml-5">
+                      <div className="body-outfit ml-5">
+                        <div className="outfit-image ">
+                          <a href="/shoes/product" title="CLASSY CHELSEA BOOTS">
+                            <img
+                              src="https://bizweb.dktcdn.net/100/292/624/themes/758446/assets/index-evo-icon-5.jpg?1700140225697"
+                              alt="CLASSY CHELSEA BOOTS"
+                            />
+                          </a>
+                        </div>
+                        <div className="outfit-product">
+                          {Array.isArray(products) ? (
+                            products.map((product) => (
+                              <Card className="product-card ml-4">
+                                <span className="sale-box">- 22% </span>
+                                <div
+                                  key={product.id}
+                                  className="product-card__inner "
+                                >
+                                  <Link
+                                    to={`/shoes/productdetail/${product.id}`}
+                                  >
+                                    <div className="product-card__image zoom">
+                                      <img
+                                        src={`https://s3-ap-southeast-1.amazonaws.com/imageshoestore/${product.imgURI}`}
+                                        alt=""
+                                        className="product-card-image-front img-responsive center-block mt-2 "
+                                      />
+                                    </div>
+                                  </Link>
+                                  <div className="mt-4 p-3 text-center ">
+                                    <h4 className="product-single__series text-uppercase">
+                                      {product.cushion}
+                                    </h4>
+                                    <Link
+                                      to={`/shoes/productdetail/${product.id}`}
+                                    >
+                                      <h3 className="product-card__title">
+                                        {/* SAVILLE CAPTOE OXFORD - OF32 */}
+                                        {`${product.name} ${product.cushion} ${product.designStyle} ${product.brand}`}
+                                      </h3>
+                                    </Link>
+                                    <div className="product-price">
+                                      <strong className="text-danger">
+                                        1.365.000₫
+                                      </strong>
+                                      <span>1.750.000₫</span>
+                                    </div>
+                                  </div>
+                                </div>
+                              </Card>
+                            ))
+                          ) : (
+                            <p>Không có dữ liệu.</p>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </Col>
               </div>
             </Container>

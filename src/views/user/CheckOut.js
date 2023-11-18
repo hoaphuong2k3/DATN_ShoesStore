@@ -4,6 +4,7 @@ import {
   CardBody,
   Container,
   Row,
+  Form,
   Button,
   Modal,
   ModalHeader,
@@ -14,10 +15,12 @@ import {
 } from "reactstrap";
 import Header from "components/Headers/ProductHeader";
 import Select from "react-select";
+import axiosInstance from "services/custommize-axios";
 
 const Checkout = () => {
   const [showVoucherModal, setShowVoucherModal] = useState(false);
   const [products, setProducts] = useState(null);
+  const storedUserId = localStorage.getItem("userId");
 
   const handleOpenVoucherModal = () => {
     setShowVoucherModal(true);
@@ -25,29 +28,22 @@ const Checkout = () => {
   const handleCloseVoucherModal = () => {
     setShowVoucherModal(false);
   };
-  useEffect(() => {
-    const handleCheckout = async () => {
-      try {
-        const response = await fetch("http://localhost:33321/api/cart/checkout", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            key: 2,
-            idVoucher: null,
-            listShoesCart: [1], // Thay selectedItems bằng dữ liệu bạn cần gửi đi
-          }),
-        });
-        const responseData = await response.json();
-        setProducts(responseData);
-        console.log(responseData);
-      } catch (error) {
-        console.error("Lỗi trong quá trình thanh toán:", error);
-      }
-    };
+  const fetchCheckout = async () => {
+    try {
+      const response = await axiosInstance.get(
+        `/cart/find-checkout/${storedUserId}`
+      );
 
-    handleCheckout();
+      setProducts(response.data.shoesCart);
+      console.log(storedUserId);
+      console.log(response.data.shoesCart);
+    } catch (error) {
+      console.error("Lỗi trong quá trình thanh toán:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchCheckout();
   }, []);
 
   return (
@@ -74,22 +70,33 @@ const Checkout = () => {
                   <hr color="orange" width="300px" className="mb-5" />
                 </div>
                 <div className="col-md-7">
-                  <div className="item d-flex mb-5">
-                    <img
-                      src="https://laforce.vn/wp-content/uploads/2022/12/giay-tay-nam-GNLAAZ01-1-D-108x136.jpg"
-                      alt="Giày da nam kiểu dáng Oxford GNLAAZ01-1-D"
-                      className="mr-3"
-                    />
-                    <div>
-                      <div className="text-dark mt-3 name">
-                        
-                        {/* Giày da nam kiểu dáng Oxford GNLAAZ01-1-D */}
+                  <div>
+                    {Array.isArray(products) ? (
+                    products.map((product) => (
+                      <div className="item d-flex mb-5" key={product.id}>
+                        <img
+                          src={
+                            "https://laforce.vn/wp-content/uploads/2022/12/giay-tay-nam-GNLAAZ01-1-D-108x136.jpg"
+                          }
+                          alt={product.name}
+                          className="mr-3"
+                        />
+                        <div>
+                          <div className="text-dark mt-3 name">
+                            {product.name}
+                          </div>
+                          <div className="text-uppercase text-muted small mt-2">
+                            {product.color}, size {product.size}
+                          </div>
+                          <div className="text-danger small mt-2">
+                            {product.price}đ
+                          </div>
+                        </div>
                       </div>
-                      <div className="text-uppercase text-muted small mt-2">
-                        Màu hồng, size 34
-                      </div>
-                      <div className="text-danger small mt-2">441.000đ</div>
-                    </div>
+                    ))
+                    ) : (
+                      <div>Loading...</div>
+                    )}
                   </div>
                   <div className="mt-5">
                     <div className="inner">
@@ -101,7 +108,7 @@ const Checkout = () => {
                         ></i>
                         Thông tin giao hàng
                       </h3>
-                      <form
+                      <Form
                         action="/checkout"
                         method="post"
                         noValidate
@@ -149,27 +156,16 @@ const Checkout = () => {
                             />
                           </div>
                           <div className="form-group col-md-4">
-                            <Select
-                              
-                              placeholder="Tỉnh thành"
-                            />
+                            <Select placeholder="Tỉnh thành" />
                           </div>
                           <div className="form-group col-md-4">
-                            <Select
-                              
-                              placeholder="Quận huyện"
-                              
-                            />
+                            <Select placeholder="Quận huyện" />
                           </div>
                           <div className="form-group col-md-4">
-                            <Select
-                              
-                              placeholder="Phường"
-                            
-                            />
+                            <Select placeholder="Phường" />
                           </div>
                         </div>
-                      </form>
+                      </Form>
                     </div>
                   </div>
                 </div>

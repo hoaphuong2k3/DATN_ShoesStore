@@ -22,7 +22,9 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-
+.product-card__title:hover{
+  color: green;
+}
 .product-card .product-card__inner .product-price {
   font-size: 14px;
   font-weight: 500;
@@ -149,6 +151,32 @@
 .image:hover {
   transform: scale(1.1);
 }
+
+/* OUTFIT */
+.outfit-content{
+  width: 955px;
+}
+.body-outfit{
+  display: flex;
+  -webkit-box-align: center;
+  align-items: center;
+  -webkit-box-pack: center;
+  justify-content: center;
+  min-height: 490px;
+}
+.outfit-image{
+  -webkit-box-flex: 0;
+  flex: 0 1 auto;
+  position: relative;
+}
+
+.outfit-product{
+  -webkit-box-flex: 0;;
+  flex: none;
+  width: 290px;
+  margin: 0 90px;
+}
+
 
 
   

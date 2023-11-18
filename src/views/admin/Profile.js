@@ -149,6 +149,8 @@ const Profile = () => {
         },
       }));
     };
+    fetchAvt();
+    updateFormData();
   }, [admins]);
 
   const saveAdmin = async () => {
