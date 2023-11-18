@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from 'react-router-dom';
 import {
   Card,
   CardHeader,
@@ -10,6 +11,7 @@ import {
   Input,
   CardTitle, Label, Modal, ModalBody, ModalFooter, ModalHeader
 } from "reactstrap";
+import { useAuth } from "services/AuthContext.js";
 import { FaEdit, FaTrash } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 import axiosInstance from "services/custommize-axios";
@@ -80,6 +82,7 @@ const Menu = ({ setActiveTab }) => {
 };
 
 const Account = () => {
+  const { logout } = useAuth();
   const storedUserId = localStorage.getItem('userId');
   const [client, setClient] = useState(null);
   const fetchData = async () => {
@@ -92,15 +95,17 @@ const Account = () => {
           const file = new File([blob], "image.jpg", { type: "image/jpeg" });
           setFile(file);
         }
-        onClickListAdress(storedUserId);
       }
     } catch (error) {
       console.error("Error fetching data: ", error);
     }
   };
   useEffect(() => {
-    fetchData();
-    fetchData2();
+    if (storedUserId) {
+      fetchData();
+      fetchData2();
+      getAllAddress();
+    }
   }, []);
   const [formData1, setFormData1] = useState({
     id: storedUserId,
@@ -192,6 +197,17 @@ const Account = () => {
     setFile(null);
   };
   //Xử lý địa chỉ
+  const [listAddress, setListAddress] = useState([]);
+  const getAllAddress = async () => {
+    const res = await axiosInstance.get(`http://localhost:33321/api/address/${storedUserId}`);
+    console.log(res);
+    if (res && res.content) {
+      setListAddress(res.content);
+      console.log(res.content);
+    }
+
+    console.log(listAddress);
+  }
   const fetchData2 = async () => {
     try {
       const provincesResponse = await axios.get("https://provinces.open-api.vn/api/?depth=3");
@@ -201,16 +217,6 @@ const Account = () => {
     }
   };
   const [provinces, setProvinces] = useState([]);
-  const [modalAdress, setModalAdress] = useState(false);
-  const toggleAdress = () => setModalAdress(!modalAdress);
-
-  useEffect(() => {
-    if (modalAdress === false && modalAddAdress === false) {
-      setFormData({ ...formData, idClient: "" });
-      setListAddress([])
-    }
-    console.log("modalAdress:", modalAdress, modalAddAdress);
-  }, [modalAdress]);
 
   const [modalAddAdress, setModalAddAdress] = useState(false);
   const toggleAddAdress = () => setModalAddAdress(!modalAddAdress);
@@ -219,25 +225,8 @@ const Account = () => {
     if (modalAddAdress === false) {
       resetFormData();
     }
-    console.log("modalAddAdress:", modalAdress, modalAddAdress);
+    console.log("modalAddAdress:", modalAddAdress);
   }, [modalAddAdress]);
-  const [listAddress, setListAddress] = useState([]);
-  const getAllAddress = async () => {
-    const res = await axiosInstance.get(`http://localhost:33321/api/address/${formData.idClient}`);
-    if (res && res.data) {
-      setListAddress(res.data.content);
-      console.log(listAddress);
-    }
-  }
-
-  const onClickListAdress = async (id) => {
-    const res = await axiosInstance.get(`http://localhost:33321/api/address/${id}`);
-    if (res && res.data.content) {
-      setListAddress(res.data.content);
-    }
-    setFormData({ ...formData, idClient: id });
-    toggleAdress();
-  };
 
   const [formData, setFormData] = useState({
     id: null,
@@ -281,7 +270,7 @@ const Account = () => {
           districtCode: formData.districtCode,
           communeCode: formData.communeCode,
           addressDetail: formData.addressDetail,
-          idClient: formData.idClient
+          idClient: storedUserId
         });
         getAllAddress();
         toast.success("Cập nhật thành công!");
@@ -291,7 +280,7 @@ const Account = () => {
           districtCode: formData.districtCode,
           communeCode: formData.communeCode,
           addressDetail: formData.addressDetail,
-          idClient: formData.idClient
+          idClient: storedUserId
         });
         getAllAddress();
         toast.success("Thêm mới thành công!");
@@ -324,6 +313,37 @@ const Account = () => {
     }
   };
   //Kết thúc địa chỉ
+
+
+  // changePassword
+  const navigate = useNavigate();
+  const [formPass, setFormPass] = useState({
+    newPassword: "",
+    confirmPassword: "",
+  });
+
+  const changePassword = async () => {
+    try {
+      const requestBody = {
+        id: storedUserId,
+        newPassword: formPass.newPassword,
+        confirmPassword: formPass.confirmPassword,
+      };
+      console.log(requestBody);
+      await axiosInstance.put("/user/changePassword", requestBody);
+      toast.success("Bạn đã thay đổi mật khẩu thành công!");
+      logout();
+      navigate('/');
+    } catch (error) {
+      console.error("Lỗi rồi trời ơi:", error);
+      if (error.response) {
+        console.error("Response data:", error.response.data);
+        toast.error(error.response.data.message);
+      } else {
+        toast.error("Đã có lỗi xảy ra.");
+      }
+    }
+  };
   return (
     <>
       <Container fluid>
@@ -437,7 +457,7 @@ const Account = () => {
                                             defaultChecked
                                             checked={formData1.gender === 'false' || formData1.gender === false}
                                             onClick={(e) => onInputChange(e)}
-                                          />Nam
+                                          />Nữ
                                         </div>
                                         <div className="custom-control custom-radio">
                                           <Input
@@ -448,7 +468,7 @@ const Account = () => {
                                             value={true}
                                             checked={formData1.gender === 'true' || formData1.gender === true}
                                             onClick={(e) => onInputChange(e)}
-                                          />Nữ
+                                          />Nam
                                         </div>
                                       </div>
                                     </Row>
@@ -558,16 +578,16 @@ const Account = () => {
                                     <>
                                       <Row>
                                         <Col lg="9"  >
-                                          <div style={{ fontSize: 13 }} className="text-small text-muted mb-0">
+                                          <div style={{ fontSize: "14" }} className="text-small text-muted mb-0">
                                             {item.addressDetail},&nbsp;{item.communeCode},&nbsp;{item.districtCode},&nbsp;{item.proviceCode}
                                           </div>
                                         </Col>
                                         <Col lg="3" className="mr--1">
-                                          <Button color="info" size="sm" onClick={() => CLickUpdateAddress(item)}>
-                                            <FaEdit />
+                                          <Button color="link" size="sm" onClick={() => CLickUpdateAddress(item)}>
+                                            <FaEdit color="info" />
                                           </Button>
-                                          <Button color="danger" size="sm" onClick={() => deleteAddress(item.id)}>
-                                            <FaTrash />
+                                          <Button color="link" size="sm" onClick={() => deleteAddress(item.id)}>
+                                            <FaTrash color="danger" />
                                           </Button>
                                         </Col>
                                       </Row>
@@ -733,6 +753,96 @@ const Account = () => {
                     <CardBody>
                       <div className="pl-lg-4">
                         {/* Password content */}
+
+                        {/* <!-- Body ChangePass --> */}
+                        <div class="card-body">
+                          {/* <!-- Form --> */}
+                          <form id="changePasswordForm">
+                            {/* <!-- Form Group --> */}
+                            <div class="row form-group">
+                              <label
+                                for="newPassword"
+                                class="col-sm-3 col-form-label input-label"
+                              >
+                                Mật khẩu mới
+                              </label>
+
+                              <div class="col-sm-9">
+                                <Input
+                                  type="password"
+                                  class="js-pwstrength form-control"
+                                  name="newPassword"
+                                  id="newPassword"
+                                  placeholder="Enter new password"
+                                  aria-label="Enter new password"
+                                  onChange={(e) =>
+                                    setFormPass({
+                                      ...formPass,
+                                      newPassword: e.target.value,
+                                    })
+                                  }
+                                />
+
+                                <p id="passwordStrengthVerdict" class="form-text mb-2" />
+
+                                <div id="passwordStrengthProgress"></div>
+                              </div>
+                            </div>
+                            {/* <!-- End Form Group --> */}
+
+                            {/* <!-- Form Group --> */}
+                            <div class="row form-group">
+                              <label
+                                for="confirmPasswordLabel"
+                                class="col-sm-3 col-form-label input-label"
+                              >
+                                Nhập lại mật khẩu
+                              </label>
+
+                              <div class="col-sm-9">
+                                <div class="mb-3">
+                                  <Input
+                                    type="password"
+                                    class="form-control"
+                                    name="confirmPassword"
+                                    id="confirmPasswordLabel"
+                                    placeholder="Confirm your new password"
+                                    aria-label="Confirm your new password"
+                                    onChange={(e) =>
+                                      setFormPass({
+                                        ...formPass,
+                                        confirmPassword: e.target.value,
+                                      })
+                                    }
+                                  />
+                                </div>
+
+                                <h5>Yêu cầu về mật khẩu:</h5>
+                                <p class="font-size-sm mb-2">
+                                  Đảm bảo các yêu cầu sau được đáp ứng:
+                                </p>
+                                <ul class="font-size-sm">
+                                  <li>Tối thiểu 8 ký tự - càng nhiều càng tốt</li>
+                                  <li>Ít nhất một ký tự viết thường</li>
+                                  <li>Ít nhất một ký tự viết hoa</li>
+                                  <li>Ít nhất một số, ký hiệu hoặc ký tự khoảng trắng</li>
+                                </ul>
+                              </div>
+                            </div>
+                            {/* <!-- End Form Group --> */}
+                          </form>
+                          {/* <!-- End Form --> */}
+                          <div class="d-flex justify-content-end ">
+                            <Button
+                              type="submit"
+                              color="primary"
+                              onClick={changePassword}
+                            >
+                              Lưu
+                            </Button>
+                          </div>
+                        </div>
+                        {/* <!-- End Body --> */}
                       </div>
                     </CardBody>
                   </Card>
