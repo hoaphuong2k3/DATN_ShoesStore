@@ -1,80 +1,101 @@
-import React from 'react';
+import React, { useState } from "react";
+import {
+  Row, Col, Button, Nav, NavItem, NavLink, TabPane, TabContent,
+  Container, Card, CardHeader, CardBody
+} from "reactstrap";
 import classnames from "classnames";
-import { Card, CardBody, Container, TabContent, TabPane, Nav, NavItem, NavLink, Row } from "reactstrap";
+import { ToastContainer, toast } from "react-toastify";
+import Order from "views/admin/sells/Order.js";
+import { VscClose } from "react-icons/vsc";
 
-// core components
-import CreateOrder from "views/admin/sells/CreateOrder.js";
-import OrderHistory from "views/admin/sells/OrderHistory.js";
+const CreateOrderPage = () => {
+  const [activeTab, setActiveTab] = useState("1");
+  const [orders, setOrders] = useState(["Hóa đơn 1"]);
 
-class Sales extends React.Component {
-  constructor(props) {
-    super(props);
+  const toggle = (tab) => {
+    if (activeTab !== tab) setActiveTab(tab);
+  };
 
-    this.toggle = this.toggle.bind(this);
-    this.state = {
-      activeTab: '1'
-    };
-  }
+  const handleCreateOrder = () => {
+    handleCloneOrder();
+  };
 
-  toggle(tab) {
-    if (this.state.activeTab !== tab) {
-      this.setState({
-        activeTab: tab
-      });
+  const handleCloneOrder = () => {
+    if (orders.length >= 5) {
+      toast.warning("Đã đạt tối đa!");
+      return;
     }
-  }
+    const newOrderNumber = orders.length + 1;
+    const newOrderTitle = `Hóa đơn ${newOrderNumber}`;
+    setOrders([...orders, newOrderTitle]);
+  };
 
-  render() {
+  const handleDeleteOrder = (index) => {
+    const updatedOrders = [...orders];
+    updatedOrders.splice(index, 1);
+    setOrders(updatedOrders);
 
-    const navItemStyle = {
-      fontSize: '14px',
-    };
+    if (activeTab === `${index + 1}`) {
+      const newActiveTab = updatedOrders.length > 0 ? "1" : null;
+      setActiveTab(newActiveTab);
+    }
+  };
 
-    return (
-      <>
-        <Container className="pt-5 pt-md-7" fluid>
-          <Row>
-            <div className="col">
-              <Card className="shadow">
-                <CardBody>
-                  <div>
-                    <Nav tabs>
-                      <NavItem style={navItemStyle}>
-                        <NavLink
-                          className={classnames({ active: this.state.activeTab === '1' })}
-                          onClick={() => { this.toggle('1'); }}
-                        >
-                          Tạo mới
-                        </NavLink>
-                      </NavItem>
-                      <NavItem style={navItemStyle}>
-                        <NavLink
-                          className={classnames({ active: this.state.activeTab === '2' })}
-                          onClick={() => { this.toggle('2'); }}
-                        >
-                          Lịch sử đơn hàng
-                        </NavLink>
-                      </NavItem>
-                    </Nav>
-                    <TabContent activeTab={this.state.activeTab}>
-                      <TabPane tabId="1">
-                        <CreateOrder />
-                      </TabPane>
-                      <TabPane tabId="2">
-                        <OrderHistory />
-                      </TabPane>
 
-                    </TabContent>
-                  </div>
-                </CardBody>
-              </Card>
-            </div>
-          </Row>
+  return (
+    <>
+      <Container className="pt-5 pt-md-7" fluid>
+        <Row>
 
-        </Container>
-      </>
-    );
-  }
-}
+          {/* Tabs with icons */}
+          <div className="col">
+            <Card className="shadow">
+              <CardHeader className="bg-transparent">
+                <Col>
+                  <Button size="sm" color="primary" outline onClick={handleCreateOrder}>
+                    + Tạo mới hóa đơn
+                  </Button>
+                </Col>
+              </CardHeader>
+              <CardBody>
+                <div className="col">
+                  <Row className="align-items-center">
+                    <Col>
+                      <Nav tabs className="my-0">
+                        {orders.map((order, index) => (
+                          <NavItem key={index} style={{ fontSize: 13 }}>
+                            <NavLink
+                              className={classnames({ active: activeTab === `${index + 1}` })}
+                              onClick={() => {
+                                toggle(`${index + 1}`);
+                              }}
+                            >
+                              {order}{" "}
+                              <VscClose className="mb-2" onClick={() => handleDeleteOrder(index)} />
+                            </NavLink>
+                          </NavItem>
+                        ))}
+                      </Nav>
 
-export default Sales;
+                      <TabContent activeTab={activeTab}>
+                        {orders.map((order, index) => (
+                          <TabPane tabId={`${index + 1}`} key={index}>
+                            <Order />
+                          </TabPane>
+                        ))}
+                      </TabContent>
+                    </Col>
+                    <ToastContainer />
+                  </Row>
+                </div>
+              </CardBody>
+            </Card>
+          </div>
+        </Row>
+      </Container>
+
+    </>
+  );
+};
+
+export default CreateOrderPage;

@@ -192,17 +192,12 @@ const SaleProduct = () => {
 
     //lọc
     const resetFilters = () => {
-        setQueryParams({
-            page: 0,
-            size: 5,
-            type: 0,
-            code: "",
-            name: "",
-            fromDate: "",
-            toDate: "",
-            status: "",
-            isdelete: 0,
-        });
+        document.getElementById("minPrice").value = "";
+        document.getElementById("maxPrice").value = "";
+        document.getElementById("status").value = "";
+        document.getElementById("fromDate").value = "";
+        document.getElementById("toDate").value = "";
+    
     };
 
     const handleFilter = () => {
@@ -1070,7 +1065,7 @@ const SaleProduct = () => {
                 <ModalFooter>
                     <div className="row w-100">
                         <div className="col-4">
-                            <Button color="primary" outline size="sm" block>
+                            <Button color="primary" outline size="sm" block onClick={() => { resetFilters(); }}>
                                 Làm mới
                             </Button>
                         </div>

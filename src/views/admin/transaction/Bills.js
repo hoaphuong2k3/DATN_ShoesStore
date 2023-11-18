@@ -55,6 +55,7 @@ class Bills extends React.Component {
                         <NavLink
                           className={classnames({ active: this.state.activeTab === '1' })}
                           onClick={() => { this.toggle('1'); }}
+                          style={{ fontWeight: this.state.activeTab === '1' ? 'bold' : 'normal' }}
                         >
                           Chờ xác nhận
                         </NavLink>
@@ -63,6 +64,7 @@ class Bills extends React.Component {
                         <NavLink
                           className={classnames({ active: this.state.activeTab === '2' })}
                           onClick={() => { this.toggle('2'); }}
+                          style={{ fontWeight: this.state.activeTab === '2' ? 'bold' : 'normal' }}
                         >
                           Chờ vận chuyển
                         </NavLink>
@@ -71,6 +73,7 @@ class Bills extends React.Component {
                         <NavLink
                           className={classnames({ active: this.state.activeTab === '3' })}
                           onClick={() => { this.toggle('3'); }}
+                          style={{ fontWeight: this.state.activeTab === '3' ? 'bold' : 'normal' }}
                         >
                           Đang vận chuyển
                         </NavLink>
@@ -79,6 +82,7 @@ class Bills extends React.Component {
                         <NavLink
                           className={classnames({ active: this.state.activeTab === '4' })}
                           onClick={() => { this.toggle('4'); }}
+                          style={{ fontWeight: this.state.activeTab === '4' ? 'bold' : 'normal' }}
                         >
                           Hoàn thành
                         </NavLink>
@@ -87,6 +91,7 @@ class Bills extends React.Component {
                         <NavLink
                           className={classnames({ active: this.state.activeTab === '5' })}
                           onClick={() => { this.toggle('5'); }}
+                          style={{ fontWeight: this.state.activeTab === '5' ? 'bold' : 'normal' }}
                         >
                           Đã nhận
                         </NavLink>
@@ -95,6 +100,7 @@ class Bills extends React.Component {
                         <NavLink
                           className={classnames({ active: this.state.activeTab === '6' })}
                           onClick={() => { this.toggle('6'); }}
+                          style={{ fontWeight: this.state.activeTab === '6' ? 'bold' : 'normal' }}
                         >
                           Hủy
                         </NavLink>
