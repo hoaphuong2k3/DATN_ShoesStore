@@ -143,18 +143,13 @@ const Promotion = () => {
     };
 
     const resetFilters = () => {
-        setQueryParams({
-            page: 0,
-            size: 5,
-            code: "",
-            name: "",
-            minPrice: "",
-            maxPrice: "",
-            fromDate: "",
-            toDate: "",
-            status: "",
-            isdelete: 0,
-        });
+        document.getElementById("typePeriod").value = "";
+        document.getElementById("minPercent").value = "";
+        document.getElementById("maxPercent").value = "";
+        document.getElementById("status").value = "";
+        document.getElementById("fromDate").value = "";
+        document.getElementById("toDate").value = "";
+        document.getElementById("checkbox2").checked = false;
     };
 
     //checkbox
@@ -316,11 +311,21 @@ const Promotion = () => {
     };
     const handleDeleteButtonClick = () => {
         if (selectedItems.length > 0) {
-            if (window.confirm("Bạn có chắc chắn muốn xóa các khuyến mại đã chọn không?")) {
-                selectedItems.forEach(id => {
-                    deleteDiscount(id);
-                });
-                setSelectedItems([]);
+            const confirmed = window.confirm("Bạn có chắc chắn muốn xóa các khuyến mại đã chọn không?");
+
+            if (confirmed) {
+                const idsToDelete = selectedItems.join(',');
+
+                axiosInstance.delete(`/admin/discount-period/deleteDiscountPeriodAll?deleteAll=${idsToDelete}`)
+                    .then(response => {
+                        fetchData();
+                        toast.success("Xóa thành công");
+                        setSelectedItems([]);
+                        setSelectAll(false);
+                    })
+                    .catch(error => {
+                        console.error('Lỗi khi xóa dữ liệu:', error);
+                    });
             }
         }
     };
@@ -449,8 +454,6 @@ const Promotion = () => {
         <>
             <Container className="pt-5 pt-md-7" fluid>
                 <Row>
-
-                    {/* Tabs with icons */}
                     <div className="col">
                         <Card className="shadow">
                             <CardHeader className="bg-transparent">
@@ -525,14 +528,14 @@ const Promotion = () => {
                                                 </th>
                                                 <th scope="col" style={{ color: "black" }}>STT</th>
                                                 <th scope="col" style={{ color: "black", position: "sticky", zIndex: '1', left: '0' }}>Trạng thái</th>
-                                                <th scope="col" style={{ color: "black" }}>Mã<FaSort style={{cursor: "pointer"}}/></th>
-                                                <th scope="col" style={{ color: "black" }}>Loại<FaSort style={{cursor: "pointer"}}/></th>
-                                                <th scope="col" style={{ color: "black" }}>Tên khuyến mại<FaSort style={{cursor: "pointer"}}/></th>
-                                                <th scope="col" style={{ color: "black" }}>Hóa đơn <br />tối thiểu<FaSort style={{cursor: "pointer"}}/></th>
-                                                <th scope="col" style={{ color: "black" }}>Giá trị <FaSort style={{cursor: "pointer"}}/></th>
+                                                <th scope="col" style={{ color: "black" }}>Mã<FaSort style={{ cursor: "pointer" }} /></th>
+                                                <th scope="col" style={{ color: "black" }}>Loại<FaSort style={{ cursor: "pointer" }} /></th>
+                                                <th scope="col" style={{ color: "black" }}>Tên khuyến mại<FaSort style={{ cursor: "pointer" }} /></th>
+                                                <th scope="col" style={{ color: "black" }}>Hóa đơn <br />tối thiểu<FaSort style={{ cursor: "pointer" }} /></th>
+                                                <th scope="col" style={{ color: "black" }}>Giá trị <FaSort style={{ cursor: "pointer" }} /></th>
                                                 <th scope="col" style={{ color: "black" }}>Quà tặng</th>
-                                                <th scope="col" style={{ color: "black" }}>Ngày bắt đầu<FaSort style={{cursor: "pointer"}}/></th>
-                                                <th scope="col" style={{ color: "black" }}>Ngày kết thúc<FaSort style={{cursor: "pointer"}}/></th>
+                                                <th scope="col" style={{ color: "black" }}>Ngày bắt đầu<FaSort style={{ cursor: "pointer" }} /></th>
+                                                <th scope="col" style={{ color: "black" }}>Ngày kết thúc<FaSort style={{ cursor: "pointer" }} /></th>
                                                 <th scope="col" style={{ color: "black", position: "sticky", zIndex: '1', right: '0' }}>Thao tác</th>
 
                                             </tr>
@@ -1045,7 +1048,7 @@ const Promotion = () => {
                                     <ModalFooter>
                                         <div className="row w-100">
                                             <div className="col-4">
-                                                <Button color="primary" outline size="sm" block>
+                                                <Button color="primary" outline size="sm" block onClick={() => { resetFilters(); }}>
                                                     Làm mới
                                                 </Button>
                                             </div>

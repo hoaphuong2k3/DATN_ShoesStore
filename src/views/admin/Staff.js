@@ -627,7 +627,7 @@ const Staff = () => {
                     </thead>
                     <tbody>
                       {Array.isArray(filterAdmins) &&
-                      filterAdmins.length > 0 ? (
+                        filterAdmins.length > 0 ? (
                         filterAdmins.map((admin, index) => (
                           <tr key={admin.id}>
                             <td className="text-center">

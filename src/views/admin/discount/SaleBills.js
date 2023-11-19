@@ -91,17 +91,11 @@ const SaleBills = () => {
     };
     //lọc
     const resetFilters = () => {
-        setQueryParams({
-            page: 0,
-            size: 5,
-            type: 0,
-            code: "",
-            name: "",
-            fromDate: "",
-            toDate: "",
-            status: "",
-            isdelete: 0,
-        });
+        document.getElementById("minPrice").value = "";
+        document.getElementById("maxPrice").value = "";
+        document.getElementById("status").value = "";
+        document.getElementById("fromDate").value = "";
+        document.getElementById("toDate").value = "";
     };
 
     const handleFilter = () => {
@@ -334,14 +328,25 @@ const SaleBills = () => {
     };
     const handleDeleteButtonClick = () => {
         if (selectedItems.length > 0) {
-            if (window.confirm("Bạn có chắc chắn muốn xóa các khuyến mại đã chọn không?")) {
-                selectedItems.forEach(id => {
-                    deleteDiscount(id);
-                });
-                setSelectedItems([]);
+            const confirmed = window.confirm("Bạn có chắc chắn muốn xóa các khuyến mại đã chọn không?");
+            
+            if (confirmed) {
+                const idsToDelete = selectedItems.join(',');
+    
+                axiosInstance.delete(`/vouchers/deleteVoucherAll?deleteAll=${idsToDelete}`)
+                    .then(response => {
+                        fetchData();
+                        toast.success("Xóa thành công");
+                        setSelectedItems([]);
+                        setSelectAll(false);
+                    })
+                    .catch(error => {
+                        console.error('Lỗi khi xóa dữ liệu:', error);
+                    });
             }
         }
     };
+    
 
     return (
         <>
@@ -801,7 +806,7 @@ const SaleBills = () => {
                 <ModalFooter>
                     <div className="row w-100">
                         <div className="col-4">
-                            <Button color="primary" outline size="sm" block>
+                            <Button color="primary" outline size="sm" block onClick={() => { resetFilters(); }}>
                                 Làm mới
                             </Button>
                         </div>

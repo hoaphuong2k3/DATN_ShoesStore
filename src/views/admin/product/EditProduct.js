@@ -9,6 +9,7 @@ import {
 } from "reactstrap";
 import { toast } from 'react-toastify';
 import Header from "components/Headers/Header.js";
+import axios from "axios";
 
 const EditProduct = () => {
 
@@ -30,16 +31,19 @@ const EditProduct = () => {
     const [dataEdit, setDataEdit] = useState([])
     //getData
     const [imageUrl, setimageUrl] = useState();
+    const [isChange, setisChange] = useState("")
     const getData = async () => {
         try {
             let res = await findShoes(id);
             if (res && res.data) {
                 setDataEdit(res.data);
+                if (res.data.imgURI) {
+                    setimageUrl(`https://s3-ap-southeast-1.amazonaws.com/imageshoestore/${res.data.imgURI}`);
+                    setisChange("")
+                }
             }
 
-            if (res.data.imgURI) {
-                setimageUrl(`https://s3-ap-southeast-1.amazonaws.com/imageshoestore/${res.data.imgURI}`);
-            }
+
         } catch (error) {
             let errorMessage = "Lỗi từ máy chủ";
             if (error.response && error.response.data && error.response.data.message) {
@@ -100,6 +104,7 @@ const EditProduct = () => {
         const selectedFile = e.target.files[0];
         if (selectedFile) {
             setFile(selectedFile);
+            setisChange(true);
         }
     };
 
@@ -141,6 +146,7 @@ const EditProduct = () => {
             formData.append('file', file);
         }
         formData.append('data', shoesDataJson);
+        formData.append('isChange', isChange);
 
         try {
             await updateShoes(id, formData);
