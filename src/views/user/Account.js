@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import {
   Card,
   CardHeader,
@@ -12,10 +12,11 @@ import {
   CardTitle, Label, Modal, ModalBody, ModalFooter, ModalHeader
 } from "reactstrap";
 import { useAuth } from "services/AuthContext.js";
-import { FaEdit, FaTrash } from 'react-icons/fa';
+import { FaEdit, FaTrash, FaBook, FaRegUser, FaDollarSign } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 import axiosInstance from "services/custommize-axios";
 import axios from "axios";
+import Bill from "views/user/hoadon/Bills.js";
 const Menu = ({ setActiveTab }) => {
   return (
     <div className="col-3">
@@ -58,6 +59,12 @@ const Menu = ({ setActiveTab }) => {
         </style>
         <CardBody>
           <span
+            className="menu-link ml--4"
+            onClick={() => setActiveTab("profile")}
+          >
+            <FaRegUser /> Tài khoản của tôi
+          </span>
+          <span
             className="menu-link"
             onClick={() => setActiveTab("profile")}
           >
@@ -74,6 +81,15 @@ const Menu = ({ setActiveTab }) => {
             onClick={() => setActiveTab("password")}
           >
             Đổi mật khẩu
+          </span>
+          <span onClick={() => setActiveTab("bill")} className="menu-link ml--4">
+            <FaBook /> Đơn mua
+          </span>
+          <span
+            className="menu-link ml--4"
+
+          >
+            <FaDollarSign /> Điểm tích lũy
           </span>
         </CardBody>
       </Card>
@@ -413,7 +429,7 @@ const Account = () => {
       <Container fluid>
         <Row className="mt-7">
           {client === null &&
-            <div>
+            <div className="text-center">
               Bạn chưa đăng nhập
             </div>
           }
@@ -896,6 +912,10 @@ const Account = () => {
                       </div>
                     </CardBody>
                   </Card>
+                )}
+                {/* Password */}
+                {activeTab === "bill" && (
+                  <Bill />
                 )}
               </div>
             </>

@@ -132,7 +132,7 @@ const UserNavbar = () => {
                     <i className="ni ni-single-02" />
                     <span>Tài khoản</span>
                   </DropdownItem>
-                  <DropdownItem to="/shoes/account" tag={Link}>
+                  <DropdownItem to="/shoes/bill" tag={Link}>
                     <i className="ni ni-single-02" />
                     <span>Đơn mua</span>
                   </DropdownItem>
@@ -142,7 +142,7 @@ const UserNavbar = () => {
                   </DropdownItem>
                   <DropdownItem divider />
                   <DropdownItem onClick={handleLogout}>
-                    <i className="ni ni-user-run"  />
+                    <i className="ni ni-user-run" />
                     <span>Đăng xuất</span>
                   </DropdownItem>
                 </DropdownMenu>
