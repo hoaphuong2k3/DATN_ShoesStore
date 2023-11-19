@@ -30,7 +30,6 @@ const SaleBills = () => {
     }
 
 
-    const [value, setValue] = useState('no');
     const [discounts, setDiscounts] = useState([]);
     const [totalElements, setTotalElements] = useState(0);
     const [totalPages, setTotalPages] = useState(0);
@@ -148,6 +147,7 @@ const SaleBills = () => {
         name: "",
         minPrice: "",
         sale: false,
+        quantity: 0,
         salePercent: "",
         salePrice: "",
         description: "",
@@ -162,6 +162,7 @@ const SaleBills = () => {
                 id: discount.id,
                 code: discount.code,
                 name: discount.name,
+                quantity: discount.quantity,
                 startDate: discount.startDate,
                 endDate: discount.endDate,
                 description: discount.description,
@@ -177,6 +178,7 @@ const SaleBills = () => {
                 id: discount.id,
                 code: discount.code,
                 name: discount.name,
+                quantity: discount.quantity,
                 startDate: discount.startDate,
                 endDate: discount.endDate,
                 description: discount.description,
@@ -246,6 +248,7 @@ const SaleBills = () => {
                     name: formData.name,
                     minPrice: formData.minPrice,
                     sale: formData.sale,
+                    quantity: formData.quantity,
                     description: formData.description,
                     startDate: formattedStartDate,
                     endDate: formattedEndDate,
@@ -263,6 +266,7 @@ const SaleBills = () => {
                     name: formData.name,
                     minPrice: formData.minPrice,
                     sale: formData.sale,
+                    quantity: formData.quantity,
                     description: formData.description,
                     startDate: formattedStartDate,
                     endDate: formattedEndDate,
@@ -329,10 +333,10 @@ const SaleBills = () => {
     const handleDeleteButtonClick = () => {
         if (selectedItems.length > 0) {
             const confirmed = window.confirm("Bạn có chắc chắn muốn xóa các khuyến mại đã chọn không?");
-            
+
             if (confirmed) {
                 const idsToDelete = selectedItems.join(',');
-    
+
                 axiosInstance.delete(`/vouchers/deleteVoucherAll?deleteAll=${idsToDelete}`)
                     .then(response => {
                         fetchData();
@@ -346,13 +350,13 @@ const SaleBills = () => {
             }
         }
     };
-    
+
 
     return (
         <>
 
             <div className="col mt-4">
-               
+
                 <Row className="align-items-center my-4">
                     <div className="col d-flex">
                         <Button color="warning" outline size="sm" onClick={handleModal3}>
@@ -413,8 +417,9 @@ const SaleBills = () => {
                             <th scope="col" style={{ color: "black" }}>Mã</th>
                             <th scope="col" style={{ color: "black" }}>Tên khuyến mại</th>
                             <th scope="col" style={{ color: "black" }}>Hóa đơn <br />tối thiểu</th>
+                            <th scope="col" style={{ color: "black" }}>Phương thức</th>
                             <th scope="col" style={{ color: "black" }}>Giá trị</th>
-
+                            <th scope="col" style={{ color: "black" }}>Số lượng</th>
                             <th scope="col" style={{ color: "black" }}>Ngày bắt đầu</th>
                             <th scope="col" style={{ color: "black" }}>Ngày kết thúc</th>
                             <th scope="col" style={{ color: "black" }}>Mô tả</th>
@@ -451,11 +456,20 @@ const SaleBills = () => {
                                         <td>{discount.code}</td>
                                         <td>{discount.name}</td>
 
-                                        <td style={{ textAlign: "right" }}>{discount.minPrice.toLocaleString("vi-VN")} VNĐ</td>
+                                        <td style={{ textAlign: "right" }}>{discount.minPrice.toLocaleString("vi-VN")} VND</td>
+                                        <td style={{ textAlign: "center" }}>
+                                            {discount.salePercent ? (
+                                                <Badge color="info">Phần trăm</Badge>
+                                            ) : discount.salePrice ? (
+                                                <Badge color="success">Tiền mặt</Badge>
+                                            ) : null}
+                                        </td>
+
                                         <td style={{ textAlign: "right" }}>
                                             {discount.salePercent ? `${discount.salePercent}%` : ""}
-                                            {discount.salePrice ? `${discount.salePrice.toLocaleString("vi-VN")} VNĐ` : ""}
+                                            {discount.salePrice ? `${discount.salePrice.toLocaleString("vi-VN")} VND` : ""}
                                         </td>
+                                        <td style={{ textAlign: "right" }}>{discount.quantity}</td>
                                         <td>{format(new Date(discount.startDate), 'yyyy-MM-dd HH:mm', { locale: vi })}</td>
                                         <td>{format(new Date(discount.endDate), 'yyyy-MM-dd HH:mm', { locale: vi })}</td>
                                         <td>{discount.description}</td>
@@ -528,7 +542,7 @@ const SaleBills = () => {
                 toggle={toggle}
                 backdrop={'static'}
                 keyboard={false}
-                style={{ maxWidth: '900px' }}
+                style={{ maxWidth: '800px' }}
             >
                 <ModalHeader toggle={toggle}>
                     <h3 className="heading-small text-muted mb-0">{formData.id ? 'Cập Nhật Khuyến mại' : 'Thêm Mới Khuyến mại'}</h3>
@@ -539,7 +553,7 @@ const SaleBills = () => {
                         <div className="pl-lg-4">
                             <Row>
 
-                                <Col lg="4">
+                                <Col lg="6">
                                     <FormGroup>
                                         <label
                                             className="form-control-label"
@@ -557,7 +571,24 @@ const SaleBills = () => {
                                     </FormGroup>
                                 </Col>
 
-                                <Col lg="4">
+                                <Col lg="6">
+                                    <FormGroup>
+                                        <label
+                                            className="form-control-label"
+                                            htmlFor="startDate"
+                                        >
+                                            Hóa đơn tối thiểu:
+                                        </label>
+                                        <Input
+                                            className="form-control-alternative"
+                                            type="number"
+                                            value={formData.minPrice}
+                                            onChange={(e) => setFormData({ ...formData, minPrice: e.target.value })}
+                                        />
+                                    </FormGroup>
+                                </Col>
+
+                                <Col lg="6">
                                     <FormGroup>
                                         <label
                                             className="form-control-label"
@@ -574,7 +605,7 @@ const SaleBills = () => {
                                         />
                                     </FormGroup>
                                 </Col>
-                                <Col lg="4">
+                                <Col lg="6">
                                     <FormGroup>
                                         <label
                                             className="form-control-label"
@@ -592,25 +623,8 @@ const SaleBills = () => {
                                     </FormGroup>
                                 </Col>
 
-                                <Col lg="4">
-                                    <FormGroup>
-                                        <label
-                                            className="form-control-label"
-                                            htmlFor="startDate"
-                                        >
-                                            Hóa đơn tối thiểu:
-                                        </label>
-                                        <Input
-                                            className="form-control-alternative"
-                                            type="number"
-                                            value={formData.minPrice}
-                                            onChange={(e) => setFormData({ ...formData, minPrice: e.target.value })}
-                                        />
-                                    </FormGroup>
-                                </Col>
 
-
-                                <Col lg="4">
+                                <Col lg="6">
                                     <FormGroup>
                                         <label
                                             className="form-control-label"
@@ -642,7 +656,7 @@ const SaleBills = () => {
                                 </Col>
 
                                 {formData.sale && (
-                                    <Col lg="4">
+                                    <Col lg="6">
                                         <FormGroup>
                                             <label
                                                 className="form-control-label"
@@ -661,7 +675,7 @@ const SaleBills = () => {
                                 )}
 
                                 {!formData.sale && (
-                                    <Col lg="4">
+                                    <Col lg="6">
                                         <FormGroup>
                                             <label
                                                 className="form-control-label"
@@ -678,6 +692,23 @@ const SaleBills = () => {
                                     </Col>
                                 )}
 
+
+                                <Col lg="6">
+                                    <FormGroup>
+                                        <label
+                                            className="form-control-label"
+                                            htmlFor="startDate"
+                                        >
+                                            Số lượng:
+                                        </label>
+                                        <Input
+                                            className="form-control-alternative"
+                                            type="number"
+                                            value={formData.quantity}
+                                            onChange={(e) => setFormData({ ...formData, quantity: e.target.value })}
+                                        />
+                                    </FormGroup>
+                                </Col>
 
                                 <Col className="pl-lg-4">
                                     <FormGroup>

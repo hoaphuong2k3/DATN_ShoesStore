@@ -528,14 +528,14 @@ const Promotion = () => {
                                                 </th>
                                                 <th scope="col" style={{ color: "black" }}>STT</th>
                                                 <th scope="col" style={{ color: "black", position: "sticky", zIndex: '1', left: '0' }}>Trạng thái</th>
-                                                <th scope="col" style={{ color: "black" }}>Mã<FaSort style={{ cursor: "pointer" }} /></th>
-                                                <th scope="col" style={{ color: "black" }}>Loại<FaSort style={{ cursor: "pointer" }} /></th>
-                                                <th scope="col" style={{ color: "black" }}>Tên khuyến mại<FaSort style={{ cursor: "pointer" }} /></th>
-                                                <th scope="col" style={{ color: "black" }}>Hóa đơn <br />tối thiểu<FaSort style={{ cursor: "pointer" }} /></th>
-                                                <th scope="col" style={{ color: "black" }}>Giá trị <FaSort style={{ cursor: "pointer" }} /></th>
+                                                <th scope="col" style={{ color: "black" }}>Mã<FaSort style={{ cursor: "pointer" }} className="text-muted"/></th>
+                                                <th scope="col" style={{ color: "black" }}>Loại<FaSort style={{ cursor: "pointer" }} className="text-muted"/></th>
+                                                <th scope="col" style={{ color: "black" }}>Tên khuyến mại<FaSort style={{ cursor: "pointer" }} className="text-muted"/></th>
+                                                <th scope="col" style={{ color: "black" }}>Hóa đơn <br />tối thiểu<FaSort style={{ cursor: "pointer" }} className="text-muted"/></th>
+                                                <th scope="col" style={{ color: "black" }}>Giá trị <FaSort style={{ cursor: "pointer" }} className="text-muted"/></th>
                                                 <th scope="col" style={{ color: "black" }}>Quà tặng</th>
-                                                <th scope="col" style={{ color: "black" }}>Ngày bắt đầu<FaSort style={{ cursor: "pointer" }} /></th>
-                                                <th scope="col" style={{ color: "black" }}>Ngày kết thúc<FaSort style={{ cursor: "pointer" }} /></th>
+                                                <th scope="col" style={{ color: "black" }}>Ngày bắt đầu<FaSort style={{ cursor: "pointer" }} className="text-muted"/></th>
+                                                <th scope="col" style={{ color: "black" }}>Ngày kết thúc<FaSort style={{ cursor: "pointer" }} className="text-muted"/></th>
                                                 <th scope="col" style={{ color: "black", position: "sticky", zIndex: '1', right: '0' }}>Thao tác</th>
 
                                             </tr>

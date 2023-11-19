@@ -136,53 +136,62 @@ const Waitting = ({ updateData }) => {
     //detail
     const handleRowClick = async (id, confirm) => {
         setSelectedOrderId(id);
+        
         try {
             const [orderResponse, deliveryResponse] = await Promise.all([
                 axiosInstance.get(`/order/admin/cart/get-all/${id}`),
                 axiosInstance.get(`/order/admin/delivery/${id}`),
             ]);
-
-
-            const productPrice = orderResponse.reduce((total, product) => {
-                return total + product.totalPrice;
-            }, 0);
-
-            const totalMoney = calculateTotalMoney(
-                productPrice,
-                deliveryResponse.data.deliveryCost,
-                confirm.percentPeriod,
-                confirm.percentVoucher,
-                confirm.priceVoucher
-            );
-            setTotalProductPrice(productPrice);
-
-            setFormData({
-                id: confirm.id,
-                code: confirm.code,
-                totalMoney: totalMoney,
-                paymentMethod: confirm.paymentMethod,
-                percentVoucher: confirm.percentVoucher,
-                priceVoucher: confirm.priceVoucher,
-                percentPeriod: confirm.percentPeriod,
-            });
-            setOrderData(orderResponse);
-            setDeliveryData(deliveryResponse.data);
-
-            const deliveryAddress = deliveryResponse.data.deliveryAddress;
-            // Phân tách chuỗi địa chỉ thành các thành phần
-            const addressParts = deliveryAddress.split(', ');
-            const [selectedProvince, selectedDistrict, selectedWard, detailedAddress] = addressParts.reverse();
-            setDetailedAddress(detailedAddress);
-            setSelectedWard(selectedWard);
-            setSelectedDistrict(selectedDistrict);
-            setSelectedProvince(selectedProvince);
-
+    
+            // Kiểm tra nếu có dữ liệu từ API đơn hàng
+            if (orderResponse && orderResponse.length > 0) {
+                const productPrice = orderResponse.reduce((total, product) => {
+                    return total + product.totalPrice;
+                }, 0);
+    
+                const totalMoney = calculateTotalMoney(
+                    productPrice,
+                    deliveryResponse?.data?.deliveryCost || 0,
+                    confirm.percentPeriod,
+                    confirm.percentVoucher,
+                    confirm.priceVoucher
+                );
+    
+                setTotalProductPrice(productPrice);
+    
+                setFormData({
+                    id: confirm.id,
+                    code: confirm.code,
+                    totalMoney: totalMoney,
+                    paymentMethod: confirm.paymentMethod,
+                    percentVoucher: confirm.percentVoucher,
+                    priceVoucher: confirm.priceVoucher,
+                    percentPeriod: confirm.percentPeriod,
+                });
+                
+                setOrderData(orderResponse);
+            }
+    
+            // Kiểm tra nếu có dữ liệu từ API vận chuyển
+            if (deliveryResponse && deliveryResponse.data) {
+                setDeliveryData(deliveryResponse.data);
+    
+                const deliveryAddress = deliveryResponse.data.deliveryAddress;
+                // Phân tách chuỗi địa chỉ thành các thành phần
+                const addressParts = deliveryAddress.split(', ');
+                const [selectedProvince, selectedDistrict, selectedWard, detailedAddress] = addressParts.reverse();
+                setDetailedAddress(detailedAddress);
+                setSelectedWard(selectedWard);
+                setSelectedDistrict(selectedDistrict);
+                setSelectedProvince(selectedProvince);
+            }
+    
             setModal(true);
         } catch (error) {
             console.error("Lỗi khi lấy dữ liệu hóa đơn:", error);
         }
     };
-
+    
     //checkbox
     const selectAllCheckbox = () => {
         setSelectAllChecked(!selectAllChecked);
@@ -293,7 +302,7 @@ const Waitting = ({ updateData }) => {
     const deleted = async () => {
         try {
             await Promise.all(selectedIds.map(async (id) => {
-                await axiosInstance.put(`/order/admin/update-status/${id}?status=-1`);
+                await axiosInstance.put(`/order/admin/update-status/${id}?status=7`);
             }));
             const newData = await fetchData();
             updateData(6, newData);
@@ -446,6 +455,7 @@ const Waitting = ({ updateData }) => {
                                 </th>
                                 <th scope="col" className="text-dark">Mã hóa đơn</th>
                                 <th scope="col" className="text-dark">Khách hàng</th>
+                                 <th scope="col" className="text-dark">Số điện thoại</th>
                                 <th scope="col" className="text-dark">Tổng tiền</th>
                                 <th scope="col" className="text-dark">Phương thức</th>
                                 <th scope="col" className="text-dark">Nhân viên</th>
@@ -471,7 +481,8 @@ const Waitting = ({ updateData }) => {
                                                 </FormGroup>
                                             </td>
                                             <td>{confirm.code}</td>
-                                            <td>{confirm.createdBy}</td>
+                                            <td>{confirm.fullname}</td>
+                                            <td>{confirm.phoneNumber}</td>
                                             <td className="text-right">{confirm.totalMoney.toLocaleString("vi-VN")} VND</td>
                                             <td className="text-center">
                                                 <Badge color={confirm.paymentMethod === 1 ? "success" : confirm.paymentMethod === 2 ? "primary" : "secondary"}>

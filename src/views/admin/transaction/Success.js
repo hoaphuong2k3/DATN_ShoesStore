@@ -127,47 +127,56 @@ const Success = ({ updateData }) => {
     //detail
     const handleRowClick = async (id, confirm) => {
         setSelectedOrderId(id);
+        
         try {
             const [orderResponse, deliveryResponse] = await Promise.all([
                 axiosInstance.get(`/order/admin/cart/get-all/${id}`),
                 axiosInstance.get(`/order/admin/delivery/${id}`),
             ]);
-
-
-            const productPrice = orderResponse.reduce((total, product) => {
-                return total + product.totalPrice;
-            }, 0);
-
-            const totalMoney = calculateTotalMoney(
-                productPrice,
-                deliveryResponse.data.deliveryCost,
-                confirm.percentPeriod,
-                confirm.percentVoucher,
-                confirm.priceVoucher
-            );
-            setTotalProductPrice(productPrice);
-
-            setFormData({
-                id: confirm.id,
-                code: confirm.code,
-                totalMoney: totalMoney,
-                paymentMethod: confirm.paymentMethod,
-                percentVoucher: confirm.percentVoucher,
-                priceVoucher: confirm.priceVoucher,
-                percentPeriod: confirm.percentPeriod,
-            });
-            setOrderData(orderResponse);
-            setDeliveryData(deliveryResponse.data);
-
-            const deliveryAddress = deliveryResponse.data.deliveryAddress;
-            // Phân tách chuỗi địa chỉ thành các thành phần
-            const addressParts = deliveryAddress.split(', ');
-            const [selectedProvince, selectedDistrict, selectedWard, detailedAddress] = addressParts.reverse();
-            setDetailedAddress(detailedAddress);
-            setSelectedWard(selectedWard);
-            setSelectedDistrict(selectedDistrict);
-            setSelectedProvince(selectedProvince);
-
+    
+            // Kiểm tra nếu có dữ liệu từ API đơn hàng
+            if (orderResponse && orderResponse.length > 0) {
+                const productPrice = orderResponse.reduce((total, product) => {
+                    return total + product.totalPrice;
+                }, 0);
+    
+                const totalMoney = calculateTotalMoney(
+                    productPrice,
+                    deliveryResponse?.data?.deliveryCost || 0,
+                    confirm.percentPeriod,
+                    confirm.percentVoucher,
+                    confirm.priceVoucher
+                );
+    
+                setTotalProductPrice(productPrice);
+    
+                setFormData({
+                    id: confirm.id,
+                    code: confirm.code,
+                    totalMoney: totalMoney,
+                    paymentMethod: confirm.paymentMethod,
+                    percentVoucher: confirm.percentVoucher,
+                    priceVoucher: confirm.priceVoucher,
+                    percentPeriod: confirm.percentPeriod,
+                });
+                
+                setOrderData(orderResponse);
+            }
+    
+            // Kiểm tra nếu có dữ liệu từ API vận chuyển
+            if (deliveryResponse && deliveryResponse.data) {
+                setDeliveryData(deliveryResponse.data);
+    
+                const deliveryAddress = deliveryResponse.data.deliveryAddress;
+                // Phân tách chuỗi địa chỉ thành các thành phần
+                const addressParts = deliveryAddress.split(', ');
+                const [selectedProvince, selectedDistrict, selectedWard, detailedAddress] = addressParts.reverse();
+                setDetailedAddress(detailedAddress);
+                setSelectedWard(selectedWard);
+                setSelectedDistrict(selectedDistrict);
+                setSelectedProvince(selectedProvince);
+            }
+    
             setModal(true);
         } catch (error) {
             console.error("Lỗi khi lấy dữ liệu hóa đơn:", error);
