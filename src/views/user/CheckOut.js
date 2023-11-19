@@ -54,46 +54,37 @@ const Checkout = () => {
           <div className="col">
             <Card className="shadow">
               <CardBody className="row">
-                <div className="col-12">
-                  <h1 className="text-dark text-center d-flex align-items-center justify-content-center">
-                    <img
-                      src="https://cdn-icons-png.flaticon.com/128/2435/2435281.png"
-                      width="40px"
-                      height="40px"
-                      className="mr-3"
-                      alt="Icon"
-                    />
-                    Thanh toán
-                  </h1>
+                <div className="col-12 text-center">
+                  <h2 className="text-uppercase mb-2 mt-2 gioHang">
+                    Thanh Toán
+                  </h2>
+                  <hr color="orange" width="280px" className="mb-5" />
                 </div>
-                <div className="col-12">
-                  <hr color="orange" width="300px" className="mb-5" />
-                </div>
-                <div className="col-md-7">
+                <div className="col-md-8">
                   <div>
                     {Array.isArray(products) ? (
-                    products.map((product) => (
-                      <div className="item d-flex mb-5" key={product.id}>
-                        <img
-                          src={
-                            "https://laforce.vn/wp-content/uploads/2022/12/giay-tay-nam-GNLAAZ01-1-D-108x136.jpg"
-                          }
-                          alt={product.name}
-                          className="mr-3"
-                        />
-                        <div>
-                          <div className="text-dark mt-3 name">
-                            {product.name}
-                          </div>
-                          <div className="text-uppercase text-muted small mt-2">
-                            {product.color}, size {product.size}
-                          </div>
-                          <div className="text-danger small mt-2">
-                            {product.price}đ
+                      products.map((product) => (
+                        <div className="item d-flex mb-5" key={product.id}>
+                          <img
+                            src={
+                              "https://laforce.vn/wp-content/uploads/2022/12/giay-tay-nam-GNLAAZ01-1-D-108x136.jpg"
+                            }
+                            alt={product.name}
+                            className="mr-3"
+                          />
+                          <div>
+                            <div className="text-dark mt-3 name">
+                              {product.name}
+                            </div>
+                            <div className="text-uppercase text-muted small mt-2">
+                              {product.color}, size {product.size}
+                            </div>
+                            <div className="text-danger small mt-2">
+                              {product.price}đ
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    ))
+                      ))
                     ) : (
                       <div>Loading...</div>
                     )}
@@ -169,23 +160,23 @@ const Checkout = () => {
                     </div>
                   </div>
                 </div>
-                <div className="col-md-5">
+                <div className="col-md-4">
                   <Card
                     style={{ backgroundColor: "#f7f7f7", marginBottom: "26px" }}
                   >
                     <CardBody>
-                      <div className="p-2 d-flex">
-                        <p className="mr-5 text-dark font-weight-bold mt-1">
+                      <div className=" d-flex">
+                        <p className="text-dark font-weight-bold mt-1">
                           <i
                             class="fa fa-ticket"
                             aria-hidden="true"
-                            style={{ color: "gray", marginRight: "5px" }}
+                            style={{ color: "gray", marginRight: "11px" }}
                           ></i>
                           ShoesVouchers
                         </p>
                         <a
                           onClick={handleOpenVoucherModal}
-                          className=" mt-1 ml-5 pointer"
+                          className=" mt-1 ml-5 pointer medium"
                         >
                           Chọn vouchers
                         </a>
@@ -266,8 +257,13 @@ const Checkout = () => {
                     <Input type="radio" name="paymentMethod" className="ml-1" />
                     <Label className="ml-4">Thẻ Master/Ví điện tử</Label>
                   </div>
-                  <Button className="btn btn-info d-flex justify-content-center mt-3 text-dark">
-                    Thanh Toán
+                  <Button
+                    name="checkout"
+                    // onClick={() => handleCheckout()}
+                    className="evo-button mobile-viewmore mt-4"
+                    style={{ width: "100%" }}
+                  >
+                    <strong>Đặt Hàng</strong>
                   </Button>
                 </div>
               </CardBody>
@@ -304,7 +300,7 @@ const Checkout = () => {
           >
             Đóng
           </a>
-          <Button className="btn btn-info small d-flex justify-content-center ml-3 text-dark">
+          <Button className=" d-flex evo-button mobile-viewmore">
             Áp dụng
           </Button>
         </ModalFooter>

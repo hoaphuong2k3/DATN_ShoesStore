@@ -3,7 +3,7 @@ import Product from "views/user/ListProduct.js";
 import News from "views/user/News.js";
 import Introduce from "views/user/Introduce.js";
 import Contact from "views/user/Contact.js";
-import Cart from "views/user/Cart.js";
+import Cart from "views/user/Cart";
 import Account from "views/user/Account.js";
 import ProductDetail from "views/user/ProductDetail.js";
 import CheckOut from "views/user/CheckOut.js";

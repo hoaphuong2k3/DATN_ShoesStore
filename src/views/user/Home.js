@@ -34,7 +34,7 @@ const Home = () => {
   const [totalPages, setTotalPages] = useState(0);
   const [totalElements, setTotalElenments] = useState(0);
   const [page, setPage] = useState(0);
-  const [size, setSize] = useState(1);
+  const [size, setSize] = useState(4);
   const [search, setSearch] = useState({
     name: "",
     brandId: null,
@@ -473,7 +473,7 @@ const Home = () => {
                           </a>
                         </div>
                         <div className="outfit-product">
-                          {Array.isArray(products) ? (
+                          {/* {Array.isArray(products) ? (
                             products.map((product) => (
                               <Card className="product-card ml-4">
                                 <span className="sale-box">- 22% </span>
@@ -500,7 +500,6 @@ const Home = () => {
                                       to={`/shoes/productdetail/${product.id}`}
                                     >
                                       <h3 className="product-card__title">
-                                        {/* SAVILLE CAPTOE OXFORD - OF32 */}
                                         {`${product.name} ${product.cushion} ${product.designStyle} ${product.brand}`}
                                       </h3>
                                     </Link>
@@ -516,7 +515,7 @@ const Home = () => {
                             ))
                           ) : (
                             <p>Không có dữ liệu.</p>
-                          )}
+                          )} */}
                         </div>
                       </div>
                     </div>
