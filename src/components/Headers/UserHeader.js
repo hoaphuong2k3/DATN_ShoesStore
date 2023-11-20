@@ -78,6 +78,7 @@ const UserHeader = () => {
             }}
           ></div>
         </Slider>
+        
         <Container fluid>
           <Row className="justify-content-end float-left">
             <Col lg="10" md="10">

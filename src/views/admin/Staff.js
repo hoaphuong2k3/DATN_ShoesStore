@@ -267,7 +267,7 @@ const Staff = () => {
       );
       const file = new File([blob], "image.jpg", { type: "image/jpeg" });
       setFile(file);
-    }else {
+    } else {
       const defaultAvatar = getDefaultAvatar(admin.gender, admin.avatar);
       const blob = await fetch(defaultAvatar).then((res) => res.blob());
       const file = new File([blob], "image.jpg", { type: "image/jpeg" });
@@ -497,6 +497,19 @@ const Staff = () => {
     toggleFilter(); // Đóng modal lọc
   };
 
+  // Sắp xếp
+  const handleSort = (field) => {
+    const newSortOrder =
+      queryParams.sortField === field && queryParams.sortOrder === "asc"
+        ? "desc"
+        : "asc";
+    setQueryParams({
+      ...queryParams,
+      sortField: field,
+      sortOrder: newSortOrder,
+    });
+  };
+
   return (
     <>
       {/* <Header /> */}
@@ -608,38 +621,63 @@ const Staff = () => {
                             />
                           </FormGroup>
                         </th>
-                        <th scope="col">STT</th>
-                        <th scope="col">Ảnh</th>
+                        <th scope="col"style={{color: "black"}}>STT</th>
+                        <th scope="col" style={{color: "black"}}>Ảnh</th>
                         <th
                           scope="col"
                           style={{
                             position: "sticky",
                             zIndex: "1",
                             left: "0",
+                            color: "black"
                           }}
                         >
                           Trạng thái
                         </th>
 
-                        <th scope="col" style={{ cursor: "pointer" }}>
+                        <th scope="col" style={{ color: "black"}}>
                           Họ tên
-                          <FaSort style={{ cursor: "pointer" }} />
+                          <FaSort
+                            style={{ cursor: "pointer" }}
+                            className="text-muted"
+                            onClick={() => handleSort("fullname")}
+                          />
                         </th>
-                        <th scope="col">Ngày sinh</th>
-                        <th scope="col">Giới tính</th>
-                        <th scope="col">Số điện thoại</th>
-                        <th scope="col" style={{ cursor: "pointer" }}>
+                        <th scope="col" style={{color: "black"}}>Ngày sinh</th>
+                        <th scope="col" style={{color: "black"}}>
+                          Giới tính
+                          <FaSort
+                            style={{ cursor: "pointer" }}
+                            className="text-muted"
+                            onClick={() => handleSort("gender")}
+                          />
+                        </th>
+                        <th scope="col" style={{ color: "black"}}>
+                          Số điện thoại
+                          <FaSort
+                            style={{ cursor: "pointer" }}
+                            className="text-muted"
+                            onClick={() => handleSort("phonenumber")}
+                          />
+                        </th>
+                        <th scope="col" style={{color: "black"}}>
                           Email
+                          <FaSort
+                            style={{ cursor: "pointer"}}
+                            className="text-muted"
+                            onClick={() => handleSort("email")}
+                          />
                         </th>
-                        <th scope="col" style={{ cursor: "pointer" }}>
+                        <th scope="col" style={{ color: "black" }}>
                           Địa chỉ
                         </th>
                         <th
                           scope="col"
                           style={{
+                            color: "black",
                             position: "sticky",
                             zIndex: "1",
-                            right: "0",
+                            right: "0"
                           }}
                         >
                           Thao tác
@@ -666,7 +704,10 @@ const Staff = () => {
                             <td>
                               <span className="avatar avatar-sm rounded-circle">
                                 <img
-                                  src={getDefaultAvatar(admin.gender, admin.avatar)}
+                                  src={getDefaultAvatar(
+                                    admin.gender,
+                                    admin.avatar
+                                  )}
                                   alt={admin.username}
                                 />
                               </span>

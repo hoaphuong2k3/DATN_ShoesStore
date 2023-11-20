@@ -205,7 +205,7 @@ const Cart = () => {
                                         handleCheckboxChange(item.id)
                                       }
                                     />
-                                    <p className="image">
+                                    <p className="">
                                       <Link
                                         to={`/shoes/productdetail/${item.id}`}
                                       >
@@ -214,9 +214,11 @@ const Cart = () => {
                                           alt={item.name}
                                           style={{
                                             float: "right",
-                                            marginRight: "3px",
+                                            marginRight: "6px",
+                                            marginTop: "20px",
+                                            borderRadius: "20%"
                                           }}
-                                          width={"70%"}
+                                          width={"60%"}
                                           // height={"90px"}
                                         />
                                       </Link>
