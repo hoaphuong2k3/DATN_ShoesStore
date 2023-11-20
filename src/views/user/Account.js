@@ -608,7 +608,7 @@ const Account = () => {
                                     />
                                   )}
                                 </div>
-                                <Label htmlFor="file-input" className="btn btn-outline-primary mt-2 btn-sm ml--4" size="sm">
+                                <Label htmlFor="file-input" className="btn btn-outline-primary mt-2 btn-sm ml--3" size="sm">
                                   Chọn file
                                 </Label>
                                 <Input
