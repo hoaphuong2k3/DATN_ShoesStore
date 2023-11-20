@@ -1,0 +1,27 @@
+.product-container {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+}
+
+.product-image {
+  width: 100px; /* Thay đổi kích thước ảnh theo yêu cầu */
+  height: auto;
+  border-radius: 15px;
+}
+
+.quantity-badge {
+  position: absolute;
+  top: -10px;
+  right: -8px;
+  background-color: black; /* Thay đổi màu sắc theo yêu cầu */
+  width: 25px; /* Đặt kích thước chiều rộng của badge */
+  height: 25px; /* Đặt kích thước chiều cao của badge */
+  border-radius: 50%; /* Làm tròn góc để tạo hình tròn */
+  text-align: center;
+}
+
+.quantity {
+  color: #ffffff; /* Thay đổi màu sắc chữ số theo yêu cầu */
+  font-size: 12px; /* Thay đổi kích thước chữ số theo yêu cầu */
+}

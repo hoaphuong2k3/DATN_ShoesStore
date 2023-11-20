@@ -16,11 +16,13 @@ import {
 import Header from "components/Headers/ProductHeader";
 import Select from "react-select";
 import axiosInstance from "services/custommize-axios";
+import "assets/css/checkout.css";
 
 const Checkout = () => {
   const [showVoucherModal, setShowVoucherModal] = useState(false);
   const [products, setProducts] = useState(null);
   const storedUserId = localStorage.getItem("userId");
+  const [totalMoney, setTotalMoney] = useState(null);
 
   const handleOpenVoucherModal = () => {
     setShowVoucherModal(true);
@@ -35,8 +37,9 @@ const Checkout = () => {
       );
 
       setProducts(response.data.shoesCart);
+      setTotalMoney(response.data.totalMoney);
       console.log(storedUserId);
-      console.log(response.data.shoesCart);
+      console.log(response.data.totalMoney);
     } catch (error) {
       console.error("Lỗi trong quá trình thanh toán:", error);
     }
@@ -65,18 +68,21 @@ const Checkout = () => {
                     {Array.isArray(products) ? (
                       products.map((product) => (
                         <div className="item d-flex mb-5" key={product.id}>
-                          <img
-                            src={
-                              "https://laforce.vn/wp-content/uploads/2022/12/giay-tay-nam-GNLAAZ01-1-D-108x136.jpg"
-                            }
-                            alt={product.name}
-                            className="mr-3"
-                          />
+                          <div className="product-container mr-5">
+                            <img
+                              src="https://laforce.vn/wp-content/uploads/2022/12/giay-tay-nam-GNLAAZ01-1-D-108x136.jpg"
+                              alt={product.name}
+                              className="product-image"
+                            />
+                            <div className="quantity-badge">
+                              <span className="quantity">{product.quantity}</span>
+                            </div>
+                          </div>
                           <div>
                             <div className="text-dark mt-3 name">
-                              {product.name}
+                              {product.name} - {product.code}
                             </div>
-                            <div className="text-uppercase text-muted small mt-2">
+                            <div className="text-uppercase text-muted small mt-1">
                               {product.color}, size {product.size}
                             </div>
                             <div className="text-danger small mt-2">
@@ -89,7 +95,7 @@ const Checkout = () => {
                       <div>Loading...</div>
                     )}
                   </div>
-                  <div className="mt-5">
+                  <div className="mt-7">
                     <div className="inner">
                       <h3 className="text-dark">
                         <i
@@ -206,7 +212,7 @@ const Checkout = () => {
                               className="text-dark font-weight-bold"
                               style={{ float: "right" }}
                             >
-                              1
+                              {products ? products.length : 0}
                             </span>
                             <br />
                           </div>
@@ -216,7 +222,7 @@ const Checkout = () => {
                               className="text-dark font-weight-bold"
                               style={{ float: "right" }}
                             >
-                              441.000 đ
+                              {totalMoney}đ
                             </span>
                             <br />
                           </div>
@@ -236,7 +242,7 @@ const Checkout = () => {
                             className="text-dark font-weight-bold"
                             style={{ float: "right" }}
                           >
-                            441.000 đ
+                            {totalMoney}đ
                           </h3>
                         </div>
                       </div>

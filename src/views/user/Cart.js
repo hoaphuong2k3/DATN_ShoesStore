@@ -229,9 +229,16 @@ const Cart = () => {
                                           href="/shoes/product"
                                           title={item.name}
                                         >
-                                          {item.name} - {item.color}/{" "}
-                                          {item.size}
+                                          {item.name} - {item.code}
                                         </a>
+                                        <div className="product-details text-muted d-flex mt-1">
+                                          <p className="product-size small mr-1">
+                                            Size: {item.size},
+                                          </p>
+                                          <p className="product-color small">
+                                            Màu: {item.color}
+                                          </p>
+                                        </div>
                                       </p>
                                       <p className="action">
                                         <p
