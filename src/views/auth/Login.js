@@ -36,7 +36,7 @@ const Login = () => {
     if (initialized) {
       const searchParams = new URLSearchParams(location.search);
       const code = searchParams.get('code');
-  
+    
       if (code && !authenticationSuccessful) {
         setAuthenticationSuccessful(true);
         console.log(code);
@@ -77,7 +77,7 @@ const Login = () => {
     const fetchGoogleRedirectUri = async () => {
       try {
         const response = await axios.get('http://localhost:33321/api/oauth/googleRedirectUri');
-        setGoogleRedirectUri('http://localhost:8080/oauth2/authorize/google?redirect_uri=' + response.data);
+        setGoogleRedirectUri('http://localhost:33321/api/oauth2/authorize/google?redirect_uri=' + response.data);
       } catch (error) {
         console.error('Error fetching Google Redirect URI:', error);
       }
@@ -102,7 +102,7 @@ const Login = () => {
       toast.success("Đăng nhập thành công!");
 
       // Kiểm tra vai trò người dùng và chuyển hướng đến trang tương ứng
-      if (authorities.some((authority) => authority.authority === "ADMIN") || authorities.some((authority) => authority.authority === "SUPPER_ADMIN")) {
+      if (authorities.some((authority) => authority.authority === "ADMIN") || authorities.some((authority) => authority.authority === "STAFF")) {
         navigate("/admin");
       } else if (authorities.some((authority) => authority.authority === "USER")) {
         navigate("/shoes");

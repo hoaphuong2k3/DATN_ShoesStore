@@ -72,7 +72,7 @@ const Checkout = () => {
       const response = await axiosInstance.post("/order/create", data);
       alert("Đặt hàng thành công");
       // Thực hiện các xử lý sau khi tạo hóa đơn thành công (nếu cần)
-      window.location.href = "/shoes/home";
+      // window.location.href = "/shoes/home";
     } catch (error) {
       console.error("Lỗi trong quá trình tạo hóa đơn:", error);
       // Xử lý lỗi (nếu cần)
