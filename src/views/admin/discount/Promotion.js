@@ -1032,7 +1032,7 @@ const Promotion = () => {
                                                         <label style={{ fontSize: 13 }}
                                                             className="form-control-label"
                                                         >
-                                                            Hóa đơn từ
+                                                            Giá trị từ
                                                         </label>
                                                         <Input
                                                             className="form-control-alternative"

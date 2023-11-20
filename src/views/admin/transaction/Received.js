@@ -6,11 +6,11 @@ import { vi } from 'date-fns/locale';
 import { connect } from 'react-redux';
 import { updateData } from './actions';
 // reactstrap components
-import ReactPaginate from 'react-paginate';
 import { Badge, Row, Col, Button, Table, Input, FormGroup, InputGroup, InputGroupAddon, InputGroupText, Modal, ModalBody, ModalFooter, ModalHeader, Label, Form } from "reactstrap";
 import { FaRegEdit, FaSearch } from 'react-icons/fa';
+import ReactPaginate from 'react-paginate';
 
-const Received = ({ updateData }) => {
+const Received  = ({ updateData }) => {
 
     const [modal, setModal] = useState(false);
     const toggle = () => setModal(!modal);
@@ -22,6 +22,7 @@ const Received = ({ updateData }) => {
     const [selectedOrderId, setSelectedOrderId] = useState(null);
     const [orderData, setOrderData] = useState({});
     const [deliveryData, setDeliveryData] = useState({});
+    const [hasDeliveryData, setHasDeliveryData] = useState(false);
     const [selectedIds, setSelectedIds] = useState([]);
     const [totalProductPrice, setTotalProductPrice] = useState(0);
 
@@ -35,6 +36,8 @@ const Received = ({ updateData }) => {
 
     const [selectAllChecked, setSelectAllChecked] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
+
+    
 
     const fetchDataFromAPI = async (url, stateSetter) => {
         try {
@@ -86,7 +89,7 @@ const Received = ({ updateData }) => {
 
     useEffect(() => {
         fetchData();
-    }, [selectedProvince, selectedDistrict]);
+    }, [selectedProvince, selectedDistrict, queryParams]);
 
     const handlePageChange = ({ selected }) => {
         setQueryParams(prevParams => ({ ...prevParams, page: selected }));
@@ -144,7 +147,6 @@ const Received = ({ updateData }) => {
         return totalMoney;
     };
 
-
     //detail
     const handleRowClick = async (id, confirm) => {
         setSelectedOrderId(id);
@@ -188,6 +190,7 @@ const Received = ({ updateData }) => {
 
             // Kiểm tra nếu có dữ liệu từ API vận chuyển
             if (deliveryResponse && deliveryResponse.data) {
+                setHasDeliveryData(true);
                 setDeliveryData(deliveryResponse.data);
 
                 const deliveryAddress = deliveryResponse.data.deliveryAddress;
@@ -198,6 +201,9 @@ const Received = ({ updateData }) => {
                 setSelectedWard(selectedWard);
                 setSelectedDistrict(selectedDistrict);
                 setSelectedProvince(selectedProvince);
+            } else {
+                setDeliveryData(null);
+                setHasDeliveryData(false);
             }
 
             setModal(true);
@@ -407,113 +413,118 @@ const Received = ({ updateData }) => {
                                                 </Col>
                                             )}
                                         </Row>
-                                        <Row>
-                                            <Col md={12}>
-                                                <h3 className="heading-small text-dark">Thông tin phiếu giao</h3>
-                                            </Col>
-                                        </Row>
-                                        <Row >
-                                            <Col md={6}>
-                                                <FormGroup>
-                                                    <Label>
-                                                        Người nhận
-                                                    </Label>
-                                                    <Input
-                                                        size="sm"
-                                                        type="text"
-                                                        value={deliveryData.recipientName}
-                                                        readOnly style={{ backgroundColor: "#fff" }}
-                                                    />
-                                                </FormGroup>
-                                            </Col>
-                                            <Col md={6}>
-                                                <FormGroup>
-                                                    <Label>
-                                                        Số điện thoại
-                                                    </Label>
-                                                    <Input
-                                                        size="sm"
-                                                        type="tel"
-                                                        value={deliveryData.recipientPhone}
-                                                        readOnly style={{ backgroundColor: "#fff" }}
-                                                    />
-                                                </FormGroup>
-                                            </Col>
-                                        </Row>
-                                        <Row >
-                                            <Col md={6}>
-                                                <FormGroup>
-                                                    <Label>
-                                                        Địa chỉ
-                                                    </Label>
-                                                    <Input
-                                                        className="mb-2"
-                                                        size="sm"
-                                                        type="select"
-                                                        style={{ fontSize: 13 }}
-                                                        value={selectedProvince}
-                                                    >
-                                                        <option value="">Chọn tỉnh/thành phố</option>
-                                                        {provinces.map((province) => (
-                                                            <option key={province.ProvinceID} value={province.ProvinceID}>
-                                                                {province.ProvinceName}
-                                                            </option>
-                                                        ))}
-                                                    </Input>
+                                        {hasDeliveryData && (
+                                            <>
+                                                <Row>
+                                                    <Col md={12}>
+                                                        <h3 className="heading-small text-dark">Thông tin phiếu giao</h3>
+                                                    </Col>
+                                                </Row>
+                                                <Row >
+                                                    <Col md={6}>
+                                                        <FormGroup>
+                                                            <Label>
+                                                                Người nhận
+                                                            </Label>
+                                                            <Input
+                                                                size="sm"
+                                                                type="text"
+                                                                value={deliveryData.recipientName}
+                                                                readOnly style={{ backgroundColor: "#fff" }}
+                                                            />
+                                                        </FormGroup>
+                                                    </Col>
+                                                    <Col md={6}>
+                                                        <FormGroup>
+                                                            <Label>
+                                                                Số điện thoại
+                                                            </Label>
+                                                            <Input
+                                                                size="sm"
+                                                                type="tel"
+                                                                value={deliveryData.recipientPhone}
+                                                                readOnly style={{ backgroundColor: "#fff" }}
+                                                            />
+                                                        </FormGroup>
+                                                    </Col>
+                                                </Row>
+                                                <Row >
+                                                    <Col md={6}>
+                                                        <FormGroup>
+                                                            <Label>
+                                                                Địa chỉ
+                                                            </Label>
+                                                            <Input
+                                                                className="mb-2"
+                                                                size="sm"
+                                                                type="select"
+                                                                style={{ fontSize: 13 }}
+                                                                value={selectedProvince}
+                                                            >
+                                                                <option value="">Chọn tỉnh/thành phố</option>
+                                                                {provinces.map((province) => (
+                                                                    <option key={province.ProvinceID} value={province.ProvinceID}>
+                                                                        {province.ProvinceName}
+                                                                    </option>
+                                                                ))}
+                                                            </Input>
 
 
-                                                    <Input
-                                                        className="mb-2"
-                                                        size="sm"
-                                                        type="select"
-                                                        style={{ fontSize: 13 }}
-                                                        value={selectedDistrict}
-                                                        disabled={!selectedProvince}
-                                                    >
-                                                        <option value="">Chọn quận/huyện</option>
-                                                        {selectedProvince &&
-                                                            districts.map((district) => (
-                                                                <option key={district.DistrictID} value={district.DistrictID}>
-                                                                    {district.DistrictName}
-                                                                </option>
-                                                            ))}
-                                                    </Input>
+                                                            <Input
+                                                                className="mb-2"
+                                                                size="sm"
+                                                                type="select"
+                                                                style={{ fontSize: 13 }}
+                                                                value={selectedDistrict}
+                                                                disabled={!selectedProvince}
+                                                            >
+                                                                <option value="">Chọn quận/huyện</option>
+                                                                {selectedProvince &&
+                                                                    districts.map((district) => (
+                                                                        <option key={district.DistrictID} value={district.DistrictID}>
+                                                                            {district.DistrictName}
+                                                                        </option>
+                                                                    ))}
+                                                            </Input>
 
-                                                    <Input
-                                                        className="mb-2"
-                                                        size="sm"
-                                                        type="select"
-                                                        style={{ fontSize: 13 }}
-                                                        value={selectedWard}
-                                                        disabled={!selectedDistrict}
-                                                    >
-                                                        <option value="">Chọn xã/phường</option>
-                                                        {selectedDistrict &&
-                                                            wards.map((ward) => (
-                                                                <option key={ward.WardCode} value={ward.WardCode}>
-                                                                    {ward.WardName}
-                                                                </option>
-                                                            ))}
-                                                    </Input>
+                                                            <Input
+                                                                className="mb-2"
+                                                                size="sm"
+                                                                type="select"
+                                                                style={{ fontSize: 13 }}
+                                                                value={selectedWard}
+                                                                disabled={!selectedDistrict}
+                                                            >
+                                                                <option value="">Chọn xã/phường</option>
+                                                                {selectedDistrict &&
+                                                                    wards.map((ward) => (
+                                                                        <option key={ward.WardCode} value={ward.WardCode}>
+                                                                            {ward.WardName}
+                                                                        </option>
+                                                                    ))}
+                                                            </Input>
 
-                                                </FormGroup>
+                                                        </FormGroup>
 
-                                            </Col>
-                                            <Col md={6}>
-                                                <FormGroup>
-                                                    <Input className="mt-4"
-                                                        style={{ fontSize: 13, backgroundColor: "#fff" }}
-                                                        size="sm"
-                                                        rows="5"
-                                                        type="textarea"
-                                                        placeholder="Địa chỉ chi tiết..."
-                                                        id="detailedAddress"
-                                                        value={detailedAddress}
-                                                        readOnly
-                                                    />
-                                                </FormGroup>
-                                            </Col>
-                                        </Row>
+                                                    </Col>
+                                                    <Col md={6}>
+                                                        <FormGroup>
+                                                            <Input className="mt-4"
+                                                                style={{ fontSize: 13, backgroundColor: "#fff" }}
+                                                                size="sm"
+                                                                rows="5"
+                                                                type="textarea"
+                                                                placeholder="Địa chỉ chi tiết..."
+                                                                id="detailedAddress"
+                                                                value={detailedAddress}
+                                                                readOnly
+                                                            />
+                                                        </FormGroup>
+                                                    </Col>
+                                                </Row>
+                                            </>
+                                        )}
+
                                         <Row>
                                             <Col md={12}>
                                                 <h3 className="heading-small text-dark">Thanh toán</h3>
@@ -577,36 +588,41 @@ const Received = ({ updateData }) => {
                                             </Col>
                                         </Row>
 
-                                        <Row >
-                                            <Col md={6}>
-                                                <FormGroup>
-                                                    <Label>
-                                                        Phí vận chuyển
-                                                    </Label>
-                                                    <InputGroup size="sm">
-                                                        <Input
-                                                            size="sm"
-                                                            type="number"
-                                                            value={Math.floor(deliveryData.deliveryCost)}
-                                                            readOnly style={{ backgroundColor: "#fff" }}
-                                                        />
-                                                        <InputGroupAddon addonType="append">
-                                                            <InputGroupText>VND</InputGroupText>
-                                                        </InputGroupAddon>
-                                                    </InputGroup>
-                                                </FormGroup>
+                                        {hasDeliveryData && (
+                                            <>
+                                                <Row >
+                                                    <Col md={6}>
+                                                        <FormGroup>
+                                                            <Label>
+                                                                Phí vận chuyển
+                                                            </Label>
+                                                            <InputGroup size="sm">
+                                                                <Input
+                                                                    size="sm"
+                                                                    type="number"
+                                                                    value={Math.floor(deliveryData.deliveryCost)}
+                                                                    readOnly style={{ backgroundColor: "#fff" }}
+                                                                />
+                                                                <InputGroupAddon addonType="append">
+                                                                    <InputGroupText>VND</InputGroupText>
+                                                                </InputGroupAddon>
+                                                            </InputGroup>
+                                                        </FormGroup>
 
-                                            </Col>
-                                            <Col md={6}>
-                                                <FormGroup>
-                                                    <img className="my-3 ml-3"
-                                                        width={"80%"}
-                                                        alt="..."
-                                                        src={require("../../../assets/img/theme/giaohangnhanh.webp")}
-                                                    />
-                                                </FormGroup>
-                                            </Col>
-                                        </Row>
+                                                    </Col>
+                                                    <Col md={6}>
+                                                        <FormGroup>
+                                                            <img className="my-3 ml-3"
+                                                                width={"80%"}
+                                                                alt="..."
+                                                                src={require("../../../assets/img/theme/giaohangnhanh.webp")}
+                                                            />
+                                                        </FormGroup>
+                                                    </Col>
+                                                </Row>
+                                            </>
+                                        )}
+
                                         <FormGroup>
                                             <Label>
                                                 Thành tiền
@@ -630,7 +646,7 @@ const Received = ({ updateData }) => {
                                                 Phương thức thanh toán:
                                             </Label>
                                             <span className="border-0" style={{ fontWeight: "bold" }}>
-                                                {formData.paymentMethod === 1 ? "Thanh toán sau khi nhận hàng" : formData.paymentMethod === 2 ? "Ví điện tử" : ""}
+                                                {formData.paymentMethod === 1 ? "Tiền mặt" : formData.paymentMethod === 2 ? "Ví điện tử" : ""}
                                             </span>
                                         </FormGroup>
 
