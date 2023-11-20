@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import axiosInstance from "services/custommize-axios";
 import { ToastContainer, toast } from "react-toastify";
-import { FaQrcode, FaUserPlus, FaUndoAlt } from 'react-icons/fa';
+import { FaQrcode, FaUserPlus, FaUndoAlt, FaTrashAlt } from 'react-icons/fa';
 import { TbShoppingBagPlus } from 'react-icons/tb';
 import {
     Row, Col, Button, Card, CardBody, CardHeader, Table, InputGroup, Input,
@@ -207,6 +207,7 @@ const Order = () => {
     };
 
     //Product
+    const [newProducts, setNewProducts] = useState([]);
     const [selectedProducts, setSelectedProducts] = useState([]);
     const handleSelectProducts = (selectedProductList) => {
         setSelectedProducts(selectedProductList);
@@ -231,6 +232,15 @@ const Order = () => {
             setTotalAmount(newTotalAmount);
         }
     };
+
+    const handleDeleteRow = (index) => {
+        const updatedProducts = [...selectedProducts];
+
+        updatedProducts.splice(index, 1);
+        
+        setSelectedProducts(updatedProducts);
+    };
+    
 
     //Order
     const [deliveryData, setDeliveryData] = useState({});
@@ -369,6 +379,7 @@ const Order = () => {
                                         <th scope="col" className="text-dark">Giá khuyến mại</th>
                                         <th scope="col" className="text-dark">Số lượng</th>
                                         <th scope="col" className="text-dark">Tổng tiền</th>
+                                        <th scope="col" className="text-dark">Thao tác</th>
                                     </tr>
                                 </thead>
                                 <tbody style={{ fontSize: 14 }}>
@@ -405,6 +416,9 @@ const Order = () => {
                                                 />
                                             </td>
                                             <td className="text-right" style={{ color: "red" }}>{detail.quantity * detail.discountPrice}</td>
+                                            <td className="text-center" onClick={() => handleDeleteRow(index)}>
+                                                <FaTrashAlt style={{ cursor: "pointer" }}/>
+                                                </td>
                                         </tr>
                                     ))}
                                 </tbody>

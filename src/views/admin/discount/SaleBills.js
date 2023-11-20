@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { FaEdit, FaTrash, FaSearch, FaFilter, FaLock, FaLockOpen } from 'react-icons/fa';
+import { FaSort } from "react-icons/fa6";
 import ReactPaginate from "react-paginate";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -36,7 +37,6 @@ const SaleBills = () => {
     const [selectAll, setSelectAll] = useState(false);
     const [selectedItems, setSelectedItems] = useState([]);
     const [searchValue, setSearchValue] = useState("");
-
 
     const [queryParams, setQueryParams] = useState({
         page: 0,
@@ -88,6 +88,17 @@ const SaleBills = () => {
         1: { color: 'success', label: 'Chờ kích hoạt' },
         2: { color: 'warning', label: 'Ngừng kích hoạt' },
     };
+
+    //sắp xếp
+    const handleSort = (field) => {
+        const newSortOrder = queryParams.sortField === field && queryParams.sortOrder === 'asc' ? 'desc' : 'asc';
+        setQueryParams({
+            ...queryParams,
+            sortField: field,
+            sortOrder: newSortOrder,
+        });
+    };
+
     //lọc
     const resetFilters = () => {
         document.getElementById("minPrice").value = "";
@@ -95,6 +106,7 @@ const SaleBills = () => {
         document.getElementById("status").value = "";
         document.getElementById("fromDate").value = "";
         document.getElementById("toDate").value = "";
+        document.getElementById("sale").value = "";
     };
 
     const handleFilter = () => {
@@ -104,7 +116,7 @@ const SaleBills = () => {
         const status = document.getElementById("status").value;
         const fromDate = document.getElementById("fromDate").value;
         const toDate = document.getElementById("toDate").value;
-
+        const saleMethod = document.getElementById("sale").value;
         setQueryParams({
             ...queryParams,
             minPrice,
@@ -112,6 +124,7 @@ const SaleBills = () => {
             status,
             fromDate,
             toDate,
+            saleMethod,
         });
         toggleThirdModal();
     };
@@ -414,14 +427,50 @@ const SaleBills = () => {
                             </th>
                             <th scope="col" style={{ color: "black" }}>STT</th>
                             <th scope="col" style={{ color: "black", position: "sticky", zIndex: '1', left: '0' }}>Trạng thái</th>
-                            <th scope="col" style={{ color: "black" }}>Mã</th>
-                            <th scope="col" style={{ color: "black" }}>Tên khuyến mại</th>
-                            <th scope="col" style={{ color: "black" }}>Hóa đơn <br />tối thiểu</th>
+                            <th scope="col" style={{ color: "black" }}>
+                                Mã
+                                <FaSort
+                                    style={{ cursor: "pointer" }}
+                                    className="text-muted"
+                                    onClick={() => handleSort("code")} />
+                            </th>
+                            <th scope="col" style={{ color: "black" }}>
+                                Tên khuyến mại
+                                <FaSort
+                                    style={{ cursor: "pointer" }}
+                                    className="text-muted"
+                                    onClick={() => handleSort("name")} />
+                            </th>
+                            <th scope="col" style={{ color: "black" }}>
+                                Hóa đơn <br />tối thiểu
+                                <FaSort
+                                    style={{ cursor: "pointer" }}
+                                    className="text-muted"
+                                    onClick={() => handleSort("min_price")} />
+                            </th>
                             <th scope="col" style={{ color: "black" }}>Phương thức</th>
                             <th scope="col" style={{ color: "black" }}>Giá trị</th>
-                            <th scope="col" style={{ color: "black" }}>Số lượng</th>
-                            <th scope="col" style={{ color: "black" }}>Ngày bắt đầu</th>
-                            <th scope="col" style={{ color: "black" }}>Ngày kết thúc</th>
+                            <th scope="col" style={{ color: "black" }}>
+                                Số lượng
+                                <FaSort
+                                    style={{ cursor: "pointer" }}
+                                    className="text-muted"
+                                    onClick={() => handleSort("quantity")} />
+                            </th>
+                            <th scope="col" style={{ color: "black" }}>
+                                Ngày bắt đầu
+                                <FaSort
+                                    style={{ cursor: "pointer" }}
+                                    className="text-muted"
+                                    onClick={() => handleSort("start_date")} />
+                            </th>
+                            <th scope="col" style={{ color: "black" }}>
+                                Ngày kết thúc
+                                <FaSort
+                                    style={{ cursor: "pointer" }}
+                                    className="text-muted"
+                                    onClick={() => handleSort("end_date")} />
+                            </th>
                             <th scope="col" style={{ color: "black" }}>Mô tả</th>
                             <th scope="col" style={{ color: "black", position: "sticky", zIndex: '1', right: '0' }}>Thao tác</th>
 
@@ -435,6 +484,18 @@ const SaleBills = () => {
                                         discount.code.toLowerCase().includes(searchValue.toLowerCase()) ||
                                         discount.name.toLowerCase().includes(searchValue.toLowerCase())
                                 )
+                                .filter((discount) => {
+                                    if (queryParams.saleMethod) {
+                                        if (queryParams.saleMethod === "0" && discount.salePercent) {
+                                            return true;
+                                        }
+                                        if (queryParams.saleMethod === "1" && discount.salePrice) {
+                                            return true;
+                                        }
+                                        return false;
+                                    }
+                                    return true;
+                                })
                                 .map((discount, index) => (
                                     <tr key={discount.id}>
                                         <td>
@@ -807,6 +868,22 @@ const SaleBills = () => {
                                 <option value="0">Đang kích hoạt</option>
                                 <option value="1">Chờ kích hoạt</option>
                                 <option value="2">Ngừng kích hoạt</option>
+                            </Input>
+                        </FormGroup>
+                        <FormGroup>
+                            <label style={{ fontSize: 13 }}
+                                className="form-control-label"
+                            >
+                                Phương thức
+                            </label>
+                            <Input
+                                className="form-control-alternative"
+                                type="select" size="sm" id="sale"
+                            >
+                                <option value="">Tất cả</option>
+                                <option value="0">Phần trăm</option>
+                                <option value="1">Tiền mặt</option>
+
                             </Input>
                         </FormGroup>
                         <FormGroup>

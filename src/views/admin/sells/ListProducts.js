@@ -4,7 +4,7 @@ import { getAllShoesDetail2 } from "services/ShoesDetailService.js";
 // reactstrap components
 import {
     Row, Col, Button, Table, Input, FormGroup, InputGroup, InputGroupAddon,
-    Modal, ModalBody, ModalFooter, ModalHeader, Form
+    Modal, ModalBody, ModalFooter, ModalHeader
 } from "reactstrap";
 import { FaSearch, FaHandHoldingMedical } from 'react-icons/fa';
 import { FaSort } from "react-icons/fa6";
@@ -189,8 +189,8 @@ const Products = ({ onSelectProducts }) => {
                                     position: "relative",
                                     display: "flex",
                                     flexDirection: "column",
-                                    minHeight: "100%", 
-                                  }}
+                                    minHeight: "100%",
+                                }}
                                 onClick={() => handleEditButtonClick(item.id)}
                                 onMouseEnter={() => handleMouseEnter(item.id)}
                                 onMouseLeave={handleMouseLeave}
