@@ -7,9 +7,9 @@ import Cart from "views/user/Cart.js";
 import Account from "views/user/Account.js";
 import ProductDetail from "views/user/ProductDetail.js";
 import CheckOut from "views/user/CheckOut.js";
-
+import Bill from "views/user/hoadon/Bills.js";
 var routes = [
- 
+
   {
     path: "/home",
     name: "TRANG CHỦ",
@@ -50,6 +50,12 @@ var routes = [
     path: "/account",
     name: "TÀI KHOẢN",
     component: <Account />,
+    layout: "/shoes",
+  },
+  {
+    path: "/bill",
+    name: "TÀI KHOẢN",
+    component: <Bill />,
     layout: "/shoes",
   },
   {

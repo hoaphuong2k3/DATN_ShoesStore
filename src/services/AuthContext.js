@@ -20,6 +20,7 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
     setToken(null);
     localStorage.removeItem('token');
+    localStorage.removeItem('userId');
     // Xóa Token khỏi header của mỗi yêu cầu Axios
     delete axios.defaults.headers.common['Authorization'];
   };

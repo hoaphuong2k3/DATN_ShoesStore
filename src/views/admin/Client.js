@@ -85,14 +85,14 @@ const Client = () => {
     setClient({ ...client, [e.target.name]: e.target.value });
   };
 
-  const fetchData = async () => {
-    try {
-      const provincesResponse = await axios.get("https://provinces.open-api.vn/api/?depth=3");
-      setProvinces(provincesResponse.data);
-    } catch (error) {
-      console.error("Error fetching data: ", error);
-    }
-  };
+  // const fetchData = async () => {
+  //   try {
+  //     const provincesResponse = await axios.get("https://provinces.open-api.vn/api/?depth=3");
+  //     setProvinces(provincesResponse.data);
+  //   } catch (error) {
+  //     console.error("Error fetching data: ", error);
+  //   }
+  // };
   const getAll = async () => {
     try {
       const res = await getAllClient(page, size, search);
@@ -108,7 +108,7 @@ const Client = () => {
     getAll();
   }, [size, page]);
   useEffect(() => {
-    fetchData();
+    // fetchData();
     getAll();
   }, []);
 
@@ -299,7 +299,69 @@ const Client = () => {
   //Kết thúc hàm khóa khách hàng
 
   //Xử lý địa chỉ
+  // ADDRESS
   const [provinces, setProvinces] = useState([]);
+  const [districts, setDistricts] = useState([]);
+  const [communes, setCommunes] = useState([]);
+  const fetchDataFromAPI = async (url, stateSetter) => {
+    try {
+      const response = await axios.get(url, {
+        headers: {
+          'token': '44022259-5cfb-11ee-96dc-de6f804954c9'
+        }
+      });
+      stateSetter(response.data.data);
+    } catch (error) {
+      console.error(`Lỗi khi lấy dữ liệu từ ${url}:`, error);
+    }
+  };
+  useEffect(() => {
+    const fetchAddress = async () => {
+      try {
+        fetchDataFromAPI('https://online-gateway.ghn.vn/shiip/public-api/master-data/province', setProvinces);
+      } catch (error) {
+        console.error("Lỗi khi lấy dữ liệu tỉnh/thành phố:", error);
+      }
+    };
+
+    fetchAddress();
+  }, []);
+
+  const handleProvinceChange = async (value) => {
+    console.log(value);
+    const selectedProvinceCode = value;
+    setFormData({
+      ...formData,
+      proviceCode: selectedProvinceCode,
+      districtCode: "",
+      communeCode: ""
+    });
+
+    try {
+      const districtURL = `https://online-gateway.ghn.vn/shiip/public-api/master-data/district?province_id=${selectedProvinceCode}`;
+      fetchDataFromAPI(districtURL, setDistricts);
+    } catch (error) {
+      console.error("Lỗi khi lấy dữ liệu quận/huyện:", error);
+    }
+  };
+
+  const handleDistrictChange = async (value) => {
+    const selectedDistrictCode = value;
+    setFormData({
+      ...formData,
+      districtCode: selectedDistrictCode,
+      communeCode: ""
+    });
+    try {
+      const wardURL = `https://online-gateway.ghn.vn/shiip/public-api/master-data/ward?district_id=${selectedDistrictCode}`;
+      fetchDataFromAPI(wardURL, setCommunes);
+    } catch (error) {
+      console.error("Lỗi khi lấy dữ liệu phường/xã:", error);
+    }
+  };
+
+  // END ADDRESS
+
   const [modalAdress, setModalAdress] = useState(false);
   const toggleAdress = () => setModalAdress(!modalAdress);
 
@@ -360,6 +422,8 @@ const Client = () => {
   }, [formData]);
 
   const CLickUpdateAddress = (item) => {
+    handleProvinceChange(item.proviceCode)
+    handleDistrictChange(item.districtCode);
     setFormData({
       ...formData,
       id: item.id,
@@ -1076,17 +1140,12 @@ const Client = () => {
                       className="form-control-alternative"
                       type="select"
                       value={formData.proviceCode}
-                      onChange={(e) => setFormData({
-                        ...formData,
-                        proviceCode: e.target.value,
-                        districtCode: null,
-                        communeCode: null
-                      })}
+                      onChange={(e) => handleProvinceChange(e.target.value)}
                     >
                       <option value="">Chọn Tỉnh / Thành</option>
                       {provinces.map((province) => (
-                        <option key={province.code} value={province.name}>
-                          {province.name}
+                        <option key={province.ProvinceID} value={province.ProvinceID}>
+                          {province.ProvinceName}
                         </option>
                       ))}
                     </Input>
@@ -1101,22 +1160,16 @@ const Client = () => {
                       className="form-control-alternative"
                       type="select"
                       value={formData.districtCode}
-                      onChange={(e) => setFormData({
-                        ...formData,
-                        districtCode: e.target.value,
-                        communeCode: ""
-                      })}
+                      onChange={(e) => handleDistrictChange(e.target.value)}
                       disabled={!formData.proviceCode}
                     >
                       <option value="">Chọn Quận / Huyện</option>
-                      {formData.proviceCode &&
-                        provinces
-                          .find((province) => province.name === formData.proviceCode)
-                          .districts.map((district) => (
-                            <option key={district.code} value={district.name}>
-                              {district.name}
-                            </option>
-                          ))}
+                      {
+                        districts.map((district) => (
+                          <option key={district.DistrictID} value={district.DistrictID} >
+                            {district.DistrictName}
+                          </option>
+                        ))}
                     </Input>
                   </FormGroup>
                 </Col>
@@ -1136,15 +1189,12 @@ const Client = () => {
                       disabled={!formData.districtCode}
                     >
                       <option value="">Chọn Phường / Xã</option>
-                      {formData.districtCode &&
-                        provinces
-                          .find((province) => province.name === formData.proviceCode)
-                          .districts.find((district) => district.name === formData.districtCode)
-                          .wards.map((ward) => (
-                            <option key={ward.code} value={ward.name}>
-                              {ward.name}
-                            </option>
-                          ))}
+                      {
+                        communes.map((commune) => (
+                          <option key={commune.WardCode} value={commune.WardCode}>
+                            {commune.WardName}
+                          </option>
+                        ))}
                     </Input>
                   </FormGroup>
                 </Col>
