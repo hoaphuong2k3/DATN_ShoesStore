@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { FaEdit, FaTrash, FaSearch, FaFilter, FaLock, FaLockOpen } from 'react-icons/fa';
+import { FaSort } from "react-icons/fa6";
 import ReactPaginate from "react-paginate";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -27,9 +28,6 @@ const SaleProduct = () => {
 
     const [secondModal, setSecondModal] = useState(false);
     const toggleSecondModal = () => setSecondModal(!secondModal);
-    const handleModal2 = () => {
-        setSecondModal(true);
-    }
 
     const [thirdModal, setThirdModal] = useState(false);
     const toggleThirdModal = () => setThirdModal(!thirdModal);
@@ -37,13 +35,11 @@ const SaleProduct = () => {
         setThirdModal(true);
     }
 
-    const [value, setValue] = useState('no');
     const [discounts, setDiscounts] = useState([]);
     const [totalElements, setTotalElements] = useState(0);
     const [totalPages, setTotalPages] = useState(0);
 
     const [listShoes, setListShoes] = useState([]);
-    const [listDetail, setListShoesDetail] = useState([]);
     const [selectAll, setSelectAll] = useState(false);
     const [selectedShoesIds, setSelectedShoesIds] = useState([]);
     const [selectedDetailIds, setSelectedDetailIds] = useState([]);
@@ -55,10 +51,7 @@ const SaleProduct = () => {
     const [shoesDetailMapping, setShoesDetailMapping] = useState({});
     const [selectedShoesDetails, setSelectedShoesDetails] = useState([]);
 
-    const [search1, setSearch1] = useState({
-        code: "",
-        name: "",
-    });
+
     const [search2, setSearch2] = useState({
         code: "",
         "status": 1
@@ -103,22 +96,6 @@ const SaleProduct = () => {
         getAll1(page, size);
     }, [search, sort, sortStyle]);
 
-    //loads productDetail
-    const getAll2 = async (id, page, size) => {
-        try {
-            let res = await getAllShoesDetail2(id, page, size, search2);
-            console.log(res.data.content);
-            if (res && res.data && res.data.content) {
-                setListShoesDetail(res.data.content);
-            }
-        } catch (error) {
-            setListShoesDetail([]);
-        }
-    }
-    useEffect(() => {
-        getAll2(page, size);
-    }, [search2]);
-    
     //loads productDetail
     const handleEditButtonClick = async (shoesId) => {
         try {
@@ -190,6 +167,16 @@ const SaleProduct = () => {
         2: { color: 'warning', label: 'Ngừng kích hoạt' },
     };
 
+    //sắp xếp
+    const handleSort = (field) => {
+        const newSortOrder = queryParams.sortField === field && queryParams.sortOrder === 'asc' ? 'desc' : 'asc';
+        setQueryParams({
+            ...queryParams,
+            sortField: field,
+            sortOrder: newSortOrder,
+        });
+    };
+
     //lọc
     const resetFilters = () => {
         document.getElementById("minPrice").value = "";
@@ -197,7 +184,7 @@ const SaleProduct = () => {
         document.getElementById("status").value = "";
         document.getElementById("fromDate").value = "";
         document.getElementById("toDate").value = "";
-    
+        document.getElementById("sale").value = "";
     };
 
     const handleFilter = () => {
@@ -207,7 +194,7 @@ const SaleProduct = () => {
         const status = document.getElementById("status").value;
         const fromDate = document.getElementById("fromDate").value;
         const toDate = document.getElementById("toDate").value;
-
+        const saleMethod = document.getElementById("sale").value;
         setQueryParams({
             ...queryParams,
             minPrice,
@@ -215,6 +202,7 @@ const SaleProduct = () => {
             status,
             fromDate,
             toDate,
+            saleMethod,
         });
         toggleThirdModal();
     };
@@ -305,7 +293,7 @@ const SaleProduct = () => {
         code: "",
         name: "",
         minPrice: "",
-        sale: false,
+        sale: null,
         salePercent: "",
         salePrice: "",
         description: "",
@@ -539,13 +527,44 @@ const SaleProduct = () => {
                             </th>
                             <th scope="col" style={{ color: "black" }}>STT</th>
                             <th scope="col" style={{ color: "black", position: "sticky", zIndex: '1', left: '0' }}>Trạng thái</th>
-                            <th scope="col" style={{ color: "black" }}>Mã</th>
-                            <th scope="col" style={{ color: "black" }}>Tên khuyến mại</th>
-                            <th scope="col" style={{ color: "black" }}>Mô tả</th>
-                            <th scope="col" style={{ color: "black" }}>Giá trị  <br /> sản phẩm</th>
+                            <th scope="col" style={{ color: "black" }}>
+                                Mã
+                                <FaSort
+                                    style={{ cursor: "pointer" }}
+                                    className="text-muted"
+                                    onClick={() => handleSort("code")} />
+                            </th>
+                            <th scope="col" style={{ color: "black" }}>
+                                Tên khuyến mại
+                                <FaSort
+                                    style={{ cursor: "pointer" }}
+                                    className="text-muted"
+                                    onClick={() => handleSort("name")} />
+                            </th>
+                            <th scope="col" style={{ color: "black" }}>
+                                Sản phẩm <br />tối thiểu
+                                <FaSort
+                                    style={{ cursor: "pointer" }}
+                                    className="text-muted"
+                                    onClick={() => handleSort("min_price")} />
+                            </th>
+                            <th scope="col" style={{ color: "black" }}>Phương thức</th>
                             <th scope="col" style={{ color: "black" }}>Giá trị</th>
-                            <th scope="col" style={{ color: "black" }}>Ngày bắt đầu</th>
-                            <th scope="col" style={{ color: "black" }}>Ngày kết thúc</th>
+                            <th scope="col" style={{ color: "black" }}>
+                                Ngày bắt đầu
+                                <FaSort
+                                    style={{ cursor: "pointer" }}
+                                    className="text-muted"
+                                    onClick={() => handleSort("start_date")} />
+                            </th>
+                            <th scope="col" style={{ color: "black" }}>
+                                Ngày kết thúc
+                                <FaSort
+                                    style={{ cursor: "pointer" }}
+                                    className="text-muted"
+                                    onClick={() => handleSort("end_date")} />
+                            </th>
+                            <th scope="col" style={{ color: "black" }}>Mô tả</th>
                             <th scope="col" style={{ color: "black", position: "sticky", zIndex: '1', right: '0' }}>Thao tác</th>
 
                         </tr>
@@ -558,6 +577,18 @@ const SaleProduct = () => {
                                         discount.code.toLowerCase().includes(searchValue.toLowerCase()) ||
                                         discount.name.toLowerCase().includes(searchValue.toLowerCase())
                                 )
+                                .filter((discount) => {
+                                    if (queryParams.saleMethod) {
+                                        if (queryParams.saleMethod === "0" && discount.salePercent) {
+                                            return true;
+                                        }
+                                        if (queryParams.saleMethod === "1" && discount.salePrice) {
+                                            return true;
+                                        }
+                                        return false;
+                                    }
+                                    return true;
+                                })
                                 .map((discount, index) => (
                                     <tr key={discount.id}>
                                         <td>
@@ -578,14 +609,21 @@ const SaleProduct = () => {
                                         </td>
                                         <td>{discount.code}</td>
                                         <td>{discount.name}</td>
-                                        <td>{discount.description}</td>
-                                        <td style={{ textAlign: "right" }}>{discount.minPrice.toLocaleString("vi-VN")} VNĐ</td>
+                                        <td style={{ textAlign: "right" }}>{discount.minPrice.toLocaleString("vi-VN")} VND</td>
+                                        <td style={{ textAlign: "center" }}>
+                                            {discount.salePercent ? (
+                                                <Badge color="info">Phần trăm</Badge>
+                                            ) : discount.salePrice ? (
+                                                <Badge color="success">Tiền mặt</Badge>
+                                            ) : null}
+                                        </td>
                                         <td style={{ textAlign: "right" }}>
                                             {discount.salePercent ? `${discount.salePercent}%` : ""}
-                                            {discount.salePrice ? `${discount.salePrice.toLocaleString("vi-VN")} VNĐ` : ""}
+                                            {discount.salePrice ? `${discount.salePrice.toLocaleString("vi-VN")} VND` : ""}
                                         </td>
                                         <td>{format(new Date(discount.startDate), 'yyyy-MM-dd HH:mm', { locale: vi })}</td>
                                         <td>{format(new Date(discount.endDate), 'yyyy-MM-dd HH:mm', { locale: vi })}</td>
+                                        <td>{discount.description}</td>
                                         <td style={{ position: "sticky", zIndex: '1', right: '0', background: "#fff" }}>
                                             {discount.status === 0 &&
                                                 <Button color="link" size="sm"><FaLockOpen onClick={() => lock(discount.id)} /></Button>
@@ -666,7 +704,7 @@ const SaleProduct = () => {
                         <div className="pl-lg-4">
                             <Row>
 
-                                <Col lg="3">
+                                <Col lg="4">
                                     <FormGroup>
                                         <label
                                             className="form-control-label"
@@ -684,7 +722,7 @@ const SaleProduct = () => {
                                     </FormGroup>
                                 </Col>
 
-                                <Col lg="3">
+                                <Col lg="4">
                                     <FormGroup>
                                         <label
                                             className="form-control-label"
@@ -702,7 +740,8 @@ const SaleProduct = () => {
                                 </Col>
 
 
-                                <Col lg="3">
+
+                                <Col lg="4">
                                     <FormGroup>
                                         <label
                                             className="form-control-label"
@@ -735,7 +774,7 @@ const SaleProduct = () => {
                                 </Col>
 
                                 {formData.sale && (
-                                    <Col lg="3">
+                                    <Col lg="4">
                                         <FormGroup>
                                             <label
                                                 className="form-control-label"
@@ -755,7 +794,7 @@ const SaleProduct = () => {
                                 )}
 
                                 {!formData.sale && (
-                                    <Col lg="3">
+                                    <Col lg="4">
                                         <FormGroup>
                                             <label
                                                 className="form-control-label"
@@ -774,7 +813,7 @@ const SaleProduct = () => {
                                 )}
 
 
-                                <Col lg="3">
+                                <Col lg="4">
                                     <FormGroup>
                                         <label
                                             className="form-control-label"
@@ -791,7 +830,7 @@ const SaleProduct = () => {
                                         />
                                     </FormGroup>
                                 </Col>
-                                <Col lg="3">
+                                <Col lg="4">
                                     <FormGroup>
                                         <label
                                             className="form-control-label"
@@ -833,15 +872,15 @@ const SaleProduct = () => {
 
                     <div className="pl-lg-4">
 
-                        <Row className="align-items-center my-4">
+                        <Row className="align-items-center mb-3">
                             <div className="col" style={{ display: "flex" }}>
-                                <h3 className="heading-small text-black mb-0">Loại sản phẩm</h3>
+                                <h3 className="heading-small text-black mb-0">Áp dụng với sản phẩm:</h3>
                             </div>
 
                         </Row>
 
                         <Table bordered hover responsive>
-                            <thead className="thead-light">
+                            <thead className="thead-light text-center">
                                 <tr>
                                     <th className="text-center pb-4">
                                         <FormGroup check>
@@ -863,8 +902,6 @@ const SaleProduct = () => {
                                     <th scope="col">Đế giày</th>
                                     <th scope="col">Lót giày</th>
                                     <th scope="col">Đệm giày</th>
-                                    <th scope="col">Số lượng</th>
-                                    <th scope="col">Số CTSP</th>
                                     <th scope="col">Khoảng giá</th>
                                     <th scope="col" style={{ position: "sticky", zIndex: '1', right: '0' }}>Chi tiết</th>
                                 </tr>
@@ -891,9 +928,8 @@ const SaleProduct = () => {
                                         <td>{shoes.sole}</td>
                                         <td>{shoes.lining}</td>
                                         <td>{shoes.cushion}</td>
-                                        <td>{shoes.totalQuantity}</td>
-                                        <td>{shoes.totalRecord}</td>
-                                        <td>{shoes.priceMin} - {shoes.priceMax}</td>
+
+                                        <td className="text-right">{shoes.priceMin} - {shoes.priceMax}</td>
                                         <td className="text-center" style={{ position: "sticky", zIndex: '1', right: '0', background: "#fff" }}>
                                             <Button color="link" size="sm" onClick={() => handleEditButtonClick(shoes.id)}><FaEdit /></Button>
                                         </td>
@@ -934,9 +970,9 @@ const SaleProduct = () => {
                 </ModalHeader>
                 <ModalBody>
                     <Table bordered hover responsive>
-                        <thead className="thead-light">
+                        <thead className="thead-light text-center">
                             <tr >
-                                <th className="text-center pb-4">
+                                <th className="pb-4">
                                     <FormGroup check>
                                         <Input
                                             type="checkbox"
@@ -967,8 +1003,8 @@ const SaleProduct = () => {
                                     <td>{detail.code}</td>
                                     <td>{detail.size}</td>
                                     <td>{detail.color}</td>
-                                    <td>{detail.price}</td>
-                                    <td>{detail.quantity}</td>
+                                    <td className="text-right">{detail.price.toLocaleString("vi-VN")}</td>
+                                    <td className="text-right">{detail.quantity}</td>
                                 </tr>
                             ))}
                         </tbody>
@@ -1000,7 +1036,7 @@ const SaleProduct = () => {
                                     <label style={{ fontSize: 13 }}
                                         className="form-control-label"
                                     >
-                                        Hóa đơn từ
+                                        Sản phẩm từ
                                     </label>
                                     <Input
                                         className="form-control-alternative"
@@ -1035,6 +1071,22 @@ const SaleProduct = () => {
                                 <option value="0">Đang kích hoạt</option>
                                 <option value="1">Chờ kích hoạt</option>
                                 <option value="2">Ngừng kích hoạt</option>
+                            </Input>
+                        </FormGroup>
+                        <FormGroup>
+                            <label style={{ fontSize: 13 }}
+                                className="form-control-label"
+                            >
+                                Phương thức
+                            </label>
+                            <Input
+                                className="form-control-alternative"
+                                type="select" size="sm" id="sale"
+                            >
+                                <option value="">Tất cả</option>
+                                <option value="0">Phần trăm</option>
+                                <option value="1">Tiền mặt</option>
+
                             </Input>
                         </FormGroup>
                         <FormGroup>

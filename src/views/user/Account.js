@@ -17,10 +17,10 @@ import { toast } from 'react-toastify';
 import axiosInstance from "services/custommize-axios";
 import axios from "axios";
 import Bill from "views/user/hoadon/Bills.js";
-const Menu = ({ setActiveTab }) => {
+const Menu = ({ setActiveTab, activeTab }) => {
   return (
-    <div className="col-3">
-      <Card
+    <div className="col-2">
+      {/* <Card
         className="shadow navbar-vertical navbar-expand-lg bg-white mb-lg-2 mt-3 pb-5"
         style={{ position: "sticky", top: "5", height: "90vh" }}
       >
@@ -38,10 +38,24 @@ const Menu = ({ setActiveTab }) => {
               <div>Username</div>
             </Col>
           </Row>
-        </CardHeader>
-        <style>
-          {
-            `
+        </CardHeader> */}
+      <Row className="mt-4">
+        <Col lg={3}>
+          <img
+            src={`https://s3-ap-southeast-1.amazonaws.com/imageshoestore/`}
+            alt=""
+            width={40}
+            height={40}
+          />
+        </Col>
+        <Col lg={9}>
+          <div>Username</div>
+        </Col>
+      </Row>
+      <hr />
+      <style>
+        {
+          `
             .menu-link {
                 display: block;
                 padding: 10px;
@@ -54,45 +68,52 @@ const Menu = ({ setActiveTab }) => {
               .menu-link:hover {
                 background-color: #f0f0f0;
               }
+              .menu-link.active {
+                /* Styles for the active state */
+                color: red; /* or any other styles you want to apply */
+              }
             `
-          }
-        </style>
-        <CardBody>
-          <span
-            className="menu-link ml--4"
-            onClick={() => setActiveTab("profile")}
-          >
-            <FaRegUser /> Tài khoản của tôi
-          </span>
-          <span
-            className="menu-link"
-            onClick={() => setActiveTab("profile")}
-          >
-            Hồ sơ
-          </span>
-          <span className="menu-link" onClick={() => setActiveTab("bank")}>
-            Ngân hàng
-          </span>
-          <span className="menu-link" onClick={() => setActiveTab("address")}>
-            Địa chỉ
-          </span>
-          <span
-            className="menu-link"
-            onClick={() => setActiveTab("password")}
-          >
-            Đổi mật khẩu
-          </span>
-          <span onClick={() => setActiveTab("bill")} className="menu-link ml--4">
-            <FaBook /> Đơn mua
-          </span>
-          <span
-            className="menu-link ml--4"
+        }
+      </style>
+      <div className="ml-4">
+        <span
+          className={`menu-link ml--4 mt--2`}
+          onClick={() => setActiveTab("profile")}
+        >
+          <FaRegUser /> Tài khoản của tôi
+        </span>
+        <span
+          className={`menu-link  ${activeTab === "profile" ? "active" : ""} `}
+          onClick={() => setActiveTab("profile")}
+        >
+          Hồ sơ
+        </span>
+        <span className={`menu-link  ${activeTab === "bank" ? "active" : ""} `} onClick={() => setActiveTab("bank")}>
+          Ngân hàng
+        </span>
+        <span className={`menu-link  ${activeTab === "address" ? "active" : ""} `} onClick={() => setActiveTab("address")}>
+          Địa chỉ
+        </span>
+        <span
+          className={`menu-link  ${activeTab === "password" ? "active" : ""}`}
+          onClick={() => setActiveTab("password")}
+        >
+          Đổi mật khẩu
+        </span>
+        <span
+          onClick={() => setActiveTab("bill")}
+          className={`menu-link  ${activeTab === "bill" ? "active" : ""} ml--4`}
+        >
+          <FaBook /> Đơn mua
+        </span>
+        <span
+          className="menu-link ml--4"
 
-          >
-            <FaDollarSign /> Điểm tích lũy
-          </span>
-        </CardBody>
-      </Card>
+        >
+          <FaDollarSign /> Điểm tích lũy
+        </span>
+      </div>
+      {/* </Card> */}
     </div>
   );
 };
@@ -435,8 +456,8 @@ const Account = () => {
           }
           {client &&
             <>
-              <Menu setActiveTab={setActiveTab} />
-              <div className="col-9">
+              <Menu setActiveTab={setActiveTab} activeTab={activeTab} />
+              <div className="col-10">
                 {/* Profile */}
                 {activeTab === "profile" && (
                   <Card className="shadow">

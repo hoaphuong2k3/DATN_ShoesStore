@@ -9,44 +9,49 @@ import Order from "views/admin/sells/Order.js";
 import { VscClose } from "react-icons/vsc";
 
 const CreateOrderPage = () => {
-  const [activeTab, setActiveTab] = useState("1");
-  const [orders, setOrders] = useState(["Hóa đơn 1"]);
+  const [activeTab, setActiveTab] = useState(1);
+  const [orders, setOrders] = useState([{ id: 1, title: "Hóa đơn 1", data: {} }]);
 
   const toggle = (tab) => {
     if (activeTab !== tab) setActiveTab(tab);
   };
 
   const handleCreateOrder = () => {
-    handleCloneOrder();
+    const newOrderId = orders.length + 1;
+    handleCloneOrder(newOrderId);
   };
-
-  const handleCloneOrder = () => {
+  
+  const handleCloneOrder = (newOrderId) => {
     if (orders.length >= 5) {
       toast.warning("Đã đạt tối đa!");
       return;
     }
-    const newOrderNumber = orders.length + 1;
-    const newOrderTitle = `Hóa đơn ${newOrderNumber}`;
-    setOrders([...orders, newOrderTitle]);
+    while (orders.some(order => order.id === newOrderId)) {
+      newOrderId++;
+    }
+
+    const newOrder = { id: newOrderId, title: `Hóa đơn ${newOrderId}`, data: {} };
+    setOrders([...orders, newOrder]);
+  
+    setActiveTab(`${newOrderId}`);
   };
-
-  const handleDeleteOrder = (index) => {
-    const updatedOrders = [...orders];
-    updatedOrders.splice(index, 1);
+  
+  const handleDeleteOrder = (deletedOrderId) => {
+    const updatedOrders = orders.filter((order) => order.id !== deletedOrderId);
+    const wasActiveTabRemoved = activeTab === deletedOrderId;
+  
     setOrders(updatedOrders);
-
-    if (activeTab === `${index + 1}`) {
-      const newActiveTab = updatedOrders.length > 0 ? "1" : null;
+  
+    if (wasActiveTabRemoved && updatedOrders.length > 0) {
+      const newActiveTab = updatedOrders[0].id;
       setActiveTab(newActiveTab);
     }
   };
-
 
   return (
     <>
       <Container className="pt-5 pt-md-7" fluid>
         <Row>
-
           {/* Tabs with icons */}
           <div className="col">
             <Card className="shadow">
@@ -62,25 +67,25 @@ const CreateOrderPage = () => {
                   <Row className="align-items-center">
                     <Col>
                       <Nav tabs className="my-0">
-                        {orders.map((order, index) => (
-                          <NavItem key={index} style={{ fontSize: 13 }}>
+                        {orders.map((order) => (
+                          <NavItem key={order.id} style={{ fontSize: 13 }}>
                             <NavLink
-                              className={classnames({ active: activeTab === `${index + 1}` })}
+                              className={classnames({ active: activeTab === order.id })}
                               onClick={() => {
-                                toggle(`${index + 1}`);
+                                toggle(order.id);
                               }}
                             >
-                              {order}{" "}
-                              <VscClose className="mb-2" onClick={() => handleDeleteOrder(index)} />
+                              {order.title}{" "}
+                              <VscClose className="mb-2" onClick={() => handleDeleteOrder(order.id)} />
                             </NavLink>
                           </NavItem>
                         ))}
                       </Nav>
 
                       <TabContent activeTab={activeTab}>
-                        {orders.map((order, index) => (
-                          <TabPane tabId={`${index + 1}`} key={index}>
-                            <Order />
+                        {orders.map((order) => (
+                          <TabPane tabId={order.id} key={order.id}>
+                            <Order data={order.data} />
                           </TabPane>
                         ))}
                       </TabContent>
@@ -93,7 +98,6 @@ const CreateOrderPage = () => {
           </div>
         </Row>
       </Container>
-
     </>
   );
 };

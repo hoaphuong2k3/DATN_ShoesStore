@@ -29,16 +29,23 @@ const Login = () => {
   const { login } = useAuth();
   const [googleRedirectUri, setGoogleRedirectUri] = useState("");
   const location = useLocation();
+  const [initialized, setInitialized] = useState(false);
+  const [authenticationSuccessful, setAuthenticationSuccessful] = useState(false);
 
   useEffect(() => {
-    const searchParams = new URLSearchParams(location.search);
-    const code = searchParams.get('code');
-
-    if (code) {
-      // Gọi API từ frontend với mã code
-      callApiWithCode(code);
+    if (initialized) {
+      const searchParams = new URLSearchParams(location.search);
+      const code = searchParams.get('code');
+  
+      if (code && !authenticationSuccessful) {
+        setAuthenticationSuccessful(true);
+        console.log(code);
+        callApiWithCode(code);
+      }
+    } else {
+      setInitialized(true);
     }
-  }, [location.search]);
+  }, [location.search, authenticationSuccessful, initialized]);
 
   const callApiWithCode = async (code) => {
     try {
@@ -50,11 +57,10 @@ const Login = () => {
 
       const { id, token, authorities, userId } = response.data;
 
-      login({ id, token, authorities, userId }); // Lưu ID, token và vai trò người dùng vào Context
+      login({ id, token, authorities, userId });
 
       toast.success("Đăng nhập thành công!");
 
-      // Kiểm tra vai trò người dùng và chuyển hướng đến trang tương ứng
       if (authorities.some((authority) => authority.authority === "ADMIN") || authorities.some((authority) => authority.authority === "STAFF")) {
         navigate("/admin");
       } else if (authorities.some((authority) => authority.authority === "USER")) {
@@ -62,7 +68,6 @@ const Login = () => {
       } else {
         navigate("/");
       }
-
     } catch (error) {
       toast.error(error.response.data.message);
     }

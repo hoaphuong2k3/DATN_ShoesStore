@@ -6,12 +6,18 @@ import { vi } from 'date-fns/locale';
 import { connect } from 'react-redux';
 import { updateData } from './actions';
 // reactstrap components
+import ReactPaginate from 'react-paginate';
 import { Badge, Row, Col, Button, Table, Input, FormGroup, InputGroup, InputGroupAddon, InputGroupText, Modal, ModalBody, ModalFooter, ModalHeader, Label, Form } from "reactstrap";
-import { FaRegEdit, FaSearch} from 'react-icons/fa';
+import { FaRegEdit, FaSearch } from 'react-icons/fa';
 
 const Cancle = ({ updateData }) => {
 
     const [modal, setModal] = useState(false);
+    const toggle = () => setModal(!modal);
+
+    const [totalPages, setTotalPages] = useState(0);
+    const [totalElements, setTotalElements] = useState(0);
+
     const [confirm, setConfirm] = useState([]);
     const [selectedOrderId, setSelectedOrderId] = useState(null);
     const [orderData, setOrderData] = useState({});
@@ -30,7 +36,6 @@ const Cancle = ({ updateData }) => {
     const [selectAllChecked, setSelectAllChecked] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
 
-    const toggle = () => setModal(!modal);
 
     const fetchDataFromAPI = async (url, stateSetter) => {
         try {
@@ -44,6 +49,12 @@ const Cancle = ({ updateData }) => {
             console.error(`Lỗi khi lấy dữ liệu từ ${url}:`, error);
         }
     };
+
+    const [queryParams, setQueryParams] = useState({
+        page: 0,
+        size: 10,
+        status: 7,
+    });
 
     const fetchData = async () => {
 
@@ -64,14 +75,11 @@ const Cancle = ({ updateData }) => {
         try {
 
             const response = await axiosInstance.get("/order/admin", {
-                params: {
-                    page: 0,
-                    size: 10,
-                    status: -1,
-                    date: ""
-                }
+                params: queryParams
             });
             setConfirm(response.content);
+            setTotalElements(response.totalElements);
+            setTotalPages(response.totalPages);
         } catch (error) {
             console.error("Lỗi khi lấy dữ liệu:", error);
         }
@@ -81,10 +89,24 @@ const Cancle = ({ updateData }) => {
         fetchData();
     }, [selectedProvince, selectedDistrict]);
 
+    const handlePageChange = ({ selected }) => {
+        setQueryParams(prevParams => ({ ...prevParams, page: selected }));
+    };
+
+    const handleSizeChange = (e) => {
+        const newSize = parseInt(e.target.value);
+        setQueryParams({ ...queryParams, size: newSize, page: 0 });
+    };
+
+    const calculateIndex = (index) => {
+        return index + 1 + queryParams.page * queryParams.size;
+    };
 
     const [formData, setFormData] = useState({
         id: null,
         code: "",
+        fullname: "",
+        phoneNumber: "",
         totalMoney: "",
         paymentMethod: "",
         percentVoucher: "",
@@ -127,46 +149,57 @@ const Cancle = ({ updateData }) => {
     //detail
     const handleRowClick = async (id, confirm) => {
         setSelectedOrderId(id);
+
         try {
             const [orderResponse, deliveryResponse] = await Promise.all([
                 axiosInstance.get(`/order/admin/cart/get-all/${id}`),
                 axiosInstance.get(`/order/admin/delivery/${id}`),
             ]);
 
+            // Kiểm tra nếu có dữ liệu từ API đơn hàng
+            if (orderResponse && orderResponse.length > 0) {
+                const productPrice = orderResponse.reduce((total, product) => {
+                    return total + product.totalPrice;
+                }, 0);
 
-            const productPrice = orderResponse.reduce((total, product) => {
-                return total + product.totalPrice;
-            }, 0);
+                const totalMoney = calculateTotalMoney(
+                    productPrice,
+                    deliveryResponse?.data?.deliveryCost || 0,
+                    confirm.percentPeriod,
+                    confirm.percentVoucher,
+                    confirm.priceVoucher
+                );
 
-            const totalMoney = calculateTotalMoney(
-                productPrice,
-                deliveryResponse.data.deliveryCost,
-                confirm.percentPeriod,
-                confirm.percentVoucher,
-                confirm.priceVoucher
-            );
-            setTotalProductPrice(productPrice);
+                setTotalProductPrice(productPrice);
 
-            setFormData({
-                id: confirm.id,
-                code: confirm.code,
-                totalMoney: totalMoney,
-                paymentMethod: confirm.paymentMethod,
-                percentVoucher: confirm.percentVoucher,
-                priceVoucher: confirm.priceVoucher,
-                percentPeriod: confirm.percentPeriod,
-            });
-            setOrderData(orderResponse);
-            setDeliveryData(deliveryResponse.data);
+                setFormData({
+                    id: confirm.id,
+                    code: confirm.code,
+                    fullname: confirm.fullname,
+                    phoneNumber: confirm.phoneNumber,
+                    totalMoney: totalMoney,
+                    paymentMethod: confirm.paymentMethod,
+                    percentVoucher: confirm.percentVoucher,
+                    priceVoucher: confirm.priceVoucher,
+                    percentPeriod: confirm.percentPeriod,
+                });
 
-            const deliveryAddress = deliveryResponse.data.deliveryAddress;
-            // Phân tách chuỗi địa chỉ thành các thành phần
-            const addressParts = deliveryAddress.split(', ');
-            const [selectedProvince, selectedDistrict, selectedWard, detailedAddress] = addressParts.reverse();
-            setDetailedAddress(detailedAddress);
-            setSelectedWard(selectedWard);
-            setSelectedDistrict(selectedDistrict);
-            setSelectedProvince(selectedProvince);
+                setOrderData(orderResponse);
+            }
+
+            // Kiểm tra nếu có dữ liệu từ API vận chuyển
+            if (deliveryResponse && deliveryResponse.data) {
+                setDeliveryData(deliveryResponse.data);
+
+                const deliveryAddress = deliveryResponse.data.deliveryAddress;
+                // Phân tách chuỗi địa chỉ thành các thành phần
+                const addressParts = deliveryAddress.split(', ');
+                const [selectedProvince, selectedDistrict, selectedWard, detailedAddress] = addressParts.reverse();
+                setDetailedAddress(detailedAddress);
+                setSelectedWard(selectedWard);
+                setSelectedDistrict(selectedDistrict);
+                setSelectedProvince(selectedProvince);
+            }
 
             setModal(true);
         } catch (error) {
@@ -223,14 +256,16 @@ const Cancle = ({ updateData }) => {
                                         />
                                     </FormGroup>
                                 </th>
+                                <th scope="col" style={{ color: "black" }}>STT</th>
                                 <th scope="col" className="text-dark">Mã hóa đơn</th>
                                 <th scope="col" className="text-dark">Khách hàng</th>
+                                <th scope="col" className="text-dark">Số điện thoại</th>
                                 <th scope="col" className="text-dark">Tổng tiền</th>
-                                <th scope="col" className="text-dark">Phương thức</th>
+                                <th scope="col" className="text-dark">Thanh toán</th>
                                 <th scope="col" className="text-dark">Nhân viên</th>
                                 <th scope="col" className="text-dark">Ngày mua</th>
                                 <th scope="col" className="text-dark">Ngày xác nhận</th>
-                                <th scope="col" className="text-dark">Thao tác</th>
+                                <th scope="col" className="text-dark" style={{ position: "sticky", zIndex: '1', right: '0' }}>Thao tác</th>
                             </tr>
                         </thead>
                         <tbody style={{ color: "black" }}>
@@ -249,8 +284,10 @@ const Cancle = ({ updateData }) => {
                                                         checked={selectedIds.includes(confirm.id)} />
                                                 </FormGroup>
                                             </td>
+                                            <td className="text-center">{calculateIndex(index)}</td>
                                             <td>{confirm.code}</td>
-                                            <td>{confirm.createdBy}</td>
+                                            <td>{confirm.fullname}</td>
+                                            <td>{confirm.phoneNumber}</td>
                                             <td className="text-right">{confirm.totalMoney.toLocaleString("vi-VN")} VND</td>
                                             <td className="text-center">
                                                 <Badge color={confirm.paymentMethod === 1 ? "success" : confirm.paymentMethod === 2 ? "primary" : "secondary"}>
@@ -261,13 +298,59 @@ const Cancle = ({ updateData }) => {
                                             <td>{confirm.updateBy}</td>
                                             <td>{format(new Date(confirm.createdTime), 'dd-MM-yyyy HH:mm', { locale: vi })}</td>
                                             <td>{format(new Date(confirm.updatedTime), 'dd-MM-yyyy HH:mm', { locale: vi })}</td>
-                                            <td className="text-center">
+                                            <td className="text-center" style={{ position: "sticky", zIndex: '1', right: '0', background: "#fff" }}>
                                                 <Button color="link" size="sm" onClick={() => handleRowClick(confirm.id, confirm)}><FaRegEdit /></Button>
                                             </td>
                                         </tr>
                                     ))}
                         </tbody>
                     </Table>
+
+                    <Row className="mt-4">
+                        <Col lg={6}>
+                            <div style={{ fontSize: 14 }}>
+                                Đang xem <b>{queryParams.page * queryParams.size + 1}</b>  đến <b>{queryParams.page * queryParams.size + confirm.length}</b> trong tổng số <b></b> mục
+                            </div>
+                        </Col>
+                        <Col style={{ fontSize: 14 }} lg={2}>
+                            <Row>
+                                <span>Xem </span>&nbsp;
+                                <span>
+                                    <Input type="select" name="status" style={{ width: "60px", fontSize: 14 }} size="sm" className="mt--1" onChange={handleSizeChange}>
+                                        <option value="10">10</option>
+                                        <option value="25">25</option>
+                                        <option value="50">50</option>
+                                        <option value="100">100</option>
+                                    </Input>
+                                </span>&nbsp;
+                                <span> mục</span>
+                            </Row>
+                        </Col>
+                        <Col lg={4} style={{ fontSize: 11 }} className="mt--1 text-right">
+                            <ReactPaginate
+                                breakLabel="..."
+                                nextLabel=">"
+                                pageRangeDisplayed={2}
+                                pageCount={totalPages}
+                                previousLabel="<"
+                                onPageChange={handlePageChange}
+                                renderOnZeroPageCount={null}
+                                pageClassName="page-item"
+                                pageLinkClassName="page-link"
+                                previousClassName="page-item"
+                                previousLinkClassName="page-link"
+                                nextClassName="page-item"
+                                nextLinkClassName="page-link"
+                                breakClassName="page-item"
+                                breakLinkClassName="page-link"
+                                containerClassName="pagination"
+                                activeClassName="active"
+                                marginPagesDisplayed={1}
+                            />
+                        </Col>
+
+                    </Row>
+
 
                     <Modal
                         isOpen={modal}
@@ -295,11 +378,48 @@ const Cancle = ({ updateData }) => {
                                                 readOnly style={{ backgroundColor: "#fff" }}
                                             />
                                         </FormGroup>
+                                        <Row>
+                                            {formData.fullname && (
+                                                <Col md={6}>
+                                                    <FormGroup>
+                                                        <Label>
+                                                            Khách hàng
+                                                        </Label>
+                                                        <Input
+                                                            size="sm"
+                                                            type="text"
+                                                            value={formData.fullname}
+                                                            readOnly style={{ backgroundColor: "#fff" }}
+                                                        />
+                                                    </FormGroup>
+                                                </Col>
+                                            )}
+                                            {formData.phoneNumber && (
+                                                <Col md={6}>
+                                                    <FormGroup>
+                                                        <Label>
+                                                            Số điện thoại
+                                                        </Label>
+                                                        <Input
+                                                            size="sm"
+                                                            type="tel"
+                                                            value={formData.phoneNumber}
+                                                            readOnly style={{ backgroundColor: "#fff" }}
+                                                        />
+                                                    </FormGroup>
+                                                </Col>
+                                            )}
+                                        </Row>
+                                        <Row>
+                                            <Col md={12}>
+                                                <h3 className="heading-small text-dark">Thông tin phiếu giao</h3>
+                                            </Col>
+                                        </Row>
                                         <Row >
                                             <Col md={6}>
                                                 <FormGroup>
                                                     <Label>
-                                                        Khách hàng
+                                                        Người nhận
                                                     </Label>
                                                     <Input
                                                         size="sm"
@@ -397,7 +517,11 @@ const Cancle = ({ updateData }) => {
                                                 </FormGroup>
                                             </Col>
                                         </Row>
-
+                                        <Row>
+                                            <Col md={12}>
+                                                <h3 className="heading-small text-dark">Thanh toán</h3>
+                                            </Col>
+                                        </Row>
                                         <FormGroup>
                                             <Label>
                                                 Tổng tiền sản phẩm
@@ -414,7 +538,6 @@ const Cancle = ({ updateData }) => {
                                                 </InputGroupAddon>
                                             </InputGroup>
                                         </FormGroup>
-
 
                                         <Row >
                                             <Col md={6}>

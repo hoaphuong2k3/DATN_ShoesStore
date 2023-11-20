@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { FaEdit, FaTrash, FaSearch, FaFileAlt, FaLock, FaLockOpen, FaCamera, FaFilter } from 'react-icons/fa';
+import { FaEdit, FaTrash, FaSearch, FaLock, FaLockOpen, FaCamera, FaFilter } from 'react-icons/fa';
 import { FaSort } from "react-icons/fa6";
 import ReactPaginate from "react-paginate";
 import { ToastContainer, toast } from "react-toastify";
@@ -8,7 +8,6 @@ import axiosInstance from "services/custommize-axios";
 import { isToday } from 'date-fns';
 import "assets/css/pagination.css";
 // reactstrap components
-import Switch from 'react-input-switch';
 import Carousel from 'react-bootstrap/Carousel';
 import {
     Card, CardHeader, CardBody, Container, Row, Col, Form, FormGroup, InputGroup, InputGroupAddon, InputGroupText,
@@ -38,7 +37,6 @@ const Promotion = () => {
     }
 
     const [file, setFile] = useState(null);
-    const [value, setValue] = useState('no');
     const [discounts, setDiscounts] = useState([]);
     const [freeGift, setfreeGift] = useState([]);
     const [totalElements, setTotalElements] = useState(0);
@@ -116,6 +114,16 @@ const Promotion = () => {
         0: { color: 'danger', label: 'Kích hoạt' },
         1: { color: 'success', label: 'Chờ kích hoạt' },
         2: { color: 'warning', label: 'Ngừng kích hoạt' }
+    };
+
+    //sắp xếp
+    const handleSort = (field) => {
+        const newSortOrder = queryParams.sortField === field && queryParams.sortOrder === 'asc' ? 'desc' : 'asc';
+        setQueryParams({
+            ...queryParams,
+            sortField: field,
+            sortOrder: newSortOrder,
+        });
     };
 
     //Lọc
@@ -527,16 +535,65 @@ const Promotion = () => {
                                                     </FormGroup>
                                                 </th>
                                                 <th scope="col" style={{ color: "black" }}>STT</th>
-                                                <th scope="col" style={{ color: "black", position: "sticky", zIndex: '1', left: '0' }}>Trạng thái</th>
-                                                <th scope="col" style={{ color: "black" }}>Mã<FaSort style={{ cursor: "pointer" }} /></th>
-                                                <th scope="col" style={{ color: "black" }}>Loại<FaSort style={{ cursor: "pointer" }} /></th>
-                                                <th scope="col" style={{ color: "black" }}>Tên khuyến mại<FaSort style={{ cursor: "pointer" }} /></th>
-                                                <th scope="col" style={{ color: "black" }}>Hóa đơn <br />tối thiểu<FaSort style={{ cursor: "pointer" }} /></th>
-                                                <th scope="col" style={{ color: "black" }}>Giá trị <FaSort style={{ cursor: "pointer" }} /></th>
-                                                <th scope="col" style={{ color: "black" }}>Quà tặng</th>
-                                                <th scope="col" style={{ color: "black" }}>Ngày bắt đầu<FaSort style={{ cursor: "pointer" }} /></th>
-                                                <th scope="col" style={{ color: "black" }}>Ngày kết thúc<FaSort style={{ cursor: "pointer" }} /></th>
-                                                <th scope="col" style={{ color: "black", position: "sticky", zIndex: '1', right: '0' }}>Thao tác</th>
+                                                <th scope="col"
+                                                    style={{ color: "black", position: "sticky", zIndex: '1', left: '0' }}>
+                                                    Trạng thái
+                                                </th>
+                                                <th scope="col" style={{ color: "black" }}>
+                                                    Mã
+                                                    <FaSort
+                                                        style={{ cursor: "pointer" }}
+                                                        className="text-muted"
+                                                        onClick={() => handleSort("code")} />
+                                                </th>
+                                                <th scope="col" style={{ color: "black" }}>
+                                                    Loại
+                                                    <FaSort
+                                                        style={{ cursor: "pointer" }}
+                                                        className="text-muted"
+                                                        onClick={() => handleSort("type_period")} />
+                                                </th>
+                                                <th scope="col" style={{ color: "black" }}>
+                                                    Tên khuyến mại
+                                                    <FaSort
+                                                        style={{ cursor: "pointer" }}
+                                                        className="text-muted"
+                                                        onClick={() => handleSort("name")} />
+                                                </th>
+                                                <th scope="col" style={{ color: "black" }}>
+                                                    Hóa đơn <br />tối thiểu
+                                                    <FaSort
+                                                        style={{ cursor: "pointer" }}
+                                                        className="text-muted"
+                                                        onClick={() => handleSort("min_price")} />
+                                                </th>
+                                                <th scope="col" style={{ color: "black" }}>
+                                                    Giá trị
+                                                    <FaSort
+                                                        style={{ cursor: "pointer" }}
+                                                        className="text-muted"
+                                                        onClick={() => handleSort("sale_percent")} />
+                                                </th>
+                                                <th scope="col" style={{ color: "black" }}>
+                                                    Quà tặng</th>
+                                                <th scope="col" style={{ color: "black" }}>
+                                                    Ngày bắt đầu
+                                                    <FaSort
+                                                        style={{ cursor: "pointer" }}
+                                                        className="text-muted"
+                                                        onClick={() => handleSort("start_date")} />
+                                                </th>
+                                                <th scope="col" style={{ color: "black" }}>
+                                                    Ngày kết thúc
+                                                    <FaSort
+                                                        style={{ cursor: "pointer" }}
+                                                        className="text-muted"
+                                                        onClick={() => handleSort("end_date")} />
+                                                </th>
+                                                <th scope="col"
+                                                    style={{ color: "black", position: "sticky", zIndex: '1', right: '0' }}>
+                                                    Thao tác
+                                                </th>
 
                                             </tr>
                                         </thead>
