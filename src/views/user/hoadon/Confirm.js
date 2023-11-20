@@ -6,7 +6,7 @@ import { vi } from 'date-fns/locale';
 import { connect } from 'react-redux';
 import { updateData } from './actions';
 // reactstrap components
-import { Badge, Row, Col, Button, Table, Input, FormGroup, InputGroup, InputGroupAddon, InputGroupText, Modal, ModalBody, ModalFooter, ModalHeader, Label, Form } from "reactstrap";
+import { Badge, Row, Col, Button, Table, Input, FormGroup, CardBody, CardFooter, InputGroup, InputGroupAddon, Card, InputGroupText, Modal, ModalBody, ModalFooter, ModalHeader, Label, Form, CardHeader } from "reactstrap";
 import { FaRegEdit, FaSearch, FaMinus, FaPlus, FaTrash } from 'react-icons/fa';
 
 const Confirm = ({ updateData }) => {
@@ -260,7 +260,7 @@ const Confirm = ({ updateData }) => {
                     formData.percentPeriod,
                     formData.percentVoucher,
                     formData.priceVoucher,
-                    true, 
+                    true,
                     response.data.data.total
                 );
 
@@ -374,7 +374,7 @@ const Confirm = ({ updateData }) => {
                 formData.percentPeriod,
                 formData.percentVoucher,
                 formData.priceVoucher,
-                true, 
+                true,
                 shippingTotal
 
             );
@@ -430,7 +430,51 @@ const Confirm = ({ updateData }) => {
                         </Col>
 
                     </Row>
+                    <Card className="mb-2">
+                        <CardHeader>
+                            <Row>
+                                <Col lg="1">HD01</Col>
+                                <Col lg="11" className="d-flex justify-content-end">Đơn hàng giao thành công</Col>
+                            </Row>
+                        </CardHeader>
+                        <CardBody>
+                            <Row>
+                                <Col lg="2">
+                                    <img src={`https://tamanh.net/wp-content/uploads/2021/08/tham-khao-concepts-chup-giay.jpg`} alt="" wight="79" height="79" />
+                                </Col>
+                                <Col lg="7">
+                                    <div>
+                                        <b>Tên sp</b>
+                                    </div>
+                                    <div>
+                                        Size: 39, Màu :Hồng
+                                    </div>
+                                    <div>
+                                        X 1
+                                    </div>
+                                </Col>
+                                <Col lg="3">
+                                    <div className="d-flex justify-content-end">
+                                        Tổng tiền
+                                    </div>
+                                    <div className="d-flex justify-content-end">
+                                        120.000 đ
+                                    </div>
+                                </Col>
+                            </Row>
+                        </CardBody>
+                        <CardFooter>
+                            <Row>
+                                <Col lg="4">
+                                    Ngày mua: 11/ 12/ 2023 11:20 PM
+                                </Col>
+                                <Col lg="8" className="d-flex justify-content-end">
+                                    <Button color="primary">Đánh giá </Button>
+                                </Col>
 
+                            </Row>
+                        </CardFooter>
+                    </Card>
                     <Table className="align-items-center" hover bordered responsive >
                         <thead className="thead-light text-center">
                             <tr>
