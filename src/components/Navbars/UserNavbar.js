@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { useAuth } from "services/AuthContext.js";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
 // reactstrap components
 import "assets/css/navbar.css";
 import "assets/css/cartModal.css";
@@ -23,13 +24,12 @@ import {
   InputGroup,
   InputGroupAddon,
   InputGroupText,
-  Form, FormGroup,
-  Button
+  Form,
+  FormGroup,
+  Button,
 } from "reactstrap";
+import axiosInstance from "services/custommize-axios";
 
-// import React, { useState, Modal } from "react";
-import React from "react";
-import { CartContext } from "contexts/Cart.js";
 
 const UserNavbar = () => {
   const { logout } = useAuth();
@@ -37,11 +37,39 @@ const UserNavbar = () => {
 
   const handleLogout = () => {
     logout();
-    navigate('/');
+    navigate("/");
   };
+
+
+  const storedUserId = localStorage.getItem("userId");
+  const [cartData, setCartData] = useState(null);
+
+  const fetchData = async () => {
+    try {
+      const response = await fetch(
+        `http://localhost:33321/api/cart/${storedUserId}`
+      );
+      const data = await response.json();
+      setCartData(data.content);
+
+      console.log(storedUserId);
+      console.log(data.content);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, [storedUserId]);
+
   return (
     <>
-      <Navbar className="navbar fixednavbar navbar-horizontal fixed-top navbar-dark" expand="md" color-on-scroll="300">
+      <Navbar
+        className="navbar fixednavbar navbar-horizontal fixed-top navbar-dark"
+        expand="md"
+        color-on-scroll="300"
+      >
         <Container className="px-4">
           <NavbarBrand to="/shoes/home" tag={Link}>
             <img
@@ -78,17 +106,29 @@ const UserNavbar = () => {
                 </NavLink>
               </NavItem>
               <NavItem>
-                <NavLink className="nav-link-icon" to="/shoes/product" tag={Link}>
+                <NavLink
+                  className="nav-link-icon"
+                  to="/shoes/product"
+                  tag={Link}
+                >
                   <span className="nav-link-inner-text">SẢN PHẨM</span>
                 </NavLink>
               </NavItem>
               <NavItem>
-                <NavLink className="nav-link-icon" to="/shoes/introduce" tag={Link}>
+                <NavLink
+                  className="nav-link-icon"
+                  to="/shoes/introduce"
+                  tag={Link}
+                >
                   <span className="nav-link-inner-text">GIỚI THIỆU</span>
                 </NavLink>
               </NavItem>
               <NavItem>
-                <NavLink className="nav-link-icon" to="/shoes/contact" tag={Link}>
+                <NavLink
+                  className="nav-link-icon"
+                  to="/shoes/contact"
+                  tag={Link}
+                >
                   <span className="nav-link-inner-text">LIÊN HỆ</span>
                 </NavLink>
               </NavItem>
@@ -99,7 +139,6 @@ const UserNavbar = () => {
               </NavItem>
             </Nav>
             <Nav className="align-items-lg-center ml-lg-auto" navbar>
-
               <Form className="navbar-search navbar-search-dark form-inline mr-3 d-none d-md-flex ml-lg-auto">
                 <FormGroup className="mb-0">
                   <InputGroup className="input-group-alternative">
@@ -148,39 +187,39 @@ const UserNavbar = () => {
                 </DropdownMenu>
               </UncontrolledDropdown>
               <div>
-                <CartContext.Consumer>
-                  {({ cartItems }) => (
-                    <Button className="button-cart" to="/shoes/cart" tag={Link} color="white">
-                      <i className="ni ni-cart" />
-                      <span className="cart-item-count">
-                        {cartItems.length}
-                      </span>
-
-                    </Button>
-                  )}
-                </CartContext.Consumer>
+                <Button
+                  className="button-cart"
+                  to="/shoes/cart"
+                  tag={Link}
+                  color="white"
+                >
+                  <i className="ni ni-cart" />
+                  <span className="cart-item-count">
+                    {cartData ? cartData.length : 0}
+                  </span>
+                </Button>
               </div>
             </Nav>
             <style>
-              {
-                `
+              {`
                 .button-cart {
                   position: relative;
                 }
                 
                 .cart-item-count {
                   position: absolute;
-                  top: -5px;
-                  right: -5px;
+                  top: 2px;
+                  right: 1px;
+                  width: 18px;
+                  height: 22px;
+                  text-align: center;
                   transform: translate(50%, -50%);
-                  background-color: red;
+                  background-color: darkgreen;
                   color: white;
                   border-radius: 50%;
-                  padding: 3px;
-                  font-size: 11px;
-                }
-                `
+                  font-size: 14px;
               }
+                `}
             </style>
           </UncontrolledCollapse>
         </Container>

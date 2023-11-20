@@ -26,7 +26,7 @@ const AdminNavbar = (props) => {
 
   const [username, setUsername] = useState("");
   const [avatar, setAvatar] = useState("");
-
+  const [gender, setGender] = useState("");
   useEffect(() => {
     const storedUserId = localStorage.getItem("userId");
     const fetchUserDetails = async () => {
@@ -36,6 +36,7 @@ const AdminNavbar = (props) => {
         );
         setUsername(response.data.data.username);
         setAvatar(response.data.data.avatar);
+        setGender(response.data.data.gender);
         console.log(response.data.data.username);
       } catch (error) {
         console.log(error);
@@ -49,6 +50,20 @@ const AdminNavbar = (props) => {
     width: "120px",
     height: "43px",
     borderRadius: "20%",
+  };
+  const getDefaultAvatar = (gender, avatar) => {
+    if (avatar) {
+      return `data:image/jpeg;base64,${avatar}`;
+    } else if (gender === true) {
+      // Nữ
+      return "https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcTu-uhxThn7kpatyW-egV5DpMNflanGQ_oeqUqmgEMx7KUkhyzF";
+    } else if (gender === false) {
+      // Nam
+      return "https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSbAVI8wgtBGopfLggnV-HvwW-_NYYvGxwAGRUBdHKwdSoPRjEX";
+    } else {
+      // Null
+      return "https://thumbs.dreamstime.com/b/default-businessman-avatar-icon-vector-business-people-profile-concept-279597784.jpg";
+    }
   };
 
   return (
@@ -69,7 +84,7 @@ const AdminNavbar = (props) => {
                 <Media className="align-items-center">
                   <span className="avatar avatar-sm rounded-circle">
                     <img
-                      src={`data:image/jpeg;base64,${avatar}`}
+                      src={getDefaultAvatar(gender, avatar)}
                       alt="Avatar"
                       style={imageStyle}
                     />

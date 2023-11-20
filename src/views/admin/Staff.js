@@ -149,7 +149,7 @@ const Staff = () => {
     setFormData((prevData) => ({
       ...prevData,
       address: {
-        ...prevData.address, 
+        ...prevData.address,
         districtCode: selectedDistrictCode,
         communeCode: "",
       },
@@ -166,7 +166,7 @@ const Staff = () => {
   };
 
   // END ADDRESS
-  
+
   const handlePageChange = ({ selected }) => {
     setQueryParams((prevParams) => ({ ...prevParams, page: selected }));
   };
@@ -239,7 +239,7 @@ const Staff = () => {
   });
 
   const handleRowClick = async (admin) => {
-    handleProvinceChange(admin.proviceCode)
+    handleProvinceChange(admin.proviceCode);
     handleDistrictChange(admin.districtCode);
 
     setFormData({
@@ -265,6 +265,11 @@ const Staff = () => {
       const blob = await fetch(`data:image/jpeg;base64,${admin.avatar}`).then(
         (res) => res.blob()
       );
+      const file = new File([blob], "image.jpg", { type: "image/jpeg" });
+      setFile(file);
+    }else {
+      const defaultAvatar = getDefaultAvatar(admins.gender);
+      const blob = await fetch(defaultAvatar).then((res) => res.blob());
       const file = new File([blob], "image.jpg", { type: "image/jpeg" });
       setFile(file);
     }
@@ -364,6 +369,22 @@ const Staff = () => {
       // Xử lý lỗi (nếu cần)
     }
   };
+
+  const getDefaultAvatar = (gender, avatar) => {
+    if (avatar) {
+      return `data:image/jpeg;base64,${avatar}`;
+    } else if (gender === true) {
+      // Nữ
+      return "https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcTu-uhxThn7kpatyW-egV5DpMNflanGQ_oeqUqmgEMx7KUkhyzF";
+    } else if (gender === false) {
+      // Nam
+      return "https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSbAVI8wgtBGopfLggnV-HvwW-_NYYvGxwAGRUBdHKwdSoPRjEX";
+    } else {
+      // Null
+      return "https://thumbs.dreamstime.com/b/default-businessman-avatar-icon-vector-business-people-profile-concept-279597784.jpg";
+    }
+  };
+
   const AvatarReset = () => {
     setFile(null);
   };
@@ -627,7 +648,7 @@ const Staff = () => {
                     </thead>
                     <tbody>
                       {Array.isArray(filterAdmins) &&
-                        filterAdmins.length > 0 ? (
+                      filterAdmins.length > 0 ? (
                         filterAdmins.map((admin, index) => (
                           <tr key={admin.id}>
                             <td className="text-center">
@@ -645,8 +666,8 @@ const Staff = () => {
                             <td>
                               <span className="avatar avatar-sm rounded-circle">
                                 <img
-                                  src={`data:image/jpeg;base64,${admin.avatar}`}
-                                  alt=""
+                                  src={getDefaultAvatar(admin.gender, admin.avatar)}
+                                  alt={admin.username}
                                 />
                               </span>
                             </td>
@@ -1019,7 +1040,9 @@ const Staff = () => {
                             className="form-control-alternative"
                             type="select"
                             value={formData.address.proviceCode}
-                            onChange={(e) => handleProvinceChange(e.target.value)}
+                            onChange={(e) =>
+                              handleProvinceChange(e.target.value)
+                            }
                           >
                             <option value="">Chọn Tỉnh / Thành</option>
                             {provinces.map((province) => (
@@ -1043,19 +1066,17 @@ const Staff = () => {
                             className="form-control-alternative"
                             type="select"
                             value={formData.address.districtCode}
-                            onChange={(e)=>handleDistrictChange(e.target.value)}
+                            onChange={(e) =>
+                              handleDistrictChange(e.target.value)
+                            }
                             disabled={!formData.address.proviceCode}
                           >
                             <option value="">Chọn Quận / Huyện</option>
-                            {
-                              districts.map((district) => (
-                                <option
-                                  key={district.code}
-                                  value={district.code}
-                                >
-                                  {district.name}
-                                </option>
-                              ))}
+                            {districts.map((district) => (
+                              <option key={district.code} value={district.code}>
+                                {district.name}
+                              </option>
+                            ))}
                           </Input>
                         </FormGroup>
                       </Col>
@@ -1081,12 +1102,11 @@ const Staff = () => {
                             disabled={!formData.address.districtCode}
                           >
                             <option value="">Chọn Phường / Xã</option>
-                            {
-                              communes.map((commune) => (
-                                <option key={commune.code} value={commune.code}>
-                                  {commune.name}
-                                </option>
-                              ))}
+                            {communes.map((commune) => (
+                              <option key={commune.code} value={commune.code}>
+                                {commune.name}
+                              </option>
+                            ))}
                           </Input>
                         </FormGroup>
                       </Col>

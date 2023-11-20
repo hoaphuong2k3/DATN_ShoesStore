@@ -42,7 +42,6 @@ const Profile = () => {
       handleDistrictChange(response.data.districtCode);
       setAdmins(response.data);
       
-
       console.log(response.data.proviceCode);
       console.log(storedUserId);
       console.log(response.data);
@@ -128,6 +127,11 @@ const Profile = () => {
         ).then((res) => res.blob());
         const file = new File([blob], "image.jpg", { type: "image/jpeg" });
         setFile(file);
+      }else {
+        const defaultAvatar = getDefaultAvatar(admins && admins.gender);
+        const blob = await fetch(defaultAvatar).then((res) => res.blob());
+        const file = new File([blob], "image.jpg", { type: "image/jpeg" });
+        setFile(file);
       }
     };
 
@@ -136,6 +140,7 @@ const Profile = () => {
         ...prevFormData,
         id: storedUserId,
         username: admins ? admins.username : "",
+        gender: admins ? admins.gender : "",
         fullname: admins ? admins.fullname : "",
         email: admins ? admins.email : "",
         dateOfBirth: admins ? admins.dateOfBirth : "",
@@ -176,6 +181,7 @@ const Profile = () => {
     fullname: "",
     avatar: null,
     email: "",
+    gender: false,
     dateOfBirth: "",
     phoneNumber: "",
     address: {
@@ -241,7 +247,18 @@ const Profile = () => {
       console.error("Failed to change avatar", error);
     }
   };
-
+  const getDefaultAvatar = (gender) => {
+    if (gender === true) {
+      // Nữ
+      return "https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcTu-uhxThn7kpatyW-egV5DpMNflanGQ_oeqUqmgEMx7KUkhyzF";
+    } else if (gender === false) {
+      // Nam
+      return "https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSbAVI8wgtBGopfLggnV-HvwW-_NYYvGxwAGRUBdHKwdSoPRjEX";
+    } else {
+      // Null
+      return "https://thumbs.dreamstime.com/b/default-businessman-avatar-icon-vector-business-people-profile-concept-279597784.jpg";
+    }
+  };
   // changePassword
 
   const [formPass, setFormPass] = useState({

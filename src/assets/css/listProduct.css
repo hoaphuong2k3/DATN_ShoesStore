@@ -73,3 +73,23 @@
   /* .item{
     margin-top: 50px;
   } */
+  .product-price {
+    font-size: 14px;
+    font-weight: 500;
+    color: #1c1c1c;
+    margin-top: 10px;
+  }
+  .product-price span {
+    margin-left: 6px;
+    text-decoration: line-through;
+    color: #bbb;
+  }
+  .product-card__title {
+    font-size: 15px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin: 10px 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }

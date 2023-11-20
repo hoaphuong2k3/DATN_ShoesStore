@@ -21,6 +21,11 @@ import slideshow2 from "assets/img/theme/slideshow3.jpg";
 import { getAllShoes } from "services/Product2Service";
 
 const Home = () => {
+  const formatter = new Intl.NumberFormat("vi-VN", {
+    style: "currency",
+    currency: "VND",
+  });
+
   const settings = {
     dots: true, // Hiển thị các chấm chỉ số
     infinite: true, // Lặp lại slideshow
@@ -102,7 +107,6 @@ const Home = () => {
           <div className="col-7">
             <Card>
               <a href="/shoes/product" className="">
-                
                 <Slider {...settings}>
                   <div className="">
                     <img
@@ -192,9 +196,17 @@ const Home = () => {
                                   </Link>
                                   <div className="product-price">
                                     <strong className="text-danger">
-                                      1.365.000₫
+                                      {formatter.format(
+                                        product.discountPriceMin
+                                      )}{" "}
+                                      -{" "}
+                                      {formatter.format(
+                                        product.discountPriceMax
+                                      )}
                                     </strong>
-                                    <span>1.750.000₫</span>
+                                    <span>
+                                      {formatter.format(product.priceMin)}
+                                    </span>
                                   </div>
                                 </div>
                               </div>
@@ -426,9 +438,17 @@ const Home = () => {
                                   </Link>
                                   <div className="product-price">
                                     <strong className="text-danger">
-                                      1.365.000₫
+                                      {formatter.format(
+                                        product.discountPriceMin
+                                      )}{" "}
+                                      -{" "}
+                                      {formatter.format(
+                                        product.discountPriceMax
+                                      )}
                                     </strong>
-                                    <span>1.750.000₫</span>
+                                    <span>
+                                      {formatter.format(product.priceMin)}
+                                    </span>
                                   </div>
                                 </div>
                               </div>

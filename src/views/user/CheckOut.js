@@ -24,6 +24,11 @@ const Checkout = () => {
   const storedUserId = localStorage.getItem("userId");
   const [totalMoney, setTotalMoney] = useState(null);
 
+  const formatter = new Intl.NumberFormat("vi-VN", {
+    style: "currency",
+    currency: "VND",
+  });
+
   const handleOpenVoucherModal = () => {
     setShowVoucherModal(true);
   };
@@ -49,6 +54,31 @@ const Checkout = () => {
     fetchCheckout();
   }, []);
 
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(null);
+
+  const handleOrder = async () => {
+    if (selectedPaymentMethod === null) {
+      alert("Vui lòng chọn phương thức thanh toán");
+      return;
+    }
+    try {
+      const data = {
+        idAccount: storedUserId,
+        idDisCount: null,
+        idShoesDetail: products.map((product) => product.id),
+        paymentMethod: selectedPaymentMethod,
+        totalMoney: totalMoney,
+      };
+      const response = await axiosInstance.post("/order/create", data);
+      alert("Đặt hàng thành công");
+      // Thực hiện các xử lý sau khi tạo hóa đơn thành công (nếu cần)
+      window.location.href = "/shoes/home";
+    } catch (error) {
+      console.error("Lỗi trong quá trình tạo hóa đơn:", error);
+      // Xử lý lỗi (nếu cần)
+    }
+  };
+
   return (
     <>
       <Header />
@@ -70,12 +100,14 @@ const Checkout = () => {
                         <div className="item d-flex mb-5" key={product.id}>
                           <div className="product-container mr-5">
                             <img
-                              src="https://laforce.vn/wp-content/uploads/2022/12/giay-tay-nam-GNLAAZ01-1-D-108x136.jpg"
+                              src={`https://s3-ap-southeast-1.amazonaws.com/imageshoestore/${product.image}`}
                               alt={product.name}
                               className="product-image"
                             />
                             <div className="quantity-badge">
-                              <span className="quantity">{product.quantity}</span>
+                              <span className="quantity">
+                                {product.quantity}
+                              </span>
                             </div>
                           </div>
                           <div>
@@ -86,7 +118,7 @@ const Checkout = () => {
                               {product.color}, size {product.size}
                             </div>
                             <div className="text-danger small mt-2">
-                              {product.price}đ
+                              {formatter.format(product.price)}
                             </div>
                           </div>
                         </div>
@@ -222,7 +254,7 @@ const Checkout = () => {
                               className="text-dark font-weight-bold"
                               style={{ float: "right" }}
                             >
-                              {totalMoney}đ
+                              {formatter.format(totalMoney)}
                             </span>
                             <br />
                           </div>
@@ -242,7 +274,7 @@ const Checkout = () => {
                             className="text-dark font-weight-bold"
                             style={{ float: "right" }}
                           >
-                            {totalMoney}đ
+                            {formatter.format(totalMoney)}
                           </h3>
                         </div>
                       </div>
@@ -251,21 +283,39 @@ const Checkout = () => {
                   <div className="ml-2">
                     <p className="text-dark font-weight-bold mt-3">
                       <i
-                        class="fa fa-credit-card"
+                        className="fa fa-credit-card"
                         aria-hidden="true"
                         style={{ marginRight: "5px" }}
                       ></i>
                       PHƯƠNG THỨC THANH TOÁN
                     </p>
-                    <Input type="radio" name="paymentMethod" className="ml-1" />
+                    <Input
+                      type="radio"
+                      name="paymentMethod"
+                      className="ml-1"
+                      value={1}
+                      checked={selectedPaymentMethod === 1}
+                      onChange={(e) =>
+                        setSelectedPaymentMethod(parseInt(e.target.value))
+                      }
+                    />
                     <Label className="ml-4">Thanh toán khi nhận hàng</Label>
                     <br />
-                    <Input type="radio" name="paymentMethod" className="ml-1" />
+                    <Input
+                      type="radio"
+                      name="paymentMethod"
+                      className="ml-1"
+                      value={2}
+                      checked={selectedPaymentMethod === 2}
+                      onChange={(e) =>
+                        setSelectedPaymentMethod(parseInt(e.target.value))
+                      }
+                    />
                     <Label className="ml-4">Thẻ Master/Ví điện tử</Label>
                   </div>
                   <Button
                     name="checkout"
-                    // onClick={() => handleCheckout()}
+                    onClick={() => handleOrder()}
                     className="evo-button mobile-viewmore mt-4"
                     style={{ width: "100%" }}
                   >
