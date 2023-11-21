@@ -18,7 +18,6 @@ import Header from "components/Headers/Header";
 import "assets/css/cart.css";
 
 const Cart = () => {
-  // const { fetchData } = useContext(CartContext);
   const [cartData, setCartData] = useState(null);
   const [selectedItems, setSelectedItems] = useState([]);
   const storedUserId = localStorage.getItem("userId");
@@ -205,7 +204,7 @@ const Cart = () => {
                                         handleCheckboxChange(item.id)
                                       }
                                     />
-                                    <p className="image">
+                                    <p className="">
                                       <Link
                                         to={`/shoes/productdetail/${item.id}`}
                                       >
@@ -214,9 +213,11 @@ const Cart = () => {
                                           alt={item.name}
                                           style={{
                                             float: "right",
-                                            marginRight: "3px",
+                                            marginRight: "6px",
+                                            marginTop: "20px",
+                                            borderRadius: "20%"
                                           }}
-                                          width={"70%"}
+                                          width={"60%"}
                                           // height={"90px"}
                                         />
                                       </Link>

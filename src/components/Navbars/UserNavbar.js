@@ -30,7 +30,6 @@ import {
 } from "reactstrap";
 import axiosInstance from "services/custommize-axios";
 
-
 const UserNavbar = () => {
   const { logout } = useAuth();
   const navigate = useNavigate();
@@ -77,7 +76,6 @@ const UserNavbar = () => {
       return "https://thumbs.dreamstime.com/b/default-businessman-avatar-icon-vector-business-people-profile-concept-279597784.jpg";
     }
   };
-
 
   const storedUserId = localStorage.getItem("userId");
   const [cartData, setCartData] = useState(null);
@@ -262,6 +260,9 @@ const UserNavbar = () => {
             </Nav>
             <style>
               {`
+                .btn i:not(:last-child), .btn svg:not(:last-child) {
+                  margin-right: 0rem;
+                }
                 .button-cart {
                   position: relative;
                 }
