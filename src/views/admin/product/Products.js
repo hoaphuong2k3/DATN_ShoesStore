@@ -18,6 +18,10 @@ import axios from "axios";
 
 
 const Products = () => {
+  const formatter = new Intl.NumberFormat("vi-VN", {
+    style: "currency",
+    currency: "VND",
+  });
   const [listShoes, setListShoes] = useState([]);
   const [listBrand, setListBrand] = useState([]);
   const [listorigin, setListOrigin] = useState([]);
@@ -580,8 +584,8 @@ const Products = () => {
                               <td>{item.cushion}</td>
                               <td>{item.totalQuantity}</td>
                               <td>{item.totalRecord}</td>
-                              <td>{item.priceMin}</td>
-                              <td>{item.priceMax}</td>
+                              <td>{formatter.format(item.priceMin)}</td>
+                              <td>{formatter.format(item.priceMax)}</td>
                               <td style={{ position: "sticky", zIndex: '1', right: '0', background: "#fff" }}>
                                 <Button color="link" to={`/admin/shoesdetail/${item.id}`} tag={Link} size="sm">
                                   <i class="fa-solid fa-eye" color="primary" />
