@@ -18,7 +18,6 @@ import Header from "components/Headers/Header";
 import "assets/css/cart.css";
 
 const Cart = () => {
-  // const { fetchData } = useContext(CartContext);
   const [cartData, setCartData] = useState(null);
   const [selectedItems, setSelectedItems] = useState([]);
   const storedUserId = localStorage.getItem("userId");
