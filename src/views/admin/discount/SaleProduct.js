@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { FaEdit, FaTrash, FaSearch, FaFilter, FaLock, FaLockOpen } from 'react-icons/fa';
+import { FaEdit, FaTrash, FaSearch, FaFilter, FaLock, FaLockOpen, FaFileAlt } from 'react-icons/fa';
 import { FaSort } from "react-icons/fa6";
 import ReactPaginate from "react-paginate";
 import { ToastContainer, toast } from "react-toastify";
@@ -11,7 +11,6 @@ import { format, parseISO } from 'date-fns';
 import { vi } from 'date-fns/locale';
 import "assets/css/pagination.css";
 // reactstrap components
-import Switch from 'react-input-switch';
 import {
     Row, Col, Form, FormGroup, Input, Button, Table, Badge, InputGroup, InputGroupAddon, InputGroupText,
     Modal, ModalBody, ModalFooter, ModalHeader
@@ -31,9 +30,9 @@ const SaleProduct = () => {
 
     const [thirdModal, setThirdModal] = useState(false);
     const toggleThirdModal = () => setThirdModal(!thirdModal);
-    const handleModal3 = () => {
-        setThirdModal(true);
-    }
+
+    const [fourModal, setFourModal] = useState(false);
+    const toggleFourModal = () => setFourModal(!fourModal);
 
     const [discounts, setDiscounts] = useState([]);
     const [totalElements, setTotalElements] = useState(0);
@@ -50,6 +49,7 @@ const SaleProduct = () => {
     const [searchValue, setSearchValue] = useState("");
     const [shoesDetailMapping, setShoesDetailMapping] = useState({});
     const [selectedShoesDetails, setSelectedShoesDetails] = useState([]);
+    const [selectedProduct, setSelectedProduct] = useState(null);
 
 
     const [search2, setSearch2] = useState({
@@ -85,8 +85,6 @@ const SaleProduct = () => {
             let res = await getAllShoes(page, size, search, sort, sortStyle);
             if (res && res.data && res.data.content) {
                 setListShoes(res.data.content);
-                // setTotalElenments(res.data.totalElements);
-                // setTotalPages(res.data.totalPages);
             }
         } catch (error) {
             setListShoes([]);
@@ -115,6 +113,19 @@ const SaleProduct = () => {
 
         }
     };
+
+    //load productPromo
+    const getProductPromo = async (discount) => {
+        try {
+            const response = await axiosInstance.get(`/promos/detailPromo/${discount}`);
+            const products = response.data;
+            setSelectedProduct(products);
+            toggleFourModal();
+        } catch (error) {
+            console.error("Error fetching product details:", error);
+        }
+    };
+
 
     //loads voucher
     const [queryParams, setQueryParams] = useState({
@@ -472,7 +483,7 @@ const SaleProduct = () => {
 
                 <Row className="align-items-center my-4">
                     <div className="col d-flex">
-                        <Button color="warning" outline size="sm" onClick={handleModal3}>
+                        <Button color="warning" outline size="sm" onClick={toggleThirdModal}>
                             <FaFilter size="16px" className="mr-1" />Bộ lọc
                         </Button>
 
@@ -631,6 +642,7 @@ const SaleProduct = () => {
                                             {(discount.status === 1 || discount.status === 2) &&
                                                 <Button color="link" size="sm"><FaLock onClick={() => openlock(discount.id)} /></Button>
                                             }
+                                            <Button color="link" size="sm" onClick={() => getProductPromo(discount.id)}><FaFileAlt /></Button>
                                             <Button color="link" size="sm" onClick={() => handleRowClick(discount)}><FaEdit /></Button>
                                             <Button color="link" size="sm" onClick={() => deleteDiscount(discount.id)}> <FaTrash /></Button>
                                         </td>
@@ -957,7 +969,7 @@ const SaleProduct = () => {
 
             </Modal >
 
-            {/* DetailProduct */}
+            {/* ListDetailProduct */}
             <Modal
                 isOpen={secondModal}
                 toggle={toggleSecondModal}
@@ -1016,6 +1028,54 @@ const SaleProduct = () => {
                 </ModalFooter>
             </Modal>
 
+            {/* DetailProductPromo */}
+            <Modal
+                isOpen={fourModal}
+                toggle={toggleFourModal}
+                style={{ maxWidth: '800px' }}
+                backdrop={false}
+            >
+                <ModalHeader toggle={toggleFourModal}>
+                    <h3 className="heading-small text-muted mb-0">Sản phẩm khuyến mại</h3>
+                </ModalHeader>
+                <ModalBody style={{ paddingTop: 0, paddingBottom: 0 }}>
+                    <Table>
+                        <thead className="thead-light text-center">
+                            <tr>
+                                <th scope="col">STT</th>
+                                <th scope="col">Mã</th>
+                                <th scope="col">Ảnh</th>
+                                <th scope="col">Tên sản phẩm</th>
+                                <th scope="col">Size</th>
+                                <th scope="col">Màu</th>
+                                <th scope="col">Hãng</th>
+                                <th scope="col">Xuất xứ</th>
+                            </tr>
+                        </thead>
+                        {selectedProduct &&
+                            selectedProduct.map((product, index) => (
+                                <tr key={product.id}>
+                                    <td>{index + 1}</td>
+                                    <td>{product.code}</td>
+                                    <td>{product.imgURI}</td>
+                                    <td>{product.name}</td>
+                                    <td>{product.size}</td>
+                                    <td>{product.color}</td>
+                                    <td>{product.brand}</td>
+                                    <td>{product.origin}</td>
+                                    
+                                </tr>
+                            ))}
+                    </Table>
+
+                </ModalBody>
+                <ModalFooter>
+                    <Button color="danger" outline size="sm" onClick={toggleFourModal}>
+                        Đóng
+                    </Button>
+                </ModalFooter>
+
+            </Modal>
             {/* Lọc */}
             <Modal
                 isOpen={thirdModal}
