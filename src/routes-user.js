@@ -60,7 +60,6 @@ var routes = [
   },
   {
     path: "/productdetail/:id",
-    name: "CHI TIẾT SẢN PHẨM",
     component: <ProductDetail />,
     layout: "/shoes",
   },
