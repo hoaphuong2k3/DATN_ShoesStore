@@ -1,29 +1,88 @@
 import 'assets/scss/detailsp.scss';
-import { Container, Row, Card, CardBody} from "reactstrap";
+import { Container, Row, Card, CardBody, Col } from "reactstrap";
 import Header from "components/Headers/ProductHeader.js";
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { useParams } from 'react-router-dom';
+import { getAllShoesDetail } from "services/ShoesDetailService.js";
+import { useParams, useNavigate } from 'react-router-dom';
 import { CartContext } from "contexts/Cart.js";
+import { getAllColorId, getAllSizeId } from "services/ProductAttributeService";
+import { findShoes } from "services/Product2Service";
+import { toast } from 'react-toastify';
 
 const DetailProduct = () => {
+  const storedUserId = localStorage.getItem("userId");
   const [productDetail, setProductDetail] = useState([]);
   const { id } = useParams();
-  // const navigate = useNavigate();
-
+  const [listSizeById, setListSizeById] = useState([]);
+  const [listColorById, setListColorById] = useState([]);
+  const [idColor, setIdColor] = useState("");
+  const [idSize, setIdSize] = useState("");
+  const navigate = useNavigate();
+  const [shoesdetail, setshoesdetail] = useState({});
+  const formatter = new Intl.NumberFormat("vi-VN", {
+    style: "currency",
+    currency: "VND",
+  });
   useEffect(() => {
     getDetail();
+    getlistColorById();
+    getlistSizeById();
   }, []);
+  //Xử lý btn tắng giảm
+  const [quantity, setQuantity] = useState(1);
 
+  const handleDecrease = () => {
+    if (quantity > 1) {
+      setQuantity(quantity - 1);
+    }
+  };
+
+  const handleIncrease = () => {
+    setQuantity(quantity + 1);
+  };
+  //End Xử lý btn tắng giảm
+  useEffect(() => {
+    const getAll = async () => {
+      console.log("colorId:sizeId:", idColor, idSize)
+      try {
+        let res = await getAllShoesDetail(id, 0, 5, { colorId: idColor, sizeId: idSize });
+        if (res && res.data && res.data.content) {
+          setshoesdetail(res.data.content[0]);
+          console.log(res.data.content)
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    }
+    getAll();
+  }, [idColor, idSize]);
+  const getlistColorById = async () => {
+    let res = await getAllColorId(id);
+    if (res && res.data) {
+      setListColorById(res.data);
+      setIdColor(res.data[0].id);
+    }
+  }
+  const getlistSizeById = async () => {
+    let res = await getAllSizeId(id);
+    if (res && res.data) {
+      setListSizeById(res.data);
+      setIdSize(res.data[0].id);
+    }
+  }
   const getDetail = async () => {
     try {
-      const res = await axios.get(`https://63c1265d376b9b2e64743c4f.mockapi.io/shoesdetails/${id}`);
-      console.log(res.data);
+      let res = await findShoes(id);
       if (res && res.data) {
         setProductDetail(res.data);
       }
     } catch (error) {
-      console.error(error);
+      let errorMessage = "Lỗi từ máy chủ";
+      if (error.response && error.response.data && error.response.data.message) {
+        errorMessage = error.response.data.message;
+        console.error(errorMessage);
+      }
     }
   }
 
@@ -53,7 +112,41 @@ const DetailProduct = () => {
   // console.log(cartItems);
 
 
+  const handleCheckout = async () => {
+    if (storedUserId) {
+      try {
+        const response = await fetch("http://localhost:33321/api/cart/add", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            // Thêm thông tin xác thực nếu cần
+            // "Authorization": "Bearer <token>"
+          },
+          body: JSON.stringify({
+            "key": storedUserId,
+            "id": shoesdetail.id,
+            "quantity": quantity
+          }),
+        });
 
+        if (!response.ok) {
+          throw new Error(
+            "Có lỗi xảy ra khi thực hiện thanh toán. Vui lòng thử lại sau."
+          );
+        }
+
+        const responseData = await response.json();
+        console.log(responseData);
+        // Chuyển hướng
+        window.location.href = "/shoes/cart";
+      } catch (error) {
+        console.error("Lỗi trong quá trình thanh toán:", error);
+      }
+    } else {
+      toast.success("Bạn cần đăng nhập để có thể tiếp tục !!!!")
+      window.location.href = "/login";
+    }
+  }
 
 
   return (
@@ -70,9 +163,9 @@ const DetailProduct = () => {
                     <div className='card-box'>
                       <div className='row'>
                         <div className='col-5'>
-                          <img alt="" src={productDetail.anh} height={450} width={450} />
+                          <img alt="" src={`https://s3-ap-southeast-1.amazonaws.com/imageshoestore/${productDetail.imgURI}`} height={450} width={450} />
 
-                          <p>
+                          <p className='mt-5'>
                             <img alt="" src="https://down-vn.img.susercontent.com/file/sg-11134201-22110-49wxoj5hr7jva4" height={88} width={88} />
                             <img alt="" src="https://down-vn.img.susercontent.com/file/sg-11134201-22110-49wxoj5hr7jva4" height={88} width={88} />
                             <img alt="" src="https://down-vn.img.susercontent.com/file/sg-11134201-22110-49wxoj5hr7jva4" height={88} width={88} />
@@ -84,53 +177,99 @@ const DetailProduct = () => {
                         <div className='col-7'>
                           <div className='tensp'>
                             {/* Tên sản phẩm */}
-                            <span>{productDetail.ten}</span>
+                            <span>{productDetail.name}, Hãng {productDetail.brandName}, Xuất xứ {productDetail.originName}</span>
                           </div>
                           <br />
                           {/* start Giá sản phảm */}
                           <div className='giasp'>
+                            {
+                              (shoesdetail.discountPrice < shoesdetail.price) ?
+                                <>
+                                  <div className='giachuagiam' >
+                                    {/* Giá chuwq giảm */}
+                                    {formatter.format(shoesdetail.price)}
 
-                            <div className='giachuagiam' >
-                              {/* Giá chuwq giảm */}
-                              2.600.000 đ
-                            </div>
-                            <div className='flex items-center'>
-                              {/* Giá  giảm */}
-                              <span className='giagiam'>2.392.000 đ</span>
-                              <span className='sokhuyenmai'> Giảm 8%</span>
-                            </div>
-
+                                  </div>
+                                  <div className='flex items-center'>
+                                    {/* Giá  giảm */}
+                                    <span className='giagiam'>{shoesdetail.discountPrice === null ? "0 đ" : formatter.format(shoesdetail.discountPrice)}</span>
+                                    <span className='sokhuyenmai'> Giảm {shoesdetail.discountPrice === null ? 100 : (shoesdetail.discountPrice / shoesdetail.price) * 100}%</span>
+                                  </div>
+                                </>
+                                :
+                                <>
+                                  <div className='flex items-center'>
+                                    {/* Giá  giảm */}
+                                    <span className='giagiam'>{formatter.format(shoesdetail.price)}</span>
+                                  </div>
+                                </>
+                            }
 
                           </div>
                           {/* end Giá sản phảm */}
                           <br />
 
                           {/* Start thuộc tính */}
-                          <div >
-                            <div className='tong' >
-                              <span className='tenthuoctinh'>Thương hiệu </span>
-                              <span className='giatrithuoctinh'>{productDetail.hang}</span>
-                            </div>
-                            <div className='tong'>
-                              <span className='tenthuoctinh'>Loại SP </span>
-                              <span className='giatrithuoctinh'>{productDetail.loaisp}</span>
-                            </div>
-                            <div className='tong'>
-                              <span className='tenthuoctinh'>Chất liệu </span>
-                              <span className='giatrithuoctinh'>{productDetail.chatLieu}</span>
-                            </div>
-                            <div className='tong'>
-                              <span className='tenthuoctinh'>Màu Sắc </span>
-                              <span className='giatrithuoctinh'>{productDetail.mau}</span>
-                            </div>
-                          </div>
+
+                          <Row>
+                            <Col lg="6">
+                              <div className='tong' >
+                                <span className='tenthuoctinh'>Thương hiệu :  </span>
+                                <span className='giatrithuoctinh'>{productDetail.brandName}</span>
+                              </div>
+                            </Col>
+                            <Col lg='6'>
+                              <div className='tong'>
+                                <span className='tenthuoctinh'>Xuất xứ :  </span>
+                                <span className='giatrithuoctinh'>{productDetail.originName}</span>
+                              </div>
+                            </Col>
+                            <Col lg='6'>
+                              <div className='tong'>
+                                <span className='tenthuoctinh'>Thiết kế :   </span>
+                                <span className='giatrithuoctinh'>{productDetail.designStyleName}</span>
+                              </div>
+                            </Col>
+                            <Col lg='6'>
+                              <div className='tong'>
+                                <span className='tenthuoctinh'>Loại da : </span>
+                                <span className='giatrithuoctinh'>{productDetail.skinTypeName}</span>
+                              </div>
+                            </Col>
+                            <Col lg='6'>
+                              <div className='tong'>
+                                <span className='tenthuoctinh'>Mũi giày : </span>
+                                <span className='giatrithuoctinh'>{productDetail.toeName}</span>
+                              </div>
+                            </Col>
+                            <Col lg='6'>
+                              <div className='tong'>
+                                <span className='tenthuoctinh'>Đế giày : </span>
+                                <span className='giatrithuoctinh'>{productDetail.soleName}</span>
+                              </div>
+                            </Col>
+                            <Col lg='6'>
+                              <div className='tong'>
+                                <span className='tenthuoctinh'>Lót giày :  </span>
+                                <span className='giatrithuoctinh'>{productDetail.liningName}</span>
+                              </div>
+                            </Col>
+                            <Col lg='6'>
+                              <div className='tong'>
+                                <span className='tenthuoctinh'>Đệm giày : </span>
+                                <span className='giatrithuoctinh'>{productDetail.cushionName}</span>
+                              </div>
+                            </Col>
+                          </Row>
+
+
                           {/* End thuộc tính */}
 
                           {/* Start mã giảm giá */}
                           {/* ======================= */}
                           <div>
                             <div className='tong' >
-                              <span className='tenthuoctinh'>Mã giảm giá </span>
+                              <span className='tenthuoctinh'>Mã giảm giá :   </span>
                               <span className='giatrithuoctinh'>
                                 <span className='voucher'> Giảm 10%</span>
                                 <span className='voucher'> Giảm 20%</span>
@@ -142,27 +281,61 @@ const DetailProduct = () => {
 
                           {/* start size */}
                           {/* ===================== */}
-                          <div className='tong row'><span className='tenthuoctinh col-2 ml--3'>Size </span>
-                            <span className='giatrithuoctinh col-9 ml-3'><button class="product-variation" aria-label="35" aria-disabled="false">35
-                            </button><button class="product-variation" aria-label="35" aria-disabled="false">36</button><button class="product-variation" aria-label="35" aria-disabled="false">37</button>
-                              <button class="product-variation" aria-label="35" aria-disabled="false">38</button>
-                              <button class="product-variation" aria-label="35" aria-disabled="false">39</button>
-                              <button class="product-variation" aria-label="35" aria-disabled="false">40</button>
-                              <button class="product-variation" aria-label="35" aria-disabled="false">41</button>
-                              <button class="product-variation" aria-label="35" aria-disabled="false">42</button>
-                              <button class="product-variation" aria-label="35" aria-disabled="false">43</button>
-                              <button class="product-variation" aria-label="35" aria-disabled="false">42.5</button></span></div> */
-
+                          <div>
+                            <div className=' row'><span className='tenthuoctinh col-2'>Size :  </span>
+                              <span className='giatrithuoctinh col-9 ml-4'>
+                                {listSizeById && listSizeById.length > 0 &&
+                                  listSizeById.map((item, index) => {
+                                    return (
+                                      <button class="product-variation" aria-label="35" aria-disabled="false"
+                                        style={{ backgroundColor: idColor === item.id ? '#cccccc' : '' }}
+                                        onClick={() => setIdColor(item.id)}
+                                      >
+                                        {item.name}
+                                      </button>
+                                    )
+                                  })}
+                              </span>
+                            </div>
+                          </div>
+                          {/* start size */}
+                          {/* ===================== */}
+                          <div>
+                            <div className=' row'>
+                              <span className='tenthuoctinh col-2'>Màu sắc :  </span>
+                              <span className='giatrithuoctinh col-9 ml-4'>
+                                {listColorById && listColorById.length > 0 &&
+                                  listColorById.map((item, index) => {
+                                    return (
+                                      <button class="product-variation" aria-label="35" aria-disabled="false"
+                                        style={{ backgroundColor: idSize === item.id ? '#cccccc' : '' }}
+                                        onClick={() => setIdSize(item.id)}
+                                      >
+                                        {item.name}
+                                      </button>
+                                    )
+                                  })}
+                              </span>
+                            </div>
+                          </div>
                           {/* end size */}
 
                           <div>
                             <div className='tong'>
-                              <span className='tenthuoctinh'>Số lượng </span>
-                              <span className='giatrithuoctinh'>
-                                <button className='btntanggiam'>-</button>
-                                <input class="soluong " type="text" role="spinbutton" aria-live="assertive" aria-valuenow="1" value="1"></input>
-                                <button className='btntanggiam'>+</button>
-                                <span> {productDetail.soluong} sản phẩm có sẵn</span>
+                              <span className='tenthuoctinh'>Số lượng :  </span>
+                              <span className='giatrithuoctinh' >
+                                <button className='btntanggiam' onClick={handleDecrease}>-</button>
+                                <input
+                                  className="soluong"
+                                  type="text"
+                                  role="spinbutton"
+                                  aria-live="assertive"
+                                  aria-valuenow={quantity}
+                                  value={quantity}
+                                  readOnly
+                                />
+                                <button className='btntanggiam' onClick={handleIncrease}>+</button>
+                                <span> {shoesdetail.quantity} sản phẩm có sẵn</span>
                               </span>
                             </div>
                           </div>
@@ -170,7 +343,7 @@ const DetailProduct = () => {
                             {/* <button onClick={addToCart} className='btn btn-primary'>Thêm vào giỏ hàng</button> */}
                             <CartContext.Consumer>
                               {({ addToCart }) => (
-                                <button className='btn btn-primary' onClick={() => addToCart(productDetail)}>
+                                <button className='btn btn-primary' onClick={() => handleCheckout()}>
                                   Thêm vào giỏ hàng
                                 </button>
                               )}
