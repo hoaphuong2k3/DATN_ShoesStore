@@ -85,6 +85,13 @@ const Home = () => {
     }
   };
 
+  const images = [
+    "https://bizweb.dktcdn.net/100/292/624/themes/758446/assets/index-evo-icon-5.jpg?1700140225697",
+    "https://bizweb.dktcdn.net/100/292/624/themes/758446/assets/index-evo-icon-3.jpg?1700140225697",
+    "https://bizweb.dktcdn.net/100/292/624/themes/758446/assets/index-evo-icon-4.jpg?1700140225697",
+    "https://bizweb.dktcdn.net/100/292/624/themes/758446/assets/index-evo-icon-2.jpg?1700140225697",
+  ];
+
   return (
     <>
       <Header />
@@ -483,7 +490,7 @@ const Home = () => {
                       </h2>
                     </div>
                     <div className="outfit-content ml-5">
-                      <div className="body-outfit ml-5">
+                      <div className="body-outfit">
                         <div className="outfit-image ">
                           <a href="/shoes/product" title="CLASSY CHELSEA BOOTS">
                             <img
@@ -493,49 +500,65 @@ const Home = () => {
                           </a>
                         </div>
                         <div className="outfit-product">
-                          {/* {Array.isArray(products) ? (
-                            products.map((product) => (
-                              <Card className="product-card ml-4">
-                                <span className="sale-box">- 22% </span>
-                                <div
-                                  key={product.id}
-                                  className="product-card__inner "
-                                >
-                                  <Link
-                                    to={`/shoes/productdetail/${product.id}`}
+                          {Array.isArray(products) && products.length > 0 ? (
+                            <Slider
+                              autoplay={true}
+                              autoplaySpeed={3000}
+                              dots={true} // Hiển thị chấm chỉ mục
+                              infinite={true} // Vô hạn lặp lại slideshow
+                              speed={500} // Tốc độ chuyển đổi slide (ms)
+                              slidesToShow={1} // Số slide hiển thị cùng một lúc
+                              slidesToScroll={1} // Số slide chuyển đổi khi di chuyển
+                            >
+                              {products.map((product) => (
+                                <Card className="product-card mr-3">
+                                  <span className="sale-box">- 22% </span>
+                                  <div
+                                    key={product.id}
+                                    className="product-card__inner "
                                   >
-                                    <div className="product-card__image zoom">
-                                      <img
-                                        src={`https://s3-ap-southeast-1.amazonaws.com/imageshoestore/${product.imgURI}`}
-                                        alt=""
-                                        className="product-card-image-front img-responsive center-block mt-2 "
-                                      />
-                                    </div>
-                                  </Link>
-                                  <div className="mt-4 p-3 text-center ">
-                                    <h4 className="product-single__series text-uppercase">
-                                      {product.cushion}
-                                    </h4>
                                     <Link
                                       to={`/shoes/productdetail/${product.id}`}
                                     >
-                                      <h3 className="product-card__title">
-                                        {`${product.name} ${product.cushion} ${product.designStyle} ${product.brand}`}
-                                      </h3>
+                                      <div className="product-card__image zoom">
+                                        <img
+                                          src={`https://s3-ap-southeast-1.amazonaws.com/imageshoestore/${product.imgURI}`}
+                                          alt=""
+                                          className="product-card-image-front img-responsive center-block mt-2 "
+                                        />
+                                      </div>
                                     </Link>
-                                    <div className="product-price">
-                                      <strong className="text-danger">
-                                        1.365.000₫
-                                      </strong>
-                                      <span>1.750.000₫</span>
+                                    <div className="mt-4 p-3 text-center ">
+                                      <h4 className="product-single__series text-uppercase">
+                                        {product.cushion}
+                                      </h4>
+                                      <Link
+                                        to={`/shoes/productdetail/${product.id}`}
+                                      >
+                                        <h3 className="product-card__title">
+                                          {`${product.name} ${product.cushion} ${product.designStyle} ${product.brand}`}
+                                        </h3>
+                                      </Link>
+                                      <div className="product-price">
+                                        <strong className="text-danger">
+                                          {formatter.format(
+                                            product.discountPriceMin
+                                          )}{" "}
+                                          -{" "}
+                                          {formatter.format(
+                                            product.discountPriceMax
+                                          )}
+                                        </strong>
+                                        {formatter.format(product.priceMin)}
+                                      </div>
                                     </div>
                                   </div>
-                                </div>
-                              </Card>
-                            ))
+                                </Card>
+                              ))}
+                            </Slider>
                           ) : (
                             <p>Không có dữ liệu.</p>
-                          )} */}
+                          )}
                         </div>
                       </div>
                     </div>
