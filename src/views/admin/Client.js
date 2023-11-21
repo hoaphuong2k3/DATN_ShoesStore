@@ -540,160 +540,76 @@ const Client = () => {
                   </Row>
                 </CardHeader>
                 <CardBody className="m-2">
-                  <Row className="align-items-center">
-                    <FaSearch className="ml-3" />
-                    <h3 className="heading-small text-black mb-0 ml-2">Tìm kiếm</h3>
-                  </Row>
-                  <hr className="my-4" />
-                  <Form>
-                    <div className="pl-lg-4">
-                      <Row>
-                        <Col lg="6">
-                          <FormGroup>
-                            <label
-                              className="form-control-label"
-                              htmlFor="input-username"
-                            >
-                              Tên
-                            </label>
-                            <Input
-                              className="form-control-alternative"
-                              id="input-username"
-                              placeholder="Nhập tên"
-                              type="text"
-                              name="fullname"
-                              value={search.fullname}
-                              onChange={(e) => onInputChangeSearch(e)}
-                            />
-                          </FormGroup>
-                        </Col>
-                        <Col lg="6">
-                          <FormGroup>
-                            <label
-                              className="form-control-label"
-                              htmlFor="input-email"
-                            >
-                              Số điên thoại
-                            </label>
-                            <Input
-                              className="form-control-alternative"
-                              id="input-email"
-                              placeholder="Nhập số điện thoại"
-                              type="text"
-                              name="phonenumber"
-                              value={search.phonenumber}
-                              onChange={(e) => onInputChangeSearch(e)}
-                            />
-                          </FormGroup>
-                        </Col>
-                      </Row>
-
-                      {value === 'yes' &&
-                        <Row>
-                          <Col lg="6">
-                            <FormGroup>
-                              <label className="form-control-label">
-                                Giới tính
-                              </label>
-                              <div style={{ display: "flex" }}>
-                                <div className="custom-control custom-radio">
-                                  <Input
-                                    className="custom-control-alternative"
-                                    id="nam"
-                                    name="gender"
-                                    type="radio"
-                                    value={false}
-                                    checked={search.gender === false || search.gender === 'false'}
-                                    onClick={(e) => onInputChangeSearch(e)}
-                                  />Nữ
-                                </div>
-                                <div className="custom-control custom-radio">
-                                  <Input
-                                    className="custom-control-alternative"
-                                    id="nu"
-                                    name="gender"
-                                    type="radio"
-                                    value={true}
-                                    checked={search.gender === true || search.gender === 'true'}
-                                    onClick={(e) => onInputChangeSearch(e)}
-                                  />Nam
-                                </div>
-                              </div>
-                            </FormGroup>
-                          </Col>
-                          <Col lg="6">
-                            <FormGroup>
-                              <label
-                                className="form-control-label"
-                                htmlFor="input-city"
-                              >
-                                Email
-                              </label>
-                              <Input
-                                className="form-control-alternative"
-                                id="input-username"
-                                placeholder="Nhập tên"
-                                type="text"
-                                name="email"
-                                value={search.email}
-                                onChange={(e) => onInputChangeSearch(e)}
-                              />
-
-
-                            </FormGroup>
-                          </Col>
-
-                        </Row>
-                      }
-                    </div>
-                  </Form>
-
-                  <Row className="mt-2 ml-2">
-                    <Col lg="6" xl="6">
-                      <span>
-                        <Switch on="yes" off="no" value={value} onChange={setValue} />
-                        <span className="mb-3">
-                          &nbsp;&nbsp;
-                          Tìm kiếm nâng cao
-                          &nbsp;&nbsp;
-                        </span>
-                      </span>
-                    </Col>
-                    <Col lg="6" xl="6" className="d-flex justify-content-end">
-                      <Button color="warning" size="sm" onClick={resetSearch}>
-                        Làm mới bộ lọc
-                      </Button>
-                    </Col>
-                  </Row>
-
-
-                  <hr className="my-4" />
-
                   <Row className="align-items-center my-4">
                     <div className="col" style={{ display: "flex" }}>
-
-                      <h3 className="heading-small text-black mb-0"><FaFileAlt size="16px" className="mr-1" />Danh sách</h3>
-                    </div>
-                    <Col>
-                      <Input type="select" name="status" style={{ width: "150px" }} size="sm"
-                        value={selectedStatus}
-                        onChange={(e) => {
-                          const value = e.target.value;
-                          setSelectedStatus(value === '' ? '' : value);
-                        }}>
-                        <option value="">Tất cả</option>
-                        <option value="1">Ngừng hoạt động</option>
-                        <option value="0">Đang hoạt động</option>
-                      </Input>
-                    </Col>
-                    <div className="col text-right">
                       <Button
-                        color="primary"
-                        onClick={toggle}
+                        color="success"
+                        outline
                         size="sm"
+                        onClick={toggleFilter}
                       >
-                        + Thêm mới
+                        <FaFilter size="16px" className="mr-1" />
+                        Bộ lọc
                       </Button>
+                      <Button
+                        color="warning"
+                        outline
+                        size="sm"
+                        onClick={resetSearch}
+                      >
+                        <FaTimes size="16px" className="mr-1" />
+                        Xóa bộ lọc
+                      </Button>
+                      <Col>
+                        <InputGroup size="sm">
+                          <Input
+                            type="search"
+                            placeholder="Tìm kiếm theo tên, số điện thoại, email"
+                            name="fullname"
+                            onChange={(e) => onInputChangeSearch(e)}
+                          />
+                          <InputGroupAddon addonType="append">
+                            <InputGroupText>
+                              <FaSearch />
+                            </InputGroupText>
+                          </InputGroupAddon>
+                        </InputGroup>
+                      </Col>{" "}
+                      {/* Show Action */}
+
+                      {/* End Show Action */}
+                      {/* filter status */}
+                      <Col className="d-flex justify-content-end">
+                        <Input
+                          type="select"
+                          name="status"
+                          style={{ width: "150px" }}
+                          size="sm"
+                          value={selectedStatus}
+                          onChange={(e) => {
+                            const value = e.target.value;
+                            setSelectedStatus(value === "" ? "" : value);
+                          }}
+                        >
+                          <option value="">Tất cả</option>
+                          <option value="0">Ngừng hoạt động</option>
+                          <option value="1">Đang hoạt động</option>
+                        </Input>
+                      </Col>
+                      {/* {showActions && (
+                        <Input
+                          type="select"
+                          className="ml-3"
+                          name="action"
+                          style={{ width: "150px" }}
+                          size="sm"
+                          onChange={(e) => handleActionSelect(e.target.value)}
+                        >
+                          <option value={""}>Chọn thao tác</option>
+                          <option value="deleteAll">Xóa tất cả</option>
+                          <option value="disableAll">Ngừng hoạt động</option>
+                        </Input>
+                      )} */}
                     </div>
                   </Row>
 
@@ -1374,7 +1290,7 @@ const Client = () => {
                     value={false}
                     checked={search.gender === false || search.gender === 'false'}
                     onClick={(e) => onInputChangeSearch(e)}
-                  />Nam
+                  />Nữ
                 </div>
                 <div className="custom-control custom-radio">
                   <Input
@@ -1385,7 +1301,7 @@ const Client = () => {
                     value={true}
                     checked={search.gender === true || search.gender === 'true'}
                     onClick={(e) => onInputChangeSearch(e)}
-                  />Nữ
+                  />Nam
                 </div>
               </div>
             </FormGroup>
