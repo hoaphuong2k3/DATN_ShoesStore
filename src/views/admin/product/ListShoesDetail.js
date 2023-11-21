@@ -104,6 +104,18 @@ const ListShoesDetail = () => {
             setListShoesDetail([]);
         }
     }
+
+    const [listCheck, setListCheck] = useState([]);
+    const getListCheck = async () => {
+        try {
+            let res = await getAllShoesDetail(id, page, size, search);
+            if (res && res.data && res.data.content) {
+                setListCheck(res.data.content);
+            }
+        } catch (error) {
+            setListShoesDetail([]);
+        }
+    }
     useEffect(() => {
     }, [ListShoesDetail]);
     useEffect(() => {
@@ -125,6 +137,7 @@ const ListShoesDetail = () => {
         getlistSize();
         getData();
         getAll();
+        getListCheck();
     }, []);
 
 
@@ -342,6 +355,7 @@ const ListShoesDetail = () => {
         try {
             await axios.post(`http://localhost:33321/api/admin/shoesdetail/${id}`, { 'shoesDetailCreateRequests': [...listAddMany] });
             getAll();
+            getListCheck();
             toast.success("Thêm thành công!");
         } catch (error) {
             let errorMessage = "Lỗi từ máy chủ";
@@ -595,6 +609,7 @@ const ListShoesDetail = () => {
             console.log(iddeleteshoes);
             await axios.delete(`http://localhost:33321/api/admin/shoesdetail/delete`, { data: iddeleteshoes });
             getAll();
+            getListCheck();
             setIdDeleteShoes([]);
             toggleDelete();
             toast.success("Xóa thành công ");
@@ -636,6 +651,7 @@ const ListShoesDetail = () => {
                 try {
                     await axios.delete(`http://localhost:33321/api/admin/shoesdetail/delete`, { data: selectedItems });
                     getAll();
+                    getListCheck();
                     setSelectedItems([]);
                     toast.success("Xóa thành công ");
                 } catch (error) {
@@ -749,7 +765,7 @@ const ListShoesDetail = () => {
                                 }
                             </CardBody>
                         </Card>
-                        {ListShoesDetail.length > 0 &&
+                        {listCheck.length > 0 &&
                             <>
 
 
@@ -996,7 +1012,7 @@ const ListShoesDetail = () => {
                             </>
                         }
                         {/* Bắt đầu combobox */}
-                        {ListShoesDetail.length <= 0 &&
+                        {listCheck.length <= 0 &&
                             <Card className="card-stats mb-xl-0">
                                 <Row className="align-items-center mb-2">
                                     <Col lg="6">

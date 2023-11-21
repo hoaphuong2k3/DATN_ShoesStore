@@ -17,7 +17,7 @@ import { toast } from 'react-toastify';
 import axiosInstance from "services/custommize-axios";
 import axios from "axios";
 import Bill from "views/user/hoadon/Bills.js";
-const Menu = ({ setActiveTab, activeTab }) => {
+const Menu = ({ setActiveTab, activeTab, avatar, username }) => {
   return (
     <div className="col-2">
       {/* <Card
@@ -39,18 +39,18 @@ const Menu = ({ setActiveTab, activeTab }) => {
             </Col>
           </Row>
         </CardHeader> */}
-      <Row className="mt-4">
-        <Col lg={3}>
-          <img
-            src={`https://s3-ap-southeast-1.amazonaws.com/imageshoestore/`}
+      <Row className="mt-4 text-center">
+
+        {/* <img
+            src={avatar}
             alt=""
             width={40}
             height={40}
+            style={{ borderRadius: "50%" }}
           />
-        </Col>
-        <Col lg={9}>
-          <div>Username</div>
-        </Col>
+          &nbsp; */}
+        <span className=" ml-5">{username}</span>
+
       </Row>
       <hr />
       <style>
@@ -122,6 +122,7 @@ const Account = () => {
   const { logout } = useAuth();
   const storedUserId = localStorage.getItem('userId');
   const [client, setClient] = useState(null);
+  const [imageUrl, setimageUrl] = useState("");
   const fetchData = async () => {
     try {
       const response = await axiosInstance.get(`/user/${storedUserId}`);
@@ -131,6 +132,17 @@ const Account = () => {
           const blob = await fetch(`data:image/jpeg;base64,${response.data.avatar}`).then((res) => res.blob());
           const file = new File([blob], "image.jpg", { type: "image/jpeg" });
           setFile(file);
+        } else {
+          if (response.data.gender === false) {
+            // Nữ
+            setimageUrl("https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcTu-uhxThn7kpatyW-egV5DpMNflanGQ_oeqUqmgEMx7KUkhyzF")
+          } else if (response.data.gender === true) {
+            // Nam
+            setimageUrl("https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSbAVI8wgtBGopfLggnV-HvwW-_NYYvGxwAGRUBdHKwdSoPRjEX")
+          } else {
+            // Null
+            setimageUrl("https://thumbs.dreamstime.com/b/default-businessman-avatar-icon-vector-business-people-profile-concept-279597784.jpg")
+          }
         }
       }
     } catch (error) {
@@ -175,7 +187,10 @@ const Account = () => {
       setFile(selectedFile);
     }
   };
-  const imageUrl = file ? URL.createObjectURL(file) : null;
+
+  useEffect(() => {
+    setimageUrl(file ? URL.createObjectURL(file) : null);
+  }, [file]);
   const imageSize = "200px";
   const imageStyle = {
     width: imageSize,
@@ -418,6 +433,7 @@ const Account = () => {
   // changePassword
   const navigate = useNavigate();
   const [formPass, setFormPass] = useState({
+    oldPassword: "",
     newPassword: "",
     confirmPassword: "",
   });
@@ -426,6 +442,7 @@ const Account = () => {
     try {
       const requestBody = {
         id: storedUserId,
+        oldPassword: formPass.oldPassword,
         newPassword: formPass.newPassword,
         confirmPassword: formPass.confirmPassword,
       };
@@ -456,7 +473,7 @@ const Account = () => {
           }
           {client &&
             <>
-              <Menu setActiveTab={setActiveTab} activeTab={activeTab} />
+              <Menu setActiveTab={setActiveTab} activeTab={activeTab} avatar={imageUrl} username={client.username} />
               <div className="col-10">
                 {/* Profile */}
                 {activeTab === "profile" && (
@@ -608,7 +625,7 @@ const Account = () => {
                                     />
                                   )}
                                 </div>
-                                <Label htmlFor="file-input" className="btn btn-outline-primary mt-2 btn-sm ml--3" size="sm">
+                                &nbsp; <Label htmlFor="file-input" className="btn btn-outline-primary mt-2 btn-sm ml--5" size="sm">
                                   Chọn file
                                 </Label>
                                 <Input
@@ -848,6 +865,35 @@ const Account = () => {
                             {/* <!-- Form Group --> */}
                             <div class="row form-group">
                               <label
+                                for="oldPassword"
+                                class="col-sm-3 col-form-label input-label"
+                              >
+                                Mật khẩu cũ
+                              </label>
+
+                              <div class="col-sm-9">
+                                <Input
+                                  type="password"
+                                  class="js-pwstrength form-control"
+                                  name="oldPassword"
+                                  id="oldPassword"
+                                  placeholder="Nhập mật khẩu cũ"
+                                  aria-label="Enter new password"
+                                  onChange={(e) =>
+                                    setFormPass({
+                                      ...formPass,
+                                      oldPassword: e.target.value,
+                                    })
+                                  }
+                                />
+
+                                <p id="passwordStrengthVerdict" class="form-text mb-2" />
+
+                                <div id="passwordStrengthProgress"></div>
+                              </div>
+                            </div>
+                            <div class="row form-group">
+                              <label
                                 for="newPassword"
                                 class="col-sm-3 col-form-label input-label"
                               >
@@ -860,7 +906,7 @@ const Account = () => {
                                   class="js-pwstrength form-control"
                                   name="newPassword"
                                   id="newPassword"
-                                  placeholder="Enter new password"
+                                  placeholder="Nhập mật khẩu mới"
                                   aria-label="Enter new password"
                                   onChange={(e) =>
                                     setFormPass({
@@ -893,7 +939,7 @@ const Account = () => {
                                     class="form-control"
                                     name="confirmPassword"
                                     id="confirmPasswordLabel"
-                                    placeholder="Confirm your new password"
+                                    placeholder="Nhập lại mật khẩu mới"
                                     aria-label="Confirm your new password"
                                     onChange={(e) =>
                                       setFormPass({
