@@ -42,6 +42,8 @@ const DetailProduct = () => {
     setQuantity(quantity + 1);
   };
   //End Xử lý btn tắng giảm
+
+  const [sl, setSL] = useState(false);
   useEffect(() => {
     const getAll = async () => {
       console.log("colorId:sizeId:", idColor, idSize)
@@ -50,9 +52,12 @@ const DetailProduct = () => {
         if (res && res.data && res.data.content) {
           setshoesdetail(res.data.content[0]);
           console.log(res.data.content)
+          setSL(false);
         }
       } catch (error) {
         console.error(error);
+        setshoesdetail({});
+        setSL(true);
       }
     }
     getAll();
@@ -200,7 +205,7 @@ const DetailProduct = () => {
                                 <>
                                   <div className='flex items-center'>
                                     {/* Giá  giảm */}
-                                    <span className='giagiam'>{formatter.format(shoesdetail.price)}</span>
+                                    <span className='giagiam'>{shoesdetail.price > 0 ? formatter.format(shoesdetail.price) : "0 đ"}</span>
                                   </div>
                                 </>
                             }
@@ -334,8 +339,13 @@ const DetailProduct = () => {
                                   value={quantity}
                                   readOnly
                                 />
-                                <button className='btntanggiam' onClick={handleIncrease}>+</button>
-                                <span> {shoesdetail.quantity} sản phẩm có sẵn</span>
+                                <button className='btntanggiam' onClick={handleIncrease} disabled={quantity === shoesdetail.quantity ? true : false}>+</button>
+                                &nbsp;&nbsp;
+                                {sl === false
+                                  ? <span> {shoesdetail.quantity} &nbsp;sản phẩm có sẵn</span>
+                                  : <span style={{ color: "red" }}>Sản phẩm này đã hết hàng</span>
+                                }
+
                               </span>
                             </div>
                           </div>
@@ -343,12 +353,12 @@ const DetailProduct = () => {
                             {/* <button onClick={addToCart} className='btn btn-primary'>Thêm vào giỏ hàng</button> */}
                             <CartContext.Consumer>
                               {({ addToCart }) => (
-                                <button className='btn btn-primary' onClick={() => handleCheckout()}>
+                                <button className='btn btn-primary' onClick={() => handleCheckout()} disabled={sl === false ? false : true}>
                                   Thêm vào giỏ hàng
                                 </button>
                               )}
                             </CartContext.Consumer>
-                            <button className='btn btn-warning'>Mua ngay</button>
+                            <button className='btn btn-warning' disabled={sl === false ? false : true}>Mua ngay</button>
                           </div>
                         </div>
 
