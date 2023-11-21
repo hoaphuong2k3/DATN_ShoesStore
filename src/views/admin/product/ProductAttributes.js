@@ -21,7 +21,7 @@ const ProductAttributes = () => {
   const [modalEdit, setModalEdit] = useState(false);
   const toggleEdit = () => setModalEdit(!modalEdit);
   const [dataEdit, setDataEdit] = useState({});
-  const [selecttt, setSelecttt] = useState('brand');
+  const [selecttt, setSelecttt] = useState('color');
   const [page, setPage] = useState(0);
   const [size, setSize] = useState(5);
   const [totalPages, setTotalPages] = useState(0);
@@ -41,9 +41,7 @@ const ProductAttributes = () => {
 
   const [list, setList] = useState([]);
   const handleDeleteBrands = async (id) => {
-    if (selecttt === 'brand') {
-      getCategory();
-    } else if (selecttt === 'color') {
+    if (selecttt === 'color') {
       try {
         const response = await axios.delete(`http://localhost:33321/api/admin/color/delete`, { data: [id] });
         getColor();
@@ -55,13 +53,13 @@ const ProductAttributes = () => {
         }
         toast.error(errorMessage);
       }
+    } else if (selecttt === 'brand') {
+      getCategory();
     }
   }
 
   const handleProductAttribites = async () => {
-    if (selecttt === 'brand') {
-      getCategory();
-    } else if (selecttt === 'color') {
+    if (selecttt === 'color') {
       try {
         const response = await axios.post(`http://localhost:33321/api/admin/color`, formData);
         toggle();
@@ -75,6 +73,8 @@ const ProductAttributes = () => {
         }
         toast.error(errorMessage);
       }
+    } else if (selecttt === 'brand') {
+      getCategory();
     }
   }
   const handleEditBrands = (brand) => {
@@ -83,9 +83,7 @@ const ProductAttributes = () => {
     toggleEdit();
   }
   const EditProductAttribites = async () => {
-    if (selecttt === 'brand') {
-      getCategory();
-    } else if (selecttt === 'color') {
+    if (selecttt === 'color') {
       try {
         await axios.put(`http://localhost:33321/api/admin/color/${dataEdit.id}`, formData);
         toggleEdit();
@@ -100,6 +98,8 @@ const ProductAttributes = () => {
         }
         toast.error(errorMessage);
       }
+    } else if (selecttt === 'brand') {
+      getCategory();
     }
 
   }
@@ -110,10 +110,10 @@ const ProductAttributes = () => {
     getCategory();
   }, []);
   const getAll = () => {
-    if (selecttt === 'brand') {
-      getCategory();
-    } else if (selecttt === 'color') {
+    if (selecttt === 'color') {
       getColor();
+    } else if (selecttt === 'brand') {
+      getCategory();
     }
   }
   useEffect(() => {
@@ -174,6 +174,9 @@ const ProductAttributes = () => {
                     <FormGroup>
                       <Input id="btn_select_tt" name="select" type="select"
                         onChange={(event) => setSelecttt(event.target.value)} value={selecttt} >
+                        <option value="color">
+                          Màu
+                        </option>
                         <option value="brand">
                           Hãng
                         </option>
@@ -192,9 +195,7 @@ const ProductAttributes = () => {
                         <option value="size">
                           Size
                         </option>
-                        <option value="color">
-                          Màu
-                        </option>
+
                       </Input>
                     </FormGroup>
                   </Col>

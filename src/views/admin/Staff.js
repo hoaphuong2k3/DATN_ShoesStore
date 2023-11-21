@@ -268,7 +268,7 @@ const Staff = () => {
       const file = new File([blob], "image.jpg", { type: "image/jpeg" });
       setFile(file);
     }else {
-      const defaultAvatar = getDefaultAvatar(admins.gender);
+      const defaultAvatar = getDefaultAvatar(admin.gender, admin.avatar);
       const blob = await fetch(defaultAvatar).then((res) => res.blob());
       const file = new File([blob], "image.jpg", { type: "image/jpeg" });
       setFile(file);
@@ -710,8 +710,7 @@ const Staff = () => {
                                 maxWidth: "170px",
                               }}
                             >
-                              {admin.addressDetail}, {admin.communeCode},{" "}
-                              {admin.districtCode}, {admin.proviceCode}
+                              {admin.addressDetail}, {admin.address}
                             </td>
 
                             <td
