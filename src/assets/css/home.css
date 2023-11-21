@@ -176,5 +176,54 @@
 }
 
 
+.sidebar_single_post {
+  background: url("https://laforce.vn/wp-content/themes/banhang/images/bg_free.png");
+  margin: 8em 0px 0px 0px;
+  overflow: auto;
+  background-size: cover;
+}
+.container_{
+  width: 100%;
+  max-width: 1200px;
+  padding-left: 15px;
+  padding-right: 15px;
+  margin: 0 auto;
+  position: relative;
+}
+
+.sidebar_single_post .textwidget ul {
+  overflow: auto;
+  margin: 0px auto;
+  padding: 51px 0px 52px 0px;
+  display: table;
+  list-style: none;
+}
+
+.sidebar_single_post .textwidget ul li:first-child {
+  border-left: none;
+  background:  no-repeat url("https://laforce.vn/wp-content/themes/banhang/images/icon_security.png");
+  background-position: 10%;
+}
+
+.sidebar_single_post .textwidget ul li:nth-child(2) {
+  background:  no-repeat url("https://laforce.vn/wp-content/themes/banhang/images/icon_baohanh.png");
+  background-position: 20%;
+  padding: 1em 4em 1em 9em;
+}
+
+.sidebar_single_post .textwidget ul li {
+  float: left;
+  color: #fff;
+  padding: 1em 4em 1em 7em;
+  border-left: 1px solid #58824b;
+}
+
+.sidebar_single_post .textwidget ul li:last-child {
+  background:  no-repeat url("https://laforce.vn/wp-content/themes/banhang/images/icon_car.png");
+  background-position: 15%;
+  /* float: right; */
+  max-width: 380px;
+  padding: 0em 0em 0em 9em;
+}
 
   

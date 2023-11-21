@@ -565,9 +565,32 @@ const Home = () => {
                   </div>
                 </Col>
               </div>
+
+              
             </Container>
           </Row>
+          
         </Container>
+        <div className="sidebar_single_post">
+                <div className="container_">
+                  <div
+                    id="black-studio-tinymce-22"
+                    class="visible-all-devices widget"
+                  >
+                    <div class="textwidget">
+                      <ul>
+                        <li className="">Chất liệu 100% da thật</li>
+                        <li>Bảo trì trọn đời</li>
+                        <li>
+                          Miễn phí
+                          <br />
+                          giao hàng toàn quốc
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </div>
       </Card>
     </>
   );
