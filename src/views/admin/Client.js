@@ -165,6 +165,13 @@ const Client = () => {
   //Bắt đầu hàm update
   const [modalEdit, setModalEdit] = useState(false);
   const toggleEdit = () => setModalEdit(!modalEdit);
+  useEffect(() => {
+    if (modalEdit === false) {
+      resetEditClient();
+      AvatarReset();
+    }
+  }, [modalEdit]);
+
   const [editClient, setEditClient] = useState({
     id: null,
     avatar: null,
