@@ -1688,7 +1688,7 @@ const ListShoesDetail = () => {
                 <ModalFooter>
                     <div className="row w-100">
                         <div className="col-4">
-                            <Button color="primary" outline size="sm" block>
+                            <Button color="primary" outline size="sm" block onClick={resetSearch}>
                                 Làm mới
                             </Button>
                         </div>

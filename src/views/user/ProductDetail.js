@@ -288,8 +288,8 @@ const DetailProduct = () => {
                                   listSizeById.map((item, index) => {
                                     return (
                                       <button class="product-variation" aria-label="35" aria-disabled="false"
-                                        style={{ backgroundColor: idColor === item.id ? '#cccccc' : '' }}
-                                        onClick={() => setIdColor(item.id)}
+                                        style={{ backgroundColor: idSize === item.id ? '#cccccc' : '' }}
+                                        onClick={() => setIdSize(item.id)}
                                       >
                                         {item.name}
                                       </button>
@@ -308,8 +308,8 @@ const DetailProduct = () => {
                                   listColorById.map((item, index) => {
                                     return (
                                       <button class="product-variation" aria-label="35" aria-disabled="false"
-                                        style={{ backgroundColor: idSize === item.id ? '#cccccc' : '' }}
-                                        onClick={() => setIdSize(item.id)}
+                                        style={{ backgroundColor: idColor === item.id ? '#cccccc' : '' }}
+                                        onClick={() => setIdColor(item.id)}
                                       >
                                         {item.name}
                                       </button>
