@@ -670,6 +670,11 @@ const ListShoesDetail = () => {
     const [tt, setTT] = useState(false);
     const [thirdModal, setThirdModal] = useState(false);
     const toggleThirdModal = () => setThirdModal(!thirdModal);
+
+    const formatter = new Intl.NumberFormat("vi-VN", {
+        style: "currency",
+        currency: "VND",
+    });
     return (
         <>
             {/* Page content */}
@@ -929,8 +934,8 @@ const ListShoesDetail = () => {
                                                                     <td>{item.color}</td>
                                                                     <td>{item.size}</td>
                                                                     <td>{item.quantity}</td>
-                                                                    <td>{item.price}</td>
-                                                                    <td>{item.discountPrice}</td>
+                                                                    <td>{formatter.format(item.price)}</td>
+                                                                    <td>{formatter.format(item.discountPrice)}</td>
                                                                     <td style={{ position: "sticky", zIndex: '1', right: '0', background: "#fff" }}>
                                                                         {/* <Button color="danger" to={`/admin/product/edit/${item.id}`} tag={Link} size="sm" disabled={item.status === 0 ? true : false}>
                                                                         <i class="fa-solid fa-pen" />

@@ -577,7 +577,7 @@ const Client = () => {
                                     value={false}
                                     checked={search.gender === false || search.gender === 'false'}
                                     onClick={(e) => onInputChangeSearch(e)}
-                                  />Nam
+                                  />Nữ
                                 </div>
                                 <div className="custom-control custom-radio">
                                   <Input
@@ -588,7 +588,7 @@ const Client = () => {
                                     value={true}
                                     checked={search.gender === true || search.gender === 'true'}
                                     onClick={(e) => onInputChangeSearch(e)}
-                                  />Nữ
+                                  />Nam
                                 </div>
                               </div>
                             </FormGroup>
@@ -721,7 +721,7 @@ const Client = () => {
                           </td>
                           <td>{item.email}</td>
                           <td>{item.phoneNumber}</td>
-                          <td className="text-center">{item.gender ? "Nữ" : "Nam"}</td>
+                          <td className="text-center">{item.gender ? "Nam" : "Nữ"}</td>
                           <td>{item.dateOfBirth}</td>
                           <td style={{ position: "sticky", zIndex: '1', right: '0', backgroundColor: '#fff' }}>
                             <Button color="link" size="sm"
@@ -894,7 +894,7 @@ const Client = () => {
                           defaultChecked
                           checked={client.gender === 'false'}
                           onClick={(e) => onInputChange(e)}
-                        />Nam
+                        />Nữ
                       </div>
                       <div className="custom-control custom-radio">
                         <Input
@@ -905,7 +905,7 @@ const Client = () => {
                           value={true}
                           checked={client.gender === 'true'}
                           onClick={(e) => onInputChange(e)}
-                        />Nữ
+                        />Nam
                       </div>
                     </div>
                   </FormGroup>
@@ -1039,7 +1039,7 @@ const Client = () => {
                           value={false}
                           checked={editClient.gender === 'false' || editClient.gender === false}
                           onClick={(e) => onInputChangeDataUpdate(e)}
-                        />Nam
+                        />Nữ
                       </div>
                       <div className="custom-control custom-radio">
                         <Input
@@ -1050,7 +1050,7 @@ const Client = () => {
                           value={true}
                           checked={editClient.gender === 'true' || editClient.gender === true}
                           onClick={(e) => onInputChangeDataUpdate(e)}
-                        />Nữ
+                        />Nam
                       </div>
                     </div>
                   </FormGroup>
