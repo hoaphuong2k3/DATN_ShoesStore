@@ -1,11 +1,16 @@
 import axios from "axios";
 import React, { useState, useEffect, useRef } from "react";
 // reactstrap components
-import { Card, CardHeader, CardBody, Container, Row, Col, Form, FormGroup, Input, Button, Table, CardFooter, CardTitle, Label, Modal, ModalHeader, ModalFooter, ModalBody, Badge } from "reactstrap";
+import {
+  Card, CardHeader, CardBody, Container, Row, Col, Form, FormGroup, Input, Button, Table, CardFooter,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupText, CardTitle, Label, Modal, ModalHeader, ModalFooter, ModalBody, Badge
+} from "reactstrap";
 import Select from "react-select";
 import ReactPaginate from 'react-paginate';
 import { getAllClient, postNewClient, detailClient, updateClient, deleteClient } from "services/ClientService";
-import { FaEdit, FaTrash, FaSearch, FaFileAlt, FaCamera, FaLockOpen, FaLock } from 'react-icons/fa';
+import { FaEdit, FaTrash, FaSearch, FaFileAlt, FaCamera, FaLockOpen, FaLock, FaFilter, FaTimes } from 'react-icons/fa';
 import Header from "components/Headers/Header.js";
 import Switch from 'react-input-switch';
 import { toast } from 'react-toastify';
@@ -23,7 +28,11 @@ const Client = () => {
 
   const [listClient, setListClient] = useState([]);
 
-
+  const [modalFilter, setModalFilter] = useState(false);
+  const toggleFilter = () => {
+    setModalFilter(!modalFilter);
+    // fetchData();
+  };
   const [client, setClient] = useState({
     id: null,
     fullname: "",
@@ -156,6 +165,13 @@ const Client = () => {
   //Bắt đầu hàm update
   const [modalEdit, setModalEdit] = useState(false);
   const toggleEdit = () => setModalEdit(!modalEdit);
+  useEffect(() => {
+    if (modalEdit === false) {
+      resetEditClient();
+      AvatarReset();
+    }
+  }, [modalEdit]);
+
   const [editClient, setEditClient] = useState({
     id: null,
     avatar: null,
@@ -292,8 +308,8 @@ const Client = () => {
     }
   };
   const statusMapping = {
-    0: { color: 'success', label: 'Đang hoạt động' },
-    1: { color: 'danger', label: 'Ngừng hoạt động' },
+    1: { color: 'success', label: 'Đang hoạt động' },
+    0: { color: 'danger', label: 'Ngừng hoạt động' },
 
   };
   //Kết thúc hàm khóa khách hàng
@@ -506,169 +522,97 @@ const Client = () => {
               <Card className="shadow">
                 <CardHeader className="bg-transparent">
                   <Row className="align-items-center">
-                    <div className="col">
-                      <h2 className="heading-small text-dark mb-0">Khách Hàng</h2>
+                    <div className="col d-flex">
+                      <h3 className="heading-small text-dark mb-0">
+                        Khách Hàng
+                      </h3>
+                      <div className="col text-right">
+                        <Button
+                          color="primary"
+                          outline
+                          onClick={toggle}
+                          size="sm"
+                        >
+                          + Thêm mới
+                        </Button>
+                      </div>
                     </div>
                   </Row>
                 </CardHeader>
                 <CardBody className="m-2">
-                  <Row className="align-items-center">
-                    <FaSearch className="ml-3" />
-                    <h3 className="heading-small text-black mb-0 ml-2">Tìm kiếm</h3>
-                  </Row>
-                  <hr className="my-4" />
-                  <Form>
-                    <div className="pl-lg-4">
-                      <Row>
-                        <Col lg="6">
-                          <FormGroup>
-                            <label
-                              className="form-control-label"
-                              htmlFor="input-username"
-                            >
-                              Tên
-                            </label>
-                            <Input
-                              className="form-control-alternative"
-                              id="input-username"
-                              placeholder="Nhập tên"
-                              type="text"
-                              name="fullname"
-                              value={search.fullname}
-                              onChange={(e) => onInputChangeSearch(e)}
-                            />
-                          </FormGroup>
-                        </Col>
-                        <Col lg="6">
-                          <FormGroup>
-                            <label
-                              className="form-control-label"
-                              htmlFor="input-email"
-                            >
-                              Số điên thoại
-                            </label>
-                            <Input
-                              className="form-control-alternative"
-                              id="input-email"
-                              placeholder="Nhập số điện thoại"
-                              type="text"
-                              name="phonenumber"
-                              value={search.phonenumber}
-                              onChange={(e) => onInputChangeSearch(e)}
-                            />
-                          </FormGroup>
-                        </Col>
-                      </Row>
-
-                      {value === 'yes' &&
-                        <Row>
-                          <Col lg="6">
-                            <FormGroup>
-                              <label className="form-control-label">
-                                Giới tính
-                              </label>
-                              <div style={{ display: "flex" }}>
-                                <div className="custom-control custom-radio">
-                                  <Input
-                                    className="custom-control-alternative"
-                                    id="nam"
-                                    name="gender"
-                                    type="radio"
-                                    value={false}
-                                    checked={search.gender === false || search.gender === 'false'}
-                                    onClick={(e) => onInputChangeSearch(e)}
-                                  />Nam
-                                </div>
-                                <div className="custom-control custom-radio">
-                                  <Input
-                                    className="custom-control-alternative"
-                                    id="nu"
-                                    name="gender"
-                                    type="radio"
-                                    value={true}
-                                    checked={search.gender === true || search.gender === 'true'}
-                                    onClick={(e) => onInputChangeSearch(e)}
-                                  />Nữ
-                                </div>
-                              </div>
-                            </FormGroup>
-                          </Col>
-                          <Col lg="6">
-                            <FormGroup>
-                              <label
-                                className="form-control-label"
-                                htmlFor="input-city"
-                              >
-                                Email
-                              </label>
-                              <Input
-                                className="form-control-alternative"
-                                id="input-username"
-                                placeholder="Nhập tên"
-                                type="text"
-                                name="email"
-                                value={search.email}
-                                onChange={(e) => onInputChangeSearch(e)}
-                              />
-
-
-                            </FormGroup>
-                          </Col>
-
-                        </Row>
-                      }
-                    </div>
-                  </Form>
-
-                  <Row className="mt-2 ml-2">
-                    <Col lg="6" xl="6">
-                      <span>
-                        <Switch on="yes" off="no" value={value} onChange={setValue} />
-                        <span className="mb-3">
-                          &nbsp;&nbsp;
-                          Tìm kiếm nâng cao
-                          &nbsp;&nbsp;
-                        </span>
-                      </span>
-                    </Col>
-                    <Col lg="6" xl="6" className="d-flex justify-content-end">
-                      <Button color="warning" size="sm" onClick={resetSearch}>
-                        Làm mới bộ lọc
-                      </Button>
-                    </Col>
-                  </Row>
-
-
-                  <hr className="my-4" />
-
                   <Row className="align-items-center my-4">
                     <div className="col" style={{ display: "flex" }}>
-
-                      <h3 className="heading-small text-black mb-0"><FaFileAlt size="16px" className="mr-1" />Danh sách</h3>
-                    </div>
-                    <Col>
-                      <Input type="select" name="status" style={{ width: "150px" }} size="sm"
-                        value={selectedStatus}
-                        onChange={(e) => {
-                          const value = e.target.value;
-                          setSelectedStatus(value === '' ? '' : value);
-                        }}>
-                        <option value="">Tất cả</option>
-                        <option value="1">Ngừng hoạt động</option>
-                        <option value="0">Đang hoạt động</option>
-                      </Input>
-                    </Col>
-                    <div className="col text-right">
                       <Button
-                        color="primary"
-                        onClick={toggle}
+                        color="success"
+                        outline
                         size="sm"
+                        onClick={toggleFilter}
                       >
-                        + Thêm mới
+                        <FaFilter size="16px" className="mr-1" />
+                        Bộ lọc
                       </Button>
-                    </div>
+                      <Button
+                        color="warning"
+                        outline
+                        size="sm"
+                        onClick={resetSearch}
+                      >
+                        <FaTimes size="16px" className="mr-1" />
+                        Xóa bộ lọc
+                      </Button>
+                      <Col>
+                        <InputGroup size="sm">
+                          <Input
+                            type="search"
+                            placeholder="Tìm kiếm theo tên, số điện thoại, email"
+                            name="fullname"
+                            onChange={(e) => onInputChangeSearch(e)}
+                          />
+                          <InputGroupAddon addonType="append">
+                            <InputGroupText>
+                              <FaSearch />
+                            </InputGroupText>
+                          </InputGroupAddon>
+                        </InputGroup>
+                      </Col>{" "}
+                      {/* Show Action */}
 
+                      {/* End Show Action */}
+                      {/* filter status */}
+                      <Col className="d-flex justify-content-end">
+                        <Input
+                          type="select"
+                          name="status"
+                          style={{ width: "150px" }}
+                          size="sm"
+                          value={selectedStatus}
+                          onChange={(e) => {
+                            const value = e.target.value;
+                            setSelectedStatus(value === "" ? "" : value);
+                          }}
+                        >
+                          <option value="">Tất cả</option>
+                          <option value="0">Ngừng hoạt động</option>
+                          <option value="1">Đang hoạt động</option>
+                        </Input>
+                      </Col>
+                      {/* {showActions && (
+                        <Input
+                          type="select"
+                          className="ml-3"
+                          name="action"
+                          style={{ width: "150px" }}
+                          size="sm"
+                          onChange={(e) => handleActionSelect(e.target.value)}
+                        >
+                          <option value={""}>Chọn thao tác</option>
+                          <option value="deleteAll">Xóa tất cả</option>
+                          <option value="disableAll">Ngừng hoạt động</option>
+                        </Input>
+                      )} */}
+                    </div>
                   </Row>
+
                   <Table className="align-items-center table-flush" responsive>
                     <thead className="thead-light">
                       <tr>
@@ -729,20 +673,20 @@ const Client = () => {
                               <i class="fa-regular fa-address-book" color="primary"></i>
                             </Button>
                             <Button color="link" size="sm" onClick={() => handleRowClick(item.id)} >
-                              <FaEdit color="orange" />
+                              <FaEdit />
                             </Button>
                             {item.status === 0 &&
                               <Button color="link" size="sm" onClick={() => updateStatus(item.id, 1)}>
-                                <FaLock color="green" />
+                                <FaLock />
                               </Button>
                             }
                             {item.status === 1 &&
                               <Button color="link" size="sm" onClick={() => updateStatus(item.id, 0)} >
-                                <FaLockOpen color="green" />
+                                <FaLockOpen />
                               </Button>
                             }
                             <Button color="link" size="sm" onClick={() => onClickDeleteClient(item.id)}>
-                              <FaTrash color="red" />
+                              <FaTrash />
                             </Button>
 
                           </td>
@@ -1291,6 +1235,143 @@ const Client = () => {
         </ModalFooter>
       </Modal >
       {/* Kết thúc modal hiển thị ds  địa chỉ */}
+      {/* Filter */}
+      <Modal
+        isOpen={modalFilter}
+        toggle={toggleFilter}
+        style={{
+          width: "380px",
+          right: "unset",
+          left: 0,
+          position: "fixed",
+          marginLeft: "252px",
+          marginRight: 0,
+          top: "-27px",
+          maxHeight: "640px",
+          overflowY: "auto",
+          height: "fit-content",
+        }}
+        backdrop={false}
+      >
+        <ModalHeader toggle={toggleFilter}>
+          <h3 className="heading-small text-muted mb-0">
+            Bộ lọc tìm kiếm
+          </h3>
+        </ModalHeader>
+        <ModalBody style={{ paddingTop: 0, paddingBottom: 0 }}>
+          <Form>
+            {/* Ngày Sinh */}
+            <FormGroup>
+              <label
+                style={{ fontSize: 13 }}
+                className="form-control-label"
+              >
+                Ngày sinh
+              </label>
+              <Input
+                className="form-control-alternative"
+                type="date"
+                size="sm"
+              />
+            </FormGroup>
+
+            {/* Gioi tính */}
+            <FormGroup>
+              <label className="form-control-label">
+                Giới tính
+              </label>
+              <div style={{ display: "flex" }}>
+                <div className="custom-control custom-radio">
+                  <Input
+                    className="custom-control-alternative"
+                    id="nam"
+                    name="gender"
+                    type="radio"
+                    value={false}
+                    checked={search.gender === false || search.gender === 'false'}
+                    onClick={(e) => onInputChangeSearch(e)}
+                  />Nam
+                </div>
+                <div className="custom-control custom-radio">
+                  <Input
+                    className="custom-control-alternative"
+                    id="nu"
+                    name="gender"
+                    type="radio"
+                    value={true}
+                    checked={search.gender === true || search.gender === 'true'}
+                    onClick={(e) => onInputChangeSearch(e)}
+                  />Nữ
+                </div>
+              </div>
+            </FormGroup>
+
+            {/* Địa Chỉ */}
+            <FormGroup>
+              <label
+                style={{ fontSize: 13 }}
+                className="form-control-label"
+              >
+                Địa chỉ
+              </label>
+              <Input
+                className="form-control-alternative"
+                type="text"
+                size="sm"
+              />
+            </FormGroup>
+
+            {/* Ngày tạo */}
+            <FormGroup>
+              <label
+                style={{ fontSize: 13 }}
+                className="form-control-label"
+              >
+                Ngày tạo
+              </label>
+              <Input
+                className="form-control-alternative"
+                type="date"
+                size="sm"
+              />
+            </FormGroup>
+
+            {/* Ngày cập nhật */}
+            <FormGroup>
+              <label
+                style={{ fontSize: 13 }}
+                className="form-control-label"
+              >
+                Ngày cập nhật
+              </label>
+              <Input
+                className="form-control-alternative"
+                type="date"
+                size="sm"
+              />
+            </FormGroup>
+          </Form>
+        </ModalBody>
+        <ModalFooter>
+          <div className="row w-100">
+            <div className="col-4">
+              <Button color="primary" outline size="sm" block onClick={() => { resetSearch(); }}>
+                Làm mới
+              </Button>
+            </div>
+            <div className="col-4">
+              <Button color="primary" outline size="sm" block onClick={toggleFilter}>
+                Lọc
+              </Button>
+            </div>
+            <div className="col-4">
+              <Button color="danger" outline size="sm" block onClick={toggleFilter}>
+                Đóng
+              </Button>
+            </div>
+          </div>
+        </ModalFooter>
+      </Modal>
 
     </>
   );

@@ -646,7 +646,7 @@ const Success = ({ updateData }) => {
                                                 Phương thức thanh toán:
                                             </Label>
                                             <span className="border-0" style={{ fontWeight: "bold" }}>
-                                                {formData.paymentMethod === 1 ? "Tiền mặt" : formData.paymentMethod === 2 ? "Ví điện tử" : ""}
+                                                {formData.paymentMethod === 1 ? "Thanh toán sau khi nhận hàng" : formData.paymentMethod === 2 ? "Ví điện tử" : ""}
                                             </span>
                                         </FormGroup>
 

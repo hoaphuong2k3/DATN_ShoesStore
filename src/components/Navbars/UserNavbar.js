@@ -38,6 +38,44 @@ const UserNavbar = () => {
     logout();
     navigate("/");
   };
+  const [username, setUsername] = useState("");
+  const [avatar, setAvatar] = useState("");
+  const [gender, setGender] = useState("");
+  useEffect(() => {
+    const storedUserId = localStorage.getItem("userId");
+    const fetchUserDetails = async () => {
+      try {
+        const response = await axiosInstance.get(`/user/${storedUserId}`);
+        setUsername(response.data.username);
+        setAvatar(response.data.avatar);
+        setGender(response.data.gender);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    fetchUserDetails();
+  }, []);
+
+  const imageStyle = {
+    width: "38px",
+    height: "38px",
+    borderRadius: "50%",
+  };
+  const getDefaultAvatar = (gender, avatar) => {
+    if (avatar) {
+      return `data:image/jpeg;base64,${avatar}`;
+    } else if (gender === false) {
+      // Nữ
+      return "https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcTu-uhxThn7kpatyW-egV5DpMNflanGQ_oeqUqmgEMx7KUkhyzF";
+    } else if (gender === true) {
+      // Nam
+      return "https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSbAVI8wgtBGopfLggnV-HvwW-_NYYvGxwAGRUBdHKwdSoPRjEX";
+    } else {
+      // Null
+      return "https://thumbs.dreamstime.com/b/default-businessman-avatar-icon-vector-business-people-profile-concept-279597784.jpg";
+    }
+  };
 
   const storedUserId = localStorage.getItem("userId");
   const [cartData, setCartData] = useState(null);
@@ -68,7 +106,7 @@ const UserNavbar = () => {
         expand="md"
         color-on-scroll="300"
       >
-        <Container className="px-4">
+        <Container className="px-4" style={{ maxWidth: "1240px" }}>
           <NavbarBrand to="/shoes/home" tag={Link}>
             <img
               alt="..."
@@ -149,54 +187,76 @@ const UserNavbar = () => {
                   </InputGroup>
                 </FormGroup>
               </Form>
+              {storedUserId ?
+                <>
+                  <UncontrolledDropdown>
+                    <DropdownToggle className="pr-0" nav>
+                      <Media className="align-items-center">
 
-              <UncontrolledDropdown>
-                <DropdownToggle className="pr-0" nav>
-                  <Media className="align-items-center">
-                    <span className="avatar avatar-sm rounded-circle">
-                      <img
-                        alt="..."
-                        src={require("../../assets/img/theme/react.jpg")}
-                      />
-                    </span>
-                  </Media>
-                </DropdownToggle>
-                <DropdownMenu className="dropdown-menu-arrow">
-                  <DropdownItem className="noti-title" header tag="div">
-                    <h6 className="text-overflow m-0">Welcome!</h6>
-                  </DropdownItem>
-                  <DropdownItem to="/shoes/account" tag={Link}>
-                    <i className="ni ni-single-02" />
-                    <span>Tài khoản</span>
-                  </DropdownItem>
-                  <DropdownItem to="/shoes/bill" tag={Link}>
-                    <i className="ni ni-single-02" />
-                    <span>Đơn mua</span>
-                  </DropdownItem>
-                  <DropdownItem to="/" tag={Link}>
-                    <i className="ni ni-favourite-28" />
-                    <span>Yêu thích</span>
-                  </DropdownItem>
-                  <DropdownItem divider />
-                  <DropdownItem onClick={handleLogout}>
-                    <i className="ni ni-user-run" />
-                    <span>Đăng xuất</span>
-                  </DropdownItem>
-                </DropdownMenu>
-              </UncontrolledDropdown>
-              <div>
-                <Button
-                  className="button-cart"
-                  to="/shoes/cart"
-                  tag={Link}
-                  color="white"
-                >
-                  <i className="ni ni-cart" />
-                  <span className="cart-item-count">
-                    {cartData ? cartData.length : 0}
-                  </span>
-                </Button>
-              </div>
+                        <span className="avatar avatar-sm rounded-circle">
+                          <img
+                            src={getDefaultAvatar(gender, avatar)}
+                            alt="Avatar"
+                            style={imageStyle}
+                          />
+                        </span>
+
+
+                      </Media>
+                    </DropdownToggle>
+                    <DropdownMenu className="dropdown-menu-arrow">
+                      <DropdownItem className="noti-title" header tag="div">
+                        <h6 className="text-overflow m-0">Welcome!</h6>
+                      </DropdownItem>
+                      <DropdownItem to="/shoes/account" tag={Link}>
+                        <i className="ni ni-single-02" />
+                        <span>Tài khoản</span>
+                      </DropdownItem>
+                      <DropdownItem to="/shoes/bill" tag={Link}>
+                        <i className="ni ni-single-02" />
+                        <span>Đơn mua</span>
+                      </DropdownItem>
+                      <DropdownItem to="/" tag={Link}>
+                        <i className="ni ni-favourite-28" />
+                        <span>Yêu thích</span>
+                      </DropdownItem>
+                      <DropdownItem divider />
+                      <DropdownItem onClick={handleLogout}>
+                        <i className="ni ni-user-run" />
+                        <span>Đăng xuất</span>
+                      </DropdownItem>
+                    </DropdownMenu>
+                  </UncontrolledDropdown>
+
+                  <div>
+                    <Button
+                      className="button-cart"
+                      to="/shoes/cart"
+                      tag={Link}
+                      color="white"
+                    >
+                      <i className="ni ni-cart" />
+                      <span className="cart-item-count">
+                        {cartData ? cartData.length : 0}
+                      </span>
+                    </Button>
+                  </div>
+                </>
+                :
+                <>
+                  <NavItem>
+                    <NavLink className="nav-link-icon" to="/login" tag={Link}>
+                      <span className="nav-link-inner--text">Đăng nhập</span>
+                    </NavLink>
+                  </NavItem>
+                  <NavItem>
+                    <NavLink className="nav-link-icon" to="/register" tag={Link}>
+                      <span className="nav-link-inner--text">Đăng ký</span>
+                    </NavLink>
+                  </NavItem>
+
+                </>
+              }
             </Nav>
             <style>
               {`
