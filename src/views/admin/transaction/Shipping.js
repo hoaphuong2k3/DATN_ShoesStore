@@ -1,16 +1,16 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import axiosInstance from "services/custommize-axios";
+import { ToastContainer, toast } from "react-toastify";
 import { format } from 'date-fns';
 import { vi } from 'date-fns/locale';
-import { connect } from 'react-redux';
-import { updateData } from './actions';
+
 // reactstrap components
 import ReactPaginate from 'react-paginate';
 import { Badge, Row, Col, Button, Table, Input, FormGroup, InputGroup, InputGroupAddon, InputGroupText, Modal, ModalBody, ModalFooter, ModalHeader, Label, Form } from "reactstrap";
-import { FaRegEdit, FaSearch } from 'react-icons/fa';
+import { FaRegEdit, FaSearch, FaHandPeace } from 'react-icons/fa';
 
-const Shipping = ({ updateData }) => {
+const Shipping = () => {
 
     const [modal, setModal] = useState(false);
     const toggle = () => setModal(!modal);
@@ -228,8 +228,9 @@ const Shipping = ({ updateData }) => {
             await Promise.all(selectedIds.map(async (id) => {
                 await axiosInstance.put(`/order/admin/update-status/${id}?status=3`);
             }));
-            const newData = await fetchData();
-            updateData(4, newData);
+            fetchData();
+            toast.success("Hoàn thành đơn hàng");
+            window.location.reload();
         } catch (error) {
             console.error("Lỗi khi cập nhật trạng thái hóa đơn:", error);
         }
@@ -325,6 +326,8 @@ const Shipping = ({ updateData }) => {
                         </Button>
 
                     </Row>
+
+                    <ToastContainer />
 
                     <Row className="mt-4">
                         <Col lg={6}>
@@ -721,8 +724,4 @@ const Shipping = ({ updateData }) => {
     );
 };
 
-const mapDispatchToProps = (dispatch) => ({
-    updateData: (tabId, newData) => dispatch(updateData(tabId, newData)),
-});
-
-export default connect(null, mapDispatchToProps)(Shipping);
+export default Shipping;

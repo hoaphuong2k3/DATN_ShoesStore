@@ -3,14 +3,13 @@ import axios from "axios";
 import axiosInstance from "services/custommize-axios";
 import { format } from 'date-fns';
 import { vi } from 'date-fns/locale';
-import { connect } from 'react-redux';
-import { updateData } from './actions';
+
 // reactstrap components
 import { Badge, Row, Col, Button, Table, Input, FormGroup, InputGroup, InputGroupAddon, InputGroupText, Modal, ModalBody, ModalFooter, ModalHeader, Label, Form } from "reactstrap";
 import { FaRegEdit, FaSearch } from 'react-icons/fa';
 import ReactPaginate from 'react-paginate';
 
-const Success = ({ updateData }) => {
+const Success = () => {
 
     const [modal, setModal] = useState(false);
     const toggle = () => setModal(!modal);
@@ -715,8 +714,4 @@ const Success = ({ updateData }) => {
     );
 };
 
-const mapDispatchToProps = (dispatch) => ({
-    updateData: (tabId, newData) => dispatch(updateData(tabId, newData)),
-});
-
-export default connect(null, mapDispatchToProps)(Success);
+export default Success;

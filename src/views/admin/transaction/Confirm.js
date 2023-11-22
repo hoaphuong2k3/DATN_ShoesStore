@@ -1,16 +1,16 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import axiosInstance from "services/custommize-axios";
+import { ToastContainer, toast } from "react-toastify";
 import { format } from 'date-fns';
 import { vi } from 'date-fns/locale';
-import { connect } from 'react-redux';
-import { updateData } from './actions';
 // reactstrap components
+import Tooltip from 'react-tooltip-lite';
 import ReactPaginate from 'react-paginate';
 import { Badge, Row, Col, Button, Table, Input, FormGroup, InputGroup, InputGroupAddon, InputGroupText, Modal, ModalBody, ModalFooter, ModalHeader, Label, Form } from "reactstrap";
-import { FaRegEdit, FaSearch, FaMinus, FaPlus, FaTrash } from 'react-icons/fa';
+import { FaRegEdit, FaSearch, FaMinus, FaPlus, FaTrash, FaRegHandPointRight } from 'react-icons/fa';
 
-const Confirm = ({ updateData }) => {
+const Confirm = () => {
 
     const [modal, setModal] = useState(false);
     const toggle = () => setModal(!modal);
@@ -305,8 +305,9 @@ const Confirm = ({ updateData }) => {
             await Promise.all(selectedIds.map(async (id) => {
                 await axiosInstance.put(`/order/admin/update-status/${id}?status=1`);
             }));
-            const newData = await fetchData();
-            updateData(2, newData);
+            fetchData();
+            toast.success("Đơn hàng đang chờ vận chuyển");
+            window.location.reload();
         } catch (error) {
             console.error("Lỗi khi cập nhật trạng thái hóa đơn:", error);
         }
@@ -314,10 +315,11 @@ const Confirm = ({ updateData }) => {
     const deleted = async () => {
         try {
             await Promise.all(selectedIds.map(async (id) => {
-                await axiosInstance.put(`/order/admin/update-status/${id}?status=-1`);
+                await axiosInstance.put(`/order/admin/update-status/${id}?status=7`);
             }));
-            const newData = await fetchData();
-            updateData(6, newData);
+            fetchData();
+            toast.success("Hủy đơn hàng");
+            window.location.reload();
         } catch (error) {
             console.error("Lỗi khi cập nhật trạng thái hóa đơn:", error);
         }
@@ -459,7 +461,7 @@ const Confirm = ({ updateData }) => {
                             <tr>
                                 <th scope="col" className="pt-0">
                                     <FormGroup check>
-                                        <Input type="checkbox"
+                                        <Input type="checkbox" style={{ cursor: "pointer" }}
                                             onChange={() => selectAllCheckbox()}
                                             checked={selectAllChecked}
                                         />
@@ -484,11 +486,17 @@ const Confirm = ({ updateData }) => {
                                     )
                                     .map((confirm, index) => (
                                         <tr key={confirm.id}>
-                                            <td className="text-center pt-0">
+                                            <td className="text-center">
                                                 <FormGroup check>
-                                                    <Input type="checkbox"
+                                                    <Input type="checkbox" style={{ cursor: "pointer" }}
                                                         onChange={() => handleCheckboxChange(confirm.id)}
                                                         checked={selectedIds.includes(confirm.id)} />
+                                                    <Tooltip
+                                                        content="Xác nhận"
+                                                        direction="up"
+                                                    >
+                                                        <FaRegHandPointRight style={{ cursor: "pointer" }} />
+                                                    </Tooltip>
                                                 </FormGroup>
                                             </td>
                                             <td className="text-center">{calculateIndex(index)}</td>
@@ -520,6 +528,8 @@ const Confirm = ({ updateData }) => {
                         </Button>
 
                     </Row>
+
+                    <ToastContainer />
 
                     <Row className="mt-4">
                         <Col lg={6}>
@@ -959,8 +969,4 @@ const Confirm = ({ updateData }) => {
     );
 };
 
-const mapDispatchToProps = (dispatch) => ({
-    updateData: (tabId, newData) => dispatch(updateData(tabId, newData)),
-});
-
-export default connect(null, mapDispatchToProps)(Confirm);
+export default Confirm;
