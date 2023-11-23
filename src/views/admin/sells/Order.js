@@ -252,7 +252,7 @@ const Order = () => {
     }, [selectedProducts]);
 
     const [isBankTransfer, setIsBankTransfer] = useState(false);
-    const [paymentMethod, setPaymentMethod] = useState(1);
+    const [paymentMethod, setPaymentMethod] = useState(4);
     const handlePaymentMethodChange = (method) => {
         setPaymentMethod(method);
         setIsBankTransfer(method === 2 || method === 3 || method === 1);

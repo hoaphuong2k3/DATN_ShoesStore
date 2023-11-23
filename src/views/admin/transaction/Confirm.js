@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import axiosInstance from "services/custommize-axios";
-import { ToastContainer, toast } from "react-toastify";
 import { format } from 'date-fns';
 import { vi } from 'date-fns/locale';
 // reactstrap components
+import { ToastContainer, toast } from "react-toastify";
+import { confirmAlert } from 'react-confirm-alert';
+import 'react-confirm-alert/src/react-confirm-alert.css';
+import 'react-toastify/dist/ReactToastify.css';
 import Tooltip from 'react-tooltip-lite';
 import ReactPaginate from 'react-paginate';
 import { Badge, Row, Col, Button, Table, Input, FormGroup, InputGroup, InputGroupAddon, InputGroupText, Modal, ModalBody, ModalFooter, ModalHeader, Label, Form } from "reactstrap";
@@ -300,30 +303,81 @@ const Confirm = () => {
 
 
     //updateStatus
+
+    const handleConfirmDetail = async (orderId) => {
+        confirmAlert({
+            title: 'Xác nhận',
+            message: 'Bạn có chắc chắn xác nhận đơn hàng này?',
+            buttons: [
+                {
+                    label: 'Có',
+                    onClick: async () => {
+                        try {
+                            await axiosInstance.put(`/order/admin/update-status/${orderId}?status=1`);
+
+                            toast.success('Đơn hàng đang chờ vận chuyển', { autoClose: 2000 });
+                            fetchData();
+                            window.location.reload();
+                        } catch (error) {
+                            console.error('Lỗi khi cập nhật trạng thái đơn hàng:', error);
+                            toast.error('Lỗi khi xác nhận đơn hàng');
+
+                        }
+                    },
+                },
+                {
+                    label: 'Không',
+                    onClick: () => {
+                    },
+                },
+            ],
+        });
+    };
+
+    const handleAction = async (status, successMessage) => {
+        if (selectedIds.length === 0) {
+            toast.warning('Mời chọn ít nhất một đơn hàng.');
+            return;
+        }
+
+        confirmAlert({
+            title: 'Xác nhận',
+            message: `Bạn có chắc chắn muốn thực hiện hành động này không?`,
+            buttons: [
+                {
+                    label: 'Có',
+                    onClick: async () => {
+                        try {
+                            await Promise.all(selectedIds.map(async (id) => {
+                                await axiosInstance.put(`/order/admin/update-status/${id}?status=${status}`);
+                            }));
+                            fetchData();
+                            toast.success(successMessage, { autoClose: 2000 });
+                            window.location.reload();
+                        } catch (error) {
+                            console.error("Lỗi khi cập nhật trạng thái hóa đơn:", error);
+                        }
+                    },
+                },
+                {
+                    label: 'Không',
+                    onClick: () => {
+
+                    },
+                },
+            ],
+        });
+    };
+
     const handleConfirm = async () => {
-        try {
-            await Promise.all(selectedIds.map(async (id) => {
-                await axiosInstance.put(`/order/admin/update-status/${id}?status=1`);
-            }));
-            fetchData();
-            toast.success("Đơn hàng đang chờ vận chuyển");
-            window.location.reload();
-        } catch (error) {
-            console.error("Lỗi khi cập nhật trạng thái hóa đơn:", error);
-        }
+        handleAction(1, "Đơn hàng đang chờ vận chuyển");
     };
+
     const deleted = async () => {
-        try {
-            await Promise.all(selectedIds.map(async (id) => {
-                await axiosInstance.put(`/order/admin/update-status/${id}?status=7`);
-            }));
-            fetchData();
-            toast.success("Hủy đơn hàng");
-            window.location.reload();
-        } catch (error) {
-            console.error("Lỗi khi cập nhật trạng thái hóa đơn:", error);
-        }
+        handleAction(7, "Hủy đơn hàng");
     };
+
+
 
     //updateDelivery
     const buildDeliveryAddress = () => {
@@ -495,7 +549,7 @@ const Confirm = () => {
                                                         content="Xác nhận"
                                                         direction="up"
                                                     >
-                                                        <FaRegHandPointRight style={{ cursor: "pointer" }} />
+                                                        <FaRegHandPointRight style={{ cursor: "pointer" }} onClick={() => handleConfirmDetail(confirm.id)} />
                                                     </Tooltip>
                                                 </FormGroup>
                                             </td>
@@ -898,7 +952,7 @@ const Confirm = () => {
                                                             <Row className="col">
                                                                 <Col md={4}>
                                                                     <span className="avatar avatar-sm rounded-circle">
-                                                                        <img src={`data:image/jpeg;base64,${product.imgUri}`} alt="" />
+                                                                        <img src={`https://s3-ap-southeast-1.amazonaws.com/imageshoestore/${product.imgUri}`} alt="" />
                                                                     </span>
                                                                 </Col>
                                                                 <Col md={8}>

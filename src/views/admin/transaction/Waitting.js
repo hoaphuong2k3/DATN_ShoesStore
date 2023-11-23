@@ -1,16 +1,20 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import axiosInstance from "services/custommize-axios";
-import { ToastContainer, toast } from "react-toastify";
 import { format } from 'date-fns';
 import { vi } from 'date-fns/locale';
 // reactstrap components
+import { ToastContainer, toast } from "react-toastify";
+import { confirmAlert } from 'react-confirm-alert';
+import 'react-confirm-alert/src/react-confirm-alert.css';
+import 'react-toastify/dist/ReactToastify.css';
+import Tooltip from 'react-tooltip-lite';
 import ReactPaginate from 'react-paginate';
 import {
     Badge, Row, Col, Button, Table, Input, FormGroup, InputGroup,
     InputGroupAddon, InputGroupText, Modal, ModalBody, ModalFooter, ModalHeader, Label, Form
 } from "reactstrap";
-import { FaRegEdit, FaSearch, FaMinus, FaPlus, FaTrash, FaHandPeace } from 'react-icons/fa';
+import { FaRegEdit, FaSearch, FaMinus, FaPlus, FaTrash, FaRegHandPointRight } from 'react-icons/fa';
 
 const Waitting = () => {
 
@@ -153,9 +157,6 @@ const Waitting = () => {
 
         return totalMoney;
     };
-
-
-
 
     //detail
     const handleRowClick = async (id, confirm) => {
@@ -318,29 +319,77 @@ const Waitting = () => {
     };
 
     //updateStatus
-    const handleConfirm = async () => {
-        try {
-            await Promise.all(selectedIds.map(async (id) => {
-                await axiosInstance.put(`/order/admin/update-status/${id}?status=2`);
-            }));
-            fetchData();
-            toast.success("Đơn hàng đang vận chuyển");
-            window.location.reload();
-        } catch (error) {
-            console.error("Lỗi khi cập nhật trạng thái hóa đơn:", error);
-        }
+    const handleConfirmDetail = async (orderId) => {
+        confirmAlert({
+            title: 'Xác nhận',
+            message: 'Bạn có chắc chắn xác nhận đơn hàng này?',
+            buttons: [
+                {
+                    label: 'Có',
+                    onClick: async () => {
+                        try {
+                            await axiosInstance.put(`/order/admin/update-status/${orderId}?status=2`);
+
+                            toast.success('Đơn hàng đang chờ vận chuyển', { autoClose: 2000 });
+                            fetchData();
+                            window.location.reload();
+                        } catch (error) {
+                            console.error('Lỗi khi cập nhật trạng thái đơn hàng:', error);
+                            toast.error('Lỗi khi xác nhận đơn hàng');
+
+                        }
+                    },
+                },
+                {
+                    label: 'Không',
+                    onClick: () => {
+                    },
+                },
+            ],
+        });
     };
-    const deleted = async () => {
-        try {
-            await Promise.all(selectedIds.map(async (id) => {
-                await axiosInstance.put(`/order/admin/update-status/${id}?status=7`);
-            }));
-            fetchData();
-            toast.success("Hủy đơn hàng");
-            window.location.reload();
-        } catch (error) {
-            console.error("Lỗi khi cập nhật trạng thái hóa đơn:", error);
+
+    const handleAction = async (status, successMessage) => {
+        if (selectedIds.length === 0) {
+            toast.warning('Mời chọn ít nhất một đơn hàng.');
+            return;
         }
+
+        confirmAlert({
+            title: 'Xác nhận',
+            message: `Bạn có chắc chắn muốn thực hiện hành động này không?`,
+            buttons: [
+                {
+                    label: 'Có',
+                    onClick: async () => {
+                        try {
+                            await Promise.all(selectedIds.map(async (id) => {
+                                await axiosInstance.put(`/order/admin/update-status/${id}?status=${status}`);
+                            }));
+                            fetchData();
+                            toast.success(successMessage, { autoClose: 2000 });
+                            window.location.reload();
+                        } catch (error) {
+                            console.error("Lỗi khi cập nhật trạng thái hóa đơn:", error);
+                        }
+                    },
+                },
+                {
+                    label: 'Không',
+                    onClick: () => {
+
+                    },
+                },
+            ],
+        });
+    };
+
+    const handleConfirm = async () => {
+        handleAction(2, "Đơn hàng đang vận chuyển");
+    };
+
+    const deleted = async () => {
+        handleAction(7, "Hủy đơn hàng");
     };
 
     //updateDelivery
@@ -452,6 +501,28 @@ const Waitting = () => {
         }
     }, [isProductDeleted]);
 
+    const paymentMethodColors = {
+        1: { color: "success", label: "COD" },
+        2: { color: "primary", label: "Ví điện tử" },
+        3: { color: "info", label: "Chuyển khoản" },
+        4: { color: "warning", label: "Tiền mặt" },
+    };
+
+    const getPaymentMethodText = (method) => {
+        switch (method) {
+            case 1:
+                return "Thanh toán sau khi nhận hàng";
+            case 2:
+                return "Ví điện tử";
+            case 3:
+                return "Chuyển khoản";
+            case 4:
+                return "Tiền mặt";
+            default:
+                return "";
+        }
+    };
+
     return (
         <>
             <Row >
@@ -511,6 +582,12 @@ const Waitting = () => {
                                                     <Input type="checkbox"
                                                         onChange={() => handleCheckboxChange(confirm.id)}
                                                         checked={selectedIds.includes(confirm.id)} />
+                                                        <Tooltip
+                                                        content="Xác nhận"
+                                                        direction="up"
+                                                    >
+                                                        <FaRegHandPointRight style={{ cursor: "pointer" }} onClick={() => handleConfirmDetail(confirm.id)} />
+                                                    </Tooltip>
                                                 </FormGroup>
                                             </td>
                                             <td className="text-center">{calculateIndex(index)}</td>
@@ -519,12 +596,12 @@ const Waitting = () => {
                                             <td>{confirm.phoneNumber}</td>
                                             <td className="text-right">{confirm.totalMoney.toLocaleString("vi-VN")} VND</td>
                                             <td className="text-center">
-                                                <Badge color={confirm.paymentMethod === 1 ? "success" : confirm.paymentMethod === 2 ? "primary" : "secondary"}>
-                                                    {confirm.paymentMethod === 1 ? "COD" : confirm.paymentMethod === 2 ? "Ví điện tử" : "Không xác định"}
+                                                <Badge color={paymentMethodColors[confirm.paymentMethod]?.color || "secondary"}>
+                                                    {paymentMethodColors[confirm.paymentMethod]?.label || "Không xác định"}
                                                 </Badge>
                                             </td>
 
-                                            <td>{confirm.updateBy}</td>
+                                            <td>{confirm.updatedBy}</td>
                                             <td>{format(new Date(confirm.createdTime), 'dd-MM-yyyy HH:mm', { locale: vi })}</td>
                                             <td>{format(new Date(confirm.updatedTime), 'dd-MM-yyyy HH:mm', { locale: vi })}</td>
                                             <td className="text-center" style={{ position: "sticky", zIndex: '1', right: '0', background: "#fff" }}>
@@ -897,7 +974,7 @@ const Waitting = () => {
                                                 Phương thức thanh toán:
                                             </Label>
                                             <span className="border-0" style={{ fontWeight: "bold" }}>
-                                                {formData.paymentMethod === 1 ? "Thanh toán sau khi nhận hàng" : formData.paymentMethod === 2 ? "Ví điện tử" : ""}
+                                                {getPaymentMethodText(formData.paymentMethod)}
                                             </span>
                                         </FormGroup>
 
@@ -959,9 +1036,9 @@ const Waitting = () => {
                                                                         <FaPlus fontSize={8} />
                                                                     </button>
                                                                 </>
-                                                            ) : formData && formData.paymentMethod === 2 ? (
+                                                            ) : (
                                                                 <>{product.quantity}</>
-                                                            ) : null}
+                                                            )}
                                                         </td>
 
                                                         <td className="text-right">{product.discountPrice}</td>
