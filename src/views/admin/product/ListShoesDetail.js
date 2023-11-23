@@ -350,10 +350,37 @@ const ListShoesDetail = () => {
         }
     }, [shoesdetail]);
     //Kêt thúc conmbobox
+    const generateNewFileName = (originalName, number) => {
+        const extension = originalName.split('.').pop();
+        const baseName = originalName.substring(0, originalName.lastIndexOf('.')) || originalName;
+        return `${baseName}_${number}.${extension}`;
+    };
+    const formData1 = new FormData();
     const onClickAddMany = async () => {
-        console.log({ 'shoesDetailCreateRequests': [...listAddMany] });
+        console.log(listAddMany);
+
         try {
-            await axios.post(`http://localhost:33321/api/admin/shoesdetail/${id}`, { 'shoesDetailCreateRequests': [...listAddMany] });
+            if (selectedImages) {
+                const updatedArray = selectedImages.map(item => {
+                    const newName = generateNewFileName(item.file.name, item.i);
+                    return {
+                        ...item,
+                        file: {
+                            ...item.file,
+                            name: newName
+                        },
+                    };
+
+                })
+                console.log(updatedArray);
+                updatedArray.map((item, index) => {
+                    console.log(item.file);
+                    formData1.append(`file[${index}]`, item.file);
+                })
+            }
+            const shoesDataJson = JSON.stringify(listAddMany);
+            formData1.append('data', shoesDataJson);
+            await axios.post(`http://localhost:33321/api/admin/shoesdetail/${id}`, formData1);
             getAll();
             getListCheck();
             toast.success("Thêm thành công!");
@@ -675,6 +702,65 @@ const ListShoesDetail = () => {
         style: "currency",
         currency: "VND",
     });
+    //Xuwr lys anhr khi theem
+    const [file, setFile] = useState(null);
+    const [selectedImages, setSelectedImages] = useState([]);
+    const handleFileChange1 = (e, x) => {
+        console.log(x);
+        const selectedFile = e.target.files[0];
+        let randomId;
+        do {
+            // Tạo một ID ngẫu nhiên
+            randomId = `id_${Math.random().toString(36).substr(2, 9)}_${Date.now()}`;
+            // Kiểm tra xem ID đã tồn tại trong mảng chưa
+        } while (selectedImages.some((image) => image.id === randomId));
+        if (selectedFile) {
+            setSelectedImages([...selectedImages, {
+                file: selectedFile,
+                url: URL.createObjectURL(selectedFile),
+                i: x,
+                id: randomId
+            }]);
+        }
+    };
+    const handleFileChange2 = (e, index, id) => {
+        const selectedFile = e.target.files[0];
+        if (selectedFile) {
+            const updatedArray = selectedImages.map(item => {
+                if (item && item.id === id) {
+                    return {
+                        ...item, file: selectedFile, url: URL.createObjectURL(selectedFile)
+                    };
+                }
+                return item;
+            });
+            setSelectedImages(updatedArray);
+        }
+    };
+    useEffect(() => {
+        console.log(selectedImages);
+    }, [selectedImages]);
+    const imageUrl = file ? URL.createObjectURL(file) : null;
+    const imageSize = "110px";
+    const imageStyle = {
+        width: imageSize,
+        height: imageSize,
+    };
+    const buttonStyle = {
+        position: "absolute",
+        top: "50%",
+        left: "50%",
+        transform: "translate(-50%, -50%)",
+        color: "#000",
+        padding: "8px",
+        cursor: "pointer",
+        border: "1px dashed gray",
+        width: imageSize,
+        height: imageSize,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+    };
     return (
         <>
             {/* Page content */}
@@ -1134,7 +1220,7 @@ const ListShoesDetail = () => {
                                                                     <th>Trạng Thái</th>
                                                                 </tr>
 
-                                                                {selectedValuesSize.map((value, index) => (
+                                                                {selectedValuesSize.map((value) => (
 
                                                                     <tbody>
                                                                         <tr key={value.id} >
@@ -1171,14 +1257,70 @@ const ListShoesDetail = () => {
                                                                                 </Input>
                                                                             </td>
                                                                         </tr>
+
                                                                     </tbody>
 
                                                                 ))}
                                                             </Table >
+
+                                                            <tr className="text-center">
+                                                                <div className="d-flex justify-content-center">
+                                                                    {selectedImages.length > 0 && selectedImages.filter((itemA) => itemA.i === index).map((itemA, x) => (
+                                                                        <div className="mr-4"
+                                                                            key={itemA.id}
+                                                                            style={{
+                                                                                position: "relative",
+                                                                                width: imageSize,
+                                                                                height: imageSize,
+                                                                            }}
+                                                                        >
+                                                                            <img
+                                                                                alt="preview"
+                                                                                src={itemA.url}
+                                                                                style={imageStyle}
+                                                                            />
+                                                                            <Input
+                                                                                type="file"
+                                                                                id={`image_${index}_${x}`}
+                                                                                style={{ display: "none" }}
+                                                                                onChange={(e) => { handleFileChange2(e, index, itemA.id) }}
+                                                                            />
+                                                                            <Label htmlFor={`image_${index}_${x}`} style={buttonStyle}>
+                                                                                +
+                                                                            </Label>
+                                                                        </div>
+                                                                    ))}
+                                                                    <div
+                                                                        style={{
+                                                                            position: "relative",
+                                                                            width: imageSize,
+                                                                            height: imageSize,
+                                                                        }}
+                                                                    >
+                                                                        {imageUrl && (
+                                                                            <img
+                                                                                alt="preview"
+                                                                                src={imageUrl}
+                                                                                style={imageStyle}
+                                                                            />
+                                                                        )}
+                                                                        <Input
+                                                                            type="file"
+                                                                            id={`image_${index}`}
+                                                                            style={{ display: "none" }}
+                                                                            onChange={(e) => { handleFileChange1(e, index) }}
+                                                                        />
+                                                                        <Label htmlFor={`image_${index}`} style={buttonStyle}>
+                                                                            +
+                                                                        </Label>
+                                                                    </div>
+
+                                                                </div>
+                                                            </tr>
                                                         </>
                                                     ))}
 
-                                                    <Row className="text-center">
+                                                    <Row className="text-center mt-5">
                                                         <Col>
                                                             <Button onClick={onClickAddMany} color="primary">Thêm</Button>
                                                         </Col>
