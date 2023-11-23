@@ -21,16 +21,12 @@ const UserHeader = () => {
     slidesToScroll: 1,
     autoplay: true,
     autoplaySpeed: 3000,
-    beforeChange: handleSlideChange,
   };
 
   useEffect(() => {
     setShowText(currentSlide === 0);
   }, [currentSlide]);
 
-  const handleSlideChange = (currentSlide) => {
-    setCurrentSlide(currentSlide);
-  };
 
   return (
     <>
@@ -38,13 +34,7 @@ const UserHeader = () => {
         className="header pb-8 pt-5 pt-lg-8 d-flex align-items-center"
         style={{
           minHeight: "670px",
-          backgroundImage: `url(${
-            currentSlide === 0
-              ? bannerShoes1
-              : currentSlide === 1
-              ? bannerShoes2
-              : bannerShoes3
-          })`,
+          backgroundImage: `url(${bannerShoes1})`,
           backgroundSize: "cover",
           backgroundPosition: "center top",
         }}

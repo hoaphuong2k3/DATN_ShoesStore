@@ -68,6 +68,12 @@ const Checkout = () => {
         idShoesDetail: products.map((product) => product.id),
         paymentMethod: selectedPaymentMethod,
         totalMoney: totalMoney,
+        deliveryOrderDTO : {
+          address: null,
+          recipientName: null,
+          recipientPhone: null,
+          deliveryCost:  null
+      }
       };
       const response = await axiosInstance.post("/order/create", data);
       alert("Đặt hàng thành công");
