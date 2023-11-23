@@ -355,27 +355,15 @@ const ListShoesDetail = () => {
         const baseName = originalName.substring(0, originalName.lastIndexOf('.')) || originalName;
         return `${baseName}_${number}.${extension}`;
     };
-    const formData1 = new FormData();
+ 
     const onClickAddMany = async () => {
-        console.log(listAddMany);
-
+        const formData1 = new FormData();
         try {
             if (selectedImages) {
-                const updatedArray = selectedImages.map(item => {
+               selectedImages.map((item, index) => {
                     const newName = generateNewFileName(item.file.name, item.i);
-                    return {
-                        ...item,
-                        file: {
-                            ...item.file,
-                            name: newName
-                        },
-                    };
-
-                })
-                console.log(updatedArray);
-                updatedArray.map((item, index) => {
-                    console.log(item.file);
-                    formData1.append(`file[${index}]`, item.file);
+                    const modifiedFile = new File([item.file], newName, { type: item.file.type });
+                    formData1.append(`files[${index}]`, modifiedFile);
                 })
             }
             const shoesDataJson = JSON.stringify(listAddMany);
