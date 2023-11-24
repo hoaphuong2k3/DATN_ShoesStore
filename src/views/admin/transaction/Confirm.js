@@ -11,7 +11,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import Tooltip from 'react-tooltip-lite';
 import ReactPaginate from 'react-paginate';
 import { Badge, Row, Col, Button, Table, Input, FormGroup, InputGroup, InputGroupAddon, InputGroupText, Modal, ModalBody, ModalFooter, ModalHeader, Label, Form } from "reactstrap";
-import { FaRegEdit, FaSearch, FaMinus, FaPlus, FaTrash, FaRegHandPointRight } from 'react-icons/fa';
+import { FaRegEdit, FaSearch, FaMinus, FaPlus, FaTrash, FaRegHandPointLeft } from 'react-icons/fa';
 
 const Confirm = () => {
 
@@ -545,12 +545,6 @@ const Confirm = () => {
                                                     <Input type="checkbox" style={{ cursor: "pointer" }}
                                                         onChange={() => handleCheckboxChange(confirm.id)}
                                                         checked={selectedIds.includes(confirm.id)} />
-                                                    <Tooltip
-                                                        content="Xác nhận"
-                                                        direction="up"
-                                                    >
-                                                        <FaRegHandPointRight style={{ cursor: "pointer" }} onClick={() => handleConfirmDetail(confirm.id)} />
-                                                    </Tooltip>
                                                 </FormGroup>
                                             </td>
                                             <td className="text-center">{calculateIndex(index)}</td>
@@ -565,7 +559,13 @@ const Confirm = () => {
                                             </td>
 
                                             <td>{format(new Date(confirm.createdTime), 'dd-MM-yyyy HH:mm', { locale: vi })}</td>
-                                            <td className="text-center">
+                                            <td className="text-center d-flex">
+                                                <Tooltip
+                                                    content="Xác nhận"
+                                                    direction="up"
+                                                >
+                                                    <Button color="link" size="sm" onClick={() => handleConfirmDetail(confirm.id)}><FaRegHandPointLeft /></Button>
+                                                </Tooltip>
                                                 <Button color="link" size="sm" onClick={() => handleRowClick(confirm.id, confirm)}><FaRegEdit /></Button>
                                             </td>
                                         </tr>
@@ -988,7 +988,7 @@ const Confirm = () => {
                                                             ) : null}
                                                         </td>
 
-                                                        <td className="text-right">{product.discountPrice}</td>
+                                                        <td className="text-right">{product.price}</td>
                                                         <td className="text-right">{product.totalPrice}</td>
                                                         <td className="text-right">
                                                             <Button className="pt-0" color="link" size="sm" onClick={() => handleDeleteProduct(product.id)}

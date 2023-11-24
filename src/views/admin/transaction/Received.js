@@ -709,7 +709,7 @@ const Received = ({ updateData }) => {
 
                                                         </td>
                                                         <td className="text-center">{product.quantity}</td>
-                                                        <td className="text-right">{product.discountPrice}</td>
+                                                        <td className="text-right">{product.price}</td>
                                                         <td className="text-right">{product.totalPrice}</td>
                                                     </tr>
                                                 ))}

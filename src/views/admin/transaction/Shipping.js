@@ -12,7 +12,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import Tooltip from 'react-tooltip-lite';
 import ReactPaginate from 'react-paginate';
 import { Badge, Row, Col, Button, Table, Input, FormGroup, InputGroup, InputGroupAddon, InputGroupText, Modal, ModalBody, ModalFooter, ModalHeader, Label, Form } from "reactstrap";
-import { FaRegEdit, FaSearch, FaRegHandPointRight } from 'react-icons/fa';
+import { FaRegEdit, FaSearch, FaRegHandPointLeft } from 'react-icons/fa';
 
 const Shipping = () => {
 
@@ -373,12 +373,6 @@ const Shipping = () => {
                                                     <Input type="checkbox"
                                                         onChange={() => handleCheckboxChange(confirm.id)}
                                                         checked={selectedIds.includes(confirm.id)} />
-                                                    <Tooltip
-                                                        content="Xác nhận"
-                                                        direction="up"
-                                                    >
-                                                        <FaRegHandPointRight style={{ cursor: "pointer" }} onClick={() => handleConfirmDetail(confirm.id)} />
-                                                    </Tooltip>
                                                 </FormGroup>
                                             </td>
                                             <td className="text-center">{calculateIndex(index)}</td>
@@ -395,7 +389,13 @@ const Shipping = () => {
                                             <td>{confirm.updatedBy}</td>
                                             <td>{format(new Date(confirm.createdTime), 'dd-MM-yyyy HH:mm', { locale: vi })}</td>
                                             <td>{format(new Date(confirm.updatedTime), 'dd-MM-yyyy HH:mm', { locale: vi })}</td>
-                                            <td className="text-center" style={{ position: "sticky", zIndex: '1', right: '0', background: "#fff" }}>
+                                            <td className="text-center d-flex" style={{ position: "sticky", zIndex: '1', right: '0', background: "#fff" }}>
+                                                <Tooltip
+                                                    content="Xác nhận"
+                                                    direction="up"
+                                                >
+                                                    <Button color="link" size="sm" onClick={() => handleConfirmDetail(confirm.id)}><FaRegHandPointLeft /></Button>
+                                                </Tooltip>
                                                 <Button color="link" size="sm" onClick={() => handleRowClick(confirm.id, confirm)}><FaRegEdit /></Button>
                                             </td>
                                         </tr>
@@ -781,7 +781,7 @@ const Shipping = () => {
 
                                                         </td>
                                                         <td className="text-center">{product.quantity}</td>
-                                                        <td className="text-right">{product.discountPrice}</td>
+                                                        <td className="text-right">{product.price}</td>
                                                         <td className="text-right">{product.totalPrice}</td>
                                                     </tr>
                                                 ))}
