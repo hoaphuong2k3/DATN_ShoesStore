@@ -50,19 +50,19 @@ const AdminNavbar = () => {
               <NavItem>
                 <NavLink className="nav-link-icon" to="/shoes/home" tag={Link}>
                   <i className="ni ni-planet" />
-                  <span className="nav-link-inner--text">Dashboard</span>
+                  <span className="nav-link-inner--text">Trang chủ</span>
                 </NavLink>
               </NavItem>
               <NavItem>
                 <NavLink className="nav-link-icon" to="/register" tag={Link}>
                   <i className="ni ni-circle-08"/>
-                  <span className="nav-link-inner--text">Register</span>
+                  <span className="nav-link-inner--text">Đăng ký</span>
                 </NavLink>
               </NavItem>
               <NavItem>
                 <NavLink className="nav-link-icon" to="/login" tag={Link}>
                   <i className="ni ni-key-25" />
-                  <span className="nav-link-inner--text">Login</span>
+                  <span className="nav-link-inner--text">Đăng nhập</span>
                 </NavLink>
               </NavItem>
             </Nav>

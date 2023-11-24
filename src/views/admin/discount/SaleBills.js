@@ -317,8 +317,7 @@ const SaleBills = () => {
         try {
             const selectedDiscount = discounts.find(discount => discount.id === id);
 
-            if (new Date(selectedDiscount.endDate) >= new Date(selectedDiscount.startDate) &&
-                isToday(new Date(selectedDiscount.startDate))) {
+            if (new Date(selectedDiscount.endDate) >= new Date(selectedDiscount.startDate)) {
                 await axiosInstance.patch(`/vouchers/setVoucherRun/${id}`);
                 toast.success("Cập nhật thành công");
                 fetchData();
@@ -327,6 +326,11 @@ const SaleBills = () => {
             }
         } catch (error) {
             console.error("Lỗi khi cập nhật trạng thái:", error);
+            if (error.response) {
+                console.error("Response data:", error.response.data);
+                toast.error(error.response.data.message);
+            }
+
         }
     };
 

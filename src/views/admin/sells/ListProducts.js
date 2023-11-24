@@ -1,22 +1,35 @@
 import React, { useState, useEffect } from "react";
 import { getAllShoes } from "services/Product2Service";
-import { getAllShoesDetail2 } from "services/ShoesDetailService.js";
+import { getAllShoesDetail } from "services/ShoesDetailService.js";
+import { getAllColorId, getAllSizeId } from "services/ProductAttributeService";
+import { getAllBrand, getAllOrigin, getAllDesignStyle, getAllSkinType, getAllToe, getAllSole, getAllLining, getAllCushion } from "services/ProductAttributeService";
 // reactstrap components
 import {
-    Row, Col, Button, Table, Input, FormGroup, InputGroup, InputGroupAddon,
-    Modal, ModalBody, ModalFooter, ModalHeader
+    Row, Col, Button, Table, Input, InputGroup, InputGroupAddon, InputGroupText,
+    Modal, ModalBody, ModalFooter, ModalHeader, Form, FormGroup, Label, Card
 } from "reactstrap";
-import { FaSearch, FaHandHoldingMedical } from 'react-icons/fa';
-import { FaSort } from "react-icons/fa6";
+import { FaSearch, FaHandHoldingMedical, FaFilter } from 'react-icons/fa';
 const Products = ({ onSelectProducts }) => {
 
     const [modal, setModal] = useState(false);
     const toggle = () => setModal(!modal);
 
+    const [thirdModal, setThirdModal] = useState(false);
+    const toggleThirdModal = () => setThirdModal(!thirdModal);
+
     const [modal2, setModal2] = useState(false);
     const toggle2 = () => setModal2(!modal2);
 
+    const [searchTerm, setSearchTerm] = useState('');
     const [listShoes, setListShoes] = useState([]);
+    const [listBrand, setListBrand] = useState([]);
+    const [listorigin, setListOrigin] = useState([]);
+    const [listDesignStyle, setListDesignStyle] = useState([]);
+    const [listSkinStype, setListSkinType] = useState([]);
+    const [listToe, setListToe] = useState([]);
+    const [listSole, setListSole] = useState([]);
+    const [listLining, setListLining] = useState([]);
+    const [listCushion, setListCushion] = useState([]);
     const [totalPages, setTotalPages] = useState(0);
     const [totalElements, setTotalElenments] = useState(0);
     const [page, setPage] = useState(0);
@@ -62,14 +75,76 @@ const Products = ({ onSelectProducts }) => {
         })
     };
 
+    useEffect(() => {
+        getAll(page, size);
+        getlistBrand();
+        getListOrigin();
+        getListDesignStyle();
+        getListSkinType();
+        getListToe();
+        getListSole();
+        getListLining();
+        getListCushion();
+    }, []);
+
+    const getlistBrand = async () => {
+        let res = await getAllBrand();
+        console.log(res);
+        if (res && res.data) {
+            setListBrand(res.data);
+        }
+    }
+    const getListOrigin = async () => {
+        let res = await getAllOrigin();
+        if (res && res.data) {
+            setListOrigin(res.data);
+        }
+    }
+    const getListDesignStyle = async () => {
+        let res = await getAllDesignStyle();
+        if (res && res.data) {
+            setListDesignStyle(res.data);
+        }
+    }
+    const getListSkinType = async () => {
+        let res = await getAllSkinType();
+        if (res && res.data) {
+            setListSkinType(res.data);
+        }
+    }
+    const getListToe = async () => {
+        let res = await getAllToe();
+        if (res && res.data) {
+            setListToe(res.data);
+        }
+    }
+    const getListSole = async () => {
+        let res = await getAllSole();
+        if (res && res.data) {
+            setListSole(res.data);
+        }
+    }
+    const getListLining = async () => {
+        let res = await getAllLining();
+        if (res && res.data) {
+            setListLining(res.data);
+        }
+    }
+    const getListCushion = async () => {
+        let res = await getAllCushion();
+        if (res && res.data) {
+            setListCushion(res.data);
+        }
+    }
+    const onInputChange = (e) => {
+        setSearch({ ...search, [e.target.name]: e.target.value });
+    };
+
+
     //Sort
     const [sort, setSort] = useState('');
     const [sortStyle, setSortStyle] = useState('');
-    const onClickSort = (a, b) => {
-        setSort(a);
-        setSortStyle(b);
-    }
-
+  
     //getListShoes
     const getAll = async () => {
         try {
@@ -97,10 +172,6 @@ const Products = ({ onSelectProducts }) => {
         setSearch({ ...search, size: newSize, page: 0 });
     };
 
-    const calculateIndex = (index) => {
-        return index + 1 + search.page * search.size;
-    };
-
     //getShoesDetail
     const [shoesDetailMapping, setShoesDetailMapping] = useState({});
     const [selectedShoesDetails, setSelectedShoesDetails] = useState([]);
@@ -116,7 +187,7 @@ const Products = ({ onSelectProducts }) => {
     });
     const handleEditButtonClick = async (shoesId) => {
         try {
-            const response = await getAllShoesDetail2(shoesId, page, size, search2);
+            const response = await getAllShoesDetail(shoesId, page, size, search2);
             if (response && response.data && response.data.content) {
 
                 setSelectedShoesDetails(response.data.content);
@@ -162,6 +233,11 @@ const Products = ({ onSelectProducts }) => {
         setSelectedId(null);
     };
 
+    const formatter = new Intl.NumberFormat("vi-VN", {
+        style: "currency",
+        currency: "VND",
+    });
+
     // Tính toán số hàng dựa trên số cột mong muốn
     const calculateRows = (items, columnsPerRow) => {
         return items.reduce((rows, item, index) => {
@@ -176,87 +252,123 @@ const Products = ({ onSelectProducts }) => {
 
     return (
         <>
+
+            <Row className="col align-items-center mb-4">
+                <Col className="d-flex">
+                    <Button color="warning" outline size="sm" onClick={toggleThirdModal}>
+                        <FaFilter size="16px" className="mr-1" />Bộ lọc
+                    </Button>
+
+                    <Col>
+                        <InputGroup size="sm">
+                            <Input type="search"
+                                placeholder="Tìm kiếm mã, tên sản phẩm..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                            />
+                            <InputGroupAddon addonType="append">
+                                <InputGroupText>
+                                    <FaSearch />
+                                </InputGroupText>
+                            </InputGroupAddon>
+                        </InputGroup>
+                    </Col>
+                </Col>
+            </Row>
             {listShoes &&
                 listShoes.length > 0 &&
                 calculateRows(listShoes, 4).map((row, rowIndex) => (
                     <Row className="col mb-4" key={rowIndex}>
-                        {row.map((item) => (
-                            <Col
-                                lg={3}
-                                key={item.id}
-                                style={{
-                                    cursor: "pointer",
-                                    position: "relative",
-                                    display: "flex",
-                                    flexDirection: "column",
-                                    minHeight: "100%",
-                                }}
-                                onClick={() => handleEditButtonClick(item.id)}
-                                onMouseEnter={() => handleMouseEnter(item.id)}
-                                onMouseLeave={handleMouseLeave}
-                            >
-                                <h4 className="mb-3 text-center">{item.code}- {item.name}</h4>
-                                <img
-                                    src={`https://s3-ap-southeast-1.amazonaws.com/imageshoestore/${item.imgURI}`}
-                                    alt="Ảnh mô tả"
+                        {row
+                            .filter((item) =>
+                                item.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                                item.name.toLowerCase().includes(searchTerm.toLowerCase())
+                            )
+                            .map((item) => (
+                                <Col
+                                    lg={3}
+                                    key={item.id}
                                     style={{
-                                        maxWidth: "100%",
-                                        height: "200px",
-                                        boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+                                        cursor: "pointer",
+                                        position: "relative",
+                                        display: "flex",
+                                        flexDirection: "column",
+                                        minHeight: "100%",
                                     }}
-                                />
-                                {selectedId === item.id && (
-                                    <div
-                                        style={{
-                                            position: "absolute",
-                                            top: "0",
-                                            left: "0",
-                                            width: "100%",
-                                            height: "100%",
-                                            background: "rgba(255, 255, 255, 0.9)",
-                                            zIndex: "1",
-                                        }}
-                                    >
-                                        <Table striped bordered size="sm">
-                                            <tr>
-                                                <th>Thương hiệu</th>
-                                                <td>{item.brand}</td>
-                                            </tr>
-                                            <tr>
-                                                <th>Xuất xứ</th>
-                                                <td>{item.origin}</td>
-                                            </tr>
-                                            <tr>
-                                                <th>Thiết kế</th>
-                                                <td>{item.designStyle}</td>
+                                    onClick={() => handleEditButtonClick(item.id)}
+                                    onMouseEnter={() => handleMouseEnter(item.id)}
+                                    onMouseLeave={handleMouseLeave}
+                                >
+                                    <Card className="p-3" style={{boxShadow: "0 0 10px rgba(0, 0, 0, 0.1)" }}>
+                                        <img
+                                            src={`https://s3-ap-southeast-1.amazonaws.com/imageshoestore/${item.imgURI}`}
+                                            alt="Ảnh mô tả"
+                                            style={{
+                                                maxWidth: "100%",
+                                                height: "160px",
+                                                boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+                                            }}
+                                        />
+                                        <h4 className="mt-1 text-center">{item.code}_{item.name}</h4>
+                                        <h5 className="text-center text-danger">
+                                            {formatter.format(item.discountPriceMin)}{" "}
+                                            -{" "}{formatter.format(item.discountPriceMax)}
+                                        </h5>
 
-                                            </tr>
-                                            <tr>
-                                                <th>Loại da</th>
-                                                <td>{item.skinType}</td>
-                                            </tr>
-                                            <tr>
-                                                <th>Mũi giày</th>
-                                                <td>{item.toe}</td>
-                                            </tr>
-                                            <tr>
-                                                <th>Đế giày</th>
-                                                <td>{item.sole}</td>
-                                            </tr>
-                                            <tr>
-                                                <th>Lót giày</th>
-                                                <td>{item.lining}</td>
-                                            </tr>
-                                            <tr>
-                                                <th>Đệm giày</th>
-                                                <td>{item.cushion}</td>
-                                            </tr>
-                                        </Table>
-                                    </div>
+                                    </Card>
+                                    {selectedId === item.id && (
+                                        <div
+                                            style={{
+                                                position: "absolute",
+                                                top: "0",
+                                                left: "0",
+                                                width: "100%",
+                                                height: "100%",
+                                                background: "rgba(255, 255, 255, 0.9)",
+                                                zIndex: "1",
+                                            }}
+                                        >
+                                            <Table striped bordered size="sm">
+                                                <tr>
+                                                    <th>Thương hiệu</th>
+                                                    <td>{item.brand}</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>Xuất xứ</th>
+                                                    <td>{item.origin}</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>Thiết kế</th>
+                                                    <td>{item.designStyle}</td>
 
-                                )}
-                            </Col>
-                        ))}
+                                                </tr>
+                                                <tr>
+                                                    <th>Loại da</th>
+                                                    <td>{item.skinType}</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>Mũi giày</th>
+                                                    <td>{item.toe}</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>Đế giày</th>
+                                                    <td>{item.sole}</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>Lót giày</th>
+                                                    <td>{item.lining}</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>Đệm giày</th>
+                                                    <td>{item.cushion}</td>
+                                                </tr>
+                                            </Table>
+                                        </div>
+
+                                    )}
+
+                                </Col>
+                            ))}
                     </Row>
                 ))}
 
@@ -313,6 +425,262 @@ const Products = ({ onSelectProducts }) => {
                     </div>
                 </ModalFooter>
             </Modal >
+
+            {/* Lọc */}
+            <Modal
+                isOpen={thirdModal}
+                toggle={toggleThirdModal}
+                style={{ maxWidth: '400px', right: 'unset', left: 0, position: 'fixed', marginLeft: '252px', marginRight: 0 }}
+                backdrop={false}
+            >
+                <ModalHeader toggle={toggleThirdModal}>
+                    <h3 className="heading-small text-muted mb-0">Bộ lọc tìm kiếm</h3>
+                </ModalHeader>
+                <ModalBody style={{ paddingTop: 0, paddingBottom: 0 }}>
+                    <Form>
+                        <Row>
+                            <Col lg="6">
+                                <FormGroup>
+                                    <label
+                                        className="form-control-label"
+                                        style={{ fontSize: 13 }}
+                                    >
+                                        Hãng
+                                    </label>
+                                    <Input id="btn_select_tt" type="select" name="brandId" value={search.brandId}
+                                        className="form-control-alternative"
+                                        size="sm"
+                                        onChange={(e) => onInputChange(e)}>
+                                        <option value=" "> -- Chọn --  </option>
+                                        {listBrand && listBrand.length > 0 &&
+                                            listBrand.map((item, index) => {
+                                                return (
+                                                    <option value={item.id} key={item.id} >
+                                                        {item.name}
+                                                    </option>
+                                                )
+
+                                            })
+                                        }
+                                    </Input>
+                                </FormGroup>
+                            </Col>
+                            <Col lg="6">
+                                <FormGroup>
+                                    <label
+                                        className="form-control-label"
+                                        style={{ fontSize: 13 }}
+                                    >
+                                        Xuất xứ
+                                    </label>
+                                    <Input id="btn_select_tt" name="originId" type="select" value={search.originId}
+                                        className="form-control-alternative"
+                                        size="sm"
+                                        onChange={(e) => onInputChange(e)}>
+                                        <option value="" > -- Chọn --  </option>
+                                        {listorigin && listorigin.length > 0 &&
+                                            listorigin.map((item, index) => {
+                                                return (
+                                                    <option value={item.id} key={item.id}>
+                                                        {item.name}
+                                                    </option>
+                                                )
+
+                                            })
+                                        }
+                                    </Input>
+                                </FormGroup>
+                            </Col>
+                            <Col lg="6">
+                                <FormGroup>
+                                    <label
+                                        className="form-control-label"
+                                        style={{ fontSize: 13 }}
+                                    >
+                                        Thiết kế
+                                    </label>
+                                    <Input id="btn_select_tt" name="designStyleId" type="select" value={search.designStyleId}
+                                        onChange={(e) => onInputChange(e)} className="form-control-alternative" size="sm">
+                                        <option value="" > -- Chọn --  </option>
+                                        {listDesignStyle && listDesignStyle.length > 0 &&
+                                            listDesignStyle.map((item, index) => {
+                                                return (
+                                                    <option value={item.id} key={item.id}>
+                                                        {item.name}
+                                                    </option>
+                                                )
+
+                                            })
+                                        }
+                                    </Input>
+                                </FormGroup>
+                            </Col>
+
+                            <Col lg="6">
+                                <FormGroup>
+                                    <label
+                                        className="form-control-label"
+                                        style={{ fontSize: 13 }}
+                                    >
+                                        Loại da
+                                    </label>
+                                    <Input id="btn_select_tt" name="skinTypeId" type="select" value={search.skinTypeId}
+                                        onChange={(e) => onInputChange(e)} className="form-control-alternative" size="sm">
+                                        <option value="" > -- Chọn --  </option>
+                                        {listSkinStype && listSkinStype.length > 0 &&
+                                            listSkinStype.map((item, index) => {
+                                                return (
+                                                    <option value={item.id} key={item.id}>
+                                                        {item.name}
+                                                    </option>
+                                                )
+
+                                            })
+                                        }
+                                    </Input>
+                                </FormGroup>
+                            </Col>
+                            <Col lg="6">
+                                <FormGroup>
+                                    <label
+                                        className="form-control-label"
+                                        style={{ fontSize: 13 }}
+                                    >
+                                        Mũi giày
+                                    </label>
+                                    <Input id="btn_select_tt" name="toeId" type="select" value={search.toeId}
+                                        onChange={(e) => onInputChange(e)} className="form-control-alternative" size="sm">
+                                        <option value="" > -- Chọn --  </option>
+                                        {listToe && listToe.length > 0 &&
+                                            listToe.map((item, index) => {
+                                                return (
+                                                    <option value={item.id} key={item.id}>
+                                                        {item.name}
+                                                    </option>
+                                                )
+
+                                            })
+                                        }
+                                    </Input>
+                                </FormGroup>
+                            </Col>
+                            <Col lg="6">
+                                <FormGroup>
+                                    <label
+                                        className="form-control-label"
+                                        style={{ fontSize: 13 }}
+                                    >
+                                        Đế giày
+                                    </label>
+                                    <Input id="btn_select_tt" name="soleId" type="select" value={search.soleId}
+                                        onChange={(e) => onInputChange(e)} className="form-control-alternative" size="sm">
+                                        <option value="" > -- Chọn --  </option>
+                                        {listSole && listSole.length > 0 &&
+                                            listSole.map((item, index) => {
+                                                return (
+                                                    <option value={item.id} key={item.id}>
+                                                        {item.name}
+                                                    </option>
+                                                )
+
+                                            })
+                                        }
+                                    </Input>
+                                </FormGroup>
+                            </Col>
+                            <Col lg="6">
+                                <FormGroup>
+                                    <label
+                                        className="form-control-label"
+                                        style={{ fontSize: 13 }}
+                                    >
+                                        Lót giày
+                                    </label>
+                                    <Input id="btn_select_tt" name="liningId" type="select" value={search.liningId}
+                                        onChange={(e) => onInputChange(e)} className="form-control-alternative" size="sm">
+                                        <option value="" > -- Chọn --  </option>
+                                        {listLining && listLining.length > 0 &&
+                                            listLining.map((item, index) => {
+                                                return (
+                                                    <option value={item.id} key={item.id}>
+                                                        {item.name}
+                                                    </option>
+                                                )
+
+                                            })
+                                        }
+                                    </Input>
+                                </FormGroup>
+                            </Col>
+
+                            <Col lg="6">
+                                <FormGroup>
+                                    <label
+                                        className="form-control-label"
+                                        style={{ fontSize: 13 }}
+                                    >
+                                        Đệm giày
+                                    </label>
+                                    <Input id="btn_select_tt" name="cushionId" type="select" value={search.cushionId}
+                                        onChange={(e) => onInputChange(e)} className="form-control-alternative" size="sm">
+                                        <option value=" "> -- Chọn --  </option>
+                                        {listCushion && listCushion.length > 0 &&
+                                            listCushion.map((item, index) => {
+                                                return (
+                                                    <option value={item.id} key={item.id}>
+                                                        {item.name}
+                                                    </option>
+                                                )
+
+                                            })
+                                        }
+                                    </Input>
+                                </FormGroup>
+                            </Col>
+
+                            <Col>
+                                <FormGroup>
+
+                                    <Row>
+                                        <Col xl={6}>
+                                            <Label style={{ fontSize: 13 }} className="form-control-label">
+                                                Giá từ:
+                                            </Label>
+                                            <Input size="sm"
+                                                className="form-control-alternative"
+                                                id="find_code"
+                                                name="fromPrice"
+                                                value={search.fromPrice}
+                                                onChange={(e) => onInputChange(e)}
+                                            />
+                                        </Col>
+
+                                        <Col xl={6}>
+                                            <Label style={{ fontSize: 13 }} className="form-control-label">
+                                                đến:
+                                            </Label>
+                                            <Input size="sm"
+                                                className="form-control-alternative"
+                                                id="find_code"
+                                                name="toPrice"
+                                                value={search.toPrice}
+                                                onChange={(e) => onInputChange(e)}
+                                            />
+                                        </Col>
+                                    </Row>
+                                </FormGroup>
+                            </Col>
+                        </Row>
+
+                    </Form>
+                </ModalBody>
+                <ModalFooter>
+                    <Button color="primary" outline size="sm" block onClick={resetSearch}>
+                        Làm mới
+                    </Button>
+                </ModalFooter>
+
+            </Modal>
         </>
     );
 };

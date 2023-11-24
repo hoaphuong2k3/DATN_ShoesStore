@@ -3,14 +3,17 @@ import axios from "axios";
 import axiosInstance from "services/custommize-axios";
 import { format } from 'date-fns';
 import { vi } from 'date-fns/locale';
-import { connect } from 'react-redux';
-import { updateData } from './actions';
 // reactstrap components
+import { ToastContainer, toast } from "react-toastify";
+import { confirmAlert } from 'react-confirm-alert';
+import 'react-confirm-alert/src/react-confirm-alert.css';
+import 'react-toastify/dist/ReactToastify.css';
+import Tooltip from 'react-tooltip-lite';
 import ReactPaginate from 'react-paginate';
 import { Badge, Row, Col, Button, Table, Input, FormGroup, InputGroup, InputGroupAddon, InputGroupText, Modal, ModalBody, ModalFooter, ModalHeader, Label, Form } from "reactstrap";
-import { FaRegEdit, FaSearch, FaMinus, FaPlus, FaTrash } from 'react-icons/fa';
+import { FaRegEdit, FaSearch, FaMinus, FaPlus, FaTrash, FaRegHandPointLeft } from 'react-icons/fa';
 
-const Confirm = ({ updateData }) => {
+const Confirm = () => {
 
     const [modal, setModal] = useState(false);
     const toggle = () => setModal(!modal);
@@ -300,28 +303,81 @@ const Confirm = ({ updateData }) => {
 
 
     //updateStatus
+
+    const handleConfirmDetail = async (orderId) => {
+        confirmAlert({
+            title: 'Xác nhận',
+            message: 'Bạn có chắc chắn xác nhận đơn hàng này?',
+            buttons: [
+                {
+                    label: 'Có',
+                    onClick: async () => {
+                        try {
+                            await axiosInstance.put(`/order/admin/update-status/${orderId}?status=1`);
+
+                            toast.success('Đơn hàng đang chờ vận chuyển', { autoClose: 2000 });
+                            fetchData();
+                            window.location.reload();
+                        } catch (error) {
+                            console.error('Lỗi khi cập nhật trạng thái đơn hàng:', error);
+                            toast.error('Lỗi khi xác nhận đơn hàng');
+
+                        }
+                    },
+                },
+                {
+                    label: 'Không',
+                    onClick: () => {
+                    },
+                },
+            ],
+        });
+    };
+
+    const handleAction = async (status, successMessage) => {
+        if (selectedIds.length === 0) {
+            toast.warning('Mời chọn ít nhất một đơn hàng.');
+            return;
+        }
+
+        confirmAlert({
+            title: 'Xác nhận',
+            message: `Bạn có chắc chắn muốn thực hiện hành động này không?`,
+            buttons: [
+                {
+                    label: 'Có',
+                    onClick: async () => {
+                        try {
+                            await Promise.all(selectedIds.map(async (id) => {
+                                await axiosInstance.put(`/order/admin/update-status/${id}?status=${status}`);
+                            }));
+                            fetchData();
+                            toast.success(successMessage, { autoClose: 2000 });
+                            window.location.reload();
+                        } catch (error) {
+                            console.error("Lỗi khi cập nhật trạng thái hóa đơn:", error);
+                        }
+                    },
+                },
+                {
+                    label: 'Không',
+                    onClick: () => {
+
+                    },
+                },
+            ],
+        });
+    };
+
     const handleConfirm = async () => {
-        try {
-            await Promise.all(selectedIds.map(async (id) => {
-                await axiosInstance.put(`/order/admin/update-status/${id}?status=1`);
-            }));
-            const newData = await fetchData();
-            updateData(2, newData);
-        } catch (error) {
-            console.error("Lỗi khi cập nhật trạng thái hóa đơn:", error);
-        }
+        handleAction(1, "Đơn hàng đang chờ vận chuyển");
     };
+
     const deleted = async () => {
-        try {
-            await Promise.all(selectedIds.map(async (id) => {
-                await axiosInstance.put(`/order/admin/update-status/${id}?status=-1`);
-            }));
-            const newData = await fetchData();
-            updateData(6, newData);
-        } catch (error) {
-            console.error("Lỗi khi cập nhật trạng thái hóa đơn:", error);
-        }
+        handleAction(7, "Hủy đơn hàng");
     };
+
+
 
     //updateDelivery
     const buildDeliveryAddress = () => {
@@ -459,7 +515,7 @@ const Confirm = ({ updateData }) => {
                             <tr>
                                 <th scope="col" className="pt-0">
                                     <FormGroup check>
-                                        <Input type="checkbox"
+                                        <Input type="checkbox" style={{ cursor: "pointer" }}
                                             onChange={() => selectAllCheckbox()}
                                             checked={selectAllChecked}
                                         />
@@ -484,9 +540,9 @@ const Confirm = ({ updateData }) => {
                                     )
                                     .map((confirm, index) => (
                                         <tr key={confirm.id}>
-                                            <td className="text-center pt-0">
+                                            <td className="text-center">
                                                 <FormGroup check>
-                                                    <Input type="checkbox"
+                                                    <Input type="checkbox" style={{ cursor: "pointer" }}
                                                         onChange={() => handleCheckboxChange(confirm.id)}
                                                         checked={selectedIds.includes(confirm.id)} />
                                                 </FormGroup>
@@ -503,7 +559,13 @@ const Confirm = ({ updateData }) => {
                                             </td>
 
                                             <td>{format(new Date(confirm.createdTime), 'dd-MM-yyyy HH:mm', { locale: vi })}</td>
-                                            <td className="text-center">
+                                            <td className="text-center d-flex">
+                                                <Tooltip
+                                                    content="Xác nhận"
+                                                    direction="up"
+                                                >
+                                                    <Button color="link" size="sm" onClick={() => handleConfirmDetail(confirm.id)}><FaRegHandPointLeft /></Button>
+                                                </Tooltip>
                                                 <Button color="link" size="sm" onClick={() => handleRowClick(confirm.id, confirm)}><FaRegEdit /></Button>
                                             </td>
                                         </tr>
@@ -520,6 +582,8 @@ const Confirm = ({ updateData }) => {
                         </Button>
 
                     </Row>
+
+                    <ToastContainer />
 
                     <Row className="mt-4">
                         <Col lg={6}>
@@ -888,7 +952,7 @@ const Confirm = ({ updateData }) => {
                                                             <Row className="col">
                                                                 <Col md={4}>
                                                                     <span className="avatar avatar-sm rounded-circle">
-                                                                        <img src={`data:image/jpeg;base64,${product.imgUri}`} alt="" />
+                                                                        <img src={`https://s3-ap-southeast-1.amazonaws.com/imageshoestore/${product.imgUri}`} alt="" />
                                                                     </span>
                                                                 </Col>
                                                                 <Col md={8}>
@@ -924,7 +988,7 @@ const Confirm = ({ updateData }) => {
                                                             ) : null}
                                                         </td>
 
-                                                        <td className="text-right">{product.discountPrice}</td>
+                                                        <td className="text-right">{product.price}</td>
                                                         <td className="text-right">{product.totalPrice}</td>
                                                         <td className="text-right">
                                                             <Button className="pt-0" color="link" size="sm" onClick={() => handleDeleteProduct(product.id)}
@@ -959,8 +1023,4 @@ const Confirm = ({ updateData }) => {
     );
 };
 
-const mapDispatchToProps = (dispatch) => ({
-    updateData: (tabId, newData) => dispatch(updateData(tabId, newData)),
-});
-
-export default connect(null, mapDispatchToProps)(Confirm);
+export default Confirm;

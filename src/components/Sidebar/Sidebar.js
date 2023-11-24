@@ -64,6 +64,7 @@ const Sidebar1 = (props) => {
       className="navbar-vertical fixed-left navbar-light bg-white"
       expand="md"
       id="sidenav-main"
+      // style={{backgroundColor: ""}}
     >
       <Container fluid>
         {/* Toggler */}
@@ -77,24 +78,28 @@ const Sidebar1 = (props) => {
         {/* Brand */}
         {logo ? (
           <NavbarBrand className="pt-0" {...navbarBrandProps}>
-            <img
+            <img 
               alt={logo.imgAlt}
-              className="navbar-brand-img"
+              className="navbar-brand-img p-0"
               src={logo.imgSrc}
+               style={{
+                width: "90%",
+                minHeight:"60px"
+               }}
             />
 
           </NavbarBrand>
         ) : null}
 
         {/* User */}
-        <Nav className="align-items-center d-md-none">
+        <Nav className="align-items-center d-md-none mt-0 pt-0">
           <UncontrolledDropdown nav>
             <DropdownToggle nav>
               <Media className="align-items-center">
                 <span className="avatar avatar-sm rounded-circle">
                   <img
                     alt="..."
-                    src={require("../../assets/img/theme/team-1-800x800.jpg")}
+                    src={""}
                   />
                 </span>
               </Media>

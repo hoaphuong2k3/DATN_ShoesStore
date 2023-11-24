@@ -300,6 +300,10 @@ const Promotion = () => {
             }
         } catch (error) {
             console.error("Lỗi khi cập nhật trạng thái:", error);
+            if (error.response) {
+                console.error("Response data:", error.response.data);
+                toast.error(error.response.data.message);
+            }
         }
     };
 

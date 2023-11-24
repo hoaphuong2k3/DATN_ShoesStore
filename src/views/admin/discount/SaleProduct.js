@@ -362,6 +362,7 @@ const SaleProduct = () => {
             salePercent: "",
             minPrice: "",
             salePrice: "",
+            idDiscountShoeDetails: "",
             sale: false
 
         });
@@ -395,6 +396,7 @@ const SaleProduct = () => {
                     salePrice: formData.sale ? null : formData.salePrice,
                     status: formData.status,
                     idShoe: selectedDetailIds,
+                    idDiscountShoeDetails: formData.idDiscountShoeDetails
                 });
                 fetchData();
                 toast.success("Cập nhật thành công!");

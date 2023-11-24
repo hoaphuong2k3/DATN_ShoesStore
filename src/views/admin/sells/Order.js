@@ -207,7 +207,6 @@ const Order = () => {
     };
 
     //Product
-    const [newProducts, setNewProducts] = useState([]);
     const [selectedProducts, setSelectedProducts] = useState([]);
     const handleSelectProducts = (selectedProductList) => {
         setSelectedProducts(selectedProductList);
@@ -237,10 +236,10 @@ const Order = () => {
         const updatedProducts = [...selectedProducts];
 
         updatedProducts.splice(index, 1);
-        
+
         setSelectedProducts(updatedProducts);
     };
-    
+
 
     //Order
     const [deliveryData, setDeliveryData] = useState({});
@@ -253,10 +252,10 @@ const Order = () => {
     }, [selectedProducts]);
 
     const [isBankTransfer, setIsBankTransfer] = useState(false);
-    const [paymentMethod, setPaymentMethod] = useState(1);
+    const [paymentMethod, setPaymentMethod] = useState(4);
     const handlePaymentMethodChange = (method) => {
         setPaymentMethod(method);
-        setIsBankTransfer(method === 2);
+        setIsBankTransfer(method === 2 || method === 3 || method === 1);
     };
 
     const buildDeliveryAddress = () => {
@@ -417,8 +416,8 @@ const Order = () => {
                                             </td>
                                             <td className="text-right" style={{ color: "red" }}>{detail.quantity * detail.discountPrice}</td>
                                             <td className="text-center" onClick={() => handleDeleteRow(index)}>
-                                                <FaTrashAlt style={{ cursor: "pointer" }}/>
-                                                </td>
+                                                <FaTrashAlt style={{ cursor: "pointer" }} />
+                                            </td>
                                         </tr>
                                     ))}
                                 </tbody>
@@ -707,31 +706,56 @@ const Order = () => {
                                         <h5 style={{ color: "red" }}>{changeAmount}</h5>
                                     </Col>
                                 </Row>
-                                <Row className="mb-1">
-                                    <Label className="col">Phương thức:</Label>
-                                    <Col className="d-flex">
-                                        <div>
-                                            <Label className="col" check>
-                                                <Input
-                                                    type="radio"
-                                                    name="money"
-                                                    checked={paymentMethod === 1}
-                                                    onChange={() => handlePaymentMethodChange(1)}
-                                                />
-                                                Tiền mặt
-                                            </Label>
-                                            <Label className="col" check>
-                                                <Input
-                                                    type="radio"
-                                                    name="money"
-                                                    checked={paymentMethod === 2}
-                                                    onChange={() => handlePaymentMethodChange(2)}
-                                                />
-                                                Chuyển khoản
-                                            </Label>
-                                        </div>
+
+                                <Row className="col ml-5">
+                                    <Col>
+                                        <Label check>
+                                            <Input
+                                                type="radio"
+                                                name="money"
+                                                checked={paymentMethod === 4}
+                                                onChange={() => handlePaymentMethodChange(4)}
+                                            />
+                                            Tiền mặt
+                                        </Label>
+                                    </Col>
+                                    <Col>
+                                        <Label check>
+                                            <Input
+                                                type="radio"
+                                                name="money"
+                                                checked={paymentMethod === 2}
+                                                onChange={() => handlePaymentMethodChange(2)}
+                                            />
+                                            Ví điện tử
+                                        </Label>
                                     </Col>
                                 </Row>
+                                <Row className="col ml-5">
+                                    <Col>
+                                        <Label check>
+                                            <Input
+                                                type="radio"
+                                                name="money"
+                                                checked={paymentMethod === 3}
+                                                onChange={() => handlePaymentMethodChange(3)}
+                                            />
+                                            Chuyển khoản
+                                        </Label>
+                                    </Col>
+                                    <Col>
+                                        <Label check>
+                                            <Input
+                                                type="radio"
+                                                name="money"
+                                                checked={paymentMethod === 1}
+                                                onChange={() => handlePaymentMethodChange(1)}
+                                            />
+                                            COD
+                                        </Label>
+                                    </Col>
+                                </Row>
+
                             </Form>
                         </CardBody>
 

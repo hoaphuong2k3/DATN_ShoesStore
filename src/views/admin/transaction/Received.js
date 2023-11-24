@@ -3,14 +3,13 @@ import axios from "axios";
 import axiosInstance from "services/custommize-axios";
 import { format } from 'date-fns';
 import { vi } from 'date-fns/locale';
-import { connect } from 'react-redux';
-import { updateData } from './actions';
+
 // reactstrap components
 import { Badge, Row, Col, Button, Table, Input, FormGroup, InputGroup, InputGroupAddon, InputGroupText, Modal, ModalBody, ModalFooter, ModalHeader, Label, Form } from "reactstrap";
 import { FaRegEdit, FaSearch } from 'react-icons/fa';
 import ReactPaginate from 'react-paginate';
 
-const Received  = ({ updateData }) => {
+const Received = ({ updateData }) => {
 
     const [modal, setModal] = useState(false);
     const toggle = () => setModal(!modal);
@@ -37,7 +36,7 @@ const Received  = ({ updateData }) => {
     const [selectAllChecked, setSelectAllChecked] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
 
-    
+
 
     const fetchDataFromAPI = async (url, stateSetter) => {
         try {
@@ -227,6 +226,28 @@ const Received  = ({ updateData }) => {
         }
     };
 
+    const paymentMethodColors = {
+        1: { color: "success", label: "COD" },
+        2: { color: "primary", label: "Ví điện tử" },
+        3: { color: "info", label: "Chuyển khoản" },
+        4: { color: "warning", label: "Tiền mặt" },
+    };
+
+    const getPaymentMethodText = (method) => {
+        switch (method) {
+            case 1:
+                return "Thanh toán sau khi nhận hàng";
+            case 2:
+                return "Ví điện tử";
+            case 3:
+                return "Chuyển khoản";
+            case 4:
+                return "Tiền mặt";
+            default:
+                return "";
+        }
+    };
+
     return (
         <>
             <Row >
@@ -294,12 +315,12 @@ const Received  = ({ updateData }) => {
                                             <td>{confirm.phoneNumber}</td>
                                             <td className="text-right">{confirm.totalMoney.toLocaleString("vi-VN")} VND</td>
                                             <td className="text-center">
-                                                <Badge color={confirm.paymentMethod === 1 ? "success" : confirm.paymentMethod === 2 ? "primary" : "secondary"}>
-                                                    {confirm.paymentMethod === 1 ? "COD" : confirm.paymentMethod === 2 ? "Ví điện tử" : "Không xác định"}
+                                                <Badge color={paymentMethodColors[confirm.paymentMethod]?.color || "secondary"}>
+                                                    {paymentMethodColors[confirm.paymentMethod]?.label || "Không xác định"}
                                                 </Badge>
                                             </td>
 
-                                            <td>{confirm.updateBy}</td>
+                                            <td>{confirm.updatedBy}</td>
                                             <td>{format(new Date(confirm.createdTime), 'dd-MM-yyyy HH:mm', { locale: vi })}</td>
                                             <td>{format(new Date(confirm.updatedTime), 'dd-MM-yyyy HH:mm', { locale: vi })}</td>
                                             <td className="text-center" style={{ position: "sticky", zIndex: '1', right: '0', background: "#fff" }}>
@@ -646,7 +667,7 @@ const Received  = ({ updateData }) => {
                                                 Phương thức thanh toán:
                                             </Label>
                                             <span className="border-0" style={{ fontWeight: "bold" }}>
-                                                {formData.paymentMethod === 1 ? "Tiền mặt" : formData.paymentMethod === 2 ? "Ví điện tử" : ""}
+                                                {getPaymentMethodText(formData.paymentMethod)}
                                             </span>
                                         </FormGroup>
 
@@ -675,7 +696,7 @@ const Received  = ({ updateData }) => {
                                                             <Row className="col">
                                                                 <Col md={4}>
                                                                     <span className="avatar avatar-sm rounded-circle">
-                                                                        <img src={`data:image/jpeg;base64,${product.imgUri}`} alt="" />
+                                                                        <img src={`https://s3-ap-southeast-1.amazonaws.com/imageshoestore/${product.imgUri}`} alt="" />
                                                                     </span>
                                                                 </Col>
                                                                 <Col md={8}>
@@ -688,7 +709,7 @@ const Received  = ({ updateData }) => {
 
                                                         </td>
                                                         <td className="text-center">{product.quantity}</td>
-                                                        <td className="text-right">{product.discountPrice}</td>
+                                                        <td className="text-right">{product.price}</td>
                                                         <td className="text-right">{product.totalPrice}</td>
                                                     </tr>
                                                 ))}
@@ -715,8 +736,4 @@ const Received  = ({ updateData }) => {
     );
 };
 
-const mapDispatchToProps = (dispatch) => ({
-    updateData: (tabId, newData) => dispatch(updateData(tabId, newData)),
-});
-
-export default connect(null, mapDispatchToProps)(Received);
+export default Received;

@@ -18,7 +18,13 @@ import {
   InputGroup,
   Row,
   Col,
+  Modal,
+  ModalBody,
+  ModalFooter,
+  ModalHeader
 } from "reactstrap";
+
+import ForgotPass from "../auth/ForgotPass.js";
 
 const Login = () => {
 
@@ -36,7 +42,7 @@ const Login = () => {
     if (initialized) {
       const searchParams = new URLSearchParams(location.search);
       const code = searchParams.get('code');
-    
+
       if (code && !authenticationSuccessful) {
         setAuthenticationSuccessful(true);
         console.log(code);
@@ -115,6 +121,8 @@ const Login = () => {
     }
   };
 
+  const [modal, setModal] = useState(false);
+  const toggle = () => setModal(!modal);
 
 
   return (
@@ -224,13 +232,9 @@ const Login = () => {
         </Card>
         <Row className="mt-3">
           <Col xs="6">
-            <a
-              className="text-light"
-              href="#pablo"
-              onClick={(e) => e.preventDefault()}
-            >
-              <small>Forgot password?</small>
-            </a>
+            
+              <small className="text-light" onClick={toggle} style={{cursor: "pointer"}}>Quên mật khẩu?</small>
+            
           </Col>
           <Col className="text-right" xs="6">
             <Link className="text-light" to="/register" tag={Link}>
@@ -240,6 +244,26 @@ const Login = () => {
         </Row>
       </Col>
       <ToastContainer />
+
+      <Modal
+        isOpen={modal}
+        toggle={toggle}
+        backdrop={'static'}
+        keyboard={false}
+        style={{ maxWidth: '430px' }}
+      >
+        <ModalHeader toggle={toggle}>
+          <h3 className="heading-small text-dark mb-0">Đặt lại mật khẩu</h3>
+        </ModalHeader>
+        <ModalBody>
+            <ForgotPass/>    
+        </ModalBody >
+        <ModalFooter>
+            <Button color="danger" outline onClick={toggle} size="sm">
+              Đóng
+            </Button>
+        </ModalFooter>
+      </Modal >
     </>
   );
 };
