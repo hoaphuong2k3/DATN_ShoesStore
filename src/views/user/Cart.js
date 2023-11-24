@@ -21,6 +21,8 @@ const Cart = () => {
   const [cartData, setCartData] = useState(null);
   const [selectedItems, setSelectedItems] = useState([]);
   const storedUserId = localStorage.getItem("userId");
+  const [page, setPage] = useState(0);
+  const [size, setSize] = useState(10);
 
   const formatter = new Intl.NumberFormat("vi-VN", {
     style: "currency",
@@ -30,21 +32,21 @@ const Cart = () => {
   const fetchData = async () => {
     try {
       const response = await fetch(
-        `http://localhost:33321/api/cart/${storedUserId}`
+        `http://localhost:33321/api/cart/${storedUserId}?page=${page}&size=${size}`
       );
       const data = await response.json();
       setCartData(data.content);
-
+  
       console.log(storedUserId);
       console.log(data.content);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
   };
-
+  
   useEffect(() => {
     fetchData();
-  }, [storedUserId]);
+  }, [storedUserId, page, size]);
 
   const handleRemoveItem = async (idAccount, idShoes) => {
     try {
@@ -137,8 +139,6 @@ const Cart = () => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          // Thêm thông tin xác thực nếu cần
-          // "Authorization": "Bearer <token>"
         },
         body: JSON.stringify({
           key: storedUserId,

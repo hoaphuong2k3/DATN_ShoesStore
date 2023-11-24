@@ -117,15 +117,13 @@ const DetailProduct = () => {
   // console.log(cartItems);
 
 
-  const handleCheckout = async () => {
+  const handleAddCart = async () => {
     if (storedUserId) {
       try {
         const response = await fetch("http://localhost:33321/api/cart/add", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            // Thêm thông tin xác thực nếu cần
-            // "Authorization": "Bearer <token>"
           },
           body: JSON.stringify({
             "key": storedUserId,
@@ -143,7 +141,41 @@ const DetailProduct = () => {
         const responseData = await response.json();
         console.log(responseData);
         // Chuyển hướng
-        window.location.href = "/shoes/cart";
+        // window.location.href = "/shoes/cart";
+      } catch (error) {
+        console.error("Lỗi trong quá trình thanh toán:", error);
+      }
+    } else {
+      toast.success("Bạn cần đăng nhập để có thể tiếp tục !!!!")
+      window.location.href = "/login";
+    }
+  }
+
+  const handleCheckout = async () => {
+    if (storedUserId) {
+      try {
+        const response = await fetch("http://localhost:33321/api/cart/byNow", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            "key": storedUserId,
+            "id": shoesdetail.id,
+            "quantity": quantity
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error(
+            "Có lỗi xảy ra khi thực hiện thanh toán. Vui lòng thử lại sau."
+          );
+        }
+
+        const responseData = await response.json();
+        console.log(responseData);
+        // Chuyển hướng
+        window.location.href = "/shoes/checkout";
       } catch (error) {
         console.error("Lỗi trong quá trình thanh toán:", error);
       }
@@ -164,7 +196,7 @@ const DetailProduct = () => {
             <Card className="shadow">
               <CardBody>
                 <>
-                  <div className='container khung'>
+                  <div className='container khung mt-5'>
                     <div className='card-box'>
                       <div className='row'>
                         <div className='col-5'>
@@ -353,12 +385,12 @@ const DetailProduct = () => {
                             {/* <button onClick={addToCart} className='btn btn-primary'>Thêm vào giỏ hàng</button> */}
                             <CartContext.Consumer>
                               {({ addToCart }) => (
-                                <button className='btn btn-primary' onClick={() => handleCheckout()} disabled={sl === false ? false : true}>
+                                <button className='btn btn-primary' onClick={() => handleAddCart()} disabled={sl === false ? false : true}>
                                   Thêm vào giỏ hàng
                                 </button>
                               )}
                             </CartContext.Consumer>
-                            <button className='btn btn-warning' disabled={sl === false ? false : true}>Mua ngay</button>
+                            <button className='btn btn-warning' onClick={() => handleCheckout()} disabled={sl === false ? false : true}>Mua ngay</button>
                           </div>
                         </div>
 

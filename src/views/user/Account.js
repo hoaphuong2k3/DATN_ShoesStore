@@ -697,7 +697,7 @@ const Account = () => {
                                       <Row>
                                         <Col lg="9"  >
                                           <div style={{ fontSize: "14" }} className="text-small text-muted mb-0">
-                                            {item.addressDetail},&nbsp;{item.communeCode},&nbsp;{item.districtCode},&nbsp;{item.proviceCode}
+                                          {item.addressDetail}, {item.address}
                                           </div>
                                         </Col>
                                         <Col lg="3" className="mr--1">
