@@ -22,4 +22,4 @@ const updateImage = (id, image) => {
 const deleteImage = (id) => {
   return axios.delete('/admin/image/delete', id)
 }
-export { getAllImage, updateImage, postNewImage,deleteImage };
+export { getAllImage, updateImage, postNewImage, deleteImage };

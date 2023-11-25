@@ -634,7 +634,7 @@ const ListShoesDetail = () => {
         const selectedFile = e.target.files[0];
         if (selectedFile) {
             try {
-                formData2.append(selectedFile);
+                formData2.append("file",selectedFile);
                 const res1 = await updateImage(id, formData2);
                 const updatedArray = selectedImages.map(item => {
                     if (item && item.id === id) {
@@ -1411,7 +1411,6 @@ const ListShoesDetail = () => {
                                                                             </Label>
                                                                         </div>
                                                                     }
-
                                                                 </div>
                                                             </tr>
                                                         </>
