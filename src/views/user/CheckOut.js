@@ -28,7 +28,7 @@ const Checkout = () => {
   const [products, setProducts] = useState(null);
   const storedUserId = localStorage.getItem("userId");
   const [totalMoney, setTotalMoney] = useState(null);
-  
+
   const formatter = new Intl.NumberFormat("vi-VN", {
     style: "currency",
     currency: "VND",
@@ -215,7 +215,7 @@ const Checkout = () => {
     } else {
       // Nếu danh sách địa chỉ rỗng, reset các combobox tỉnh thành, quận huyện
       resetFormData();
-      
+
     }
   };
 
@@ -233,61 +233,61 @@ const Checkout = () => {
 
   const handleApiCall = async () => {
 
-    if(!selectedAddress){
-      setShippingTotal(0);
-      return;
-    }
+    // if (!selectedAddress) {
+    //   setShippingTotal(0);
+    //   return;
+    // }
 
     const servicesUrl = 'https://online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/available-services';
     const servicesPayload = {
-        shop_id: '4580194',
-        from_district: 3440,
-        to_district: formData.districtCode,
+      shop_id: '4580194',
+      from_district: 3440,
+      to_district: formData.districtCode,
     };
 
     try {
-        const servicesResponse = await axios.get(servicesUrl, {
-            headers: {
-                'Content-Type': 'application/json',
-                'token': '44022259-5cfb-11ee-96dc-de6f804954c9'
-            },
-            params: servicesPayload,
+      const servicesResponse = await axios.get(servicesUrl, {
+        headers: {
+          'Content-Type': 'application/json',
+          'token': '44022259-5cfb-11ee-96dc-de6f804954c9'
+        },
+        params: servicesPayload,
+      });
+
+      const servicesData = servicesResponse.data;
+      console.log(servicesData);
+
+      const selectedService = servicesData.data.find(service => service.service_type_id === 2);
+
+      if (selectedService) {
+        const serviceId = selectedService.service_id;
+        console.log("DV", serviceId);
+        const response = await axios.get('https://online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/fee', {
+          headers: {
+            'token': '44022259-5cfb-11ee-96dc-de6f804954c9',
+            'shop_id': '4580194',
+            'Content-Type': 'application/json'
+          },
+          params: {
+            service_id: serviceId,
+            insurance_value: 500000,
+            coupon: null,
+            from_district_id: 3440,
+            to_district_id: formData.districtCode,
+            to_ward_code: formData.communeCode,
+            height: 15,
+            length: 15,
+            weight: 2000,
+            width: 15
+          }
         });
-
-        const servicesData = servicesResponse.data;
-        console.log(servicesData);
-
-        const selectedService = servicesData.data.find(service => service.service_type_id === 2);
-
-        if (selectedService) {
-            const serviceId = selectedService.service_id;
-            console.log(serviceId);
-            const response = await axios.get('https://online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/fee', {
-                headers: {
-                    'token': '44022259-5cfb-11ee-96dc-de6f804954c9',
-                    'shop_id': '4580194',
-                    'Content-Type': 'application/json'
-                },
-                params: {
-                    service_id: serviceId,
-                    insurance_value: 500000,
-                    coupon: null,
-                    from_district_id: 3440,
-                    to_district_id: formData.districtCode,
-                    to_ward_code: formData.communeCode,
-                    height: 15,
-                    length: 15,
-                    weight: 2000,
-                    width: 15
-                }
-            });
-
-            setShippingTotal(response.data.data.total);
-        }
+        console.log(response.data.data.total);
+        setShippingTotal(response.data.data.total);
+      }
     } catch (error) {
-        console.error('Lỗi trong quá trình gọi API:', error);
-    }   
-};
+      console.error('Lỗi trong quá trình gọi API:', error);
+    }
+  };
 
   return (
     <>
@@ -417,7 +417,7 @@ const Checkout = () => {
                                   value={formData.proviceCode}
                                   onChange={(e) =>
                                     handleProvinceChange(e.target.value)
-                                    
+
                                   }
                                 >
                                   <option value="">Chọn Tỉnh / Thành</option>
@@ -465,12 +465,14 @@ const Checkout = () => {
                                   className="form-control-alternative"
                                   type="select"
                                   value={formData.communeCode}
-                                  onChange={(e) =>
+                                  onChange={(e) => {
                                     setFormData({
                                       ...formData,
                                       communeCode: e.target.value,
                                     })
-                                    
+                                    handleApiCall();
+                                  }
+
                                   }
                                   disabled={!formData.districtCode}
                                 >
@@ -586,7 +588,7 @@ const Checkout = () => {
                             className="text-dark font-weight-bold"
                             style={{ float: "right" }}
                           >
-                            {formatter.format(totalMoney + shippingTotal)} 
+                            {formatter.format(totalMoney + shippingTotal)}
                           </h3>
                         </div>
                       </div>

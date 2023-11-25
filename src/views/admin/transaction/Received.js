@@ -17,6 +17,11 @@ const Received = ({ updateData }) => {
     const [totalPages, setTotalPages] = useState(0);
     const [totalElements, setTotalElements] = useState(0);
 
+    const formatter = new Intl.NumberFormat("vi-VN", {
+        style: "currency",
+        currency: "VND",
+    });
+
     const [confirm, setConfirm] = useState([]);
     const [selectedOrderId, setSelectedOrderId] = useState(null);
     const [orderData, setOrderData] = useState({});
@@ -313,7 +318,7 @@ const Received = ({ updateData }) => {
                                             <td>{confirm.code}</td>
                                             <td>{confirm.fullname}</td>
                                             <td>{confirm.phoneNumber}</td>
-                                            <td className="text-right">{confirm.totalMoney.toLocaleString("vi-VN")} VND</td>
+                                            <td className="text-right">{formatter.format(confirm.totalMoney)}</td>
                                             <td className="text-center">
                                                 <Badge color={paymentMethodColors[confirm.paymentMethod]?.color || "secondary"}>
                                                     {paymentMethodColors[confirm.paymentMethod]?.label || "Không xác định"}
@@ -709,8 +714,8 @@ const Received = ({ updateData }) => {
 
                                                         </td>
                                                         <td className="text-center">{product.quantity}</td>
-                                                        <td className="text-right">{product.price}</td>
-                                                        <td className="text-right">{product.totalPrice}</td>
+                                                        <td className="text-right">{formatter.format(product.price)}</td>
+                                                        <td className="text-right">{formatter.format(product.totalPrice)}</td>
                                                     </tr>
                                                 ))}
                                         </tbody>

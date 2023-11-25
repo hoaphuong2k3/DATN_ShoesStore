@@ -45,6 +45,11 @@ const Confirm = () => {
     const [selectAllChecked, setSelectAllChecked] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
 
+    const formatter = new Intl.NumberFormat("vi-VN", {
+        style: "currency",
+        currency: "VND",
+    });
+
     const fetchDataFromAPI = async (url, stateSetter) => {
         try {
             const response = await axios.get(url, {
@@ -551,7 +556,7 @@ const Confirm = () => {
                                             <td>{confirm.code}</td>
                                             <td>{confirm.fullname}</td>
                                             <td>{confirm.phoneNumber}</td>
-                                            <td className="text-right">{confirm.totalMoney.toLocaleString("vi-VN")} VND</td>
+                                            <td className="text-right">{formatter.format(confirm.totalMoney)}</td>
                                             <td className="text-center">
                                                 <Badge color={confirm.paymentMethod === 1 ? "success" : confirm.paymentMethod === 2 ? "primary" : "secondary"}>
                                                     {confirm.paymentMethod === 1 ? "COD" : confirm.paymentMethod === 2 ? "Ví điện tử" : "Không xác định"}
@@ -988,8 +993,8 @@ const Confirm = () => {
                                                             ) : null}
                                                         </td>
 
-                                                        <td className="text-right">{product.price}</td>
-                                                        <td className="text-right">{product.totalPrice}</td>
+                                                        <td className="text-right">{formatter.format(product.price)}</td>
+                                                        <td className="text-right">{formatter.format(product.totalPrice)}</td>
                                                         <td className="text-right">
                                                             <Button className="pt-0" color="link" size="sm" onClick={() => handleDeleteProduct(product.id)}
                                                             ><FaTrash />
