@@ -852,20 +852,7 @@ const ListShoesDetail = () => {
         padding: "4px"
     };
     //Slide show
-    const getAllImage = async () => {
-        const res1 = await getAllImage(id);
-        console.log("res1:", res1.data);
-        if (res1 && res1.data) {
-            const updatedArray = res1.data.map(item => {
-                return {
-                    ...item,
-                    url: `https://s3-ap-southeast-1.amazonaws.com/imageshoestore/${item.imgURI}`,
-                    id: item.id
-                };
-            });
-            setSelectedImages(updatedArray);
-        }
-    }
+
 
     return (
         <>
