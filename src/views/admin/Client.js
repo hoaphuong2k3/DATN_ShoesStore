@@ -665,7 +665,9 @@ const Client = () => {
                           </td>
                           <td>{item.email}</td>
                           <td>{item.phoneNumber}</td>
-                          <td className="text-center">{item.gender ? "Nam" : "Nữ"}</td>
+                          <td className="text-center">
+                            {item.gender === true ? "Nam" : item.gender === false ? "Nữ" : ""}
+                          </td>
                           <td>{item.dateOfBirth}</td>
                           <td style={{ position: "sticky", zIndex: '1', right: '0', backgroundColor: '#fff' }}>
                             <Button color="link" size="sm"

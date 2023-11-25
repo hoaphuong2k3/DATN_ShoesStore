@@ -12,6 +12,7 @@ import {
 import { toast } from 'react-toastify';
 import Switch from 'react-input-switch';
 import axios from "axios";
+import SlideShow from './SlideShow';
 
 const ListShoesDetail = () => {
     const [value, setValue] = useState('no');
@@ -850,6 +851,22 @@ const ListShoesDetail = () => {
         cursor: "pointer",
         padding: "4px"
     };
+    //Slide show
+    const getAllImage = async () => {
+        const res1 = await getAllImage(id);
+        console.log("res1:", res1.data);
+        if (res1 && res1.data) {
+            const updatedArray = res1.data.map(item => {
+                return {
+                    ...item,
+                    url: `https://s3-ap-southeast-1.amazonaws.com/imageshoestore/${item.imgURI}`,
+                    id: item.id
+                };
+            });
+            setSelectedImages(updatedArray);
+        }
+    }
+
     return (
         <>
             {/* Page content */}
@@ -1068,6 +1085,7 @@ const ListShoesDetail = () => {
                                                         </th>
                                                         <th>STT</th>
                                                         <th>Trạng thái</th>
+                                                        <th></th>
                                                         <th>Mã</th>
                                                         <th>Màu</th>
                                                         <th>Size</th>
@@ -1104,6 +1122,9 @@ const ListShoesDetail = () => {
                                                                         <Badge color={statusMapping[item.status]?.color || statusMapping.default.color}>
                                                                             {statusMapping[item.status]?.label || statusMapping.default.label}
                                                                         </Badge>
+                                                                    </td>
+                                                                    <td>
+                                                                        {/* <SlideShow images={item.images} /> */}
                                                                     </td>
                                                                     <td>{item.code}</td>
                                                                     <td>{item.color}</td>
