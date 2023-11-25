@@ -5,6 +5,7 @@ import { getAllShoesDetail } from "services/ShoesDetailService.js";
 import ReactPaginate from 'react-paginate';
 import { FaEdit, FaTrash, FaLock, FaLockOpen, FaAngleDown, FaAngleUp, FaFilter, FaSearch } from 'react-icons/fa';
 import { getAllColorId, getAllSizeId, getAllColor, getAllSize } from "services/ProductAttributeService";
+import { getAllImage, updateImage, postNewImage, deleteImage } from "services/ImageService";
 import {
     Card, CardBody, Container, Row, Col, FormGroup, Input, Button, Form, CardTitle, Label, Table, Badge, Modal, ModalHeader, ModalFooter, ModalBody, CardHeader, InputGroup, InputGroupAddon, InputGroupText
 } from "reactstrap";
@@ -355,12 +356,12 @@ const ListShoesDetail = () => {
         const baseName = originalName.substring(0, originalName.lastIndexOf('.')) || originalName;
         return `${baseName}_${number}.${extension}`;
     };
- 
+
     const onClickAddMany = async () => {
         const formData1 = new FormData();
         try {
             if (selectedImages) {
-               selectedImages.map((item, index) => {
+                selectedImages.map((item, index) => {
                     const newName = generateNewFileName(item.file.name, item.i);
                     const modifiedFile = new File([item.file], newName, { type: item.file.type });
                     formData1.append(`files[${index}]`, modifiedFile);
@@ -371,6 +372,7 @@ const ListShoesDetail = () => {
             await axios.post(`http://localhost:33321/api/admin/shoesdetail/${id}`, formData1);
             getAll();
             getListCheck();
+            setSelectedImages([]);
             toast.success("Thêm thành công!");
         } catch (error) {
             let errorMessage = "Lỗi từ máy chủ";
@@ -426,6 +428,7 @@ const ListShoesDetail = () => {
         fileInputRef.current.click();
     };
     const formData = new FormData();
+
     const handleFileChange = async (event) => {
         const selectedFile = event.target.files[0];
 
@@ -519,11 +522,13 @@ const ListShoesDetail = () => {
     useEffect(() => {
         if (modalAdd === false) {
             resetAddOne();
+            setSelectedImages([]);
         }
     }, [modalAdd]);
     useEffect(() => {
         if (modalEdit === false) {
             resetAddOne();
+            setSelectedImages([]);
         }
     }, [modalEdit]);
     const [addone, setAddOne] = useState({
@@ -578,6 +583,18 @@ const ListShoesDetail = () => {
                 price: res.data.data.price,
                 status: res.data.data.status
             })
+            const res1 = await getAllImage(id);
+            console.log("res1:", res1.data);
+            if (res1 && res1.data) {
+                const updatedArray = res1.data.map(item => {
+                    return {
+                        ...item,
+                        url: `https://s3-ap-southeast-1.amazonaws.com/imageshoestore/${item.imgURI}`,
+                        id: item.id
+                    };
+                });
+                setSelectedImages(updatedArray);
+            }
             toggleEdit();
         } catch (error) {
             let errorMessage = "Lỗi từ máy chủ";
@@ -587,6 +604,79 @@ const ListShoesDetail = () => {
             toast.error(errorMessage);
         }
 
+    }
+    const handleAddImage = async (e) => {
+        const formData2 = new FormData();
+        const selectedFile = e.target.files[0];
+        if (selectedFile) {
+            try {
+                formData2.append("files", selectedFile);
+                const res1 = await postNewImage(addone.id, formData2);
+                console.log(res1);
+                if (res1 && res1.data) {
+                    setSelectedImages([...selectedImages, {
+                        url: `https://s3-ap-southeast-1.amazonaws.com/imageshoestore/${res1.data[0].imgURI}`,
+                        id: res1.data[0].id
+                    }]);
+
+                }
+            } catch (error) {
+                let errorMessage = "Lỗi từ máy chủ";
+                if (error.response && error.response.data && error.response.data.message) {
+                    errorMessage = error.response.data.message;
+                }
+                toast.error(errorMessage);
+            }
+        }
+    };
+    const handleEditImage = async (e, id) => {
+        const formData2 = new FormData();
+        const selectedFile = e.target.files[0];
+        if (selectedFile) {
+            try {
+                formData2.append(selectedFile);
+                const res1 = await updateImage(id, formData2);
+                const updatedArray = selectedImages.map(item => {
+                    if (item && item.id === id) {
+                        return {
+                            ...item,
+                            url: `https://s3-ap-southeast-1.amazonaws.com/imageshoestore/${res1.data[0].imgURI}`
+                        };
+                    }
+                    return item;
+                });
+                setSelectedImages(updatedArray);
+            } catch (error) {
+                let errorMessage = "Lỗi từ máy chủ";
+                if (error.response && error.response.data && error.response.data.message) {
+                    errorMessage = error.response.data.message;
+                }
+                toast.error(errorMessage);
+            }
+        }
+    }
+    const handleDeleteImage = async (id) => {
+        try {
+            await deleteImage({ data: [id] });
+            const res1 = await getAllImage(addone.id);
+            console.log("res1:", res1.data);
+            if (res1 && res1.data) {
+                const updatedArray = res1.data.map(item => {
+                    return {
+                        ...item,
+                        url: `https://s3-ap-southeast-1.amazonaws.com/imageshoestore/${item.imgURI}`,
+                        id: item.id
+                    };
+                });
+                setSelectedImages(updatedArray);
+            }
+        } catch (error) {
+            let errorMessage = "Lỗi từ máy chủ";
+            if (error.response && error.response.data && error.response.data.message) {
+                errorMessage = error.response.data.message;
+            }
+            toast.error(errorMessage);
+        }
     }
     const saveEdit = async () => {
         try {
@@ -711,7 +801,7 @@ const ListShoesDetail = () => {
             }]);
         }
     };
-    const handleFileChange2 = (e, index, id) => {
+    const handleFileChange2 = (e, id) => {
         const selectedFile = e.target.files[0];
         if (selectedFile) {
             const updatedArray = selectedImages.map(item => {
@@ -724,6 +814,10 @@ const ListShoesDetail = () => {
             });
             setSelectedImages(updatedArray);
         }
+    };
+    const handleFileChange3 = (id) => {
+        const newArr = selectedImages.filter(item => item.id !== id);
+        setSelectedImages(newArr);
     };
     useEffect(() => {
         console.log(selectedImages);
@@ -748,6 +842,13 @@ const ListShoesDetail = () => {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
+    };
+    const deleteIconStyle = {
+        position: "absolute",
+        top: 0,
+        right: 0,
+        cursor: "pointer",
+        padding: "4px"
     };
     return (
         <>
@@ -1251,9 +1352,9 @@ const ListShoesDetail = () => {
                                                                 ))}
                                                             </Table >
 
-                                                            <tr className="text-center">
+                                                            <tr className="text-center ml--4">
                                                                 <div className="d-flex justify-content-center">
-                                                                    {selectedImages.length > 0 && selectedImages.filter((itemA) => itemA.i === index).map((itemA, x) => (
+                                                                    {selectedImages.length > 0 && selectedImages.filter((itemA) => itemA.i === itemColor.id).map((itemA, x) => (
                                                                         <div className="mr-4"
                                                                             key={itemA.id}
                                                                             style={{
@@ -1271,37 +1372,45 @@ const ListShoesDetail = () => {
                                                                                 type="file"
                                                                                 id={`image_${index}_${x}`}
                                                                                 style={{ display: "none" }}
-                                                                                onChange={(e) => { handleFileChange2(e, index, itemA.id) }}
+                                                                                onChange={(e) => { handleFileChange2(e, itemA.id) }}
                                                                             />
                                                                             <Label htmlFor={`image_${index}_${x}`} style={buttonStyle}>
                                                                                 +
                                                                             </Label>
+                                                                            <div style={deleteIconStyle} >
+                                                                                <span role="img" aria-label="Delete" style={{ fontSize: "15px" }} onClick={() => handleFileChange3(itemA.id)}>
+                                                                                    <FaTrash color="red" />
+                                                                                </span>
+                                                                            </div>
                                                                         </div>
                                                                     ))}
-                                                                    <div
-                                                                        style={{
-                                                                            position: "relative",
-                                                                            width: imageSize,
-                                                                            height: imageSize,
-                                                                        }}
-                                                                    >
-                                                                        {imageUrl && (
-                                                                            <img
-                                                                                alt="preview"
-                                                                                src={imageUrl}
-                                                                                style={imageStyle}
+                                                                    {selectedImages.filter((itemA) => itemA.i === itemColor.id).length < 5 &&
+                                                                        <div
+                                                                            style={{
+                                                                                position: "relative",
+                                                                                width: imageSize,
+                                                                                height: imageSize,
+                                                                            }}
+                                                                        >
+                                                                            {imageUrl && (
+                                                                                <img
+                                                                                    alt="preview"
+                                                                                    src={imageUrl}
+                                                                                    style={imageStyle}
+                                                                                />
+                                                                            )}
+                                                                            <Input
+                                                                                type="file"
+                                                                                id={`image_${index}`}
+                                                                                style={{ display: "none" }}
+                                                                                onChange={(e) => { handleFileChange1(e, itemColor.id) }}
                                                                             />
-                                                                        )}
-                                                                        <Input
-                                                                            type="file"
-                                                                            id={`image_${index}`}
-                                                                            style={{ display: "none" }}
-                                                                            onChange={(e) => { handleFileChange1(e, index) }}
-                                                                        />
-                                                                        <Label htmlFor={`image_${index}`} style={buttonStyle}>
-                                                                            +
-                                                                        </Label>
-                                                                    </div>
+                                                                            {/* // */}
+                                                                            <Label htmlFor={`image_${index}`} style={buttonStyle}>
+                                                                                +
+                                                                            </Label>
+                                                                        </div>
+                                                                    }
 
                                                                 </div>
                                                             </tr>
@@ -1332,7 +1441,7 @@ const ListShoesDetail = () => {
                 toggle={toggle}
                 backdrop={'static'}
                 keyboard={false}
-                style={{ maxWidth: '500px' }}
+                style={{ maxWidth: '700px' }}
             >
                 <ModalHeader toggle={toggle}>
                     <h3 className="heading-small text-muted mb-0">Thêm mới</h3>
@@ -1474,7 +1583,7 @@ const ListShoesDetail = () => {
                 toggle={toggleEdit}
                 backdrop={'static'}
                 keyboard={false}
-                style={{ maxWidth: '500px' }}
+                style={{ maxWidth: '700px' }}
             >
                 <ModalHeader toggle={toggleEdit}>
                     <h3 className="heading-small text-muted mb-0">Cập nhật</h3>
@@ -1597,6 +1706,62 @@ const ListShoesDetail = () => {
 
                                         </Input>
                                     </FormGroup>
+                                </Col>
+                                <Col lg="12">
+                                    <div className="d-flex justify-content-center">
+                                        {selectedImages.length > 0 && selectedImages.map((itemA, x) => (
+                                            <div className="mr-4"
+                                                key={itemA.id}
+                                                style={{
+                                                    position: "relative",
+                                                    width: imageSize,
+                                                    height: imageSize,
+                                                }}
+                                            >
+                                                <img
+                                                    alt="preview"
+                                                    src={itemA.url}
+                                                    style={imageStyle}
+                                                />
+                                                <Input
+                                                    type="file"
+                                                    id={`image_${x}`}
+                                                    style={{ display: "none" }}
+                                                    onChange={(e) => { handleEditImage(e, itemA.id) }}
+                                                />
+                                                <Label htmlFor={`image_${x}`} style={buttonStyle}>
+                                                    +
+                                                </Label>
+                                                <div style={deleteIconStyle} >
+                                                    <span role="img" aria-label="Delete" style={{ fontSize: "15px" }} onClick={() => handleDeleteImage(itemA.id)}>
+                                                        <FaTrash color="red" />
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        ))}
+                                        {selectedImages.length < 5 &&
+                                            <div
+                                                style={{
+                                                    position: "relative",
+                                                    width: imageSize,
+                                                    height: imageSize,
+                                                }}
+                                            >
+
+                                                <Input
+                                                    type="file"
+                                                    id={`image`}
+                                                    style={{ display: "none" }}
+                                                    onChange={(e) => { handleAddImage(e) }}
+                                                />
+                                                <Label htmlFor={`image`} style={buttonStyle}>
+                                                    +
+                                                </Label>
+                                            </div>
+                                        }
+
+                                    </div>
+
                                 </Col>
 
                             </Row>
