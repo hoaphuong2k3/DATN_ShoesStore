@@ -127,7 +127,7 @@ const DetailProduct = () => {
           },
           body: JSON.stringify({
             "key": storedUserId,
-            "id": shoesdetail.id,
+            "id": shoesdetail.shoesDetailSearchResponse.id,
             "quantity": quantity
           }),
         });
@@ -161,7 +161,7 @@ const DetailProduct = () => {
           },
           body: JSON.stringify({
             "key": storedUserId,
-            "id": shoesdetail.id,
+            "id": shoesdetail.shoesDetailSearchResponse.id,
             "quantity": quantity
           }),
         });
@@ -200,15 +200,20 @@ const DetailProduct = () => {
                     <div className='card-box'>
                       <div className='row'>
                         <div className='col-5'>
-                          <img alt="" src={`https://s3-ap-southeast-1.amazonaws.com/imageshoestore/${productDetail.imgURI}`} height={450} width={450} />
+                          {
+                            shoesdetail && shoesdetail.imageDTOS && shoesdetail.imageDTOS.length > 0
+                              ?
+                              <img alt="" src={`https://s3-ap-southeast-1.amazonaws.com/imageshoestore/${shoesdetail.imageDTOS[0].imgURI}`} height={450} width={450} />
+                              :
+                              <img alt="" src={`https://s3-ap-southeast-1.amazonaws.com/imageshoestore/${productDetail.imgURI}`} height={450} width={450} />
+                          }
 
-                          <p className='mt-5'>
-                            <img alt="" src="https://down-vn.img.susercontent.com/file/sg-11134201-22110-49wxoj5hr7jva4" height={88} width={88} />
-                            <img alt="" src="https://down-vn.img.susercontent.com/file/sg-11134201-22110-49wxoj5hr7jva4" height={88} width={88} />
-                            <img alt="" src="https://down-vn.img.susercontent.com/file/sg-11134201-22110-49wxoj5hr7jva4" height={88} width={88} />
-                            <img alt="" src="https://down-vn.img.susercontent.com/file/sg-11134201-22110-49wxoj5hr7jva4" height={88} width={88} />
-                            <img alt="" src="https://down-vn.img.susercontent.com/file/sg-11134201-22110-49wxoj5hr7jva4" height={88} width={88} />
-
+                          <p className='mt-3 text-center'>
+                            {
+                              shoesdetail && shoesdetail.imageDTOS && shoesdetail.imageDTOS.length > 0 && shoesdetail.imageDTOS.map(item => (
+                                <img alt="" src={`https://s3-ap-southeast-1.amazonaws.com/imageshoestore/${item.imgURI}`} height={88} width={88} />
+                              ))
+                            }
                           </p>
                         </div>
                         <div className='col-7'>
@@ -220,24 +225,24 @@ const DetailProduct = () => {
                           {/* start Giá sản phảm */}
                           <div className='giasp'>
                             {
-                              (shoesdetail.discountPrice < shoesdetail.price) ?
+                              (shoesdetail.shoesDetailSearchResponse && shoesdetail.shoesDetailSearchResponse.discountPrice < shoesdetail.shoesDetailSearchResponse.price) ?
                                 <>
                                   <div className='giachuagiam' >
                                     {/* Giá chuwq giảm */}
-                                    {formatter.format(shoesdetail.price)}
+                                    {formatter.format(shoesdetail.shoesDetailSearchResponse.price)}
 
                                   </div>
                                   <div className='flex items-center'>
                                     {/* Giá  giảm */}
-                                    <span className='giagiam'>{shoesdetail.discountPrice === null ? "0 đ" : formatter.format(shoesdetail.discountPrice)}</span>
-                                    <span className='sokhuyenmai'> Giảm {shoesdetail.discountPrice === null ? 100 : (shoesdetail.discountPrice / shoesdetail.price) * 100}%</span>
+                                    <span className='giagiam'>{shoesdetail.shoesDetailSearchResponse.discountPrice === null ? "0 đ" : formatter.format(shoesdetail.shoesDetailSearchResponse.discountPrice)}</span>
+                                    <span className='sokhuyenmai'> Giảm {shoesdetail.shoesDetailSearchResponse.discountPrice === null ? 100 : (shoesdetail.shoesDetailSearchResponse.discountPrice / shoesdetail.shoesDetailSearchResponse.price) * 100}%</span>
                                   </div>
                                 </>
                                 :
                                 <>
                                   <div className='flex items-center'>
                                     {/* Giá  giảm */}
-                                    <span className='giagiam'>{shoesdetail.price > 0 ? formatter.format(shoesdetail.price) : "0 đ"}</span>
+                                    <span className='giagiam'>{shoesdetail.shoesDetailSearchResponse && shoesdetail.shoesDetailSearchResponse.price > 0 ? formatter.format(shoesdetail.shoesDetailSearchResponse.price) : "0 đ"}</span>
                                   </div>
                                 </>
                             }
@@ -356,31 +361,32 @@ const DetailProduct = () => {
                             </div>
                           </div>
                           {/* end size */}
+                          {shoesdetail.shoesDetailSearchResponse &&
+                            <div>
+                              <div className='tong'>
+                                <span className='tenthuoctinh'>Số lượng :  </span>
+                                <span className='giatrithuoctinh' >
+                                  <button className='btntanggiam' onClick={handleDecrease}>-</button>
+                                  <input
+                                    className="soluong"
+                                    type="text"
+                                    role="spinbutton"
+                                    aria-live="assertive"
+                                    aria-valuenow={quantity}
+                                    value={quantity}
+                                    readOnly
+                                  />
+                                  <button className='btntanggiam' onClick={handleIncrease} disabled={quantity === shoesdetail.shoesDetailSearchResponse.quantity ? true : false}>+</button>
+                                  &nbsp;&nbsp;
+                                  {sl === false
+                                    ? <span> {shoesdetail.shoesDetailSearchResponse.quantity} &nbsp;sản phẩm có sẵn</span>
+                                    : <span style={{ color: "red" }}>Sản phẩm này đã hết hàng</span>
+                                  }
 
-                          <div>
-                            <div className='tong'>
-                              <span className='tenthuoctinh'>Số lượng :  </span>
-                              <span className='giatrithuoctinh' >
-                                <button className='btntanggiam' onClick={handleDecrease}>-</button>
-                                <input
-                                  className="soluong"
-                                  type="text"
-                                  role="spinbutton"
-                                  aria-live="assertive"
-                                  aria-valuenow={quantity}
-                                  value={quantity}
-                                  readOnly
-                                />
-                                <button className='btntanggiam' onClick={handleIncrease} disabled={quantity === shoesdetail.quantity ? true : false}>+</button>
-                                &nbsp;&nbsp;
-                                {sl === false
-                                  ? <span> {shoesdetail.quantity} &nbsp;sản phẩm có sẵn</span>
-                                  : <span style={{ color: "red" }}>Sản phẩm này đã hết hàng</span>
-                                }
-
-                              </span>
+                                </span>
+                              </div>
                             </div>
-                          </div>
+                          }
                           <div className='text-center btnInDetailSP'>
                             {/* <button onClick={addToCart} className='btn btn-primary'>Thêm vào giỏ hàng</button> */}
                             <CartContext.Consumer>
@@ -393,7 +399,6 @@ const DetailProduct = () => {
                             <button className='btn btn-warning' onClick={() => handleCheckout()} disabled={sl === false ? false : true}>Mua ngay</button>
                           </div>
                         </div>
-
                       </div>
                     </div>
 

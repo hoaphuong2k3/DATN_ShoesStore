@@ -584,8 +584,8 @@ const Products = () => {
                               <td>{item.cushion}</td>
                               <td>{item.totalQuantity}</td>
                               <td>{item.totalRecord}</td>
-                              <td>{formatter.format(item.priceMin)}</td>
-                              <td>{formatter.format(item.priceMax)}</td>
+                              <td>{item.totalRecord > 0 ? formatter.format(item.priceMin) : ""}</td>
+                              <td>{item.totalRecord > 0 ? formatter.format(item.priceMax) : ""}</td>
                               <td style={{ position: "sticky", zIndex: '1', right: '0', background: "#fff" }}>
                                 <Button color="link" to={`/admin/shoesdetail/${item.id}`} tag={Link} size="sm">
                                   <i class="fa-solid fa-eye" color="primary" />

@@ -24,6 +24,11 @@ const Waitting = () => {
     const [totalPages, setTotalPages] = useState(0);
     const [totalElements, setTotalElements] = useState(0);
 
+    const formatter = new Intl.NumberFormat("vi-VN", {
+        style: "currency",
+        currency: "VND",
+    });
+
     const [confirm, setConfirm] = useState([]);
     const [selectedOrderId, setSelectedOrderId] = useState(null);
     const [orderData, setOrderData] = useState({});
@@ -588,7 +593,7 @@ const Waitting = () => {
                                             <td>{confirm.code}</td>
                                             <td>{confirm.fullname}</td>
                                             <td>{confirm.phoneNumber}</td>
-                                            <td className="text-right">{confirm.totalMoney.toLocaleString("vi-VN")} VND</td>
+                                            <td className="text-right">{formatter.format(confirm.totalMoney)}</td>
                                             <td className="text-center">
                                                 <Badge color={paymentMethodColors[confirm.paymentMethod]?.color || "secondary"}>
                                                     {paymentMethodColors[confirm.paymentMethod]?.label || "Không xác định"}
@@ -1003,9 +1008,8 @@ const Waitting = () => {
                                                         <td>
                                                             <Row className="col">
                                                                 <Col md={4}>
-                                                                    <span className="avatar avatar-sm rounded-circle">
-                                                                        <img src={`https://s3-ap-southeast-1.amazonaws.com/imageshoestore/${product.imgURI}`}
-                                                                            alt="" />
+                                                                <span className="avatar avatar-sm rounded-circle">
+                                                                        <img src={`https://s3-ap-southeast-1.amazonaws.com/imageshoestore/${product.imgUri}`} alt="" />
                                                                     </span>
                                                                 </Col>
                                                                 <Col md={8}>
@@ -1041,8 +1045,8 @@ const Waitting = () => {
                                                             )}
                                                         </td>
 
-                                                        <td className="text-right">{product.price}</td>
-                                                        <td className="text-right">{product.totalPrice}</td>
+                                                        <td className="text-right">{formatter.format(product.price)}</td>
+                                                        <td className="text-right">{formatter.format(product.totalPrice)}</td>
                                                         <td className="text-right">
                                                             <Button className="pt-0" color="link" size="sm" onClick={() => handleDeleteProduct(product.id)}
                                                             ><FaTrash />

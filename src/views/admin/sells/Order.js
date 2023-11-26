@@ -4,6 +4,7 @@ import axiosInstance from "services/custommize-axios";
 import { ToastContainer, toast } from "react-toastify";
 import { FaQrcode, FaUserPlus, FaUndoAlt, FaTrashAlt } from 'react-icons/fa';
 import { TbShoppingBagPlus } from 'react-icons/tb';
+import ReactPaginate from 'react-paginate';
 import {
     Row, Col, Button, Card, CardBody, CardHeader, Table, InputGroup, Input,
     Form, FormGroup, Label, Modal, ModalBody, ModalHeader, ModalFooter
@@ -19,8 +20,13 @@ const Order = () => {
     const [modal2, setModal2] = useState(false);
     const toggle2 = () => setModal2(!modal2);
 
-
-
+    const [currentPage, setCurrentPage] = useState(0);
+    const itemsPerPage = 5;
+    const startIndex = currentPage * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const handlePageChange = ({ selected }) => {
+        setCurrentPage(selected);
+    };
 
     //Client
     const [clients, setClients] = useState([]);
@@ -61,11 +67,6 @@ const Order = () => {
         handleSearch();
     }, [searchTerm]);
 
-    const resetSearch = () => {
-        setSearchTerm('');
-        setSearchResults([]);
-    };
-
     //Add client
     const onAddClient = async (e) => {
         e.preventDefault();
@@ -95,7 +96,6 @@ const Order = () => {
         });
     };
 
-
     //Ship
     const [showShippingForm, setShowShippingForm] = useState(false);
     const [provinces, setProvinces] = useState([]);
@@ -107,6 +107,9 @@ const Order = () => {
     const [shippingTotal, setShippingTotal] = useState(0);
     const [selectedToDistrictID, setSelectedToDistrictID] = useState("");
     const [selectedToWardCode, setSelectedToWardCode] = useState("");
+    const [recipientName, setRecipientName] = useState('');
+    const [recipientPhone, setRecipientPhone] = useState('');
+
 
     const fetchDataFromAPI = async (url, stateSetter) => {
         try {
@@ -149,9 +152,14 @@ const Order = () => {
         setSelectedProvince("");
         setSelectedDistrict("");
         setSelectedWard("");
-        document.getElementById("detailedAddress").value = "";
-        document.getElementById('recipientName').value = "";
-        document.getElementById('recipientPhone').value = "";
+        setShippingTotal(0);
+        setRecipientName("");
+        setRecipientPhone("");
+        const detailedAddressElement = document.getElementById("detailedAddress")
+
+        if (detailedAddressElement) {
+            detailedAddressElement.value = "";
+        }
     };
 
     const handleApiCall = async () => {
@@ -209,7 +217,16 @@ const Order = () => {
     //Product
     const [selectedProducts, setSelectedProducts] = useState([]);
     const handleSelectProducts = (selectedProductList) => {
-        setSelectedProducts(selectedProductList);
+
+        const existingItemIndex = selectedProducts.findIndex((existingItem) => existingItem.shoesDetailId === selectedProductList.shoesDetailId);
+
+        if (existingItemIndex !== -1) {
+            const updatedOrderItems = [...selectedProducts];
+            updatedOrderItems[existingItemIndex].quantity += selectedProductList.quantity;
+            setSelectedProducts(updatedOrderItems);
+        } else {
+            setSelectedProducts([...selectedProducts, selectedProductList]);
+        }
     };
     const resetSelectedProducts = () => {
         setSelectedProducts([]);
@@ -255,7 +272,7 @@ const Order = () => {
     const [paymentMethod, setPaymentMethod] = useState(4);
     const handlePaymentMethodChange = (method) => {
         setPaymentMethod(method);
-        setIsBankTransfer(method === 2 || method === 3 || method === 1);
+        setIsBankTransfer(method === 3 || method === 1);
     };
 
     const buildDeliveryAddress = () => {
@@ -285,16 +302,12 @@ const Order = () => {
     const createOrder = async () => {
 
         const idClient = selectedClient ? selectedClient.id : null;
-
         let deliveryOrderDTO = null;
 
         if (showShippingForm) {
 
             const newDeliveryAddress = buildDeliveryAddress();
             setDeliveryData({ ...deliveryData, deliveryAddress: newDeliveryAddress });
-            const recipientName = document.getElementById('recipientName')?.value || '';
-            const recipientPhone = document.getElementById('recipientPhone')?.value || '';
-
             deliveryOrderDTO = {
                 address: newDeliveryAddress,
                 recipientName: recipientName,
@@ -312,7 +325,7 @@ const Order = () => {
                 idClient: idClient,
                 shoesInCart: selectedProducts.map(product => ({
                     quantity: product.quantity,
-                    idShoesDetail: product.id
+                    idShoesDetail: product.shoesDetailId
                 })),
                 deliveryOrderDTO: deliveryOrderDTO,
             });
@@ -326,7 +339,6 @@ const Order = () => {
             resetShip();
             setShowShippingForm(false);
             setPaymentMethod(1);
-
         } catch (error) {
             // Xử lý lỗi nếu có
             console.error('Lỗi khi tạo hóa đơn:', error);
@@ -345,6 +357,11 @@ const Order = () => {
         const remainingAmount = paymentAmount - (totalAmount + shippingTotal);
         setChangeAmount(remainingAmount < 0 ? 0 : remainingAmount);
     };
+
+    const formatter = new Intl.NumberFormat("vi-VN", {
+        style: "currency",
+        currency: "VND",
+    });
 
     return (
         <Row className="my-4">
@@ -382,47 +399,64 @@ const Order = () => {
                                     </tr>
                                 </thead>
                                 <tbody style={{ fontSize: 14 }}>
-                                    {selectedProducts.map((detail, index) => (
-                                        <tr key={detail.id}>
-                                            <th className="text-center">{index + 1}</th>
-                                            <td>
+                                    {selectedProducts
+                                        .slice(startIndex, endIndex)
+                                        .map((detail, index) => (
+                                            <tr key={detail.shoesDetailId}>
+                                                <th className="text-center">{index + 1}</th>
+                                                <td>
 
-                                                <img
-                                                    src={""}
-                                                    alt="Ảnh mô tả"
-                                                    style={{
-                                                        maxWidth: "100%",
-                                                        height: "150px",
-                                                        border: "1px solid #ccc",
-                                                    }}
-                                                />
+                                                    <img
+                                                        src={""}
+                                                        alt="Ảnh mô tả"
+                                                        style={{
+                                                            maxWidth: "100%",
+                                                            height: "150px",
+                                                            border: "1px solid #ccc",
+                                                        }}
+                                                    />
 
-                                            </td>
-                                            <td>
-                                                <h4>{detail.code} - </h4>
-                                                <span className="mr-2">Size: {detail.size}</span>
-                                                <span>Màu: {detail.color}</span>
-                                            </td>
-                                            <td className="text-right" style={{ textDecoration: 'line-through' }}>{detail.price}</td>
-                                            <td className="text-right" >{detail.discountPrice}</td>
-                                            <td>
-                                                <Input className="text-center m-auto"
-                                                    type="number"
-                                                    size="sm" min={1}
-                                                    style={{ width: "50px" }}
-                                                    value={detail.quantity}
-                                                    onChange={(e) => handleQuantityChange(e, index)}
-                                                />
-                                            </td>
-                                            <td className="text-right" style={{ color: "red" }}>{detail.quantity * detail.discountPrice}</td>
-                                            <td className="text-center" onClick={() => handleDeleteRow(index)}>
-                                                <FaTrashAlt style={{ cursor: "pointer" }} />
-                                            </td>
-                                        </tr>
-                                    ))}
+                                                </td>
+                                                <td>
+                                                    <h4>{detail.code} - </h4>
+                                                    <span className="mr-2">Size: {detail.sizeName}</span>
+                                                    <span>Màu: {detail.colorName}</span>
+                                                </td>
+                                                <td className="text-right" style={{ textDecoration: 'line-through' }}>{formatter.format(detail.price)}</td>
+                                                <td className="text-right" >{formatter.format(detail.discountPrice)}</td>
+                                                <td>
+                                                    <Input className="text-center m-auto"
+                                                        type="number"
+                                                        size="sm" min={1}
+                                                        style={{ width: "50px" }}
+                                                        value={detail.quantity}
+                                                        onChange={(e) => handleQuantityChange(e, index)}
+                                                    />
+                                                </td>
+                                                <td className="text-right" style={{ color: "red" }}>{formatter.format(detail.quantity * detail.discountPrice)}</td>
+                                                <td className="text-center" onClick={() => handleDeleteRow(index)}>
+                                                    <FaTrashAlt style={{ cursor: "pointer" }} />
+                                                </td>
+                                            </tr>
+                                        ))}
                                 </tbody>
                             </Table>
+                        )}
 
+                        {selectedProducts.length > 0 && (
+                            <Row className="col" style={{ justifyContent: "center" }}>
+                                <ReactPaginate
+                                    pageCount={Math.ceil(selectedProducts.length / itemsPerPage)}
+                                    pageRangeDisplayed={5}
+                                    marginPagesDisplayed={2}
+                                    previousLabel={'<'}
+                                    nextLabel={'>'}
+                                    breakLabel={'...'}
+                                    onPageChange={handlePageChange}
+                                    containerClassName={'pagination'}
+                                    activeClassName={'active'}
+                                />
+                            </Row>
                         )}
                     </CardBody>
 
@@ -518,7 +552,7 @@ const Order = () => {
                                 <CardHeader>
                                     <Row className="col" style={{ justifyContent: "space-between" }}>
                                         <h4>Thông tin giao hàng</h4>
-                                        <FaUndoAlt outline onClick={() => { resetShip(); setShippingTotal(0); }} style={{ cursor: "pointer" }} />
+                                        <FaUndoAlt outline onClick={resetShip} style={{ cursor: "pointer" }} />
 
                                     </Row>
                                 </CardHeader>
@@ -529,13 +563,19 @@ const Order = () => {
                                             <Col lg="6">
                                                 <FormGroup>
                                                     <Label>Người nhận</Label>
-                                                    <Input type="text" size="sm" id="recipientName" />
+                                                    <Input type="text" size="sm"
+                                                        value={recipientName}
+                                                        onChange={(e) => setRecipientName(e.target.value)}
+                                                    />
                                                 </FormGroup>
                                             </Col>
                                             <Col lg="6">
                                                 <FormGroup>
                                                     <Label>Số điện thoại</Label>
-                                                    <Input type="tel" size="sm" id="recipientPhone" />
+                                                    <Input type="tel" size="sm"
+                                                        value={recipientPhone}
+                                                        onChange={(e) => setRecipientPhone(e.target.value)}
+                                                    />
                                                 </FormGroup>
                                             </Col>
                                         </Row>
@@ -624,6 +664,7 @@ const Order = () => {
                                                         type="textarea"
                                                         size="sm"
                                                         id="detailedAddress"
+                                                        placeholder="Địa chỉ chi tiết..."
                                                     />
                                                 </FormGroup>
                                             </Col>
@@ -648,7 +689,12 @@ const Order = () => {
                                         <Input
                                             type="checkbox"
                                             checked={showShippingForm}
-                                            onChange={() => setShowShippingForm(!showShippingForm)}
+                                            onChange={() => {
+                                                setShowShippingForm(!showShippingForm);
+                                                if (!showShippingForm) {
+                                                    resetShip();
+                                                }
+                                            }}
                                         />Ship
                                     </Label>
                                 </FormGroup>
@@ -660,7 +706,7 @@ const Order = () => {
                                 <Row className="mb-1">
                                     <Label className="col">Tiền hàng:</Label>
                                     <Col className="text-right">
-                                        <h5>{totalAmount}</h5>
+                                        <h5>{formatter.format(totalAmount)}</h5>
                                     </Col>
                                 </Row>
                                 <Row className="mb-1">
@@ -672,7 +718,7 @@ const Order = () => {
                                 <Row className="mb-1">
                                     <Label className="col">Phí vận chuyển:</Label>
                                     <Col className="text-right">
-                                        <h5>{shippingTotal}</h5>
+                                        <h5>{formatter.format(shippingTotal)}</h5>
                                     </Col>
                                 </Row>
                                 <Row className="mb-1">
@@ -684,7 +730,7 @@ const Order = () => {
                                 <Row className="mb-1">
                                     <Label className="col h5" style={{ fontSize: 14 }}>Thành tiền:</Label>
                                     <Col className="text-right">
-                                        <h5 style={{ color: "red" }}>{totalAmount + shippingTotal}</h5>
+                                        <h5 style={{ color: "red" }}>{formatter.format(totalAmount + shippingTotal)}</h5>
                                     </Col>
                                 </Row>
                                 <Row className="mb-1">
@@ -703,7 +749,7 @@ const Order = () => {
                                 <Row className="mb-1">
                                     <Label className="col">Tiền thừa:</Label>
                                     <Col className="text-right">
-                                        <h5 style={{ color: "red" }}>{changeAmount}</h5>
+                                        <h5 style={{ color: "red" }}>{formatter.format(changeAmount)}</h5>
                                     </Col>
                                 </Row>
 
@@ -724,10 +770,10 @@ const Order = () => {
                                             <Input
                                                 type="radio"
                                                 name="money"
-                                                checked={paymentMethod === 2}
-                                                onChange={() => handlePaymentMethodChange(2)}
+                                                checked={paymentMethod === 3}
+                                                onChange={() => handlePaymentMethodChange(3)}
                                             />
-                                            Ví điện tử
+                                            Chuyển khoản
                                         </Label>
                                     </Col>
                                 </Row>
@@ -737,21 +783,10 @@ const Order = () => {
                                             <Input
                                                 type="radio"
                                                 name="money"
-                                                checked={paymentMethod === 3}
-                                                onChange={() => handlePaymentMethodChange(3)}
-                                            />
-                                            Chuyển khoản
-                                        </Label>
-                                    </Col>
-                                    <Col>
-                                        <Label check>
-                                            <Input
-                                                type="radio"
-                                                name="money"
                                                 checked={paymentMethod === 1}
                                                 onChange={() => handlePaymentMethodChange(1)}
                                             />
-                                            COD
+                                            Thanh toán sau khi nhận hàng
                                         </Label>
                                     </Col>
                                 </Row>

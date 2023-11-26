@@ -30,6 +30,7 @@ const Checkout = () => {
   const storedUserId = localStorage.getItem("userId");
   const [totalMoney, setTotalMoney] = useState(null);
 
+
   const formatter = new Intl.NumberFormat("vi-VN", {
     style: "currency",
     currency: "VND",
@@ -304,6 +305,8 @@ const Checkout = () => {
 
       const servicesData = servicesResponse.data;
       console.log(servicesData);
+      const servicesData = servicesResponse.data;
+      console.log(servicesData);
 
       const selectedService = servicesData.data.find(
         (service) => service.service_type_id === 2
@@ -556,6 +559,7 @@ const Checkout = () => {
                             className="text-dark font-weight-bold"
                             style={{ float: "right" }}
                           >
+                            {formatter.format(totalMoney + shippingTotal)}
                             {formatter.format(totalMoney + shippingTotal)}
                           </h3>
                         </div>

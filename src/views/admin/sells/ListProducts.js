@@ -2,13 +2,19 @@ import React, { useState, useEffect } from "react";
 import { getAllShoes } from "services/Product2Service";
 import { getAllShoesDetail } from "services/ShoesDetailService.js";
 import { getAllColorId, getAllSizeId } from "services/ProductAttributeService";
-import { getAllBrand, getAllOrigin, getAllDesignStyle, getAllSkinType, getAllToe, getAllSole, getAllLining, getAllCushion } from "services/ProductAttributeService";
+import {
+    getAllBrand, getAllOrigin, getAllDesignStyle, getAllSkinType,
+    getAllToe, getAllSole, getAllLining, getAllCushion
+} from "services/ProductAttributeService";
 // reactstrap components
+import ReactPaginate from 'react-paginate';
+import { FaSearch, FaFilter } from 'react-icons/fa';
 import {
     Row, Col, Button, Table, Input, InputGroup, InputGroupAddon, InputGroupText,
     Modal, ModalBody, ModalFooter, ModalHeader, Form, FormGroup, Label, Card
 } from "reactstrap";
-import { FaSearch, FaHandHoldingMedical, FaFilter } from 'react-icons/fa';
+
+
 const Products = ({ onSelectProducts }) => {
 
     const [modal, setModal] = useState(false);
@@ -16,9 +22,6 @@ const Products = ({ onSelectProducts }) => {
 
     const [thirdModal, setThirdModal] = useState(false);
     const toggleThirdModal = () => setThirdModal(!thirdModal);
-
-    const [modal2, setModal2] = useState(false);
-    const toggle2 = () => setModal2(!modal2);
 
     const [searchTerm, setSearchTerm] = useState('');
     const [listShoes, setListShoes] = useState([]);
@@ -30,10 +33,18 @@ const Products = ({ onSelectProducts }) => {
     const [listSole, setListSole] = useState([]);
     const [listLining, setListLining] = useState([]);
     const [listCushion, setListCushion] = useState([]);
+
+    const [shoesdetail, setshoesdetail] = useState({});
+    const [listSizeById, setListSizeById] = useState([]);
+    const [listColorById, setListColorById] = useState([]);
+    const [idColor, setIdColor] = useState("");
+    const [idSize, setIdSize] = useState("");
+
     const [totalPages, setTotalPages] = useState(0);
     const [totalElements, setTotalElenments] = useState(0);
     const [page, setPage] = useState(0);
-    const [size, setSize] = useState(5);
+    const [size, setSize] = useState(8);
+
     const [search, setSearch] = useState({
         code: "",
         name: "",
@@ -74,18 +85,6 @@ const Products = ({ onSelectProducts }) => {
             createdBy: ""
         })
     };
-
-    useEffect(() => {
-        getAll(page, size);
-        getlistBrand();
-        getListOrigin();
-        getListDesignStyle();
-        getListSkinType();
-        getListToe();
-        getListSole();
-        getListLining();
-        getListCushion();
-    }, []);
 
     const getlistBrand = async () => {
         let res = await getAllBrand();
@@ -140,11 +139,23 @@ const Products = ({ onSelectProducts }) => {
         setSearch({ ...search, [e.target.name]: e.target.value });
     };
 
+    useEffect(() => {
+        getAll(page, size);
+        getlistBrand();
+        getListOrigin();
+        getListDesignStyle();
+        getListSkinType();
+        getListToe();
+        getListSole();
+        getListLining();
+        getListCushion();
+    }, []);
+
 
     //Sort
     const [sort, setSort] = useState('');
     const [sortStyle, setSortStyle] = useState('');
-  
+
     //getListShoes
     const getAll = async () => {
         try {
@@ -173,62 +184,87 @@ const Products = ({ onSelectProducts }) => {
     };
 
     //getShoesDetail
-    const [shoesDetailMapping, setShoesDetailMapping] = useState({});
-    const [selectedShoesDetails, setSelectedShoesDetails] = useState([]);
-    const [search2, setSearch2] = useState({
-        code: "",
-        sizeId: null,
-        colorId: null,
-        fromQuantity: null,
-        toQuantity: null,
-        fromPrice: null,
-        toPrice: null,
-        status: null,
-    });
-    const handleEditButtonClick = async (shoesId) => {
-        try {
-            const response = await getAllShoesDetail(shoesId, page, size, search2);
-            if (response && response.data && response.data.content) {
+    const [selectedProductId, setSelectedProductId] = useState(null);
+    const [sl, setSL] = useState(false);
+    useEffect(() => {
+        const getShoesbyId = async (id) => {
 
-                setSelectedShoesDetails(response.data.content);
-
-                const mapping = { ...shoesDetailMapping };
-                mapping[shoesId] = response.data.content.map(detail => detail.id);
-                setShoesDetailMapping(mapping);
+            try {
+                let res = await getAllShoesDetail(id, 0, 5, { colorId: idColor, sizeId: idSize });
+                if (res && res.data && res.data.content) {
+                    setshoesdetail(res.data.content[0]);
+                    setSelectedShoesDetailId(res.data.content[0].id);
+                    setSL(false);
+                }
+            } catch (error) {
+                console.error(error);
+                setshoesdetail({});
+                setSL(true);
             }
-            toggle();
+        };
 
-        } catch (error) {
-            setSelectedShoesDetails([]);
+        if (selectedProductId !== null) {
+            getShoesbyId(selectedProductId);
+        }
+    }, [selectedProductId, idColor, idSize]);
 
+    const getlistColorById = async (id) => {
+        let res = await getAllColorId(id);
+        if (res && res.data) {
+            setListColorById(res.data);
+            setIdColor(res.data[0].id);
+        }
+    }
+    const getlistSizeById = async (id) => {
+        let res = await getAllSizeId(id);
+        if (res && res.data) {
+            setListSizeById(res.data);
+            setIdSize(res.data[0].id);
+        }
+    }
+    useEffect(() => {
+        if (selectedProductId !== null) {
+            getlistColorById(selectedProductId);
+            getlistSizeById(selectedProductId);
+        }
+    }, [selectedProductId]);
+
+    const handleProductClick = (productId) => {
+        setSelectedProductId(productId);
+        toggle();
+    };
+
+    //getShoesDetail
+    const [selectedShoesDetailId, setSelectedShoesDetailId] = useState(null);
+    const [inputQuantity, setInputQuantity] = useState(1);
+    const handleConfirmation = () => {
+        if (selectedShoesDetailId !== null) {
+            if (selectedShoesDetailId) {
+                const selectedSize = listSizeById.find((size) => size.id === idSize);
+                const selectedColor = listColorById.find((color) => color.id === idColor);
+
+                if (selectedSize && selectedColor) {
+                    const confirmationData = {
+                        shoesDetailId: selectedShoesDetailId,
+                        sizeName: selectedSize.name,
+                        colorName: selectedColor.name,
+                        quantity: inputQuantity,
+                        discountPrice: shoesdetail.discountPrice,
+                        price: shoesdetail.price,
+                        code: shoesdetail.code
+                    };
+
+                    onSelectProducts(confirmationData);
+                }
+            }
         }
     };
-    const [selectedProducts, setSelectedProducts] = useState([]);
 
-    const handleProductClick = (detail) => {
-        const isProductSelected = selectedProducts.some((item) => item.id === detail.id);
-
-        if (!isProductSelected) {
-            const updatedDetail = { ...detail, quantity: 1 };
-            setSelectedProducts((prevSelectedProducts) => [...prevSelectedProducts, updatedDetail]);
-        } else {
-            const updatedProducts = selectedProducts.map((item) =>
-                item.id === detail.id ? { ...item, quantity: item.quantity + 1 } : item
-            );
-            setSelectedProducts(updatedProducts);
-        }
-
-        if (onSelectProducts) {
-            onSelectProducts(selectedProducts);
-        }
-    };
 
     const [selectedId, setSelectedId] = useState(null);
-
     const handleMouseEnter = (id) => {
         setSelectedId(id);
     };
-
     const handleMouseLeave = () => {
         setSelectedId(null);
     };
@@ -238,7 +274,7 @@ const Products = ({ onSelectProducts }) => {
         currency: "VND",
     });
 
-    // Tính toán số hàng dựa trên số cột mong muốn
+    // Tính toán cột
     const calculateRows = (items, columnsPerRow) => {
         return items.reduce((rows, item, index) => {
             const rowIndex = Math.floor(index / columnsPerRow);
@@ -295,11 +331,11 @@ const Products = ({ onSelectProducts }) => {
                                         flexDirection: "column",
                                         minHeight: "100%",
                                     }}
-                                    onClick={() => handleEditButtonClick(item.id)}
+                                    onClick={() => handleProductClick(item.id)}
                                     onMouseEnter={() => handleMouseEnter(item.id)}
                                     onMouseLeave={handleMouseLeave}
                                 >
-                                    <Card className="p-3" style={{boxShadow: "0 0 10px rgba(0, 0, 0, 0.1)" }}>
+                                    <Card className="p-3" style={{ boxShadow: "0 0 10px rgba(0, 0, 0, 0.1)" }}>
                                         <img
                                             src={`https://s3-ap-southeast-1.amazonaws.com/imageshoestore/${item.imgURI}`}
                                             alt="Ảnh mô tả"
@@ -371,6 +407,20 @@ const Products = ({ onSelectProducts }) => {
                             ))}
                     </Row>
                 ))}
+            {/* Phân trang */}
+            <Row className="col" style={{ justifyContent: "center" }}>
+                <ReactPaginate
+                    pageCount={totalPages}
+                    pageRangeDisplayed={5}
+                    marginPagesDisplayed={2}
+                    previousLabel={'<'}
+                    nextLabel={'>'}
+                    breakLabel={'...'}
+                    onPageChange={handlePageChange}
+                    containerClassName={'pagination'}
+                    activeClassName={'active'}
+                />
+            </Row>
 
 
             <Modal
@@ -384,41 +434,94 @@ const Products = ({ onSelectProducts }) => {
                     <h3 className="heading-small text-dark mb-0">Chi tiết sản phẩm</h3>
                 </ModalHeader>
                 <ModalBody>
-                    <Table bordered hover responsive>
-                        <thead className="thead-light text-center">
-                            <tr >
-                                <th scope="col" className="text-dark">STT</th>
-                                <th scope="col" className="text-dark">Mã</th>
-                                <th scope="col" className="text-dark">Màu</th>
-                                <th scope="col" className="text-dark">Size</th>
-                                <th scope="col" className="text-dark">Giá gốc</th>
-                                <th scope="col" className="text-dark">Giá khuyến mại</th>
-                                <th scope="col" className="text-dark">Số lượng</th>
-                                <th scope="col" style={{ position: "sticky", zIndex: '1', right: '0', color: "#000" }}>Thao tác</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {selectedShoesDetails.map((detail, index) => (
-                                <tr key={detail.id}>
-                                    <td>{index + 1}</td>
-                                    <td>{detail.code}</td>
-                                    <td>{detail.color}</td>
-                                    <td className="text-center">{detail.size}</td>
-                                    <td className="text-right">{detail.price} VND</td>
-                                    <td className="text-right">{detail.discountPrice} VND</td>
-                                    <td className="text-right">{detail.quantity}</td>
-                                    <td style={{ position: "sticky", zIndex: '1', right: '0', background: "#fff", textAlign: "center" }}>
-                                        <Button color="link" size="sm" onClick={() => handleProductClick(detail)}>
-                                            <FaHandHoldingMedical />
-                                        </Button>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </Table>
+
+                    <Row>
+                        <Col lg={4}>
+                        </Col>
+                        <Col lg={8}>
+
+                            <div className="mb-2 p-2" style={{ borderRadius: 5, boxShadow: "0 0 10px rgba(0, 0, 0, 0.1)" }}>
+                                {shoesdetail.discountPrice !== null && shoesdetail.discountPrice !== 0 && (
+                                    <div style={{ fontWeight: 'bold', color: 'red' }}>
+                                        Giá sale: {formatter.format(shoesdetail.discountPrice)}
+                                    </div>
+                                )}
+                                <div >
+                                    Giá gốc:
+                                    <span style={{ textDecoration: shoesdetail.discountPrice ? 'line-through' : 'none', fontWeight: "bold", marginLeft: 12 }}>
+                                        {formatter.format(shoesdetail.price)}
+                                    </span>
+
+                                </div>
+                                {shoesdetail.discountPrice !== null && shoesdetail.discountPrice !== 0 && (
+                                    <div>Tiết kiệm: {formatter.format(shoesdetail.price - shoesdetail.discountPrice)}</div>
+                                )}
+                            </div>
+
+                            <div className='row p-2'>
+                                <span className='col-3'>Màu sắc :  </span>
+                                <span className='col-9'>
+                                    {listColorById && listColorById.length > 0 &&
+                                        listColorById.map((item, index) => {
+                                            return (
+                                                <button className="ml-2"
+                                                    style={{ backgroundColor: idColor === item.id ? '#ccc' : '', border: "1px solid #ccc" }}
+                                                    onClick={() => setIdColor(item.id)}
+                                                >
+                                                    {item.name}
+                                                </button>
+                                            )
+                                        })}
+                                </span>
+                            </div>
+
+                            <div className="row p-2">
+                                <span className='col-3'>Size :  </span>
+                                <span className='col-9'>
+                                    {listSizeById && listSizeById.length > 0 &&
+                                        listSizeById.map((item, index) => {
+                                            return (
+                                                <button className="ml-2"
+                                                    style={{ backgroundColor: idSize === item.id ? '#ccc' : '', border: "1px solid #ccc" }}
+                                                    onClick={() => setIdSize(item.id)}
+                                                >
+                                                    {item.name}
+                                                </button>
+                                            )
+                                        })}
+                                </span>
+
+                            </div>
+
+
+                            <div className='row p-2'>
+                                <span className='col-3'>Số lượng :  </span>
+                                <span className='col-9 d-flex'>
+                                    <Input
+                                        className="text-center mr-2 ml-2"
+                                        type="number"
+                                        size="sm"
+                                        min={1}
+                                        style={{ width: "50px" }}
+                                        value={inputQuantity}
+                                        onChange={(e) => setInputQuantity(parseInt(e.target.value, 10) || 1)}
+                                    />
+
+                                    {sl === false
+                                        ? <span> {shoesdetail.quantity} &nbsp;sản phẩm</span>
+                                        : <span style={{ color: "red" }}>Hết hàng</span>
+                                    }
+                                </span>
+                            </div>
+                        </Col>
+                    </Row>
+
                 </ModalBody >
                 <ModalFooter>
                     <div className="text-center">
+                        <Button color="primary" outline size="sm" onClick={handleConfirmation}>
+                            Xác nhận
+                        </Button>
                         <Button color="danger" outline onClick={toggle} size="sm">
                             Đóng
                         </Button>
