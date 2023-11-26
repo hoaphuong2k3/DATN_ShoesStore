@@ -9,7 +9,7 @@ import {
     Row, Col, Button, Card, CardBody, CardHeader, Table, InputGroup, Input,
     Form, FormGroup, Label, Modal, ModalBody, ModalHeader, ModalFooter
 } from "reactstrap";
-
+import SlideShow from '../product/SlideShow.js';
 import Product from "views/admin/sells/ListProducts.js";
 
 const Order = () => {
@@ -258,7 +258,7 @@ const Order = () => {
 
         setSelectedProducts(updatedProducts);
     };
-    
+
 
     //Order
     const [deliveryData, setDeliveryData] = useState({});
@@ -416,8 +416,7 @@ const Order = () => {
                                             <tr key={detail.shoesDetailId}>
                                                 <th className="text-center">{index + 1}</th>
                                                 <td>
-
-                                                    <img
+                                                    {/* <img
                                                         src={""}
                                                         alt="Ảnh mô tả"
                                                         style={{
@@ -425,8 +424,11 @@ const Order = () => {
                                                             height: "150px",
                                                             border: "1px solid #ccc",
                                                         }}
+                                                    /> */}
+                                                    <SlideShow
+                                                        images={detail.image}
+                                                        imageSize={"80px"}
                                                     />
-
                                                 </td>
                                                 <td>
                                                     <h4>{detail.code} - </h4>
