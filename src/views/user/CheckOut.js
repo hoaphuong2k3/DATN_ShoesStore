@@ -79,7 +79,7 @@ const Checkout = () => {
       if (selectedAddressData) {
         // Nếu có, sử dụng địa chỉ từ danh sách
         deliveryAddress = {
-          address: `${selectedAddressData.addressDetail}, ${selectedAddressData.proviceCode}, ${selectedAddressData.districtCode}, ${selectedAddressData.communeCode}`,
+          address: `${selectedAddressData.addressDetail}, ${selectedAddressData.communeCode},${selectedAddressData.districtCode}, ${selectedAddressData.proviceCode} `,
         };
       }
     } else {
@@ -88,7 +88,7 @@ const Checkout = () => {
       if (newAddress) {
         // Nếu có địa chỉ mới, sử dụng địa chỉ mới
         deliveryAddress = {
-          address: `${newAddress.addressDetail}, ${newAddress.proviceCode}, ${newAddress.districtCode}, ${newAddress.communeCode}`,
+          address: `${newAddress.addressDetail}, ${newAddress.communeCode}, ${newAddress.districtCode}, ,${newAddress.proviceCode}`,
         };
       } else {
         // Người dùng đã hủy thêm địa chỉ, không thể tiếp tục đặt hàng
