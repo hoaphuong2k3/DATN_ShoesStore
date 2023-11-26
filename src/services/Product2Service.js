@@ -1,7 +1,11 @@
 import axios from 'services/custommize-axios.js';
 
-const getAllShoes = (page, size, search,sort,sortStyle) => {
+const getAllShoes = (page, size, search, sort, sortStyle) => {
   return axios.post(`/admin/shoes/search?page=${page}&size=${size}&sort=${sort},${sortStyle}`, search)
+}
+const getAllShoesUser = (page, size,search) => {
+  return axios.post(`/user/shoes/search?page=${page}&size=${size}`, search)
+
 }
 
 const postNewShoes = (shoes) => {
@@ -26,4 +30,4 @@ const updateShoes = (id, shoes) => {
 const deleteShoes = (id) => {
   return axios.delete('/admin/shoes/delete', id)
 }
-export { getAllShoes, postNewShoes, findShoes, updateShoes, deleteShoes };
+export { getAllShoes, postNewShoes, findShoes, updateShoes, deleteShoes,getAllShoesUser };
