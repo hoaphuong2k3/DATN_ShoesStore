@@ -92,15 +92,11 @@ const ListShoesDetail = () => {
     const getAll = async () => {
         try {
             let res = await getAllShoesDetail(id, page, size, search);
+            console.log("res6:", res);
             if (res && res.data && res.data.content) {
                 setListShoesDetail(res.data.content);
-                console.log(res);
                 setTotalElenments(res.data.totalElements);
                 setTotalPages(res.data.totalPages);
-                // setListShoes
-                // setTotalUsers(res.total);
-                // setTotalPages(res.total_pages);
-                // setlistUsers(res.data);
             }
         } catch (error) {
             setListShoesDetail([]);
@@ -532,6 +528,9 @@ const ListShoesDetail = () => {
             setSelectedImages([]);
         }
     }, [modalEdit]);
+    useEffect(() => {
+        console.log(addone);
+    }, [addone]);
     const [addone, setAddOne] = useState({
         id: "",
         sizeId: "",
@@ -550,20 +549,70 @@ const ListShoesDetail = () => {
             status: "1"
         })
     }
-    const saveAdd = async () => {
-        try {
-            await axios.post(`http://localhost:33321/api/admin/shoesdetail/${id}`, {
-                'shoesDetailCreateRequests': [{
-                    sizeId: addone.sizeId,
-                    colorId: addone.colorId,
-                    quantity: addone.quantity,
-                    price: addone.price,
-                    status: addone.status
-                }]
+    const handleAddFileImage = (e) => {
+        const selectedFile = e.target.files[0];
+        let randomId;
+        do {
+            // Tạo một ID ngẫu nhiên
+            randomId = `id_${Math.random().toString(36).substr(2, 9)}_${Date.now()}`;
+            // Kiểm tra xem ID đã tồn tại trong mảng chưa
+        } while (selectedImages.some((image) => image.id === randomId));
+        if (selectedFile) {
+            setSelectedImages([...selectedImages, {
+                file: selectedFile,
+                url: URL.createObjectURL(selectedFile),
+                i: null,
+                id: randomId
+            }]);
+        }
+    };
+    const handleAddFileImage2 = (e, id) => {
+        const selectedFile = e.target.files[0];
+        if (selectedFile) {
+            const updatedArray = selectedImages.map(item => {
+                if (item && item.id === id) {
+                    return {
+                        ...item, file: selectedFile, url: URL.createObjectURL(selectedFile)
+                    };
+                }
+                return item;
             });
-            toggle();
-            getAll();
-            toast.success("Thêm thành công!");
+            setSelectedImages(updatedArray);
+        }
+    };
+    const handleAddFileImage3 = (id) => {
+        const newArr = selectedImages.filter(item => item.id !== id);
+        setSelectedImages(newArr);
+    };
+    const saveAdd = async () => {
+        const formData1 = new FormData();
+        try {
+            if (addone.colorId) {
+                if (selectedImages.length >= 3) {
+                    selectedImages.map((item, index) => {
+                        const newName = generateNewFileName(item.file.name, addone.colorId);
+                        const modifiedFile = new File([item.file], newName, { type: item.file.type });
+                        formData1.append(`files[${index}]`, modifiedFile);
+                    })
+                    const shoesDataJson = JSON.stringify([{
+                        sizeId: addone.sizeId,
+                        colorId: addone.colorId,
+                        quantity: addone.quantity,
+                        price: addone.price,
+                        status: addone.status
+                    }]);
+                    formData1.append('data', shoesDataJson);
+                    await axios.post(`http://localhost:33321/api/admin/shoesdetail/${id}`, formData1);
+                    toggle();
+                    getAll();
+                    toast.success("Thêm thành công!");
+
+                } else {
+                    toast.error("Phải tải lên ít nhất 3 ảnh");
+                }
+            } else {
+                toast.error("Màu không được để trống");
+            }
         } catch (error) {
             let errorMessage = "Lỗi từ máy chủ";
             if (error.response && error.response.data && error.response.data.message) {
@@ -584,19 +633,26 @@ const ListShoesDetail = () => {
                 price: res.data.data.price,
                 status: res.data.data.status
             })
-            const res1 = await getAllImage(id);
-            console.log("res1:", res1.data);
-            if (res1 && res1.data) {
-                const updatedArray = res1.data.map(item => {
-                    return {
-                        ...item,
-                        url: `https://s3-ap-southeast-1.amazonaws.com/imageshoestore/${item.imgURI}`,
-                        id: item.id
-                    };
-                });
-                setSelectedImages(updatedArray);
+            try {
+                const res1 = await getAllImage(id);
+                console.log("res1:", res1.data);
+                if (res1 && res1.data) {
+                    const updatedArray = res1.data.map(item => {
+                        return {
+                            ...item,
+                            url: `https://s3-ap-southeast-1.amazonaws.com/imageshoestore/${item.imgURI}`,
+                            id: item.id
+                        };
+                    });
+                    setSelectedImages(updatedArray);
+                }
+                toggleEdit();
+
+            } catch (eror) {
+                console.log(eror);
+                toggleEdit();
             }
-            toggleEdit();
+
         } catch (error) {
             let errorMessage = "Lỗi từ máy chủ";
             if (error.response && error.response.data && error.response.data.message) {
@@ -681,15 +737,19 @@ const ListShoesDetail = () => {
     }
     const saveEdit = async () => {
         try {
-            await axios.put(`http://localhost:33321/api/admin/shoesdetail/${addone.id}`, {
-                sizeId: addone.sizeId,
-                colorId: addone.colorId,
-                quantity: addone.quantity,
-                price: addone.price
-            });
-            toggleEdit();
-            getAll();
-            toast.success("Cập nhật thành công!");
+            if (selectedImages.length >= 3) {
+                await axios.put(`http://localhost:33321/api/admin/shoesdetail/${addone.id}`, {
+                    sizeId: addone.sizeId,
+                    colorId: addone.colorId,
+                    quantity: addone.quantity,
+                    price: addone.price
+                });
+                toggleEdit();
+                getAll();
+                toast.success("Cập nhật thành công!");
+            } else {
+                toast.error("Phải tải lên ít nhất 3 ảnh");
+            }
         } catch (error) {
             let errorMessage = "Lỗi từ máy chủ";
             if (error.response && error.response.data && error.response.data.message) {
@@ -1072,7 +1132,7 @@ const ListShoesDetail = () => {
                                                         </th>
                                                         <th>STT</th>
                                                         <th>Trạng thái</th>
-                                                        <th></th>
+                                                        <th>Ảnh</th>
                                                         <th>Mã</th>
                                                         <th>Màu</th>
                                                         <th>Size</th>
@@ -1098,45 +1158,45 @@ const ListShoesDetail = () => {
                                                                         <FormGroup check className="pb-4">
                                                                             <Input
                                                                                 type="checkbox"
-                                                                                checked={selectedItems.includes(item.id)}
-                                                                                onChange={() => handleCheckboxChange(item.id)}
+                                                                                checked={selectedItems.includes(item.shoesDetailSearchResponse.id)}
+                                                                                onChange={() => handleCheckboxChange(item.shoesDetailSearchResponse.id)}
                                                                             />
 
                                                                         </FormGroup>
                                                                     </td>
                                                                     <th scope="row"> {index + 1}</th>
                                                                     <td>
-                                                                        <Badge color={statusMapping[item.status]?.color || statusMapping.default.color}>
-                                                                            {statusMapping[item.status]?.label || statusMapping.default.label}
+                                                                        <Badge color={statusMapping[item.shoesDetailSearchResponse.status]?.color || statusMapping.default.color}>
+                                                                            {statusMapping[item.shoesDetailSearchResponse.status]?.label || statusMapping.default.label}
                                                                         </Badge>
                                                                     </td>
                                                                     <td>
-                                                                        {/* <SlideShow images={item.images} /> */}
+                                                                        <SlideShow images={item.imageDTOS} />
                                                                     </td>
-                                                                    <td>{item.code}</td>
-                                                                    <td>{item.color}</td>
-                                                                    <td>{item.size}</td>
-                                                                    <td>{item.quantity}</td>
-                                                                    <td>{formatter.format(item.price)}</td>
-                                                                    <td>{formatter.format(item.discountPrice)}</td>
+                                                                    <td>{item.shoesDetailSearchResponse.code}</td>
+                                                                    <td>{item.shoesDetailSearchResponse.color}</td>
+                                                                    <td>{item.shoesDetailSearchResponse.size}</td>
+                                                                    <td>{item.shoesDetailSearchResponse.quantity}</td>
+                                                                    <td>{formatter.format(item.shoesDetailSearchResponse.price)}</td>
+                                                                    <td>{formatter.format(item.shoesDetailSearchResponse.discountPrice)}</td>
                                                                     <td style={{ position: "sticky", zIndex: '1', right: '0', background: "#fff" }}>
                                                                         {/* <Button color="danger" to={`/admin/product/edit/${item.id}`} tag={Link} size="sm" disabled={item.status === 0 ? true : false}>
                                                                         <i class="fa-solid fa-pen" />
                                                                     </Button> */}
-                                                                        <Button color="link" size="sm" disabled={item.status === 0 ? true : false} onClick={() => openEdit(item.id)}>
+                                                                        <Button color="link" size="sm" disabled={item.shoesDetailSearchResponse.status === 0 ? true : false} onClick={() => openEdit(item.shoesDetailSearchResponse.id)}>
                                                                             <FaEdit color="primary" />
                                                                         </Button>
                                                                         {item.status === 0 &&
-                                                                            <Button color="link" size="sm" onClick={() => openlock(item.id)}>
+                                                                            <Button color="link" size="sm" onClick={() => openlock(item.shoesDetailSearchResponse.id)}>
                                                                                 <FaLockOpen color="primary" />
                                                                             </Button>
                                                                         }
                                                                         {(item.status === 1 || item.status === 2) &&
-                                                                            <Button color="link" size="sm" onClick={() => lock(item.id)} >
+                                                                            <Button color="link" size="sm" onClick={() => lock(item.shoesDetailSearchResponse.id)} >
                                                                                 <FaLock color="primary" />
                                                                             </Button>
                                                                         }
-                                                                        <Button color="link" size="sm" onClick={() => handleConfirmDelete(item)}>
+                                                                        <Button color="link" size="sm" onClick={() => handleConfirmDelete(item.shoesDetailSearchResponse)}>
                                                                             <FaTrash color="primary" />
                                                                         </Button>
                                                                     </td>
@@ -1360,7 +1420,7 @@ const ListShoesDetail = () => {
                                                                 ))}
                                                             </Table >
 
-                                                            <tr className="text-center ml--4">
+                                                            <Col>
                                                                 <div className="d-flex justify-content-center">
                                                                     {selectedImages.length > 0 && selectedImages.filter((itemA) => itemA.i === itemColor.id).map((itemA, x) => (
                                                                         <div className="mr-4"
@@ -1420,7 +1480,7 @@ const ListShoesDetail = () => {
                                                                         </div>
                                                                     }
                                                                 </div>
-                                                            </tr>
+                                                            </Col>
                                                         </>
                                                     ))}
 
@@ -1565,6 +1625,68 @@ const ListShoesDetail = () => {
                                             </option>
                                         </Input>
                                     </FormGroup>
+                                </Col>
+                                <Col lg="12">
+                                    <div className="d-flex justify-content-center">
+                                        {selectedImages.length > 0 && selectedImages.map((itemA, x) => (
+                                            <div className="mr-4"
+                                                key={itemA.id}
+                                                style={{
+                                                    position: "relative",
+                                                    width: imageSize,
+                                                    height: imageSize,
+                                                }}
+                                            >
+                                                <img
+                                                    alt="preview"
+                                                    src={itemA.url}
+                                                    style={imageStyle}
+                                                />
+                                                <Input
+                                                    type="file"
+                                                    id={`image_${x}`}
+                                                    style={{ display: "none" }}
+                                                    onChange={(e) => { handleAddFileImage2(e, itemA.id) }}
+                                                />
+                                                <Label htmlFor={`image_${x}`} style={buttonStyle}>
+                                                    +
+                                                </Label>
+                                                <div style={deleteIconStyle} >
+                                                    <span role="img" aria-label="Delete" style={{ fontSize: "15px" }} onClick={() => handleAddFileImage3(itemA.id)}>
+                                                        <FaTrash color="red" />
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        ))}
+                                        {selectedImages.length < 5 &&
+                                            <div
+                                                style={{
+                                                    position: "relative",
+                                                    width: imageSize,
+                                                    height: imageSize,
+                                                }}
+                                            >
+                                                {imageUrl && (
+                                                    <img
+                                                        alt="preview"
+                                                        src={imageUrl}
+                                                        style={imageStyle}
+                                                    />
+                                                )}
+                                                <Input
+                                                    type="file"
+                                                    id={`image`}
+                                                    style={{ display: "none" }}
+                                                    onChange={(e) => { handleAddFileImage(e) }}
+                                                />
+                                                {/* // */}
+                                                <Label htmlFor={`image`} style={buttonStyle}>
+                                                    +
+                                                </Label>
+                                            </div>
+                                        }
+                                    </div>
+
                                 </Col>
 
                             </Row>
