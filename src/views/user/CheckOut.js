@@ -21,6 +21,7 @@ import Header from "components/Headers/ProductHeader";
 import Select from "react-select";
 import axiosInstance from "services/custommize-axios";
 import axios from "axios";
+import { toast } from "react-toastify";
 import "assets/css/checkout.css";
 
 const Checkout = () => {
@@ -66,17 +67,40 @@ const Checkout = () => {
       alert("Vui lòng chọn phương thức thanh toán");
       return;
     }
-    if (!selectedAddress) {
-      alert("Vui lòng chọn địa chỉ");
-      return;
+
+    let deliveryAddress = {};
+
+    // Kiểm tra xem có địa chỉ được chọn từ danh sách không
+    if (selectedAddress) {
+      const selectedAddressData = listAddress.find(
+        (address) => address.addressDetail === selectedAddress
+      );
+
+      if (selectedAddressData) {
+        // Nếu có, sử dụng địa chỉ từ danh sách
+        deliveryAddress = {
+          address: `${selectedAddressData.addressDetail}, ${selectedAddressData.communeCode},${selectedAddressData.districtCode}, ${selectedAddressData.proviceCode} `,
+        };
+      }
+    } else {
+      // Nếu không có địa chỉ, hiển thị modal để thêm địa chỉ mới
+      const newAddress = await toggleAddAdress();
+      if (newAddress) {
+        // Nếu có địa chỉ mới, sử dụng địa chỉ mới
+        deliveryAddress = {
+          address: `${newAddress.addressDetail}, ${newAddress.communeCode}, ${newAddress.districtCode}, ,${newAddress.proviceCode}`,
+        };
+      } else {
+        // Người dùng đã hủy thêm địa chỉ, không thể tiếp tục đặt hàng
+        return;
+      }
     }
-    const selectedAddressData = listAddress.find(
-      (address) => address.addressDetail === selectedAddress
-    );
 
     try {
-      const recipientName = document.getElementById('recipientName')?.value || '';
-      const recipientPhone = document.getElementById('recipientPhone')?.value || '';
+      const recipientName =
+        document.getElementById("recipientName")?.value || "";
+      const recipientPhone =
+        document.getElementById("recipientPhone")?.value || "";
       const data = {
         idAccount: storedUserId,
         idDisCount: null,
@@ -84,7 +108,7 @@ const Checkout = () => {
         paymentMethod: selectedPaymentMethod,
         totalMoney: totalMoney,
         deliveryOrderDTO: {
-          address: selectedAddressData,
+          address: deliveryAddress.address, // Sử dụng chuỗi địa chỉ
           recipientName: recipientName,
           recipientPhone: recipientPhone,
           deliveryCost: shippingTotal,
@@ -92,13 +116,13 @@ const Checkout = () => {
       };
       const response = await axiosInstance.post("/order/create", data);
       alert("Đặt hàng thành công");
-      // Thực hiện các xử lý sau khi tạo hóa đơn thành công (nếu cần)
       window.location.href = "/shoes/home";
     } catch (error) {
       console.error("Lỗi trong quá trình tạo hóa đơn:", error);
-      // Xử lý lỗi (nếu cần)
     }
   };
+
+  // ADDRESS
 
   const [listAddress, setListAddress] = useState([]);
   const getAllAddress = async () => {
@@ -116,7 +140,7 @@ const Checkout = () => {
       getAllAddress();
     }
   }, []);
-  // ADDRESS
+
   const [provinces, setProvinces] = useState([]);
   const [districts, setDistricts] = useState([]);
   const [communes, setCommunes] = useState([]);
@@ -181,9 +205,17 @@ const Checkout = () => {
     }
   };
 
-  // END ADDRESS
+  const [modalAddAdress, setModalAddAdress] = useState(false);
+  const toggleAddAdress = () => setModalAddAdress(!modalAddAdress);
+
+  useEffect(() => {
+    if (modalAddAdress === false) {
+      resetFormData();
+    }
+    console.log("modalAddAdress:", modalAddAdress);
+  }, [modalAddAdress]);
+
   const [formData, setFormData] = useState({
-    id: null,
     proviceCode: null,
     districtCode: null,
     communeCode: null,
@@ -194,62 +226,75 @@ const Checkout = () => {
     console.log("check", formData);
   }, [formData]);
 
-  const [selectedAddress, setSelectedAddress] = useState("");
-  const handleAddressChange = (selectedAddress) => {
-    // Tìm địa chỉ trong danh sách địa chỉ dựa trên addressDetail
-    const selectedAddressData = listAddress.find(
-      (address) => address.addressDetail === selectedAddress
-    );
-    if (selectedAddressData) {
-      handleProvinceChange(selectedAddressData.proviceCode);
-      handleDistrictChange(selectedAddressData.districtCode);
-      // Cập nhật giá trị proviceCode, districtCode và communeCode trong formData
-      setFormData({
-        ...formData,
-        proviceCode: selectedAddressData.proviceCode,
-        districtCode: selectedAddressData.districtCode,
-        communeCode: selectedAddressData.communeCode,
-        addressDetail: selectedAddressData.addressDetail,
+  const saveAddress = async () => {
+    try {
+      await axiosInstance.post("http://localhost:33321/api/address/create", {
+        proviceCode: formData.proviceCode,
+        districtCode: formData.districtCode,
+        communeCode: formData.communeCode,
+        addressDetail: formData.addressDetail,
+        idClient: storedUserId,
       });
-      // handleApiCall();
-    } else {
-      // Nếu danh sách địa chỉ rỗng, reset các combobox tỉnh thành, quận huyện
-      resetFormData();
+      getAllAddress();
+      toast.success("Thêm mới địa chỉ thành công!");
 
+      // Đóng modal và reset form
+      toggleAddAdress();
+      resetFormData();
+    } catch (error) {
+      // Xử lý lỗi
+      console.error("Error:", error);
+      if (error.response) {
+        console.error("Response data:", error.response.data);
+        toast.error(error.response.data.message);
+      } else {
+        toast.error("Đã có lỗi xảy ra.");
+      }
     }
   };
+  // END ADDRESS
 
   const resetFormData = () => {
     setFormData({
       ...formData,
-      id: null,
       proviceCode: "",
       districtCode: "",
       communeCode: "",
-      addressDetail: ""
+      addressDetail: "",
     });
-  }
+  };
   const [shippingTotal, setShippingTotal] = useState(0);
+  const [selectedAddress, setSelectedAddress] = useState("");
 
-  const handleApiCall = async () => {
+  const handleApiCall = async (selectedAddress) => {
+    // Nếu không có địa chỉ được chọn, set phí vận chuyển về 0 và kết thúc hàm
+    if (!selectedAddress) {
+      setShippingTotal(0);
+      return;
+    }
 
-    // if (!selectedAddress) {
-    //   setShippingTotal(0);
-    //   return;
-    // }
+    const selectedAddressData = listAddress.find(
+      (address) => address.addressDetail === selectedAddress
+    );
 
-    const servicesUrl = 'https://online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/available-services';
+    // Nếu không tìm thấy địa chỉ trong danh sách, kết thúc hàm
+    if (!selectedAddressData) {
+      return;
+    }
+
+    const servicesUrl =
+      "https://online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/available-services";
     const servicesPayload = {
-      shop_id: '4580194',
+      shop_id: "4580194",
       from_district: 3440,
-      to_district: formData.districtCode,
+      to_district: selectedAddressData.districtCode,
     };
 
     try {
       const servicesResponse = await axios.get(servicesUrl, {
         headers: {
-          'Content-Type': 'application/json',
-          'token': '44022259-5cfb-11ee-96dc-de6f804954c9'
+          "Content-Type": "application/json",
+          token: "44022259-5cfb-11ee-96dc-de6f804954c9",
         },
         params: servicesPayload,
       });
@@ -257,35 +302,40 @@ const Checkout = () => {
       const servicesData = servicesResponse.data;
       console.log(servicesData);
 
-      const selectedService = servicesData.data.find(service => service.service_type_id === 2);
+      const selectedService = servicesData.data.find(
+        (service) => service.service_type_id === 2
+      );
 
       if (selectedService) {
         const serviceId = selectedService.service_id;
-        console.log("DV", serviceId);
-        const response = await axios.get('https://online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/fee', {
-          headers: {
-            'token': '44022259-5cfb-11ee-96dc-de6f804954c9',
-            'shop_id': '4580194',
-            'Content-Type': 'application/json'
-          },
-          params: {
-            service_id: serviceId,
-            insurance_value: 500000,
-            coupon: null,
-            from_district_id: 3440,
-            to_district_id: formData.districtCode,
-            to_ward_code: formData.communeCode,
-            height: 15,
-            length: 15,
-            weight: 2000,
-            width: 15
+        console.log(serviceId);
+        const response = await axios.get(
+          "https://online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/fee",
+          {
+            headers: {
+              token: "44022259-5cfb-11ee-96dc-de6f804954c9",
+              shop_id: "4580194",
+              "Content-Type": "application/json",
+            },
+            params: {
+              service_id: serviceId,
+              insurance_value: 500000,
+              coupon: null,
+              from_district_id: 3440,
+              to_district_id: selectedAddressData.districtCode,
+              to_ward_code: selectedAddressData.communeCode,
+              height: 15,
+              length: 15,
+              weight: 2000,
+              width: 15,
+            },
           }
-        });
-        console.log(response.data.data.total);
+        );
+
         setShippingTotal(response.data.data.total);
       }
     } catch (error) {
-      console.error('Lỗi trong quá trình gọi API:', error);
+      console.error("Lỗi trong quá trình gọi API:", error);
     }
   };
 
@@ -363,26 +413,40 @@ const Checkout = () => {
                             {/* List address */}
                             <Col lg="12">
                               <FormGroup>
-                                <Input
-                                  className="form-control-alternative"
-                                  type="select"
-                                  value={selectedAddress}
-                                  onChange={(e) => {
-                                    setSelectedAddress(e.target.value);
-                                    handleAddressChange(e.target.value); // Gọi hàm xử lý khi địa chỉ thay đổi
-                                    handleApiCall();
-                                  }}
-                                >
-                                  <option value="">Chọn địa chỉ</option>
-                                  {listAddress.map((address, index) => (
-                                    <option
-                                      // key={index}
-                                      value={address.addressDetail}
-                                    >
-                                      {`${address.addressDetail} - ${address.address}`}
-                                    </option>
-                                  ))}
-                                </Input>
+                                <div className="d-flex align-items-center">
+                                  <Input
+                                    className="form-control-alternative"
+                                    type="select"
+                                    value={selectedAddress}
+                                    onChange={(e) => {
+                                      setSelectedAddress(e.target.value);
+                                      handleApiCall(e.target.value);
+                                    }}
+                                  >
+                                    <option value="">Chọn địa chỉ</option>
+                                    {listAddress &&
+                                      listAddress.length > 0 &&
+                                      listAddress.map((address, index) => (
+                                        <option
+                                          key={index}
+                                          value={
+                                            address.address &&
+                                            address.addressDetail
+                                          }
+                                        >
+                                          {`${address.addressDetail}, ${address.address}`}
+                                        </option>
+                                      ))}
+                                  </Input>
+                                  <Button
+                                    color="primary"
+                                    onClick={toggleAddAdress}
+                                    outline
+                                    size="sm"
+                                  >
+                                    Thêm địa chỉ
+                                  </Button>
+                                </div>
                               </FormGroup>
                             </Col>
 
@@ -407,105 +471,6 @@ const Checkout = () => {
                                 placeholder="Điện thoại"
                               />
                             </div>
-
-                            {/* Tỉnh thành */}
-                            <Col lg="4">
-                              <FormGroup>
-                                <Input
-                                  className="form-control-alternative"
-                                  type="select"
-                                  value={formData.proviceCode}
-                                  onChange={(e) =>
-                                    handleProvinceChange(e.target.value)
-
-                                  }
-                                >
-                                  <option value="">Chọn Tỉnh / Thành</option>
-                                  {provinces.map((province) => (
-                                    <option
-                                      key={province.ProvinceID}
-                                      value={province.ProvinceID}
-                                    >
-                                      {province.ProvinceName}
-                                    </option>
-                                  ))}
-                                </Input>
-                              </FormGroup>
-                            </Col>
-
-                            {/* Quận huyện */}
-                            <Col lg="4">
-                              <FormGroup>
-                                <Input
-                                  className="form-control-alternative"
-                                  type="select"
-                                  value={formData.districtCode}
-                                  onChange={(e) =>
-                                    handleDistrictChange(e.target.value)
-                                  }
-                                  disabled={!formData.proviceCode}
-                                >
-                                  <option value="">Chọn Quận / Huyện</option>
-                                  {districts.map((district) => (
-                                    <option
-                                      key={district.DistrictID}
-                                      value={district.DistrictID}
-                                    >
-                                      {district.DistrictName}
-                                    </option>
-                                  ))}
-                                </Input>
-                              </FormGroup>
-                            </Col>
-
-                            {/* Phường xã */}
-                            <Col lg="4">
-                              <FormGroup>
-                                <Input
-                                  className="form-control-alternative"
-                                  type="select"
-                                  value={formData.communeCode}
-                                  onChange={(e) => {
-                                    setFormData({
-                                      ...formData,
-                                      communeCode: e.target.value,
-                                    })
-                                    handleApiCall();
-                                  }
-
-                                  }
-                                  disabled={!formData.districtCode}
-                                >
-                                  <option value="">Chọn Phường / Xã</option>
-                                  {communes.map((commune) => (
-                                    <option
-                                      key={commune.WardCode}
-                                      value={commune.WardCode}
-                                    >
-                                      {commune.WardName}
-                                    </option>
-                                  ))}
-                                </Input>
-                              </FormGroup>
-                            </Col>
-
-                            {/* Địa chỉ */}
-                            <Col lg="12">
-                              <FormGroup>
-                                <Input
-                                  placeholder="Địa chỉ"
-                                  className="form-control-alternative"
-                                  type="textarea"
-                                  value={formData.addressDetail}
-                                  onChange={(e) =>
-                                    setFormData({
-                                      ...formData,
-                                      addressDetail: e.target.value,
-                                    })
-                                  }
-                                />
-                              </FormGroup>
-                            </Col>
                           </div>
                         </Form>
                       </div>
@@ -580,6 +545,7 @@ const Checkout = () => {
                             >
                               {formatter.format(shippingTotal)}
                             </span>
+
                             <br />
                           </div>
                           <hr />
@@ -675,6 +641,141 @@ const Checkout = () => {
           </Button>
         </ModalFooter>
       </Modal>
+
+      {/* Modal Thêm Địa chỉ */}
+      <Modal
+        isOpen={modalAddAdress}
+        toggle={toggleAddAdress}
+        backdrop={"static"}
+        keyboard={false}
+        style={{ maxWidth: "500px" }}
+      >
+        <ModalHeader toggle={toggleAddAdress}>
+          <h3 className="heading-small text-muted mb-0">Thêm Mới Địa chỉ</h3>
+        </ModalHeader>
+        <ModalBody>
+          <Form>
+            <div className="pl-lg-4">
+              <Row>
+                <Col lg="12">
+                  <FormGroup>
+                    <label className="form-control-label">
+                      Chi tiết địa chỉ
+                    </label>
+                    <Input
+                      className="form-control-alternative"
+                      type="textarea"
+                      value={formData.addressDetail}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          addressDetail: e.target.value,
+                        })
+                      }
+                    />
+                  </FormGroup>
+                </Col>
+                <Col lg="6">
+                  <FormGroup>
+                    <label className="form-control-label" htmlFor="input-city">
+                      Tỉnh / Thành
+                    </label>
+                    <Input
+                      className="form-control-alternative"
+                      type="select"
+                      value={formData.proviceCode}
+                      onChange={(e) => handleProvinceChange(e.target.value)}
+                    >
+                      <option value="">Chọn Tỉnh / Thành</option>
+                      {provinces.map((province) => (
+                        <option
+                          key={province.ProvinceID}
+                          value={province.ProvinceID}
+                        >
+                          {province.ProvinceName}
+                        </option>
+                      ))}
+                    </Input>
+                  </FormGroup>
+                </Col>
+                <Col lg="6">
+                  <FormGroup>
+                    <label
+                      className="form-control-label"
+                      htmlFor="input-country"
+                    >
+                      Quận / Huyện
+                    </label>
+                    <Input
+                      className="form-control-alternative"
+                      type="select"
+                      value={formData.districtCode}
+                      onChange={(e) => handleDistrictChange(e.target.value)}
+                      disabled={!formData.proviceCode}
+                    >
+                      <option value="">Chọn Quận / Huyện</option>
+                      {districts.map((district) => (
+                        <option
+                          key={district.DistrictID}
+                          value={district.DistrictID}
+                        >
+                          {district.DistrictName}
+                        </option>
+                      ))}
+                    </Input>
+                  </FormGroup>
+                </Col>
+                <Col lg="6">
+                  <FormGroup>
+                    <label className="form-control-label">Phường / Xã</label>
+                    <Input
+                      className="form-control-alternative"
+                      type="select"
+                      value={formData.communeCode}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          communeCode: e.target.value,
+                        })
+                      }
+                      disabled={!formData.districtCode}
+                    >
+                      <option value="">Chọn Phường / Xã</option>
+                      {communes.map((commune) => (
+                        <option key={commune.WardCode} value={commune.WardCode}>
+                          {commune.WardName}
+                        </option>
+                      ))}
+                    </Input>
+                  </FormGroup>
+                </Col>
+              </Row>
+            </div>
+          </Form>
+        </ModalBody>
+        <ModalFooter>
+          <div className="text-center">
+            <Button
+              name="checkout"
+              onClick={(e) => saveAddress(e)}
+              className="evo-button mobile-viewmore"
+            >
+              <strong>Thêm mới</strong>
+            </Button>{" "}
+            {formData.id ? (
+              ""
+            ) : (
+              <Button className="evo-button mobile-viewmore" name="checkout" onClick={resetFormData}>
+                Reset
+              </Button>
+            )}
+            <Button className="evo-button mobile-viewmore" name="checkout" onClick={toggleAddAdress}>
+              Close
+            </Button>
+          </div>
+        </ModalFooter>
+      </Modal>
+      {/* Kết thúc thêm modal địa chỉ */}
     </>
   );
 };

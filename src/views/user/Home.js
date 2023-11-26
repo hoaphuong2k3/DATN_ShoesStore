@@ -18,7 +18,7 @@ import giay from "assets/img/theme/gia-da-nam-ca-tinh.jpg";
 import giay1 from "assets/img/theme/giay-da-nam-hai-phong-2-1.jpg";
 import slideshow2 from "assets/img/theme/slideshow3.jpg";
 
-import { getAllShoes } from "services/Product2Service";
+import { getAllShoesUser } from "services/Product2Service";
 
 const Home = () => {
   const formatter = new Intl.NumberFormat("vi-VN", {
@@ -64,7 +64,7 @@ const Home = () => {
 
   const getListShoes = async (page, size) => {
     try {
-      let res = await getAllShoes(page, size, search, "", "");
+      let res = await getAllShoesUser(page, size, search);
       if (res && res.data && res.data.content) {
         setProducts(res.data.content);
         console.log(res.data);

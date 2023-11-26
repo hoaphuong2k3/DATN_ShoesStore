@@ -13,6 +13,7 @@ import {
 } from "reactstrap";
 import { Link } from "react-router-dom";
 import { useHistory } from "react-router-dom";
+import { ToastContainer, toast } from "react-toastify";
 import Header from "components/Headers/Header";
 // import { CartContext } from "contexts/Cart.js";
 import "assets/css/cart.css";
@@ -36,14 +37,14 @@ const Cart = () => {
       );
       const data = await response.json();
       setCartData(data.content);
-  
+
       console.log(storedUserId);
       console.log(data.content);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
   };
-  
+
   useEffect(() => {
     fetchData();
   }, [storedUserId, page, size]);
@@ -68,6 +69,14 @@ const Cart = () => {
 
   // update quantity
   const handleQuantityChange = async (idAccount, idShoes, quantity) => {
+    if (quantity < 1) {
+      toast.error("Vui lòng chọn số lượng tối thiểu là 1");
+      return;
+    }
+    if (quantity > 15) {
+      toast.error("Số lượng tối đa là 15");
+      return;
+    }
     try {
       const response = await fetch(`http://localhost:33321/api/cart/update`, {
         method: "PUT",
@@ -105,6 +114,7 @@ const Cart = () => {
       if (prevSelectedItems.includes(id)) {
         // Nếu đã chọn, loại bỏ khỏi danh sách
         const updatedItems = prevSelectedItems.filter((item) => item !== id);
+        setSelectAll(true);
         return updatedItems;
       } else {
         // Nếu chưa chọn, thêm vào danh sách
@@ -113,6 +123,28 @@ const Cart = () => {
       }
     });
   };
+  const [selectAll, setSelectAll] = useState(false);
+  const handleSelectAllChange = () => {
+    setSelectAll(!selectAll);
+
+    if (!selectAll) {
+      // Nếu chưa chọn, chọn tất cả
+      const allItemIds = cartData.map((item) => item.id);
+      setSelectedItems(allItemIds);
+    } else {
+      // Nếu đã chọn, bỏ chọn tất cả
+      setSelectedItems([]);
+    }
+  };
+
+  useEffect(() => {
+    if (cartData) {
+      const selectedIds = cartData.map((item) => item.id);
+      const allItemsSelected = selectedIds.length > 0 && selectedIds.length === selectedItems.length;
+  
+      setSelectAll(allItemsSelected);
+    }
+  }, [cartData, selectedItems]);
 
   const calculateTotalPrice = () => {
     let total = 0;
@@ -125,7 +157,7 @@ const Cart = () => {
     return total;
   };
 
-  const [isCheckoutError, setIsCheckoutError] = useState(false);
+  const [isCheckoutError, setIsCheckoutError] = useState(true );
 
   // checkout
   const handleCheckout = async () => {
@@ -193,6 +225,18 @@ const Cart = () => {
                         <Table className="cart-table full table--responsive">
                           <tbody>
                             <div className="cart-item">
+                              <div className="row">
+                                <div className="col-3">
+                                  <Input
+                                    type="checkbox"
+                                    className="checkbox_input_1 mb-5"
+                                    checked={selectAll}
+                                    onChange={handleSelectAllChange}
+                                  />
+                                  {/* ... */}
+                                </div>
+                                {/* ... */}
+                              </div>
                               {(cartData || []).map((item, index) => (
                                 <div key={index} className="row">
                                   <div className="col-3 img">
@@ -215,7 +259,7 @@ const Cart = () => {
                                             float: "right",
                                             marginRight: "6px",
                                             marginTop: "20px",
-                                            borderRadius: "20%"
+                                            borderRadius: "20%",
                                           }}
                                           width={"60%"}
                                           // height={"90px"}

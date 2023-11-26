@@ -249,7 +249,8 @@ const Products = ({ onSelectProducts }) => {
                         quantity: inputQuantity,
                         discountPrice: shoesdetail.shoesDetailSearchResponse.discountPrice,
                         price: shoesdetail.shoesDetailSearchResponse.price,
-                        code: shoesdetail.shoesDetailSearchResponse.code
+                        code: shoesdetail.shoesDetailSearchResponse.code,
+                        image: shoesdetail.imageDTOS
                     };
                     console.log(confirmationData.price);
 
