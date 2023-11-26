@@ -6,7 +6,10 @@
   transform: scale(1.4);
   margin-top: 10px;
 }
-
+.checkbox_input_1 {
+  transform: scale(1.4);
+  margin-top: -35px;
+}
 .quantity-input {
   display: flex;
   justify-content: center;

@@ -24,7 +24,7 @@ import {
   getAllLining,
   getAllCushion,
 } from "services/ProductAttributeService";
-import { getAllShoes } from "services/Product2Service";
+import { getAllShoesUser } from "services/Product2Service";
 
 const Product = () => {
   const [errorMessage, setErrorMessage] = useState("");
@@ -62,7 +62,7 @@ const Product = () => {
 
   const getListShoes = async (page, size) => {
     try {
-      let res = await getAllShoes(page, size, search, "", "");
+      let res = await getAllShoesUser(page, size, search);
       if (res && res.data && res.data.content) {
         setProducts(res.data.content);
         console.log(res.data);
@@ -214,18 +214,16 @@ const Product = () => {
                                 }
                               >
                                 <i
-                                  className={`fa-solid ${
-                                    contentState.brand ? "fa-minus" : "fa-plus"
-                                  }`}
+                                  className={`fa-solid ${contentState.brand ? "fa-minus" : "fa-plus"
+                                    }`}
                                 />
                               </button>
                             </li>
                           </ul>
                         </div>
                         <div
-                          className={`content ${
-                            contentState.brand ? "show" : "hide"
-                          }`}
+                          className={`content ${contentState.brand ? "show" : "hide"
+                            }`}
                         >
                           {listBrand.map((x) => (
                             <div key={x.id}>
@@ -261,18 +259,16 @@ const Product = () => {
                                 }
                               >
                                 <i
-                                  className={`fa-solid ${
-                                    contentState.origin ? "fa-minus" : "fa-plus"
-                                  }`}
+                                  className={`fa-solid ${contentState.origin ? "fa-minus" : "fa-plus"
+                                    }`}
                                 />
                               </button>
                             </li>
                           </ul>
                         </div>
                         <div
-                          className={`content ${
-                            contentState.origin ? "show" : "hide"
-                          }`}
+                          className={`content ${contentState.origin ? "show" : "hide"
+                            }`}
                         >
                           {listOrigin.map((x) => (
                             <div key={x.id}>
@@ -308,18 +304,16 @@ const Product = () => {
                                 }
                               >
                                 <i
-                                  className={`fa-solid ${
-                                    contentState.design ? "fa-minus" : "fa-plus"
-                                  }`}
+                                  className={`fa-solid ${contentState.design ? "fa-minus" : "fa-plus"
+                                    }`}
                                 />
                               </button>
                             </li>
                           </ul>
                         </div>
                         <div
-                          className={`content ${
-                            contentState.design ? "show" : "hide"
-                          }`}
+                          className={`content ${contentState.design ? "show" : "hide"
+                            }`}
                         >
                           {listDesignStyle.map((x) => (
                             <div key={x.id}>
@@ -355,18 +349,16 @@ const Product = () => {
                                 }
                               >
                                 <i
-                                  className={`fa-solid ${
-                                    contentState.skin ? "fa-minus" : "fa-plus"
-                                  }`}
+                                  className={`fa-solid ${contentState.skin ? "fa-minus" : "fa-plus"
+                                    }`}
                                 />
                               </button>
                             </li>
                           </ul>
                         </div>
                         <div
-                          className={`content ${
-                            contentState.skin ? "show" : "hide"
-                          }`}
+                          className={`content ${contentState.skin ? "show" : "hide"
+                            }`}
                         >
                           {listSkinStype.map((x) => (
                             <div key={x.id}>
@@ -402,18 +394,16 @@ const Product = () => {
                                 }
                               >
                                 <i
-                                  className={`fa-solid ${
-                                    contentState.sole ? "fa-minus" : "fa-plus"
-                                  }`}
+                                  className={`fa-solid ${contentState.sole ? "fa-minus" : "fa-plus"
+                                    }`}
                                 />
                               </button>
                             </li>
                           </ul>
                         </div>
                         <div
-                          className={`content ${
-                            contentState.sole ? "show" : "hide"
-                          }`}
+                          className={`content ${contentState.sole ? "show" : "hide"
+                            }`}
                         >
                           {listSole.map((x) => (
                             <div key={x.id}>
@@ -449,18 +439,16 @@ const Product = () => {
                                 }
                               >
                                 <i
-                                  className={`fa-solid ${
-                                    contentState.lining ? "fa-minus" : "fa-plus"
-                                  }`}
+                                  className={`fa-solid ${contentState.lining ? "fa-minus" : "fa-plus"
+                                    }`}
                                 />
                               </button>
                             </li>
                           </ul>
                         </div>
                         <div
-                          className={`content ${
-                            contentState.lining ? "show" : "hide"
-                          }`}
+                          className={`content ${contentState.lining ? "show" : "hide"
+                            }`}
                         >
                           {listLining.map((x) => (
                             <div key={x.id}>
@@ -496,18 +484,16 @@ const Product = () => {
                                 }
                               >
                                 <i
-                                  className={`fa-solid ${
-                                    contentState.toe ? "fa-minus" : "fa-plus"
-                                  }`}
+                                  className={`fa-solid ${contentState.toe ? "fa-minus" : "fa-plus"
+                                    }`}
                                 />
                               </button>
                             </li>
                           </ul>
                         </div>
                         <div
-                          className={`content ${
-                            contentState.toe ? "show" : "hide"
-                          }`}
+                          className={`content ${contentState.toe ? "show" : "hide"
+                            }`}
                         >
                           {listToe.map((x) => (
                             <div key={x.id}>
@@ -543,20 +529,18 @@ const Product = () => {
                                 }
                               >
                                 <i
-                                  className={`fa-solid ${
-                                    contentState.cushion
-                                      ? "fa-minus"
-                                      : "fa-plus"
-                                  }`}
+                                  className={`fa-solid ${contentState.cushion
+                                    ? "fa-minus"
+                                    : "fa-plus"
+                                    }`}
                                 />
                               </button>
                             </li>
                           </ul>
                         </div>
                         <div
-                          className={`content ${
-                            contentState.cushion ? "show" : "hide"
-                          }`}
+                          className={`content ${contentState.cushion ? "show" : "hide"
+                            }`}
                         >
                           {listCushion.map((x) => (
                             <div key={x.id}>
