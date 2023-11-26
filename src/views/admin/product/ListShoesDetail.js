@@ -1171,7 +1171,7 @@ const ListShoesDetail = () => {
                                                                         </Badge>
                                                                     </td>
                                                                     <td>
-                                                                        <SlideShow images={item.imageDTOS} />
+                                                                        <SlideShow images={item.imageDTOS} imageSize={"80px"}/>
                                                                     </td>
                                                                     <td>{item.shoesDetailSearchResponse.code}</td>
                                                                     <td>{item.shoesDetailSearchResponse.color}</td>

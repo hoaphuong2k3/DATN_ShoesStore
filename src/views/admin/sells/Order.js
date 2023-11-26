@@ -20,6 +20,7 @@ const Order = () => {
     const [modal2, setModal2] = useState(false);
     const toggle2 = () => setModal2(!modal2);
 
+    //phân trang
     const [currentPage, setCurrentPage] = useState(0);
     const itemsPerPage = 5;
     const startIndex = currentPage * itemsPerPage;
@@ -28,7 +29,8 @@ const Order = () => {
         setCurrentPage(selected);
     };
 
-    //Client
+    //Client+Promotion
+    const [promo, setPromo] = useState([]);
     const [clients, setClients] = useState([]);
     const [searchTerm, setSearchTerm] = useState("");
     const [searchResults, setSearchResults] = useState([]);
@@ -42,11 +44,12 @@ const Order = () => {
         username: "",
     });
 
-    // Get Client
     const fetchClients = async () => {
         try {
             const response = await axiosInstance.get('/client/admin');
             setClients(response.content);
+            const res = await axiosInstance.get('/store/find-discount_period');
+            setPromo(res.data);
         } catch (error) {
             console.error('Lỗi khi tải lại dữ liệu khách hàng:', error);
         }
@@ -109,7 +112,6 @@ const Order = () => {
     const [selectedToWardCode, setSelectedToWardCode] = useState("");
     const [recipientName, setRecipientName] = useState('');
     const [recipientPhone, setRecipientPhone] = useState('');
-
 
     const fetchDataFromAPI = async (url, stateSetter) => {
         try {
@@ -256,11 +258,12 @@ const Order = () => {
 
         setSelectedProducts(updatedProducts);
     };
-
+    
 
     //Order
     const [deliveryData, setDeliveryData] = useState({});
     const [totalAmount, setTotalAmount] = useState(0);
+
     useEffect(() => {
         const newTotalAmount = selectedProducts.reduce((total, detail) => {
             return total + detail.quantity * detail.discountPrice;
@@ -299,6 +302,14 @@ const Order = () => {
 
         return deliveryAddress;
     };
+
+    const calculateTotalMoney = () => {
+        return totalAmount -
+            (promo && promo.typePeriod === 0 ? (promo.salePercent / 100) * totalAmount : 0) +
+            shippingTotal +
+            ((promo && promo.typePeriod === 1) ? -shippingTotal : 0);
+    };
+
     const createOrder = async () => {
 
         const idClient = selectedClient ? selectedClient.id : null;
@@ -318,7 +329,7 @@ const Order = () => {
 
         try {
             const orderResponse = await axiosInstance.post('/store/create', {
-                totalMoney: totalAmount + shippingTotal,
+                totalMoney: calculateTotalMoney(),
                 totalPayment: "",
                 paymentMethod: paymentMethod,
                 idDiscountPeriods: null,
@@ -354,7 +365,7 @@ const Order = () => {
         setCustomerPayment(paymentAmount);
 
         // Tính toán số tiền thừa
-        const remainingAmount = paymentAmount - (totalAmount + shippingTotal);
+        const remainingAmount = paymentAmount - calculateTotalMoney();
         setChangeAmount(remainingAmount < 0 ? 0 : remainingAmount);
     };
 
@@ -691,7 +702,7 @@ const Order = () => {
                                             checked={showShippingForm}
                                             onChange={() => {
                                                 setShowShippingForm(!showShippingForm);
-                                                if (!showShippingForm) {
+                                                if (showShippingForm) {
                                                     resetShip();
                                                 }
                                             }}
@@ -702,37 +713,45 @@ const Order = () => {
                         </CardHeader>
                         <CardBody style={{ fontSize: 14 }}>
                             <Form>
-
                                 <Row className="mb-1">
                                     <Label className="col">Tiền hàng:</Label>
                                     <Col className="text-right">
                                         <h5>{formatter.format(totalAmount)}</h5>
                                     </Col>
                                 </Row>
-                                <Row className="mb-1">
-                                    <Label className="col">Voucher của shop:</Label>
-                                    <Col className="text-right">
-                                        <h5>0</h5>
-                                    </Col>
-                                </Row>
-                                <Row className="mb-1">
-                                    <Label className="col">Phí vận chuyển:</Label>
-                                    <Col className="text-right">
-                                        <h5>{formatter.format(shippingTotal)}</h5>
-                                    </Col>
-                                </Row>
-                                <Row className="mb-1">
-                                    <Label className="col">Giảm phí vận chuyển:</Label>
-                                    <Col className="text-right">
-                                        <h5>0</h5>
-                                    </Col>
-                                </Row>
+                                {promo && promo.minPrice !== null && totalAmount >= promo.minPrice && promo.typePeriod === 0 && (
+                                    <Row className="mb-1">
+                                        <Label className="col">Voucher của shop:</Label>
+                                        <Col className="text-right">
+                                            <h5>{formatter.format((promo.salePercent / 100) * totalAmount)}</h5>
+                                        </Col>
+                                    </Row>
+                                )}
+                                {showShippingForm && (
+                                    <Row className="mb-1">
+                                        <Label className="col">Phí vận chuyển:</Label>
+                                        <Col className="text-right">
+                                            <h5>{formatter.format(shippingTotal)}</h5>
+                                        </Col>
+                                    </Row>
+                                )}
+                                {promo?.minPrice === null && promo?.typePeriod === 1 && showShippingForm && (
+                                    <Row className="mb-1">
+                                        <Label className="col">Giảm phí vận chuyển:</Label>
+                                        <Col className="text-right">
+                                            <h5>{formatter.format(-shippingTotal)}</h5>
+                                        </Col>
+                                    </Row>
+                                )}
                                 <Row className="mb-1">
                                     <Label className="col h5" style={{ fontSize: 14 }}>Thành tiền:</Label>
                                     <Col className="text-right">
-                                        <h5 style={{ color: "red" }}>{formatter.format(totalAmount + shippingTotal)}</h5>
+                                        <h5 style={{ color: "red" }}>
+                                            {formatter.format(calculateTotalMoney())}
+                                        </h5>
                                     </Col>
                                 </Row>
+
                                 <Row className="mb-1">
                                     <Col lg="12">
                                         <InputGroup size="sm">

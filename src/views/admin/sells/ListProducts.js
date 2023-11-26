@@ -7,6 +7,7 @@ import {
     getAllToe, getAllSole, getAllLining, getAllCushion
 } from "services/ProductAttributeService";
 // reactstrap components
+import SlideShow from '../product/SlideShow.js';
 import ReactPaginate from 'react-paginate';
 import { FaSearch, FaFilter } from 'react-icons/fa';
 import {
@@ -178,11 +179,6 @@ const Products = ({ onSelectProducts }) => {
         setSearch(prevSearch => ({ ...prevSearch, page: selected }));
     };
 
-    const handleSizeChange = (e) => {
-        const newSize = parseInt(e.target.value);
-        setSearch({ ...search, size: newSize, page: 0 });
-    };
-
     //getShoesDetail
     const [selectedProductId, setSelectedProductId] = useState(null);
     const [sl, setSL] = useState(false);
@@ -193,8 +189,9 @@ const Products = ({ onSelectProducts }) => {
                 let res = await getAllShoesDetail(id, 0, 5, { colorId: idColor, sizeId: idSize });
                 if (res && res.data && res.data.content) {
                     setshoesdetail(res.data.content[0]);
-                    setSelectedShoesDetailId(res.data.content[0].id);
+                    setSelectedShoesDetailId(res.data.content[0].shoesDetailSearchResponse.id);
                     setSL(false);
+                    console.log(res.data.content[0].shoesDetailSearchResponse.id);
                 }
             } catch (error) {
                 console.error(error);
@@ -238,6 +235,7 @@ const Products = ({ onSelectProducts }) => {
     const [selectedShoesDetailId, setSelectedShoesDetailId] = useState(null);
     const [inputQuantity, setInputQuantity] = useState(1);
     const handleConfirmation = () => {
+        console.log(selectedShoesDetailId);
         if (selectedShoesDetailId !== null) {
             if (selectedShoesDetailId) {
                 const selectedSize = listSizeById.find((size) => size.id === idSize);
@@ -249,10 +247,11 @@ const Products = ({ onSelectProducts }) => {
                         sizeName: selectedSize.name,
                         colorName: selectedColor.name,
                         quantity: inputQuantity,
-                        discountPrice: shoesdetail.discountPrice,
-                        price: shoesdetail.price,
-                        code: shoesdetail.code
+                        discountPrice: shoesdetail.shoesDetailSearchResponse.discountPrice,
+                        price: shoesdetail.shoesDetailSearchResponse.price,
+                        code: shoesdetail.shoesDetailSearchResponse.code
                     };
+                    console.log(confirmationData.price);
 
                     onSelectProducts(confirmationData);
                 }
@@ -437,25 +436,38 @@ const Products = ({ onSelectProducts }) => {
 
                     <Row>
                         <Col lg={4}>
+                            {shoesdetail.imageDTOS && (
+                                <>
+                                    <SlideShow 
+                                        images={shoesdetail.imageDTOS}
+                                        imageSize={"100%"}
+                                    />
+                                </>
+                            )}
                         </Col>
                         <Col lg={8}>
 
                             <div className="mb-2 p-2" style={{ borderRadius: 5, boxShadow: "0 0 10px rgba(0, 0, 0, 0.1)" }}>
-                                {shoesdetail.discountPrice !== null && shoesdetail.discountPrice !== 0 && (
-                                    <div style={{ fontWeight: 'bold', color: 'red' }}>
-                                        Giá sale: {formatter.format(shoesdetail.discountPrice)}
-                                    </div>
-                                )}
-                                <div >
-                                    Giá gốc:
-                                    <span style={{ textDecoration: shoesdetail.discountPrice ? 'line-through' : 'none', fontWeight: "bold", marginLeft: 12 }}>
-                                        {formatter.format(shoesdetail.price)}
-                                    </span>
+                                {shoesdetail.shoesDetailSearchResponse && (
+                                    <>
+                                        {shoesdetail.shoesDetailSearchResponse.discountPrice !== null && shoesdetail.shoesDetailSearchResponse.discountPrice !== 0 && (
+                                            <div style={{ fontWeight: 'bold', color: 'red' }}>
+                                                Giá sale: {formatter.format(shoesdetail.shoesDetailSearchResponse.discountPrice)}
+                                            </div>
+                                        )}
+                                        <div >
+                                            Giá gốc:
+                                            <span style={{ textDecoration: shoesdetail.shoesDetailSearchResponse.discountPrice ? 'line-through' : 'none', fontWeight: "bold", marginLeft: 12 }}>
+                                                {formatter.format(shoesdetail.shoesDetailSearchResponse.price)}
+                                            </span>
 
-                                </div>
-                                {shoesdetail.discountPrice !== null && shoesdetail.discountPrice !== 0 && (
-                                    <div>Tiết kiệm: {formatter.format(shoesdetail.price - shoesdetail.discountPrice)}</div>
+                                        </div>
+                                        {shoesdetail.shoesDetailSearchResponse.discountPrice !== null && shoesdetail.shoesDetailSearchResponse.discountPrice !== 0 && (
+                                            <div>Tiết kiệm: {formatter.format(shoesdetail.shoesDetailSearchResponse.price - shoesdetail.shoesDetailSearchResponse.discountPrice)}</div>
+                                        )}
+                                    </>
                                 )}
+
                             </div>
 
                             <div className='row p-2'>

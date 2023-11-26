@@ -98,13 +98,14 @@ const SaleProduct = () => {
     const handleEditButtonClick = async (shoesId) => {
         try {
             const response = await getAllShoesDetail2(shoesId, page, size, search2);
-            if (response && response.data && response.data.content) {
+            if (response) {
 
                 setSelectedShoesDetails(response.data.content);
-
+                console.log(response.data.content);
                 const mapping = { ...shoesDetailMapping };
-                mapping[shoesId] = response.data.content.map(detail => detail.id);
+                mapping[shoesId] = response.data.content.map(detail => detail.shoesDetailSearchResponse.id);
                 setShoesDetailMapping(mapping);
+                console.log(mapping);
             }
             setSecondModal(true);
 
@@ -276,16 +277,16 @@ const SaleProduct = () => {
         setSelectedDetailIds(detailIds);
     };
 
-    const handleSelectAllDetails = () => {
-        const allDetailsSelected = selectedDetailIds.length === selectedShoesDetails.length;
-        if (allDetailsSelected) {
-            setSelectedDetailIds([]);
-        } else {
-            // Lấy danh sách ID chi tiết
-            const detailIds = selectedShoesDetails.map(detail => detail.id);
-            setSelectedDetailIds(detailIds);
-        }
-    };
+    // const handleSelectAllDetails = () => {
+    //     const allDetailsSelected = selectedDetailIds.length === selectedShoesDetails.length;
+    //     if (allDetailsSelected) {
+    //         setSelectedDetailIds([]);
+    //     } else {
+    //         // Lấy danh sách ID chi tiết
+    //         const detailIds = selectedShoesDetails.map(detail => detail.id);
+    //         setSelectedDetailIds(detailIds);
+    //     }
+    // };
 
     const handleDetailCheckboxChange = (detailId) => {
         let detailIds = [...selectedDetailIds];
@@ -295,6 +296,7 @@ const SaleProduct = () => {
             detailIds.push(detailId);
         }
         setSelectedDetailIds(detailIds);
+        // handleSelectAllDetails(); 
     };
 
 
@@ -987,13 +989,13 @@ const SaleProduct = () => {
                         <thead className="thead-light text-center">
                             <tr >
                                 <th className="pb-4">
-                                    <FormGroup check>
+                                    {/* <FormGroup check>
                                         <Input
                                             type="checkbox"
                                             checked={selectedDetailIds.length === selectedShoesDetails.length}
                                             onChange={handleSelectAllDetails}
                                         />
-                                    </FormGroup>
+                                    </FormGroup> */}
                                 </th>
                                 <th scope="col">Mã</th>
                                 <th scope="col">Size</th>
@@ -1009,16 +1011,16 @@ const SaleProduct = () => {
                                         <FormGroup check>
                                             <Input
                                                 type="checkbox"
-                                                checked={selectedDetailIds.includes(detail.id)}
-                                                onChange={() => handleDetailCheckboxChange(detail.id)}
+                                                checked={selectedDetailIds.includes(detail.shoesDetailSearchResponse.id)}
+                                                onChange={() => handleDetailCheckboxChange(detail.shoesDetailSearchResponse.id)}
                                             />
                                         </FormGroup>
                                     </td>
-                                    <td>{detail.code}</td>
-                                    <td>{detail.size}</td>
-                                    <td>{detail.color}</td>
-                                    <td className="text-right">{detail.price.toLocaleString("vi-VN")}</td>
-                                    <td className="text-right">{detail.quantity}</td>
+                                    <td>{detail.shoesDetailSearchResponse.code}</td>
+                                    <td>{detail.shoesDetailSearchResponse.size}</td>
+                                    <td>{detail.shoesDetailSearchResponse.color}</td>
+                                    <td className="text-right">{detail.shoesDetailSearchResponse.price}</td>
+                                    <td className="text-right">{detail.shoesDetailSearchResponse.quantity}</td>
                                 </tr>
                             ))}
                         </tbody>

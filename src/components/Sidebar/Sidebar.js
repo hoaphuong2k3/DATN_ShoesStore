@@ -116,14 +116,6 @@ const Sidebar1 = (props) => {
                 <i className="ni ni-settings-gear-65" />
                 <span>Settings</span>
               </DropdownItem>
-              <DropdownItem to="/admin/user-profile" tag={Link}>
-                <i className="ni ni-calendar-grid-58" />
-                <span>Activity</span>
-              </DropdownItem>
-              <DropdownItem to="/admin/user-profile" tag={Link}>
-                <i className="ni ni-support-16" />
-                <span>Support</span>
-              </DropdownItem>
               <DropdownItem divider />
               <DropdownItem href="#pablo" onClick={(e) => e.preventDefault()}>
                 <i className="ni ni-user-run" />
@@ -176,7 +168,7 @@ const Sidebar1 = (props) => {
               >
                 <MenuItem icon={<RiExchangeFundsLine />}><NavLink style={{ fontSize: 15, color: "black" }} to="/admin/direct-sales" tag={Link}>Bán hàng</NavLink></MenuItem>
                 <MenuItem icon={<RiExchangeFundsLine />}><NavLink style={{ fontSize: 15, color: "black" }} to="/admin/bills" tag={Link}>Hóa đơn</NavLink></MenuItem>
-                <MenuItem icon={<RiExchangeFundsLine />}><NavLink style={{ fontSize: 15, color: "black" }} to="/admin/delivery" tag={Link}>Phiếu giao hàng</NavLink></MenuItem>
+                {/* <MenuItem icon={<RiExchangeFundsLine />}><NavLink style={{ fontSize: 15, color: "black" }} to="/admin/delivery" tag={Link}>Phiếu giao hàng</NavLink></MenuItem> */}
               </SubMenu>
               <SubMenu
                 defaultOpen={false}
@@ -185,7 +177,7 @@ const Sidebar1 = (props) => {
               >
                 <MenuItem icon={<RiStackLine />}><NavLink style={{ fontSize: 15, color: "black" }} to="/admin/product" tag={Link}>Sản phẩm</NavLink></MenuItem>
                 <MenuItem icon={<RiStackLine />}><NavLink style={{ fontSize: 15, color: "black" }} to="/admin/product-attributes" tag={Link}>Thuộc tính</NavLink></MenuItem>
-                <MenuItem icon={<RiStackLine />}><NavLink style={{ fontSize: 15, color: "black" }} to="/admin/product" tag={Link}>Thư viện hình ảnh</NavLink></MenuItem>
+                {/* <MenuItem icon={<RiStackLine />}><NavLink style={{ fontSize: 15, color: "black" }} to="/admin/product" tag={Link}>Thư viện hình ảnh</NavLink></MenuItem> */}
               </SubMenu>
               <SubMenu
                 defaultOpen={false}
@@ -200,9 +192,9 @@ const Sidebar1 = (props) => {
                 label={"Quản lý khuyến mại"}
                 icon={<RiPriceTag2Line />}
               >
-
-                <MenuItem icon={<RiPriceTag3Line />}><NavLink style={{ fontSize: 15, color: "black" }} to="/admin/promotion" tag={Link}>Đợt giảm giá</NavLink></MenuItem>
                 <MenuItem icon={<RiPriceTag3Line />}><NavLink style={{ fontSize: 15, color: "black" }} to="/admin/discount" tag={Link}>Phiếu giảm giá</NavLink></MenuItem>
+                <MenuItem icon={<RiPriceTag3Line />}><NavLink style={{ fontSize: 15, color: "black" }} to="/admin/promotion" tag={Link}>Đợt giảm giá</NavLink></MenuItem>
+                <MenuItem icon={<RiPriceTag3Line />}><NavLink style={{ fontSize: 15, color: "black" }} to="/admin/free-gift" tag={Link}>Quà tặng</NavLink></MenuItem>
               </SubMenu>
               <MenuItem icon={<RiLineChartFill />}><NavLink style={{ fontSize: 15, color: "black" }} to="/admin/statistics" tag={Link}>Thống kê</NavLink></MenuItem>
             </Menu>

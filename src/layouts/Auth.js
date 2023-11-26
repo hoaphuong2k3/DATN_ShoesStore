@@ -10,20 +10,6 @@ import AuthFooter from "components/Footers/AuthFooter.js";
 import routes from "routes-auth.js";
 
 const Auth = (props) => {
-  const mainContent = React.useRef(null);
-  const location = useLocation();
-
-  React.useEffect(() => {
-    document.body.classList.add("bg-default");
-    return () => {
-      document.body.classList.remove("bg-default");
-    };
-  }, []);
-  React.useEffect(() => {
-    document.documentElement.scrollTop = 0;
-    document.scrollingElement.scrollTop = 0;
-    mainContent.current.scrollTop = 0;
-  }, [location]);
 
   const getRoutes = (routes) => {
     return routes.map((prop, key) => {
@@ -39,39 +25,24 @@ const Auth = (props) => {
 
   return (
     <>
-      <div className="main-content" ref={mainContent}>
+      <div className="main-content" style={{ backgroundImage: "url('https://designs.vn/wp-content/images/22-08-2019/6-phoi-canh-de-anh-chup-bai-bien-tro-nen-thu-vi-hon-1.jpg')", backgroundSize: "cover", backgroundPosition: "center center", height: "auto" }}>
         <AuthNavbar />
-        <div className="header bg-gradient-info py-7 py-lg-8">
+        {/* <div className="header py-7 py-lg-8">
           <Container>
             <div className="header-body text-center mb-7">
               <Row className="justify-content-center">
                 <Col lg="5" md="6">
                   <h1 className="text-white">Xin chào!</h1>
                   <p className="text-lead text-light">
-                  Chúng tôi chân thành chào đón tất cả các bạn đã ghé thăm trang web của Shoes Store.
+                    Chúng tôi chân thành chào đón tất cả các bạn đã ghé thăm trang web của Leather Gent.
                   </p>
                 </Col>
               </Row>
             </div>
           </Container>
-          <div className="separator separator-bottom separator-skew zindex-100">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              preserveAspectRatio="none"
-              version="1.1"
-              viewBox="0 0 2560 100"
-              x="0"
-              y="0"
-            >
-              <polygon
-                className="fill-default"
-                points="2560 0 2560 100 0 100"
-              />
-            </svg>
-          </div>
-        </div>
+        </div> */}
         {/* Page content */}
-        <Container className="mt--8 pb-5">
+        <Container className="pt-9">
           <Row className="justify-content-center">
             <Routes>
               {getRoutes(routes)}
@@ -79,8 +50,10 @@ const Auth = (props) => {
             </Routes>
           </Row>
         </Container>
+
+        <AuthFooter />
       </div>
-      <AuthFooter />
+      
     </>
   );
 };

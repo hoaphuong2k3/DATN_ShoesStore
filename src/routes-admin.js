@@ -3,6 +3,7 @@ import Bills from "views/admin/transaction/Bills.js";
 import Products from "views/admin/product/Products.js";
 import ProductAttributes from "views/admin/product/ProductAttributes.js";
 import Promo from "views/admin/discount/Promotion.js";
+import FreeGift from "views/admin/discount/FreeGift.js";
 import Staff from "views/admin/Staff.js";
 import Client from "views/admin/Client.js";
 import Profile from "views/admin/Profile.js";
@@ -10,7 +11,6 @@ import Statistical from "views/admin/Statistical.js";
 import AddProduct from "views/admin/product/AddProduct";
 import EditProduct from "views/admin/product/EditProduct";
 import DetailProducts from "views/admin/product/DetailProduct.js";
-// import BillDetail from "views/admin/transaction/BillDetail.js";
 import ListShoesDetail from "views/admin/product/ListShoesDetail.js";
 import Discount from "views/admin/discount/Discount.js";
 import Delivery from "views/admin/transaction/Delivery.js";
@@ -50,6 +50,11 @@ var routes = [
   {
     path: "/promotion",
     component: <Promo />,
+    layout: "/admin",
+  },
+  {
+    path: "/free-gift",
+    component: <FreeGift />,
     layout: "/admin",
   },
   {

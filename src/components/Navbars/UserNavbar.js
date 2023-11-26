@@ -111,7 +111,7 @@ const UserNavbar = () => {
             <img
               alt="..."
               src={require("../../assets/img/brand/logo.png")}
-              width={140} style={{height:100}}
+              width={130} style={{height:80}}
             />
           </NavbarBrand>
           <button className="navbar-toggler" id="navbar-collapse-main">

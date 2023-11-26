@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-const SlideShow = ({ images }) => {
+const SlideShow = ({ images, imageSize }) => {
     const [currentImage, setCurrentImage] = useState(0);
     useEffect(() => {
         // Thêm kiểm tra images và images.length
@@ -13,7 +13,7 @@ const SlideShow = ({ images }) => {
             return () => clearInterval(interval);
         }
     }, [currentImage, images]);
-    const imageSize = "80px";
+    // const imageSize = "80px";
     const imageStyle = {
         width: imageSize,
         height: imageSize,
