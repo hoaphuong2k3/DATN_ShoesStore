@@ -305,8 +305,6 @@ const Checkout = () => {
 
       const servicesData = servicesResponse.data;
       console.log(servicesData);
-      const servicesData = servicesResponse.data;
-      console.log(servicesData);
 
       const selectedService = servicesData.data.find(
         (service) => service.service_type_id === 2
