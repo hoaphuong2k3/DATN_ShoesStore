@@ -367,8 +367,8 @@ const ListShoesDetail = () => {
             const shoesDataJson = JSON.stringify(listAddMany);
             formData1.append('data', shoesDataJson);
             await axios.post(`http://localhost:33321/api/admin/shoesdetail/${id}`, formData1);
-            getAll();
             getListCheck();
+            getAll();
             setSelectedImages([]);
             toast.success("Thêm thành công!");
         } catch (error) {
@@ -1186,12 +1186,12 @@ const ListShoesDetail = () => {
                                                                         <Button color="link" size="sm" disabled={item.shoesDetailSearchResponse.status === 0 ? true : false} onClick={() => openEdit(item.shoesDetailSearchResponse.id)}>
                                                                             <FaEdit color="primary" />
                                                                         </Button>
-                                                                        {item.status === 0 &&
+                                                                        {item.shoesDetailSearchResponse.status === 0 &&
                                                                             <Button color="link" size="sm" onClick={() => openlock(item.shoesDetailSearchResponse.id)}>
                                                                                 <FaLockOpen color="primary" />
                                                                             </Button>
                                                                         }
-                                                                        {(item.status === 1 || item.status === 2) &&
+                                                                        {(item.shoesDetailSearchResponse.status === 1 || item.shoesDetailSearchResponse.status === 2) &&
                                                                             <Button color="link" size="sm" onClick={() => lock(item.shoesDetailSearchResponse.id)} >
                                                                                 <FaLock color="primary" />
                                                                             </Button>
