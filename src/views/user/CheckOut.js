@@ -30,7 +30,6 @@ const Checkout = () => {
   const storedUserId = localStorage.getItem("userId");
   const [totalMoney, setTotalMoney] = useState(null);
 
-
   const formatter = new Intl.NumberFormat("vi-VN", {
     style: "currency",
     currency: "VND",
@@ -68,15 +67,15 @@ const Checkout = () => {
       alert("Vui lòng chọn phương thức thanh toán");
       return;
     }
-  
+
     let deliveryAddress = {};
-  
+
     // Kiểm tra xem có địa chỉ được chọn từ danh sách không
     if (selectedAddress) {
       const selectedAddressData = listAddress.find(
         (address) => address.addressDetail === selectedAddress
       );
-  
+
       if (selectedAddressData) {
         // Nếu có, sử dụng địa chỉ từ danh sách
         deliveryAddress = {
@@ -96,7 +95,7 @@ const Checkout = () => {
         return;
       }
     }
-  
+
     try {
       const recipientName =
         document.getElementById("recipientName")?.value || "";
@@ -122,9 +121,6 @@ const Checkout = () => {
       console.error("Lỗi trong quá trình tạo hóa đơn:", error);
     }
   };
-  
-  
-  
 
   // ADDRESS
 
@@ -433,7 +429,10 @@ const Checkout = () => {
                                       listAddress.map((address, index) => (
                                         <option
                                           key={index}
-                                          value={address.address && address.addressDetail}
+                                          value={
+                                            address.address &&
+                                            address.addressDetail
+                                          }
                                         >
                                           {`${address.addressDetail}, ${address.address}`}
                                         </option>
@@ -450,8 +449,6 @@ const Checkout = () => {
                                 </div>
                               </FormGroup>
                             </Col>
-
-                           
 
                             <div className="form-group col-md-6">
                               <Input
@@ -557,7 +554,6 @@ const Checkout = () => {
                             className="text-dark font-weight-bold"
                             style={{ float: "right" }}
                           >
-                            {formatter.format(totalMoney + shippingTotal)}
                             {formatter.format(totalMoney + shippingTotal)}
                           </h3>
                         </div>
@@ -759,17 +755,21 @@ const Checkout = () => {
         </ModalBody>
         <ModalFooter>
           <div className="text-center">
-            <Button color="danger" onClick={(e) => saveAddress(e)}>
-              Thêm mới
+            <Button
+              name="checkout"
+              onClick={(e) => saveAddress(e)}
+              className="evo-button mobile-viewmore"
+            >
+              <strong>Thêm mới</strong>
             </Button>{" "}
             {formData.id ? (
               ""
             ) : (
-              <Button color="primary" onClick={resetFormData}>
+              <Button className="evo-button mobile-viewmore" name="checkout" onClick={resetFormData}>
                 Reset
               </Button>
             )}
-            <Button color="danger" onClick={toggleAddAdress}>
+            <Button className="evo-button mobile-viewmore" name="checkout" onClick={toggleAddAdress}>
               Close
             </Button>
           </div>
