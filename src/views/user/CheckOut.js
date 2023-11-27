@@ -3,6 +3,8 @@ import {
   Card,
   CardHeader,
   CardBody,
+  CardTitle,
+  CardText,
   Container,
   Row,
   Col,
@@ -10,38 +12,126 @@ import {
   Form,
   Button,
   Input,
-  CardTitle,
   Label,
   Modal,
   ModalBody,
   ModalFooter,
   ModalHeader,
+  InputGroup
 } from "reactstrap";
 import Header from "components/Headers/ProductHeader";
-import Select from "react-select";
 import axiosInstance from "services/custommize-axios";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { FaTimes, FaCommentMedical } from "react-icons/fa";
 import "assets/css/checkout.css";
 
 const Checkout = () => {
-  const [showVoucherModal, setShowVoucherModal] = useState(false);
+
+  const [modal, setModal] = useState(false);
+  const [selectedVoucherCode, setSelectedVoucherCode] = useState("");
+  const [usedVoucherCode, setUsedVoucherCode] = useState(null);
+  const [selectedVoucherDetails, setSelectedVoucherDetails] = useState(null);
+  const [voucherValue, setVoucherValue] = useState(0);
+  const [searchValue, setSearchValue] = useState("");
   const [products, setProducts] = useState(null);
   const storedUserId = localStorage.getItem("userId");
-  const [totalMoney, setTotalMoney] = useState(null);
+  const [voucher, setVoucher] = useState([]);
+  const [checkout, setCheckout] = useState([]);
 
   const formatter = new Intl.NumberFormat("vi-VN", {
     style: "currency",
     currency: "VND",
   });
 
-  const handleOpenVoucherModal = () => {
-    setShowVoucherModal(true);
-  };
-  const handleCloseVoucherModal = () => {
-    setShowVoucherModal(false);
+  const formatTimeRemaining = (endDate, startDate) => {
+    const endDateTime = new Date(endDate).getTime();
+    const now = new Date().getTime();
+    const timeRemaining = endDateTime - now;
+
+    const daysRemaining = Math.floor(timeRemaining / (1000 * 60 * 60 * 24));
+    const hoursRemaining = Math.floor(
+      (timeRemaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
+    );
+
+    if (daysRemaining === 0) {
+      return `${hoursRemaining} giờ`;
+    }
+
+    return `${daysRemaining} ngày ${hoursRemaining} giờ`;
   };
 
+  //Voucher
+  const toggle = () => {
+    setModal(!modal);
+    setSelectedVoucherCode("");
+  };
+  const handleCardClick = (code) => {
+    setSelectedVoucherCode(code);
+    setSearchValue(code);
+  };
+
+  const handleUseVoucherClick = () => {
+    if (!selectedVoucherCode) {
+      toast.error('Vui lòng chọn mã giảm giá.');
+      return;
+    }
+
+    const selectedVoucher = voucher.find((v) => v.code === selectedVoucherCode);
+    const { minPrice } = selectedVoucher;
+
+    if (minPrice && minPrice > checkout.totalMoney) {
+      toast.error('Bạn không đủ điều kiện áp dụng voucher.');
+      return;
+    }
+
+    setUsedVoucherCode(selectedVoucherCode);
+    setSelectedVoucherDetails(selectedVoucher);
+
+    const { salePercent, salePrice } = selectedVoucher;
+    const calculatedValue =
+      (salePercent !== null ? (salePercent / 100) * checkout.totalMoney : salePrice) || 0;
+
+    setVoucherValue(calculatedValue);
+    setModal(false);
+  };
+
+  const handleClearVoucher = () => {
+    setUsedVoucherCode("");
+    setVoucherValue(0);
+  };
+  useEffect(() => {
+    if (searchValue === "") {
+      setSelectedVoucherCode("");
+      return;
+    }
+    const foundVoucher = voucher.find((v) => v.code.toLowerCase() === searchValue.toLowerCase());
+    if (foundVoucher) {
+      setSelectedVoucherCode(foundVoucher.code);
+      setModal(true);
+    }
+  }, [searchValue, voucher]);
+
+
+  //Voucher
+  const fetchPromo = async () => {
+    try {
+      const res = await axiosInstance.get('/promos/getAll');
+      setVoucher(res.data);
+      console.log("Promo:", res.data);
+    } catch (error) {
+      console.error('Lỗi khi tải lại dữ liệu khách hàng:', error);
+    }
+  };
+  useEffect(() => {
+    fetchPromo();
+  }, []);
+
+  const getSelectedVoucherId = () => {
+    return selectedVoucherDetails ? selectedVoucherDetails.id : null;
+  };
+
+  //Checkout
   const fetchCheckout = async () => {
     try {
       const response = await axiosInstance.get(
@@ -49,9 +139,9 @@ const Checkout = () => {
       );
 
       setProducts(response.data.shoesCart);
-      setTotalMoney(response.data.totalMoney);
-      console.log(storedUserId);
-      console.log(response.data.totalMoney);
+      setCheckout(response.data);
+      console.log(response.data);
+
     } catch (error) {
       console.error("Lỗi trong quá trình thanh toán:", error);
     }
@@ -60,6 +150,20 @@ const Checkout = () => {
   useEffect(() => {
     fetchCheckout();
   }, []);
+
+  const calculatePayment = () => {
+    return checkout.totalMoney +
+      (checkout.periodType === 0
+        ? -(checkout.totalMoney - checkout.totalPayment)
+        : 0) +
+      (usedVoucherCode ? -voucherValue : 0) +
+      shippingTotal +
+      (checkout.periodType === 1 ? -shippingTotal : 0);
+  };
+
+
+
+
 
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(null);
   const handleOrder = async () => {
@@ -102,19 +206,22 @@ const Checkout = () => {
       const recipientPhone =
         document.getElementById("recipientPhone")?.value || "";
       const data = {
-        idAccount: storedUserId,
-        idDisCount: null,
+        idClient: storedUserId,
+        idStaff: null,
+        idDisCountPeriod: null,
+        idVoucher: getSelectedVoucherId(),
         idShoesDetail: products.map((product) => product.id),
         paymentMethod: selectedPaymentMethod,
-        totalMoney: totalMoney,
+        totalMoney: checkout.totalMoney,
+        totalPayment: calculatePayment(),
         deliveryOrderDTO: {
-          address: deliveryAddress.address, // Sử dụng chuỗi địa chỉ
+          address: deliveryAddress.address,
           recipientName: recipientName,
           recipientPhone: recipientPhone,
           deliveryCost: shippingTotal,
         },
       };
-      const response = await axiosInstance.post("/order/create", data);
+      await axiosInstance.post("/order/create", data);
       alert("Đặt hàng thành công");
       window.location.href = "/shoes/home";
     } catch (error) {
@@ -130,10 +237,7 @@ const Checkout = () => {
     console.log(res);
     if (res && res.content) {
       setListAddress(res.content);
-      console.log(res.content);
     }
-
-    console.log(listAddress);
   };
   useEffect(() => {
     if (storedUserId) {
@@ -212,7 +316,6 @@ const Checkout = () => {
     if (modalAddAdress === false) {
       resetFormData();
     }
-    console.log("modalAddAdress:", modalAddAdress);
   }, [modalAddAdress]);
 
   const [formData, setFormData] = useState({
@@ -223,7 +326,6 @@ const Checkout = () => {
   });
 
   useEffect(() => {
-    console.log("check", formData);
   }, [formData]);
 
   const saveAddress = async () => {
@@ -245,7 +347,6 @@ const Checkout = () => {
       // Xử lý lỗi
       console.error("Error:", error);
       if (error.response) {
-        console.error("Response data:", error.response.data);
         toast.error(error.response.data.message);
       } else {
         toast.error("Đã có lỗi xảy ra.");
@@ -394,63 +495,77 @@ const Checkout = () => {
                     )}
                   </div>
 
-                  <Card className="mt-5">
-                    <CardBody>
-                      <h3 className="text-dark mb-3">
-                        <i
-                          class="fa fa-map-marker"
-                          style={{ marginRight: "5px;" }}
-                          aria-hidden="true"
-                        ></i>
-                        Thông tin giao hàng
-                      </h3>
-                      <div className="inner px-4">
-                        <Form
-                          noValidate
-                          className="checkout table-wrap medium--hide small--hide"
-                        >
-                          <div className="form-row">
-                            {/* List address */}
-                            <Col lg="12">
-                              <FormGroup>
-                                <div className="d-flex align-items-center">
-                                  <Input
-                                    className="form-control-alternative"
-                                    type="select"
-                                    value={selectedAddress}
-                                    onChange={(e) => {
-                                      setSelectedAddress(e.target.value);
-                                      handleApiCall(e.target.value);
-                                    }}
-                                  >
-                                    <option value="">Chọn địa chỉ</option>
-                                    {listAddress &&
-                                      listAddress.length > 0 &&
-                                      listAddress.map((address, index) => (
-                                        <option
-                                          key={index}
-                                          value={
-                                            address.address &&
-                                            address.addressDetail
-                                          }
-                                        >
-                                          {`${address.addressDetail}, ${address.address}`}
-                                        </option>
-                                      ))}
-                                  </Input>
-                                  <Button
-                                    color="primary"
-                                    onClick={toggleAddAdress}
-                                    outline
-                                    size="sm"
-                                  >
-                                    Thêm địa chỉ
-                                  </Button>
-                                </div>
-                              </FormGroup>
-                            </Col>
+                  <div style={{ padding: "15px 0 5px 0", boxShadow: "0 0 10px rgba(0, 0, 0, 0.1)" }}>
+                    <div className="item d-flex">
+                      <div className="product-container mr-5 ml-5">
+                        <img
+                          src={`data:image/jpeg;base64,${checkout.freeGiftImage}`}
+                          alt={checkout.freeGiftName}
+                          style={{ width: "70px" }}
+                        />
+                        <div className="quantity-badge">
+                          <span className="quantity">1</span>
+                        </div>
+                      </div>
 
-                            <div className="form-group col-md-6">
+                      <div>
+                        <div className="text-warning text-center" style={{ border: "1px solid", fontSize: 11 }}>Quà tặng</div>
+                        <div className="mt-1">{checkout.freeGiftName}</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <Card className="mt-5">
+                    <CardHeader className="h5 text-uppercase border-0">Địa chỉ nhận hàng</CardHeader>
+                    <CardBody>
+
+                      <Form>
+
+                        <Row className="col">
+                          <Col md={12}>
+                          <FormGroup>
+                            <div className="d-flex align-items-center">
+                              <Input
+                                className="form-control-alternative mr-2"
+                                type="select"
+                                value={selectedAddress}
+                                onChange={(e) => {
+                                  setSelectedAddress(e.target.value);
+                                  handleApiCall(e.target.value);
+                                }}
+                              >
+                                <option value="">Chọn địa chỉ</option>
+                                {listAddress &&
+                                  listAddress.length > 0 &&
+                                  listAddress.map((address, index) => (
+                                    <option
+                                      key={index}
+                                      value={
+                                        address.address &&
+                                        address.addressDetail
+                                      }
+                                    >
+                                      {`${address.addressDetail}, ${address.address}`}
+                                    </option>
+                                  ))}
+                              </Input>
+                              <Button
+                                color="secondary"
+                                onClick={toggleAddAdress}
+                                outline
+                                size="sm" style={{border: '1px solid'}}
+                              >
+                                <FaCommentMedical />
+                              </Button>
+                            </div>
+                          </FormGroup>
+                          </Col>
+                          
+                        </Row>
+
+                        <Row className="col">
+                          <Col md={6}>
+                            <FormGroup>
                               <Input
                                 type="text"
                                 className="form-control"
@@ -459,9 +574,11 @@ const Checkout = () => {
                                 required
                                 placeholder="Họ và tên"
                               />
-                            </div>
+                            </FormGroup>
+                          </Col>
 
-                            <div className="form-group col-md-6">
+                          <Col md={6}>
+                            <FormGroup>
                               <Input
                                 type="tel"
                                 className="form-control"
@@ -470,94 +587,104 @@ const Checkout = () => {
                                 required
                                 placeholder="Điện thoại"
                               />
-                            </div>
-                          </div>
-                        </Form>
-                      </div>
-                    </CardBody>
-                  </Card>
-                </div>
-                <div className="col-md-4">
-                  <Card
-                    style={{ backgroundColor: "#f7f7f7", marginBottom: "26px" }}
-                  >
-                    <CardBody>
-                      <div className=" d-flex">
-                        <p className="text-dark font-weight-bold mt-1">
-                          <i
-                            class="fa fa-ticket"
-                            aria-hidden="true"
-                            style={{ color: "gray", marginRight: "11px" }}
-                          ></i>
-                          ShoesVouchers
-                        </p>
-                        <a
-                          onClick={handleOpenVoucherModal}
-                          className=" mt-1 ml-5 pointer medium"
-                        >
-                          Chọn vouchers
-                        </a>
-                      </div>
-                      <style>
-                        {`
-                            .pointer {
-                                cursor: pointer;
-                            }
-                          `}
-                      </style>
-                    </CardBody>
-                  </Card>
-                  <Card>
-                    <CardBody>
-                      <div className="justify-content-between align-items-center">
-                        <div className="d-flex align-items-center">
-                          <h3 className="mr-3 text-dark font-weight-bold mt-1">
-                            TẠM TÍNH
-                          </h3>
-                          {/* <span className="badge badge-info">2</span> */}
-                        </div>
-                        <div className="">
-                          <div className="mb-2">
-                            <span className="mr-2 small">Số lượng</span>
-                            <span
-                              className="text-dark font-weight-bold"
-                              style={{ float: "right" }}
-                            >
-                              {products ? products.length : 0}
-                            </span>
-                            <br />
-                          </div>
-                          <div className="mb-2">
-                            <span className="mr-2 small">Tạm tính</span>
-                            <span
-                              className="text-dark font-weight-bold"
-                              style={{ float: "right" }}
-                            >
-                              {formatter.format(totalMoney)}
-                            </span>
-                            <br />
-                          </div>
-                          <div>
-                            <span className="mr-2 small">Phí vận chuyển</span>
-                            <span
-                              className="text-dark font-weight-bold"
-                              style={{ float: "right" }}
-                            >
-                              {formatter.format(shippingTotal)}
-                            </span>
+                            </FormGroup>
+                          </Col>
+                        </Row>
 
-                            <br />
-                          </div>
-                          <hr />
-                          <span className="mr-2">Tổng cộng</span>
-                          <h3
-                            className="text-dark font-weight-bold"
-                            style={{ float: "right" }}
-                          >
-                            {formatter.format(totalMoney + shippingTotal)}
-                          </h3>
+                      </Form>
+
+                    </CardBody>
+                  </Card>
+
+                </div>
+
+
+                <div className="col-md-4">
+
+                  {/* Voucher */}
+                  <Card className="mb-4">
+                    <CardHeader className="h5 text-center text-warning border-0">
+                      <i class="fa fa-ticket" style={{ marginRight: "11px" }}></i>
+                      Leather Gent Vouchers
+                    </CardHeader>
+                    <CardBody className="pt-0">
+
+                      <Button block color="link" style={{ border: "1px dashed #ccc", fontSize: 12 }} onClick={toggle}>
+                        {usedVoucherCode ? (
+                          <>
+                            <span>
+                              Đã chọn mã: {usedVoucherCode} (
+                              {selectedVoucherDetails?.salePercent !== null
+                                ? `${selectedVoucherDetails?.salePercent}%`
+                                : `${formatter.format(selectedVoucherDetails?.salePrice)}`}
+                              )
+                            </span>
+                            <FaTimes
+                              style={{ marginLeft: "5px", cursor: "pointer" }}
+                              onClick={handleClearVoucher}
+                            />
+                          </>
+                        ) : (
+                          "Chọn/Nhập mã"
+                        )}
+                      </Button>
+                    </CardBody>
+                  </Card>
+
+                  {/* Thanh toán */}
+                  <Card>
+                    <CardHeader className="h5 border-0">THANH TOÁN</CardHeader>
+
+                    <CardBody>
+                      <Form>
+                        <div className="mb-2">
+                          <span className="mr-2 small">Tạm tính</span>
+                          <h5 style={{ float: "right" }}>
+                            {formatter.format(checkout.totalMoney)}
+                          </h5>
                         </div>
-                      </div>
+
+                        {checkout.periodType === 0 && (
+                          <div className="mb-2">
+                            <span className="mr-2 small">Đợt giảm giá</span>
+                            <h5 style={{ float: "right" }}>
+                              {formatter.format(-(checkout.totalMoney - checkout.totalPayment))}
+                            </h5>
+                          </div>
+                        )}
+
+                        {usedVoucherCode && (
+                          <div className="mb-2">
+                            <span className="mr-2 small">Voucher của shop</span>
+                            <h5 style={{ float: "right" }}>
+                              {formatter.format(-voucherValue)}
+                            </h5>
+                          </div>
+                        )}
+
+                        <div className="mb-2">
+                          <span className="mr-2 small">Phí vận chuyển</span>
+                          <h5 style={{ float: "right" }}>
+                            {formatter.format(shippingTotal)}
+                          </h5>
+                        </div>
+
+                        {checkout.periodType === 1 && (
+                          <div className="mb-2">
+                            <span className="mr-2 small">Giảm phí vận chuyển</span>
+                            <h5 style={{ float: "right" }}>
+                              {formatter.format(-shippingTotal)}
+                            </h5>
+                          </div>
+                        )}
+                      </Form>
+
+                      <hr />
+                      <span className="mr-2">Thành tiền</span>
+                      <h3 style={{ float: "right" }}>
+                        {formatter.format(calculatePayment())}
+                      </h3>
+
                     </CardBody>
                   </Card>
                   <div className="ml-2">
@@ -608,39 +735,61 @@ const Checkout = () => {
         </Row>
       </Container>
 
-      <Modal isOpen={showVoucherModal} toggle={handleCloseVoucherModal}>
-        <ModalHeader toggle={handleCloseVoucherModal}>
-          Danh sách vouchers
+      <Modal isOpen={modal} toggle={toggle} style={{ maxWidth: '400px' }}>
+        <ModalHeader toggle={toggle}>
+          <h3 className="heading-small text-muted mb-0">Danh sách Vouchers</h3>
         </ModalHeader>
-        <ModalBody>
-          <Card>
-            <CardBody>
-              <div>
-                <div>
-                  <span className="mr-5">Mã giảm giá 1</span>
-                  <Input
-                    name="voucher_1"
-                    style={{ float: "right" }}
-                    type="radio"
-                  />
-                </div>
-              </div>
-            </CardBody>
-          </Card>
+        <ModalBody className="pt-0">
+
+          <Row>
+            <Col className="d-flex" style={{ justifyContent: "space-between" }}>
+              <InputGroup style={{ width: 245 }}>
+                <Input
+                  type="text"
+                  placeholder="Nhập mã khuyến mại"
+                  value={searchValue}
+                  onChange={(e) => setSearchValue(e.target.value)}
+                />
+              </InputGroup>
+              <Button color="primary" outline onClick={handleUseVoucherClick}>
+                Dùng mã
+              </Button>
+            </Col>
+          </Row>
+
+          {voucher.map((voucher, index) => (
+            <Card body
+              key={voucher.id}
+              className="mt-3 pb-2 pt-2"
+              style={{
+                boxShadow: "0 0 10px rgba(0, 0, 0, 0.05)",
+                cursor: "pointer",
+                backgroundColor: selectedVoucherCode === voucher.code ? "#F5F5F5" : "transparent",
+              }}
+              onClick={() => handleCardClick(voucher.code)}
+            >
+              <CardTitle className="mb-1 text-warning">
+                {voucher.salePercent !== null
+                  ? `Giảm giá ${voucher.salePercent}% cho đơn từ ${formatter.format(voucher.minPrice)}`
+                  : `Giảm giá ${formatter.format(voucher.salePrice)} cho đơn từ ${formatter.format(voucher.minPrice)}`}
+              </CardTitle>
+              <CardText style={{ fontSize: 12 }}>
+                HSD:{" "}
+                <span style={{ color: "red" }}>
+                  Chỉ còn {formatTimeRemaining(voucher.endDate, voucher.startDate)}
+                </span>
+              </CardText>
+            </Card>
+          ))}
+
+
         </ModalBody>
         <ModalFooter>
-          <a
-            color="secondary"
-            onClick={handleCloseVoucherModal}
-            style={{ cursor: "pointer" }}
-          >
+          <Button color="danger" size="sm" outline onClick={toggle}>
             Đóng
-          </a>
-          <Button className=" d-flex evo-button mobile-viewmore">
-            Áp dụng
           </Button>
         </ModalFooter>
-      </Modal>
+      </Modal >
 
       {/* Modal Thêm Địa chỉ */}
       <Modal
@@ -648,7 +797,8 @@ const Checkout = () => {
         toggle={toggleAddAdress}
         backdrop={"static"}
         keyboard={false}
-        style={{ maxWidth: "500px" }}
+        style={{ maxWidth: "500px" }
+        }
       >
         <ModalHeader toggle={toggleAddAdress}>
           <h3 className="heading-small text-muted mb-0">Thêm Mới Địa chỉ</h3>
@@ -775,7 +925,6 @@ const Checkout = () => {
           </div>
         </ModalFooter>
       </Modal>
-      {/* Kết thúc thêm modal địa chỉ */}
     </>
   );
 };

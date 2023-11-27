@@ -329,10 +329,10 @@ const Order = () => {
 
         try {
             const orderResponse = await axiosInstance.post('/store/create', {
-                totalMoney: calculateTotalMoney(),
-                totalPayment: "",
+                totalMoney: totalAmount,
+                totalPayment: calculateTotalMoney(),
                 paymentMethod: paymentMethod,
-                idDiscountPeriods: null,
+                idDiscountPeriods: promo.id,
                 idClient: idClient,
                 shoesInCart: selectedProducts.map(product => ({
                     quantity: product.quantity,
@@ -416,15 +416,6 @@ const Order = () => {
                                             <tr key={detail.shoesDetailId}>
                                                 <th className="text-center">{index + 1}</th>
                                                 <td>
-                                                    {/* <img
-                                                        src={""}
-                                                        alt="Ảnh mô tả"
-                                                        style={{
-                                                            maxWidth: "100%",
-                                                            height: "150px",
-                                                            border: "1px solid #ccc",
-                                                        }}
-                                                    /> */}
                                                     <SlideShow
                                                         images={detail.image}
                                                         imageSize={"80px"}
