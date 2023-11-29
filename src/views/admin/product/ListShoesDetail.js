@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { findShoes } from "services/Product2Service";
 import { getAllShoesDetail } from "services/ShoesDetailService.js";
 import ReactPaginate from 'react-paginate';
-import { FaEdit, FaTrash, FaLock, FaLockOpen, FaAngleDown, FaAngleUp, FaFilter, FaSearch } from 'react-icons/fa';
+import { FaEdit, FaTrash, FaLock, FaLockOpen, FaAngleDown, FaAngleUp, FaFilter, FaSearch, FaQrcode } from 'react-icons/fa';
 import { getAllColorId, getAllSizeId, getAllColor, getAllSize } from "services/ProductAttributeService";
 import { getAllImage, updateImage, postNewImage, deleteImage } from "services/ImageService";
 import {
@@ -13,8 +13,24 @@ import { toast } from 'react-toastify';
 import Switch from 'react-input-switch';
 import axios from "axios";
 import SlideShow from './SlideShow';
+import QrReader from 'react-qr-reader';
 
 const ListShoesDetail = () => {
+
+    const [modal3, setModal3] = useState(false);
+    const toggle3 = () => setModal3(!modal3);
+    const [result, setResult] = useState("No result");
+    let handleScan = data => {
+        if (data) {
+            setResult(data);
+        }
+    };
+
+    let handleError = err => {
+        // alert(err);
+    };
+
+
     const [value, setValue] = useState('no');
     const { id } = useParams();
     const statusMapping = {
@@ -1084,6 +1100,10 @@ const ListShoesDetail = () => {
                                                         <FaFilter size="16px" className="mr-1" />Bộ lọc
                                                     </Button>
 
+                                                    <Button color="warning" outline size="sm" onClick={toggle3}>
+                                                        <FaQrcode className="mr-1" />QR Code
+                                                    </Button>
+
                                                     <Col>
                                                         <InputGroup size="sm">
                                                             <Input type="search"
@@ -1105,6 +1125,9 @@ const ListShoesDetail = () => {
                                                         <option value="2">Hết hàng</option>
                                                     </Input>
                                                 </Col>
+
+
+
                                                 <div className="col text-right">
                                                     {showActions && (
                                                         <Button
@@ -1139,7 +1162,7 @@ const ListShoesDetail = () => {
                                                         <th>Số lượng</th>
                                                         <th>Giá gốc</th>
                                                         <th>Giá KM</th>
-
+                                                        <th>QR Code</th>
                                                         <th colSpan={2} style={{ position: "sticky", zIndex: '1', right: '0' }}>Thao tác</th>
                                                     </tr>
                                                 </thead>
@@ -1171,7 +1194,7 @@ const ListShoesDetail = () => {
                                                                         </Badge>
                                                                     </td>
                                                                     <td>
-                                                                        <SlideShow images={item.imageDTOS} imageSize={"80px"}/>
+                                                                        <SlideShow images={item.imageDTOS} imageSize={"80px"} />
                                                                     </td>
                                                                     <td>{item.shoesDetailSearchResponse.code}</td>
                                                                     <td>{item.shoesDetailSearchResponse.color}</td>
@@ -1179,6 +1202,15 @@ const ListShoesDetail = () => {
                                                                     <td>{item.shoesDetailSearchResponse.quantity}</td>
                                                                     <td>{formatter.format(item.shoesDetailSearchResponse.price)}</td>
                                                                     <td>{formatter.format(item.shoesDetailSearchResponse.discountPrice)}</td>
+                                                                    <td>
+                                                                        <img
+                                                                            src={`https://s3-ap-southeast-1.amazonaws.com/imageshoestore/${item.shoesDetailSearchResponse.qrcodeURI}`}
+                                                                            alt=""
+                                                                            style={{ width: "80px" }}
+                                                                        />
+
+
+                                                                    </td>
                                                                     <td style={{ position: "sticky", zIndex: '1', right: '0', background: "#fff" }}>
                                                                         {/* <Button color="danger" to={`/admin/product/edit/${item.id}`} tag={Link} size="sm" disabled={item.status === 0 ? true : false}>
                                                                         <i class="fa-solid fa-pen" />
@@ -2135,6 +2167,22 @@ const ListShoesDetail = () => {
                 </ModalFooter>
 
             </Modal>
+
+            {/* QRCode */}
+            <Modal isOpen={modal3} toggle={toggle3} size="sm">
+                <ModalHeader toggle={toggle3}>QR Code Scanner</ModalHeader>
+                <ModalBody>
+                    <QrReader
+                        delay={300}
+                        onError={handleError}
+                        onScan={handleScan}
+                        style={{ width: "100%" }}
+                        facingMode="environment"
+                    />
+                    <p>{result}</p>
+                </ModalBody>
+            </Modal>
+
         </>
     );
 };

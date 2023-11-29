@@ -160,6 +160,7 @@ const Promotion = () => {
                 const file = new File([blob], "image.jpg", { type: "image/jpeg" });
                 setFile(file);
             }
+            setSecondModal(true);
         } catch (error) {
             console.error("Lỗi khi lấy dữ liệu:", error);
         }
@@ -204,6 +205,7 @@ const Promotion = () => {
             toast.success(formData2.id ? "Cập nhật thành công!" : "Thêm mới thành công!");
             fetchData();
             resetGift();
+            setSecondModal(false);
         } catch (error) {
             console.error("Lỗi khi lưu dữ liệu:", error);
             if (error.response) {

@@ -23,7 +23,9 @@ import Header from "components/Headers/ProductHeader";
 import axiosInstance from "services/custommize-axios";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { FaTimes, FaCommentMedical } from "react-icons/fa";
+import Toggle from 'react-toggle';
+import 'react-toggle/style.css';
+import { FaTimes, FaCommentMedical, FaHeart } from "react-icons/fa";
 import "assets/css/checkout.css";
 
 const Checkout = () => {
@@ -59,6 +61,12 @@ const Checkout = () => {
     }
 
     return `${daysRemaining} ngày ${hoursRemaining} giờ`;
+  };
+
+  const [usingPoints, setUsingPoints] = useState(false);
+
+  const handleToggleChange = () => {
+    setUsingPoints(!usingPoints);
   };
 
   //Voucher
@@ -116,7 +124,7 @@ const Checkout = () => {
   //Voucher
   const fetchPromo = async () => {
     try {
-      const res = await axiosInstance.get('/promos/getAll');
+      const res = await axiosInstance.get('/vouchers/getAllIsActive');
       setVoucher(res.data);
       console.log("Promo:", res.data);
     } catch (error) {
@@ -140,7 +148,7 @@ const Checkout = () => {
 
       setProducts(response.data.shoesCart);
       setCheckout(response.data);
-      console.log(response.data);
+      console.log("checkout", response.data);
 
     } catch (error) {
       console.error("Lỗi trong quá trình thanh toán:", error);
@@ -158,10 +166,13 @@ const Checkout = () => {
         : 0) +
       (usedVoucherCode ? -voucherValue : 0) +
       shippingTotal +
-      (checkout.periodType === 1 ? -shippingTotal : 0);
+      (checkout.periodType === 1 ? -shippingTotal : 0) + (usingPoints===true ? -checkout.totalPoints : 0);
   };
 
-
+  let idDisCountPeriod = checkout.idDiscountPeriod;
+  if (checkout.totalMoney <= checkout.totalPayment || checkout.totalPayment === null) {
+    idDisCountPeriod = null;
+  }
 
 
 
@@ -183,7 +194,7 @@ const Checkout = () => {
       if (selectedAddressData) {
         // Nếu có, sử dụng địa chỉ từ danh sách
         deliveryAddress = {
-          address: `${selectedAddressData.addressDetail}, ${selectedAddressData.communeCode},${selectedAddressData.districtCode}, ${selectedAddressData.proviceCode} `,
+          address: `${selectedAddressData.addressDetail}, ${selectedAddressData.communeCode}, ${selectedAddressData.districtCode}, ${selectedAddressData.proviceCode}`,
         };
       }
     } else {
@@ -208,12 +219,14 @@ const Checkout = () => {
       const data = {
         idClient: storedUserId,
         idStaff: null,
-        idDisCountPeriod: null,
+        idDisCountPeriod: idDisCountPeriod,
         idVoucher: getSelectedVoucherId(),
         idShoesDetail: products.map((product) => product.id),
         paymentMethod: selectedPaymentMethod,
         totalMoney: checkout.totalMoney,
         totalPayment: calculatePayment(),
+        points: checkout.points,
+        usingPoints: usingPoints,
         deliveryOrderDTO: {
           address: deliveryAddress.address,
           recipientName: recipientName,
@@ -495,25 +508,27 @@ const Checkout = () => {
                     )}
                   </div>
 
-                  <div style={{ padding: "15px 0 5px 0", boxShadow: "0 0 10px rgba(0, 0, 0, 0.1)" }}>
-                    <div className="item d-flex">
-                      <div className="product-container mr-5 ml-5">
-                        <img
-                          src={`data:image/jpeg;base64,${checkout.freeGiftImage}`}
-                          alt={checkout.freeGiftName}
-                          style={{ width: "70px" }}
-                        />
-                        <div className="quantity-badge">
-                          <span className="quantity">1</span>
+                  {checkout && checkout.freeGiftImage && checkout.freeGiftName && checkout.totalMoney > checkout.totalPayment && (
+                    <div style={{ padding: "15px 0 5px 0", boxShadow: "0 0 10px rgba(0, 0, 0, 0.1)" }}>
+                      <div className="item d-flex">
+                        <div className="product-container mr-5 ml-5">
+                          <img
+                            src={`data:image/jpeg;base64,${checkout.freeGiftImage}`}
+                            alt={checkout.freeGiftName}
+                            style={{ width: "70px" }}
+                          />
+                          <div className="quantity-badge">
+                            <span className="quantity">1</span>
+                          </div>
+                        </div>
+
+                        <div>
+                          <div className="text-warning text-center" style={{ border: "1px solid", fontSize: 11 }}>Quà tặng</div>
+                          <div className="mt-1">{checkout.freeGiftName}</div>
                         </div>
                       </div>
-
-                      <div>
-                        <div className="text-warning text-center" style={{ border: "1px solid", fontSize: 11 }}>Quà tặng</div>
-                        <div className="mt-1">{checkout.freeGiftName}</div>
-                      </div>
                     </div>
-                  </div>
+                  )}
 
                   <Card className="mt-5">
                     <CardHeader className="h5 text-uppercase border-0">Địa chỉ nhận hàng</CardHeader>
@@ -523,44 +538,44 @@ const Checkout = () => {
 
                         <Row className="col">
                           <Col md={12}>
-                          <FormGroup>
-                            <div className="d-flex align-items-center">
-                              <Input
-                                className="form-control-alternative mr-2"
-                                type="select"
-                                value={selectedAddress}
-                                onChange={(e) => {
-                                  setSelectedAddress(e.target.value);
-                                  handleApiCall(e.target.value);
-                                }}
-                              >
-                                <option value="">Chọn địa chỉ</option>
-                                {listAddress &&
-                                  listAddress.length > 0 &&
-                                  listAddress.map((address, index) => (
-                                    <option
-                                      key={index}
-                                      value={
-                                        address.address &&
-                                        address.addressDetail
-                                      }
-                                    >
-                                      {`${address.addressDetail}, ${address.address}`}
-                                    </option>
-                                  ))}
-                              </Input>
-                              <Button
-                                color="secondary"
-                                onClick={toggleAddAdress}
-                                outline
-                                size="sm" style={{border: '1px solid'}}
-                              >
-                                <FaCommentMedical />
-                              </Button>
-                            </div>
-                          </FormGroup>
+                            <FormGroup>
+                              <div className="d-flex align-items-center">
+                                <Input
+                                  className="form-control-alternative mr-2"
+                                  type="select"
+                                  value={selectedAddress}
+                                  onChange={(e) => {
+                                    setSelectedAddress(e.target.value);
+                                    handleApiCall(e.target.value);
+                                  }}
+                                >
+                                  <option value="">Chọn địa chỉ</option>
+                                  {listAddress &&
+                                    listAddress.length > 0 &&
+                                    listAddress.map((address, index) => (
+                                      <option
+                                        key={index}
+                                        value={
+                                          address.address &&
+                                          address.addressDetail
+                                        }
+                                      >
+                                        {`${address.addressDetail}, ${address.address}`}
+                                      </option>
+                                    ))}
+                                </Input>
+                                <Button
+                                  color="secondary"
+                                  onClick={toggleAddAdress}
+                                  outline
+                                  size="sm" style={{ border: '1px solid' }}
+                                >
+                                  <FaCommentMedical />
+                                </Button>
+                              </div>
+                            </FormGroup>
                           </Col>
-                          
+
                         </Row>
 
                         <Row className="col">
@@ -628,6 +643,12 @@ const Checkout = () => {
                           "Chọn/Nhập mã"
                         )}
                       </Button>
+
+                      <Row className="col mt-2" style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
+                        <span>{checkout.totalPoints}</span>
+                        <Toggle size="sm" defaultChecked={false} onChange={handleToggleChange} />
+                      </Row>
+
                     </CardBody>
                   </Card>
 
@@ -644,7 +665,7 @@ const Checkout = () => {
                           </h5>
                         </div>
 
-                        {checkout.periodType === 0 && (
+                        {checkout.periodType === 0 && checkout.totalMoney > checkout.totalPayment && (
                           <div className="mb-2">
                             <span className="mr-2 small">Đợt giảm giá</span>
                             <h5 style={{ float: "right" }}>
@@ -677,6 +698,16 @@ const Checkout = () => {
                             </h5>
                           </div>
                         )}
+
+                        {usingPoints === true && (
+                          <div className="mb-2">
+                            <span className="mr-2 small">Xu tích lũy</span>
+                            <h5 style={{ float: "right" }}>
+                              {formatter.format(-checkout.totalPoints)}
+                            </h5>
+                          </div>
+                        )}
+
                       </Form>
 
                       <hr />

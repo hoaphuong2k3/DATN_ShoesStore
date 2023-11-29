@@ -5,6 +5,7 @@ import { ToastContainer, toast } from "react-toastify";
 import { FaQrcode, FaUserPlus, FaUndoAlt, FaTrashAlt } from 'react-icons/fa';
 import { TbShoppingBagPlus } from 'react-icons/tb';
 import ReactPaginate from 'react-paginate';
+import QrReader from 'react-qr-reader';
 import {
     Row, Col, Button, Card, CardBody, CardHeader, Table, InputGroup, Input,
     Form, FormGroup, Label, Modal, ModalBody, ModalHeader, ModalFooter
@@ -19,6 +20,9 @@ const Order = () => {
 
     const [modal2, setModal2] = useState(false);
     const toggle2 = () => setModal2(!modal2);
+
+    const [modal3, setModal3] = useState(false);
+    const toggle3 = () => setModal3(!modal3);
 
     //phân trang
     const [currentPage, setCurrentPage] = useState(0);
@@ -50,6 +54,7 @@ const Order = () => {
             setClients(response.content);
             const res = await axiosInstance.get('/store/find-discount_period');
             setPromo(res.data);
+
         } catch (error) {
             console.error('Lỗi khi tải lại dữ liệu khách hàng:', error);
         }
@@ -217,6 +222,27 @@ const Order = () => {
     };
 
     //Product
+    const [result, setResult] = useState("No result");
+    let handleScan = data => {
+        if (data) {
+            setResult(data);
+        }
+    };
+
+    let handleError = err => {
+        // alert(err);
+    };
+
+    // const onSelectProducts = (selectedProductList, productQrCode) => {
+
+    //     if (productQrCode === qrCode) {
+
+    //         setSelectedProducts([...selectedProducts, selectedProductList]);
+    //     } else {
+
+    //     }
+    // };
+
     const [selectedProducts, setSelectedProducts] = useState([]);
     const handleSelectProducts = (selectedProductList) => {
 
@@ -334,6 +360,7 @@ const Order = () => {
                 paymentMethod: paymentMethod,
                 idDiscountPeriods: promo.id,
                 idClient: idClient,
+                usingPoints: false,
                 shoesInCart: selectedProducts.map(product => ({
                     quantity: product.quantity,
                     idShoesDetail: product.shoesDetailId
@@ -377,7 +404,7 @@ const Order = () => {
     return (
         <Row className="my-4">
             <Col lg={12} className="text-right">
-                <Button color="warning" outline size="sm">
+                <Button color="warning" outline size="sm" onClick={toggle3}>
                     <FaQrcode className="mr-1" />QR Code sản phẩm
                 </Button>
                 <Button color="primary" outline size="sm" onClick={toggle}>
@@ -402,8 +429,7 @@ const Order = () => {
                                         <th scope="col" className="text-dark">STT</th>
                                         <th scope="col" className="text-dark">Ảnh</th>
                                         <th scope="col" className="text-dark">Sản phẩm</th>
-                                        <th scope="col" className="text-dark">Giá gốc</th>
-                                        <th scope="col" className="text-dark">Giá khuyến mại</th>
+                                        <th scope="col" className="text-dark">Giá bán</th>
                                         <th scope="col" className="text-dark">Số lượng</th>
                                         <th scope="col" className="text-dark">Tổng tiền</th>
                                         <th scope="col" className="text-dark">Thao tác</th>
@@ -422,12 +448,21 @@ const Order = () => {
                                                     />
                                                 </td>
                                                 <td>
-                                                    <h4>{detail.code} - </h4>
+                                                    <h4>{detail.code} - {detail.shoesName}</h4>
                                                     <span className="mr-2">Size: {detail.sizeName}</span>
                                                     <span>Màu: {detail.colorName}</span>
                                                 </td>
-                                                <td className="text-right" style={{ textDecoration: 'line-through' }}>{formatter.format(detail.price)}</td>
-                                                <td className="text-right" >{formatter.format(detail.discountPrice)}</td>
+                                                <td className="text-right">
+                                                    {detail.discountPrice !== null && detail.discountPrice !== detail.price ? (
+                                                        <>
+                                                            <h5>{formatter.format(detail.discountPrice)}</h5>
+                                                            <span style={{ textDecoration: 'line-through' }}>{formatter.format(detail.price)}</span>
+                                                        </>
+                                                    ) : (
+                                                        <h5>{formatter.format(detail.discountPrice)}</h5>
+                                                    )}
+                                                </td>
+
                                                 <td>
                                                     <Input className="text-center m-auto"
                                                         type="number"
@@ -541,6 +576,12 @@ const Order = () => {
                                                 <Label className="col">Số điện thoại:</Label>
                                                 <Col className="text-right">
                                                     <h5>{selectedClient ? selectedClient.phoneNumber : ""}</h5>
+                                                </Col>
+                                            </Row>
+                                            <Row>
+                                                <Label className="col">Điểm tích lũy:</Label>
+                                                <Col className="text-right">
+                                                    <h5>{selectedClient ? selectedClient.totalPoints : ""}</h5>
                                                 </Col>
                                             </Row>
                                         </Form>
@@ -712,14 +753,14 @@ const Order = () => {
                                         <h5>{formatter.format(totalAmount)}</h5>
                                     </Col>
                                 </Row>
-                                {promo && promo.minPrice !== null && totalAmount >= promo.minPrice && promo.typePeriod === 0 && (
-                                    <Row className="mb-1">
-                                        <Label className="col">Voucher của shop:</Label>
-                                        <Col className="text-right">
-                                            <h5>{formatter.format((promo.salePercent / 100) * totalAmount)}</h5>
-                                        </Col>
-                                    </Row>
-                                )}
+                                {/* {promo && promo.minPrice !== null && totalAmount >= promo.minPrice && promo.typePeriod === 0 && ( */}
+                                <Row className="mb-1">
+                                    <Label className="col">Voucher của shop:</Label>
+                                    <Col className="text-right">
+                                        <h5>{formatter.format((promo.salePercent / 100) * totalAmount)}</h5>
+                                    </Col>
+                                </Row>
+                                {/* )} */}
                                 {showShippingForm && (
                                     <Row className="mb-1">
                                         <Label className="col">Phí vận chuyển:</Label>
@@ -926,6 +967,21 @@ const Order = () => {
                     </div>
                 </ModalFooter>
             </Modal >
+
+            {/* QRCode */}
+            <Modal isOpen={modal3} toggle={toggle3} size="sm">
+                <ModalHeader toggle={toggle3}>QR Code Scanner</ModalHeader>
+                <ModalBody>
+                    <QrReader
+                        delay={300}
+                        onError={handleError}
+                        onScan={handleScan}
+                        style={{ width: "100%" }}
+                        facingMode="environment"
+                    />
+                    <p>{result}</p>
+                </ModalBody>
+            </Modal>
         </Row>
     );
 };
