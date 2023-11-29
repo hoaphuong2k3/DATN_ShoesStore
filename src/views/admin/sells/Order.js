@@ -22,7 +22,10 @@ const Order = () => {
     const toggle2 = () => setModal2(!modal2);
 
     const [modal3, setModal3] = useState(false);
-    const toggle3 = () => setModal3(!modal3);
+    const toggle3 = () => {
+        setResult("");
+        setModal3(!modal3)
+    };
 
     //phân trang
     const [currentPage, setCurrentPage] = useState(0);
@@ -222,26 +225,48 @@ const Order = () => {
     };
 
     //Product
-    const [result, setResult] = useState("No result");
-    let handleScan = data => {
+    const [result, setResult] = useState("");
+    const [shoesDetail, setShoesDetail] = useState(null);
+    let handleScan = async data => {
         if (data) {
             setResult(data);
+            setModal3(false);
+            try {
+
+                const response = await axiosInstance.get(`/user/shoesdetail/find-one/qr/${data}.png`);
+                const shoesDetailData = response.data;
+
+                const existingItemIndex = selectedProducts.findIndex(
+                    (existingItem) => existingItem.shoesDetailId === shoesDetailData.detailResponse.id
+                );
+
+                if (existingItemIndex !== -1) {
+                    const updatedProducts = [...selectedProducts];
+                    updatedProducts[existingItemIndex].quantity += 1;
+                    setSelectedProducts(updatedProducts);
+                } else {
+                    const newProduct = {
+                        shoesDetailId: shoesDetailData.detailResponse.id,
+                        shoesName: shoesDetailData.detailResponse.name,
+                        sizeName: shoesDetailData.detailResponse.size,
+                        colorName: shoesDetailData.detailResponse.color,
+                        discountPrice: shoesDetailData.detailResponse.discountPrice,
+                        price: shoesDetailData.detailResponse.price,
+                        quantity: 1,
+                        image: shoesDetailData.images
+                    };
+
+                    setSelectedProducts([...selectedProducts, newProduct]);
+                }
+                setShoesDetail(shoesDetailData);
+            } catch (error) {
+                console.error('Lỗi khi lấy chi tiết giày dép:', error);
+            }
         }
     };
 
     let handleError = err => {
-        // alert(err);
     };
-
-    // const onSelectProducts = (selectedProductList, productQrCode) => {
-
-    //     if (productQrCode === qrCode) {
-
-    //         setSelectedProducts([...selectedProducts, selectedProductList]);
-    //     } else {
-
-    //     }
-    // };
 
     const [selectedProducts, setSelectedProducts] = useState([]);
     const handleSelectProducts = (selectedProductList) => {
