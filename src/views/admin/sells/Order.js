@@ -5,6 +5,8 @@ import { ToastContainer, toast } from "react-toastify";
 import { FaQrcode, FaUserPlus, FaUndoAlt, FaTrashAlt } from 'react-icons/fa';
 import { TbShoppingBagPlus } from 'react-icons/tb';
 import ReactPaginate from 'react-paginate';
+import Toggle from 'react-toggle';
+import QRCode from 'qrcode.react';
 import QrReader from 'react-qr-reader';
 import {
     Row, Col, Button, Card, CardBody, CardHeader, Table, InputGroup, Input,
@@ -26,6 +28,9 @@ const Order = () => {
         setResult("");
         setModal3(!modal3)
     };
+
+    const [showQRCode, setShowQRCode] = useState(false);
+    const toggleQR = () => setShowQRCode(!showQRCode);
 
     //phân trang
     const [currentPage, setCurrentPage] = useState(0);
@@ -264,7 +269,6 @@ const Order = () => {
             }
         }
     };
-
     let handleError = err => {
     };
 
@@ -314,7 +318,11 @@ const Order = () => {
     //Order
     const [deliveryData, setDeliveryData] = useState({});
     const [totalAmount, setTotalAmount] = useState(0);
+    const [usingPoints, setUsingPoints] = useState(false);
 
+    const handleToggleChange = () => {
+        setUsingPoints(!usingPoints);
+    };
     useEffect(() => {
         const newTotalAmount = selectedProducts.reduce((total, detail) => {
             return total + detail.quantity * detail.discountPrice;
@@ -327,6 +335,11 @@ const Order = () => {
     const handlePaymentMethodChange = (method) => {
         setPaymentMethod(method);
         setIsBankTransfer(method === 3 || method === 1);
+        if (method === 3) {
+            setShowQRCode(true);
+        } else {
+            setShowQRCode(false);
+        }
     };
 
     const buildDeliveryAddress = () => {
@@ -355,10 +368,19 @@ const Order = () => {
     };
 
     const calculateTotalMoney = () => {
-        return totalAmount -
+        const baseAmount = totalAmount -
             (promo && promo.typePeriod === 0 ? (promo.salePercent / 100) * totalAmount : 0) +
             shippingTotal +
             ((promo && promo.typePeriod === 1) ? -shippingTotal : 0);
+
+        // Kiểm tra điều kiện và tính toán giá trị mới
+        const adjustedAmount = usingPoints === true
+            ? (baseAmount >= selectedClient.totalPoints
+                ? baseAmount - selectedClient.totalPoints
+                : 0)
+            : baseAmount;
+
+        return adjustedAmount;
     };
 
     const createOrder = async () => {
@@ -385,7 +407,7 @@ const Order = () => {
                 paymentMethod: paymentMethod,
                 idDiscountPeriods: promo.id,
                 idClient: idClient,
-                usingPoints: false,
+                usingPoints: usingPoints,
                 shoesInCart: selectedProducts.map(product => ({
                     quantity: product.quantity,
                     idShoesDetail: product.shoesDetailId
@@ -399,9 +421,10 @@ const Order = () => {
             resetSelectedProducts();
             setSelectedClient(null);
             setSearchTerm("");
+            setUsingPoints(false);
             resetShip();
             setShowShippingForm(false);
-            setPaymentMethod(1);
+            setPaymentMethod(4);
         } catch (error) {
             // Xử lý lỗi nếu có
             console.error('Lỗi khi tạo hóa đơn:', error);
@@ -415,11 +438,11 @@ const Order = () => {
     const handleCustomerPaymentChange = (e) => {
         const paymentAmount = parseFloat(e.target.value) || 0;
         setCustomerPayment(paymentAmount);
-
-        // Tính toán số tiền thừa
-        const remainingAmount = paymentAmount - calculateTotalMoney();
-        setChangeAmount(remainingAmount < 0 ? 0 : remainingAmount);
     };
+    useEffect(() => {
+        const remainingAmount = customerPayment - calculateTotalMoney();
+        setChangeAmount(remainingAmount < 0 ? 0 : remainingAmount);
+    }, [calculateTotalMoney(), customerPayment]);
 
     const formatter = new Intl.NumberFormat("vi-VN", {
         style: "currency",
@@ -546,9 +569,10 @@ const Order = () => {
                                                     value={selectedClient ? selectedClient.fullname : searchTerm}
                                                     onChange={(e) => setSearchTerm(e.target.value)}
                                                     onKeyDown={(e) => {
-                                                        if (e.key === 'Enter') {
+                                                        if (e.key === 'Backspace') {
                                                             setSelectedClient(null);
                                                             setSearchTerm("");
+                                                            setUsingPoints(false);
                                                         }
                                                     }}
                                                 />
@@ -604,11 +628,19 @@ const Order = () => {
                                                 </Col>
                                             </Row>
                                             <Row>
-                                                <Label className="col">Điểm tích lũy:</Label>
+                                                <Label className="col">Xu tích lũy:</Label>
                                                 <Col className="text-right">
                                                     <h5>{selectedClient ? selectedClient.totalPoints : ""}</h5>
                                                 </Col>
                                             </Row>
+                                            <div className="mt-2 d-flex" style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
+                                                {selectedClient.totalPoints !== null && (
+                                                    <>
+                                                        <small className="mr-1">Sử dụng xu</small>
+                                                        <Toggle size="sm" defaultChecked={false} onChange={handleToggleChange} />
+                                                    </>
+                                                )}
+                                            </div>
                                         </Form>
                                     </Form>
                                 </CardBody>
@@ -778,14 +810,14 @@ const Order = () => {
                                         <h5>{formatter.format(totalAmount)}</h5>
                                     </Col>
                                 </Row>
-                                {/* {promo && promo.minPrice !== null && totalAmount >= promo.minPrice && promo.typePeriod === 0 && ( */}
-                                <Row className="mb-1">
-                                    <Label className="col">Voucher của shop:</Label>
-                                    <Col className="text-right">
-                                        <h5>{formatter.format((promo.salePercent / 100) * totalAmount)}</h5>
-                                    </Col>
-                                </Row>
-                                {/* )} */}
+                                {promo && promo.minPrice !== null && totalAmount >= promo.minPrice && promo.typePeriod === 0 && (
+                                    <Row className="mb-1">
+                                        <Label className="col">Voucher của shop:</Label>
+                                        <Col className="text-right">
+                                            <h5>{formatter.format((promo.salePercent / 100) * totalAmount)}</h5>
+                                        </Col>
+                                    </Row>
+                                )}
                                 {showShippingForm && (
                                     <Row className="mb-1">
                                         <Label className="col">Phí vận chuyển:</Label>
@@ -802,6 +834,31 @@ const Order = () => {
                                         </Col>
                                     </Row>
                                 )}
+
+                                <Row className="mb-1">
+                                    {usingPoints === true && (
+                                        <>
+                                            <Label className="col">Xu tích lũy</Label>
+                                            <Col>
+                                                <h5 className="text-right">
+                                                    {calculateTotalMoney() >= selectedClient.totalPoints
+                                                        ? formatter.format(-selectedClient.totalPoints)
+                                                        : (() => {
+                                                            const baseAmount = totalAmount -
+                                                                (promo && promo.typePeriod === 0 ? (promo.salePercent / 100) * totalAmount : 0) +
+                                                                shippingTotal +
+                                                                ((promo && promo.typePeriod === 1) ? -shippingTotal : 0);
+
+                                                            return formatter.format(-baseAmount);
+                                                        })()
+                                                    }
+                                                </h5>
+                                            </Col>
+                                        </>
+                                    )}
+                                </Row>
+
+
                                 <Row className="mb-1">
                                     <Label className="col h5" style={{ fontSize: 14 }}>Thành tiền:</Label>
                                     <Col className="text-right">
@@ -855,19 +912,22 @@ const Order = () => {
                                         </Label>
                                     </Col>
                                 </Row>
-                                <Row className="col ml-5">
-                                    <Col>
-                                        <Label check>
-                                            <Input
-                                                type="radio"
-                                                name="money"
-                                                checked={paymentMethod === 1}
-                                                onChange={() => handlePaymentMethodChange(1)}
-                                            />
-                                            Thanh toán sau khi nhận hàng
-                                        </Label>
-                                    </Col>
-                                </Row>
+
+                                {showShippingForm && (
+                                    <Row className="col ml-5">
+                                        <Col>
+                                            <Label check>
+                                                <Input
+                                                    type="radio"
+                                                    name="money"
+                                                    checked={paymentMethod === 1}
+                                                    onChange={() => handlePaymentMethodChange(1)}
+                                                />
+                                                Thanh toán sau khi nhận hàng
+                                            </Label>
+                                        </Col>
+                                    </Row>
+                                )}
 
                             </Form>
                         </CardBody>
@@ -993,7 +1053,7 @@ const Order = () => {
                 </ModalFooter>
             </Modal >
 
-            {/* QRCode */}
+            {/*Scan QRCode */}
             <Modal isOpen={modal3} toggle={toggle3} size="sm">
                 <ModalHeader toggle={toggle3}>QR Code Scanner</ModalHeader>
                 <ModalBody>
@@ -1005,6 +1065,23 @@ const Order = () => {
                         facingMode="environment"
                     />
                     <p>{result}</p>
+                </ModalBody>
+            </Modal>
+
+            {/* Mã QRCode */}
+            <Modal isOpen={showQRCode} toggle={toggleQR} size="sm">
+                <ModalHeader className="pb-0" toggle={toggleQR}>Mã QRCode</ModalHeader>
+                <ModalBody className="text-center p-0">
+
+                    <QRCode
+                        id='qrcode'
+                        value='https://viblo.asia/u/tranchien'
+                        size={300}
+                        level={'H'}
+                        includeMargin={true}
+                    />
+                    <p>Leather Gents</p>
+
                 </ModalBody>
             </Modal>
         </Row>

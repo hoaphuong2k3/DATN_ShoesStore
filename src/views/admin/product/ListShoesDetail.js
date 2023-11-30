@@ -19,17 +19,39 @@ const ListShoesDetail = () => {
 
     const [modal3, setModal3] = useState(false);
     const toggle3 = () => setModal3(!modal3);
-    const [result, setResult] = useState("No result");
+    const [result, setResult] = useState("");
     let handleScan = data => {
         if (data) {
             setResult(data);
+            setModal3(false);
+            fetchData();
         }
     };
 
     let handleError = err => {
-        // alert(err);
+        // toast.error("Không tìm thấy sản phẩm");
     };
 
+    const fetchData = async () => {
+        try {
+            if (result) {
+                setSearch({ qrCode: result });
+                const res = await getAllShoesDetail(id, page, size, search);
+                if (res && res.data && res.data.content) {
+                    setListShoesDetail(res.data.content);
+                    if (res.data.content.length > 0) {
+                        openEdit(res.data.content[0].shoesDetailSearchResponse.id);
+                    }
+                    setResult("");
+                }
+            }
+        } catch (error) {
+        }
+    };
+
+    useEffect(() => {
+        fetchData();
+    }, [result]);
 
     const [value, setValue] = useState('no');
     const { id } = useParams();
@@ -70,7 +92,8 @@ const ListShoesDetail = () => {
         toDateStr: "",
         createdBy: "",
         fromDate: "",
-        toDate: ""
+        toDate: "",
+        qrCode: "",
     });
     const resetSearch = () => {
         setSearch({
