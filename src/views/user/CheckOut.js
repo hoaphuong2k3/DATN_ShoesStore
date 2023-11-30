@@ -25,7 +25,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import Toggle from 'react-toggle';
 import 'react-toggle/style.css';
-import { FaTimes, FaCommentMedical, FaHeart } from "react-icons/fa";
+import { FaTimes, FaCommentMedical } from "react-icons/fa";
 import "assets/css/checkout.css";
 
 const Checkout = () => {
@@ -63,11 +63,12 @@ const Checkout = () => {
     return `${daysRemaining} ngày ${hoursRemaining} giờ`;
   };
 
+  const [displayedPoints, setDisplayedPoints] = useState(checkout.totalPoints);
   const [usingPoints, setUsingPoints] = useState(false);
-
   const handleToggleChange = () => {
     setUsingPoints(!usingPoints);
   };
+
 
   //Voucher
   const toggle = () => {
@@ -124,7 +125,7 @@ const Checkout = () => {
   //Voucher
   const fetchPromo = async () => {
     try {
-      const res = await axiosInstance.get('/vouchers/getAllIsActive');
+      const res = await axiosInstance.get(`/vouchers/getAllIsActive?id=${storedUserId}`);
       setVoucher(res.data);
       console.log("Promo:", res.data);
     } catch (error) {
@@ -166,14 +167,41 @@ const Checkout = () => {
         : 0) +
       (usedVoucherCode ? -voucherValue : 0) +
       shippingTotal +
-      (checkout.periodType === 1 ? -shippingTotal : 0) + (usingPoints===true ? -checkout.totalPoints : 0);
+      (checkout.periodType === 1 ? -shippingTotal : 0);
   };
+
+  const totalPaymentFinal = () => {
+    if (usingPoints === true) {
+      return calculatePayment() >= checkout.totalPoints
+        ? calculatePayment() - checkout.totalPoints
+        : 0;
+    } else {
+      return calculatePayment();
+    }
+  };
+
+  useEffect(() => {
+    const calculateAndFormatPoints = () => {
+      if (usingPoints === true) {
+        const updatedPoints =
+          calculatePayment() >= checkout.totalPoints
+            ? 0
+            : checkout.totalPoints - calculatePayment();
+        return (updatedPoints);
+      } else {
+        return (checkout.totalPoints);
+      }
+    };
+
+    setDisplayedPoints(calculateAndFormatPoints());
+  }, [usingPoints, calculatePayment(), checkout.totalPoints, formatter]);
+
+
 
   let idDisCountPeriod = checkout.idDiscountPeriod;
   if (checkout.totalMoney <= checkout.totalPayment || checkout.totalPayment === null) {
     idDisCountPeriod = null;
   }
-
 
 
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(null);
@@ -224,7 +252,7 @@ const Checkout = () => {
         idShoesDetail: products.map((product) => product.id),
         paymentMethod: selectedPaymentMethod,
         totalMoney: checkout.totalMoney,
-        totalPayment: calculatePayment(),
+        totalPayment: totalPaymentFinal(),
         points: checkout.points,
         usingPoints: usingPoints,
         deliveryOrderDTO: {
@@ -644,10 +672,19 @@ const Checkout = () => {
                         )}
                       </Button>
 
-                      <Row className="col mt-2" style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
-                        <span>{checkout.totalPoints}</span>
-                        <Toggle size="sm" defaultChecked={false} onChange={handleToggleChange} />
-                      </Row>
+                      <div className="mt-2" style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
+                        {checkout.totalPoints !== 0 && (
+                          <>
+                            <small className="mr-1">Xu tích lũy: {displayedPoints}</small>
+                            <Toggle size="sm" defaultChecked={false} onChange={handleToggleChange} />
+                          </>
+
+                        )}
+                      </div>
+
+                      <div className="text-right">
+                        <small className="text-danger">Nhận hàng hoàn xu: {checkout.points}</small>
+                      </div>
 
                     </CardBody>
                   </Card>
@@ -699,25 +736,29 @@ const Checkout = () => {
                           </div>
                         )}
 
-                        {usingPoints === true && (
-                          <div className="mb-2">
-                            <span className="mr-2 small">Xu tích lũy</span>
-                            <h5 style={{ float: "right" }}>
-                              {formatter.format(-checkout.totalPoints)}
-                            </h5>
-                          </div>
-                        )}
+                        <div className="mb-2">
+                          {usingPoints === true && (
+                            <>
+                              <span className="mr-2 small">Xu tích lũy</span>
+                              <h5 style={{ float: "right" }}>
+                                {calculatePayment() >= checkout.totalPoints
+                                  ? formatter.format(-checkout.totalPoints)
+                                  : formatter.format(-calculatePayment())}
+                              </h5>
+                            </>
+                          )}
+                        </div>
 
                       </Form>
 
                       <hr />
                       <span className="mr-2">Thành tiền</span>
                       <h3 style={{ float: "right" }}>
-                        {formatter.format(calculatePayment())}
+                        {formatter.format(totalPaymentFinal())}
                       </h3>
-
                     </CardBody>
                   </Card>
+
                   <div className="ml-2">
                     <p className="text-dark font-weight-bold mt-3">
                       <i
@@ -750,6 +791,7 @@ const Checkout = () => {
                       }
                     />
                     <Label className="ml-4">Thẻ Master/Ví điện tử</Label>
+
                   </div>
                   <Button
                     name="checkout"
@@ -788,7 +830,7 @@ const Checkout = () => {
             </Col>
           </Row>
 
-          {voucher.map((voucher, index) => (
+          {Array.isArray(voucher) && voucher.map((voucher, index) => (
             <Card body
               key={voucher.id}
               className="mt-3 pb-2 pt-2"
