@@ -108,12 +108,30 @@ const Success = (props) => {
                                                 </div>
                                             </Col>
                                             <Col lg="3">
-                                                <div className="d-flex justify-content-end" style={{ color: "red" }}>
-                                                    {formatter.format(itemC.price)}
-                                                </div>
-                                                {/* <div className="d-flex justify-content-end" style={{ color: "red" }}>
-                                                    {formatter.format(itemC.price)}
-                                                </div> */}
+                                                {
+                                                    itemC.discountPrice === null
+                                                        ?
+                                                        <>
+                                                            <div className="d-flex justify-content-end" style={{ color: "red" }}>
+                                                                {formatter.format(itemC.price)}
+                                                            </div>
+                                                        </>
+                                                        :
+                                                        <>
+                                                            {itemC.discountPrice < itemC.price &&
+                                                                <>
+                                                                    <span className="d-flex justify-content-end">
+                                                                        <div className="mt-1" style={{ color: "gray", fontSize: "12px", textDecoration: "line-through" }}>
+                                                                            {formatter.format(itemC.price)}
+                                                                        </div>&nbsp;&nbsp;
+                                                                        <div style={{ color: "red" }}>
+                                                                            {formatter.format(itemC.discountPrice)}
+                                                                        </div>
+                                                                    </span>
+                                                                </>
+                                                            }
+                                                        </>
+                                                }
                                             </Col>
                                         </Row>
                                         {(i + 1) < item.listCart.length && <hr />}
