@@ -36,6 +36,11 @@ const Promotion = () => {
         setThirdModal(true);
     }
 
+    const formatter = new Intl.NumberFormat("vi-VN", {
+        style: "currency",
+        currency: "VND",
+    });
+
     const [file, setFile] = useState(null);
     const [discounts, setDiscounts] = useState([]);
     const [freeGift, setfreeGift] = useState([]);
@@ -287,17 +292,10 @@ const Promotion = () => {
         fetchData();
     };
     const openlock = async (id) => {
-        try {
-            const selectedDiscount = discounts.find(discount => discount.id === id);
-
-            if (new Date(selectedDiscount.endDate) >= new Date(selectedDiscount.startDate) &&
-                isToday(new Date(selectedDiscount.startDate))) {
+        try {       
                 await axiosInstance.patch(`/admin/discount-period/setDiscountPeriodRun/${id}`);
                 toast.success("Cập nhật thành công");
                 fetchData();
-            } else {
-                toast.error("Không hợp lệ");
-            }
         } catch (error) {
             console.error("Lỗi khi cập nhật trạng thái:", error);
             if (error.response) {
@@ -632,7 +630,7 @@ const Promotion = () => {
                                                             <td>{discount.typePeriod === 0 ? "Order" : "FreeShip"}</td>
                                                             <td>{discount.name}</td>
                                                             <td style={{ textAlign: "right" }}>
-                                                                {discount.typePeriod === 0 ? `${discount.minPrice.toLocaleString("vi-VN")} VND` : ""}
+                                                                {discount.typePeriod === 0 ? `${formatter.format(discount.minPrice)}` : ""}
                                                             </td>
                                                             <td style={{ textAlign: "right" }}>
                                                                 {discount.typePeriod === 0 ? `${discount.salePercent}%` : ""}

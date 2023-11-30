@@ -25,6 +25,11 @@ const SaleProduct = () => {
         setModal(true);
     }
 
+    const formatter = new Intl.NumberFormat("vi-VN", {
+        style: "currency",
+        currency: "VND",
+    });
+
     const [secondModal, setSecondModal] = useState(false);
     const toggleSecondModal = () => setSecondModal(!secondModal);
 
@@ -624,7 +629,7 @@ const SaleProduct = () => {
                                         </td>
                                         <td>{discount.code}</td>
                                         <td>{discount.name}</td>
-                                        <td style={{ textAlign: "right" }}>{discount.minPrice.toLocaleString("vi-VN")} VND</td>
+                                        <td style={{ textAlign: "right" }}>{formatter.format(discount.minPrice)}</td>
                                         <td style={{ textAlign: "center" }}>
                                             {discount.salePercent ? (
                                                 <Badge color="info">Phần trăm</Badge>
@@ -634,7 +639,7 @@ const SaleProduct = () => {
                                         </td>
                                         <td style={{ textAlign: "right" }}>
                                             {discount.salePercent ? `${discount.salePercent}%` : ""}
-                                            {discount.salePrice ? `${discount.salePrice.toLocaleString("vi-VN")} VND` : ""}
+                                            {discount.salePrice ? `${formatter.format(discount.salePrice)}` : ""}
                                         </td>
                                         <td>{format(new Date(discount.startDate), 'yyyy-MM-dd HH:mm', { locale: vi })}</td>
                                         <td>{format(new Date(discount.endDate), 'yyyy-MM-dd HH:mm', { locale: vi })}</td>
@@ -945,7 +950,7 @@ const SaleProduct = () => {
                                         <td>{shoes.lining}</td>
                                         <td>{shoes.cushion}</td>
 
-                                        <td className="text-right">{shoes.priceMin} - {shoes.priceMax}</td>
+                                        <td className="text-right">{formatter.format(shoes.priceMin)} - {formatter.format(shoes.priceMax)}</td>
                                         <td className="text-center" style={{ position: "sticky", zIndex: '1', right: '0', background: "#fff" }}>
                                             <Button color="link" size="sm" onClick={() => handleEditButtonClick(shoes.id)}><FaEdit /></Button>
                                         </td>
@@ -1019,7 +1024,7 @@ const SaleProduct = () => {
                                     <td>{detail.shoesDetailSearchResponse.code}</td>
                                     <td>{detail.shoesDetailSearchResponse.size}</td>
                                     <td>{detail.shoesDetailSearchResponse.color}</td>
-                                    <td className="text-right">{detail.shoesDetailSearchResponse.price}</td>
+                                    <td className="text-right">{formatter.format(detail.shoesDetailSearchResponse.price)}</td>
                                     <td className="text-right">{detail.shoesDetailSearchResponse.quantity}</td>
                                 </tr>
                             ))}

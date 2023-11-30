@@ -30,6 +30,10 @@ const SaleBills = () => {
         setThirdModal(true);
     }
 
+    const formatter = new Intl.NumberFormat("vi-VN", {
+        style: "currency",
+        currency: "VND",
+    });
 
     const [discounts, setDiscounts] = useState([]);
     const [totalElements, setTotalElements] = useState(0);
@@ -521,7 +525,7 @@ const SaleBills = () => {
                                         <td>{discount.code}</td>
                                         <td>{discount.name}</td>
 
-                                        <td style={{ textAlign: "right" }}>{discount.minPrice.toLocaleString("vi-VN")} VND</td>
+                                        <td style={{ textAlign: "right" }}>{formatter.format(discount.minPrice)}</td>
                                         <td style={{ textAlign: "center" }}>
                                             {discount.salePercent ? (
                                                 <Badge color="info">Phần trăm</Badge>
@@ -532,7 +536,7 @@ const SaleBills = () => {
 
                                         <td style={{ textAlign: "right" }}>
                                             {discount.salePercent ? `${discount.salePercent}%` : ""}
-                                            {discount.salePrice ? `${discount.salePrice.toLocaleString("vi-VN")} VND` : ""}
+                                            {discount.salePrice ? `${formatter.format(discount.salePrice)}` : ""}
                                         </td>
                                         <td style={{ textAlign: "right" }}>{discount.quantity}</td>
                                         <td>{format(new Date(discount.startDate), 'yyyy-MM-dd HH:mm', { locale: vi })}</td>
