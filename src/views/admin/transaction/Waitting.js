@@ -29,6 +29,7 @@ const Waitting = () => {
         currency: "VND",
     });
 
+    const storedUserId = localStorage.getItem("userId");
     const [confirm, setConfirm] = useState([]);
     const [selectedOrderId, setSelectedOrderId] = useState(null);
     const [orderData, setOrderData] = useState({});
@@ -333,7 +334,7 @@ const Waitting = () => {
                     label: 'Có',
                     onClick: async () => {
                         try {
-                            await axiosInstance.put(`/order/admin/update-status/${orderId}?status=2`);
+                            await axiosInstance.put(`/order/admin/update-status/${orderId}/${storedUserId}?status=2`);
 
                             toast.success('Đơn hàng đang chờ vận chuyển', { autoClose: 2000 });
                             fetchData();
@@ -369,7 +370,7 @@ const Waitting = () => {
                     onClick: async () => {
                         try {
                             await Promise.all(selectedIds.map(async (id) => {
-                                await axiosInstance.put(`/order/admin/update-status/${id}?status=${status}`);
+                                await axiosInstance.put(`/order/admin/update-status/${id}/${storedUserId}?status=${status}`);
                             }));
                             fetchData();
                             toast.success(successMessage, { autoClose: 2000 });

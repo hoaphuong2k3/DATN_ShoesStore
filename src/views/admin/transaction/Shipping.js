@@ -27,6 +27,7 @@ const Shipping = () => {
         currency: "VND",
     });
 
+    const storedUserId = localStorage.getItem("userId");
     const [confirm, setConfirm] = useState([]);
     const [selectedOrderId, setSelectedOrderId] = useState(null);
     const [orderData, setOrderData] = useState({});
@@ -241,7 +242,7 @@ const Shipping = () => {
                     label: 'Có',
                     onClick: async () => {
                         try {
-                            await axiosInstance.put(`/order/admin/update-status/${orderId}?status=3`);
+                            await axiosInstance.put(`/order/admin/update-status/${orderId}/${storedUserId}?status=3`);
 
                             toast.success('Đơn hàng hoàn thành', { autoClose: 2000 });
                             fetchData();
@@ -277,7 +278,7 @@ const Shipping = () => {
                     onClick: async () => {
                         try {
                             await Promise.all(selectedIds.map(async (id) => {
-                                await axiosInstance.put(`/order/admin/update-status/${id}?status=3`);
+                                await axiosInstance.put(`/order/admin/update-status/${id}/${storedUserId}?status=3`);
                             }));
                             fetchData();
                             toast.success("Đơn hàng hoàn thành", { autoClose: 2000 });

@@ -18,6 +18,7 @@ const Confirm = () => {
     const [modal, setModal] = useState(false);
     const toggle = () => setModal(!modal);
 
+    const storedUserId = localStorage.getItem("userId");
     const [totalPages, setTotalPages] = useState(0);
     const [totalElements, setTotalElements] = useState(0);
 
@@ -118,13 +119,15 @@ const Confirm = () => {
     const [formData, setFormData] = useState({
         id: null,
         code: "",
-        fullname: "",
+        fullnameClient: "",
         phoneNumber: "",
-        totalMoney: "",
+        totalPayment: "",
         paymentMethod: "",
         percentVoucher: "",
         priceVoucher: "",
         percentPeriod: "",
+        nameFreeGift: "",
+        imageFreeGift: ""
     });
 
     //TotalMoney
@@ -185,13 +188,15 @@ const Confirm = () => {
             setFormData({
                 id: confirm.id,
                 code: confirm.code,
-                fullname: confirm.fullname,
+                fullnameClient: confirm.fullnameClient,
                 phoneNumber: confirm.phoneNumber,
-                totalMoney: totalMoney,
+                totalPayment: totalMoney,
                 paymentMethod: confirm.paymentMethod,
                 percentVoucher: confirm.percentVoucher,
                 priceVoucher: confirm.priceVoucher,
                 percentPeriod: confirm.percentPeriod,
+                nameFreeGift: confirm.nameFreeGift,
+                imageFreeGift: confirm.imageFreeGift
             });
             setOrderData(orderResponse);
             setDeliveryData(deliveryResponse.data);
@@ -318,7 +323,7 @@ const Confirm = () => {
                     label: 'Có',
                     onClick: async () => {
                         try {
-                            await axiosInstance.put(`/order/admin/update-status/${orderId}?status=1`);
+                            await axiosInstance.put(`/order/admin/update-status/${orderId}/${storedUserId}?status=1`);
 
                             toast.success('Đơn hàng đang chờ vận chuyển', { autoClose: 2000 });
                             fetchData();
@@ -339,6 +344,7 @@ const Confirm = () => {
         });
     };
 
+
     const handleAction = async (status, successMessage) => {
         if (selectedIds.length === 0) {
             toast.warning('Mời chọn ít nhất một đơn hàng.');
@@ -354,7 +360,7 @@ const Confirm = () => {
                     onClick: async () => {
                         try {
                             await Promise.all(selectedIds.map(async (id) => {
-                                await axiosInstance.put(`/order/admin/update-status/${id}?status=${status}`);
+                                await axiosInstance.put(`/order/admin/update-status/${id}/${storedUserId}?status=${status}`);
                             }));
                             fetchData();
                             toast.success(successMessage, { autoClose: 2000 });
@@ -466,7 +472,7 @@ const Confirm = () => {
             setTotalProductPrice(updatedProductPrice);
             setFormData((prevFormData) => ({
                 ...prevFormData,
-                totalMoney: updatedTotalMoney,
+                totalPayment: updatedTotalMoney,
             }));
             setOrderData(orderResponse);
 
@@ -554,9 +560,9 @@ const Confirm = () => {
                                             </td>
                                             <td className="text-center">{calculateIndex(index)}</td>
                                             <td>{confirm.code}</td>
-                                            <td>{confirm.fullname}</td>
+                                            <td>{confirm.fullnameClient}</td>
                                             <td>{confirm.phoneNumber}</td>
-                                            <td className="text-right">{formatter.format(confirm.totalMoney)}</td>
+                                            <td className="text-right">{formatter.format(confirm.totalPayment)}</td>
                                             <td className="text-center">
                                                 <Badge color={confirm.paymentMethod === 1 ? "success" : confirm.paymentMethod === 2 ? "primary" : "secondary"}>
                                                     {confirm.paymentMethod === 1 ? "COD" : confirm.paymentMethod === 2 ? "Ví điện tử" : "Không xác định"}
@@ -671,7 +677,7 @@ const Confirm = () => {
                                                     <Input
                                                         size="sm"
                                                         type="text"
-                                                        value={formData.fullname}
+                                                        value={formData.fullnameClient}
                                                         readOnly style={{ backgroundColor: "#fff" }}
                                                     />
                                                 </FormGroup>
@@ -835,41 +841,44 @@ const Confirm = () => {
 
 
                                         <Row >
-                                            <Col md={6}>
-                                                <FormGroup>
-                                                    <Label>
-                                                        Đợt giảm giá
-                                                    </Label>
-                                                    <InputGroup size="sm">
-                                                        <Input
-                                                            size="sm"
-                                                            type="number"
-                                                            value={formData.percentPeriod}
-                                                        />
-                                                        <InputGroupAddon addonType="append">
-                                                            <InputGroupText>%</InputGroupText>
-                                                        </InputGroupAddon>
-                                                    </InputGroup>
-                                                </FormGroup>
-
-                                            </Col>
-                                            <Col md={6}>
-                                                <FormGroup>
-                                                    <Label>
-                                                        Voucher từ shop
-                                                    </Label>
-                                                    <InputGroup size="sm">
-                                                        <Input
-                                                            size="sm"
-                                                            type="number"
-                                                            value={formData.percentVoucher || formData.priceVoucher || ""}
-                                                        />
-                                                        <InputGroupAddon addonType="append">
-                                                            <InputGroupText>{formData.percentVoucher ? "%" : "VND"}</InputGroupText>
-                                                        </InputGroupAddon>
-                                                    </InputGroup>
-                                                </FormGroup>
-                                            </Col>
+                                            {formData.percentPeriod && (
+                                                <Col md={6}>
+                                                    <FormGroup>
+                                                        <Label>
+                                                            Đợt giảm giá
+                                                        </Label>
+                                                        <InputGroup size="sm">
+                                                            <Input
+                                                                size="sm"
+                                                                type="number"
+                                                                value={formData.percentPeriod}
+                                                            />
+                                                            <InputGroupAddon addonType="append">
+                                                                <InputGroupText>%</InputGroupText>
+                                                            </InputGroupAddon>
+                                                        </InputGroup>
+                                                    </FormGroup>
+                                                </Col>
+                                            )}
+                                            {(formData.percentVoucher || formData.priceVoucher) && (
+                                                <Col md={6}>
+                                                    <FormGroup>
+                                                        <Label>
+                                                            Voucher từ shop
+                                                        </Label>
+                                                        <InputGroup size="sm">
+                                                            <Input
+                                                                size="sm"
+                                                                type="number"
+                                                                value={formData.percentVoucher || formData.priceVoucher || ""}
+                                                            />
+                                                            <InputGroupAddon addonType="append">
+                                                                <InputGroupText>{formData.percentVoucher ? "%" : "VND"}</InputGroupText>
+                                                            </InputGroupAddon>
+                                                        </InputGroup>
+                                                    </FormGroup>
+                                                </Col>
+                                            )}
                                         </Row>
 
                                         <Row >
@@ -911,8 +920,8 @@ const Confirm = () => {
                                                 <Input
                                                     size="sm"
                                                     type="number"
-                                                    value={Math.floor(formData.totalMoney)}
-                                                    onChange={(e) => setFormData({ ...formData, totalMoney: e.target.value })}
+                                                    value={Math.floor(formData.totalPayment)}
+                                                    onChange={(e) => setFormData({ ...formData, totalPayment: e.target.value })}
                                                     readOnly style={{ backgroundColor: "#fff" }}
 
                                                 />
@@ -956,11 +965,14 @@ const Confirm = () => {
                                                         <td>
                                                             <Row className="col">
                                                                 <Col md={4}>
-                                                                    <span className="avatar avatar-sm rounded-circle">
-                                                                        <img src={`https://s3-ap-southeast-1.amazonaws.com/imageshoestore/${product.imgUri}`} alt="" />
-                                                                    </span>
+
+                                                                    <img src={`https://s3-ap-southeast-1.amazonaws.com/imageshoestore/${product.imgUri}`}
+                                                                        alt=""
+                                                                        style={{ width: "60px", height: "45px" }}
+                                                                    />
+
                                                                 </Col>
-                                                                <Col md={8}>
+                                                                <Col md={8} className="pl-4">
                                                                     <h5>{product.shoesName}</h5>
                                                                     <small className="mr-1">Màu: {product.colorName}</small>
                                                                     <small>Size: {product.sizeName}</small>
@@ -970,7 +982,7 @@ const Confirm = () => {
 
                                                         </td>
                                                         <td className="text-center">
-                                                            {formData && formData.paymentMethod === 1 ? (
+                                                            {formData.paymentMethod === 1 ? (
                                                                 <>
                                                                     <button
                                                                         className="mr-3"
@@ -988,7 +1000,7 @@ const Confirm = () => {
                                                                         <FaPlus fontSize={8} />
                                                                     </button>
                                                                 </>
-                                                            ) : formData && formData.paymentMethod === 2 ? (
+                                                            ) : formData.paymentMethod === 2 ? (
                                                                 <>{product.quantity}</>
                                                             ) : null}
                                                         </td>
@@ -996,14 +1008,39 @@ const Confirm = () => {
                                                         <td className="text-right">{formatter.format(product.price)}</td>
                                                         <td className="text-right">{formatter.format(product.totalPrice)}</td>
                                                         <td className="text-right">
-                                                            <Button className="pt-0" color="link" size="sm" onClick={() => handleDeleteProduct(product.id)}
-                                                            ><FaTrash />
-                                                            </Button>
+                                                            {formData.paymentMethod === 1 && (
+                                                                <>
+                                                                    <Button className="pt-0" color="link" size="sm" onClick={() => handleDeleteProduct(product.id)}
+                                                                    ><FaTrash />
+                                                                    </Button>
+                                                                </>
+                                                            )}
                                                         </td>
                                                     </tr>
                                                 ))}
                                         </tbody>
                                     </Table>
+                                    {formData.imageFreeGift && formData.nameFreeGift && (
+                                        <div style={{ padding: "15px 0 5px 0", boxShadow: "0 0 10px rgba(0, 0, 0, 0.1)" }}>
+                                            <div className="item d-flex">
+                                                <div className="product-container mr-4 ml-5">
+                                                    <img
+                                                        src={`data:image/jpeg;base64,${formData.imageFreeGift}`}
+                                                        alt={formData.nameFreeGift}
+                                                        style={{ width: "50px" }}
+                                                    />
+                                                    <div className="quantity-badge">
+                                                        <span className="quantity">1</span>
+                                                    </div>
+                                                </div>
+
+                                                <div>
+                                                    <div className="text-warning text-center" style={{ border: "1px solid", fontSize: 11, width: 60 }}>Quà tặng</div>
+                                                    <div className="small mt-1">{formData.nameFreeGift}</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
                                 </Col>
                             </Row>
 

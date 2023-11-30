@@ -367,11 +367,17 @@ const Order = () => {
         return deliveryAddress;
     };
 
-    const calculateTotalMoney = () => {
-        const baseAmount = totalAmount -
+    const calculateBaseAmount = () => {
+        return (
+            totalAmount -
             (promo && promo.typePeriod === 0 ? (promo.salePercent / 100) * totalAmount : 0) +
             shippingTotal +
-            ((promo && promo.typePeriod === 1) ? -shippingTotal : 0);
+            (promo && promo.typePeriod === 1 ? -shippingTotal : 0)
+        );
+    };
+
+    const calculateTotalMoney = () => {
+        const baseAmount = calculateBaseAmount();
 
         // Kiểm tra điều kiện và tính toán giá trị mới
         const adjustedAmount = usingPoints === true
@@ -382,6 +388,23 @@ const Order = () => {
 
         return adjustedAmount;
     };
+
+    const usedPoints = () => {
+        const baseAmount = calculateBaseAmount();
+
+        if (usingPoints === true) {
+            return baseAmount >= selectedClient.totalPoints ? 0 : parseInt(selectedClient.totalPoints - baseAmount);
+        } else {
+            return null;
+        }
+    };
+
+    let idDiscountPeriods;
+    if (promo) {
+        idDiscountPeriods = promo.id;
+      } else {
+        idDiscountPeriods = null;
+      }
 
     const createOrder = async () => {
 
@@ -405,9 +428,10 @@ const Order = () => {
                 totalMoney: totalAmount,
                 totalPayment: calculateTotalMoney(),
                 paymentMethod: paymentMethod,
-                idDiscountPeriods: promo.id,
+                idDiscountPeriods: idDiscountPeriods,
                 idClient: idClient,
                 usingPoints: usingPoints,
+                totalPoints: usedPoints(),
                 shoesInCart: selectedProducts.map(product => ({
                     quantity: product.quantity,
                     idShoesDetail: product.shoesDetailId
@@ -530,6 +554,29 @@ const Order = () => {
                             </Table>
                         )}
 
+                        {promo && promo.freeGiftImage && promo.freeGiftName && (
+                            <div style={{ padding: "15px 0 5px 0", boxShadow: "0 0 10px rgba(0, 0, 0, 0.1)" }}>
+                                <div className="item d-flex">
+                                    <div className="product-container mr-5">
+                                        <img
+                                            src={`data:image/jpeg;base64,${promo.freeGiftImage}`}
+                                            alt={promo.freeGiftName}
+                                            style={{ width: "50px" }}
+                                        />
+                                        <div className="quantity-badge">
+                                            <span className="quantity">1</span>
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <div className="text-warning text-center" style={{ border: "1px solid", fontSize: 11, width: 60 }}>Quà tặng</div>
+                                        <div className="small mt-1">{promo.freeGiftName}</div>
+                                        {/* <div className="mt-1 small text-primary">Chương trình áp dụng: từ ngày {promo.startDate}</div> */}
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
                         {selectedProducts.length > 0 && (
                             <Row className="col" style={{ justifyContent: "center" }}>
                                 <ReactPaginate
@@ -628,7 +675,7 @@ const Order = () => {
                                                 </Col>
                                             </Row>
                                             <Row>
-                                                <Label className="col">Xu tích lũy:</Label>
+                                                <Label className="col">Xu tích lũy: </Label>
                                                 <Col className="text-right">
                                                     <h5>{selectedClient ? selectedClient.totalPoints : ""}</h5>
                                                 </Col>
@@ -636,7 +683,13 @@ const Order = () => {
                                             <div className="mt-2 d-flex" style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
                                                 {selectedClient.totalPoints !== null && (
                                                     <>
-                                                        <small className="mr-1">Sử dụng xu</small>
+                                                        <small className="mr-1">
+                                                            {usingPoints
+                                                                ? `Xu còn lại: ${usedPoints()}`
+                                                                : `Sử dụng xu`
+                                                            }
+                                                        </small>
+
                                                         <Toggle size="sm" defaultChecked={false} onChange={handleToggleChange} />
                                                     </>
                                                 )}
@@ -814,7 +867,7 @@ const Order = () => {
                                     <Row className="mb-1">
                                         <Label className="col">Voucher của shop:</Label>
                                         <Col className="text-right">
-                                            <h5>{formatter.format((promo.salePercent / 100) * totalAmount)}</h5>
+                                            <h5>{formatter.format(-(promo.salePercent / 100) * totalAmount)}</h5>
                                         </Col>
                                     </Row>
                                 )}
@@ -841,16 +894,9 @@ const Order = () => {
                                             <Label className="col">Xu tích lũy</Label>
                                             <Col>
                                                 <h5 className="text-right">
-                                                    {calculateTotalMoney() >= selectedClient.totalPoints
+                                                    {calculateBaseAmount() >= selectedClient.totalPoints
                                                         ? formatter.format(-selectedClient.totalPoints)
-                                                        : (() => {
-                                                            const baseAmount = totalAmount -
-                                                                (promo && promo.typePeriod === 0 ? (promo.salePercent / 100) * totalAmount : 0) +
-                                                                shippingTotal +
-                                                                ((promo && promo.typePeriod === 1) ? -shippingTotal : 0);
-
-                                                            return formatter.format(-baseAmount);
-                                                        })()
+                                                        : formatter.format(-calculateBaseAmount())
                                                     }
                                                 </h5>
                                             </Col>

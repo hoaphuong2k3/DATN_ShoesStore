@@ -194,7 +194,7 @@ const Checkout = () => {
     };
 
     setDisplayedPoints(calculateAndFormatPoints());
-  }, [usingPoints, calculatePayment(), checkout.totalPoints, formatter]);
+  }, [usingPoints, calculatePayment(), checkout.totalPoints]);
 
 
 
@@ -255,6 +255,7 @@ const Checkout = () => {
         totalPayment: totalPaymentFinal(),
         points: checkout.points,
         usingPoints: usingPoints,
+        totalPoints: displayedPoints,
         deliveryOrderDTO: {
           address: deliveryAddress.address,
           recipientName: recipientName,
