@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useParams } from "react";
 import { useNavigate, Link } from 'react-router-dom';
 import {
   Card,
@@ -118,7 +118,7 @@ const Menu = ({ setActiveTab, activeTab, avatar, username }) => {
   );
 };
 
-const Account = () => {
+const Account = ({ tab }) => {
   const { logout } = useAuth();
   const storedUserId = localStorage.getItem('userId');
   const [client, setClient] = useState(null);
@@ -177,8 +177,11 @@ const Account = () => {
       dateOfBirth: client ? client.dateOfBirth : ''
     }));
   }, [client]);
+  const [activeTab, setActiveTab] = useState(tab);
 
-  const [activeTab, setActiveTab] = useState("profile");
+  useEffect(() => {
+    setActiveTab(tab);
+  }, [tab]);
   const [file, setFile] = useState(null);
 
   const handleFileChange = (e) => {
@@ -473,6 +476,7 @@ const Account = () => {
           }
           {client &&
             <>
+              {console.log(tab)}
               <Menu setActiveTab={setActiveTab} activeTab={activeTab} avatar={imageUrl} username={client.username} />
               <div className="col-10">
                 {/* Profile */}
@@ -697,7 +701,7 @@ const Account = () => {
                                       <Row>
                                         <Col lg="9"  >
                                           <div style={{ fontSize: "14" }} className="text-small text-muted mb-0">
-                                          {item.addressDetail}, {item.address}
+                                            {item.addressDetail}, {item.address}
                                           </div>
                                         </Col>
                                         <Col lg="3" className="mr--1">

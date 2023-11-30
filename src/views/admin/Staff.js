@@ -4,7 +4,6 @@ import {
   FaEdit,
   FaTrash,
   FaSearch,
-  FaFileAlt,
   FaCamera,
   FaLock,
   FaLockOpen,
@@ -12,16 +11,14 @@ import {
   FaTimesCircle,
   FaUndoAlt,
   FaSort,
-  FaTimes,
+  FaTimes, FaQrcode
 } from "react-icons/fa";
 import ReactPaginate from "react-paginate";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import axiosInstance from "services/custommize-axios";
-import Header from "components/Headers/Header.js";
-
+import { QrReader } from 'react-qr-reader';
 // reactstrap components
-import Switch from "react-input-switch";
 import {
   Row,
   Card,
@@ -509,6 +506,24 @@ const Staff = () => {
       sortOrder: newSortOrder,
     });
   };
+  //Modal QR
+  const [modalQR, setModalQR] = useState(false);
+  const toggleQR = () => {
+    setModalQR(!modalQR);
+    // fetchData();
+  };
+  const [result, setResult] = useState('');
+
+  const handleScan = (data) => {
+    if (data) {
+      setResult(data);
+    }
+  }
+
+  const handleError = (err) => {
+    console.error(err);
+  }
+  //Kết thúc modal QR
 
   return (
     <>
@@ -525,6 +540,9 @@ const Staff = () => {
                         Nhân Viên
                       </h3>
                       <div className="col text-right">
+                        <Button color="warning" outline size="sm">
+                          <FaQrcode className="mr-1" onClick={toggleQR} />QR CODE
+                        </Button>
                         <Button
                           color="primary"
                           outline
@@ -621,8 +639,8 @@ const Staff = () => {
                             />
                           </FormGroup>
                         </th>
-                        <th scope="col"style={{color: "black"}}>STT</th>
-                        <th scope="col" style={{color: "black"}}>Ảnh</th>
+                        <th scope="col" style={{ color: "black" }}>STT</th>
+                        <th scope="col" style={{ color: "black" }}>Ảnh</th>
                         <th
                           scope="col"
                           style={{
@@ -635,7 +653,7 @@ const Staff = () => {
                           Trạng thái
                         </th>
 
-                        <th scope="col" style={{ color: "black"}}>
+                        <th scope="col" style={{ color: "black" }}>
                           Họ tên
                           <FaSort
                             style={{ cursor: "pointer" }}
@@ -643,8 +661,8 @@ const Staff = () => {
                             onClick={() => handleSort("fullname")}
                           />
                         </th>
-                        <th scope="col" style={{color: "black"}}>Ngày sinh</th>
-                        <th scope="col" style={{color: "black"}}>
+                        <th scope="col" style={{ color: "black" }}>Ngày sinh</th>
+                        <th scope="col" style={{ color: "black" }}>
                           Giới tính
                           <FaSort
                             style={{ cursor: "pointer" }}
@@ -652,7 +670,7 @@ const Staff = () => {
                             onClick={() => handleSort("gender")}
                           />
                         </th>
-                        <th scope="col" style={{ color: "black"}}>
+                        <th scope="col" style={{ color: "black" }}>
                           Số điện thoại
                           <FaSort
                             style={{ cursor: "pointer" }}
@@ -660,10 +678,10 @@ const Staff = () => {
                             onClick={() => handleSort("phonenumber")}
                           />
                         </th>
-                        <th scope="col" style={{color: "black"}}>
+                        <th scope="col" style={{ color: "black" }}>
                           Email
                           <FaSort
-                            style={{ cursor: "pointer"}}
+                            style={{ cursor: "pointer" }}
                             className="text-muted"
                             onClick={() => handleSort("email")}
                           />
@@ -686,7 +704,7 @@ const Staff = () => {
                     </thead>
                     <tbody>
                       {Array.isArray(filterAdmins) &&
-                      filterAdmins.length > 0 ? (
+                        filterAdmins.length > 0 ? (
                         filterAdmins.map((admin, index) => (
                           <tr key={admin.id}>
                             <td className="text-center">
@@ -1389,6 +1407,36 @@ const Staff = () => {
                     </Button>
                   </Col>
                 </div>
+              </ModalFooter>
+            </Modal>
+            {/* QR */}
+            <Modal
+              isOpen={modalQR}
+              toggle={toggleQR}
+              backdrop={"static"}
+              keyboard={false}
+              style={{ maxWidth: "400px" }}
+            >
+              <ModalHeader toggle={toggleQR}>
+                <h3 className="heading-small text-muted mb-0">
+                  QR CODE
+                </h3>
+              </ModalHeader>
+              <ModalBody>
+                <div className="mt--4">
+                  <QrReader
+                    delay={300}
+                    onError={handleError}
+                    onScan={handleScan}
+                    style={{ width: '100%' }}
+                  />
+                  <p>{result}</p>
+                </div>
+              </ModalBody>
+              <ModalFooter>
+                <Button color="danger" outline size="sm" bloc onClick={toggleQR}>
+                  Đóng
+                </Button>
               </ModalFooter>
             </Modal>
           </Col>

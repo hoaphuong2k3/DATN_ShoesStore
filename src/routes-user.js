@@ -49,14 +49,15 @@ var routes = [
   {
     path: "/account",
     name: "TÀI KHOẢN",
-    component: <Account />,
     layout: "/shoes",
+    component: <Account tab="profile" />,
   },
   {
     path: "/bill",
     name: "TÀI KHOẢN",
-    component: <Bill />,
     layout: "/shoes",
+
+    component: <Account tab="bill" />,
   },
   {
     path: "/productdetail/:id",
