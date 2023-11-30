@@ -120,7 +120,7 @@ const Waitting = (props) => {
                                                         </>
                                                         :
                                                         <>
-                                                            {itemC.discountPrice < itemC.price &&
+                                                            {itemC.discountPrice < itemC.price ?
                                                                 <>
                                                                     <span className="d-flex justify-content-end">
                                                                         <div className="mt-1" style={{ color: "gray", fontSize: "12px", textDecoration: "line-through" }}>
@@ -130,6 +130,11 @@ const Waitting = (props) => {
                                                                             {formatter.format(itemC.discountPrice)}
                                                                         </div>
                                                                     </span>
+                                                                </> :
+                                                                <>
+                                                                    <div className="d-flex justify-content-end" style={{ color: "red" }}>
+                                                                        {formatter.format(itemC.price)}
+                                                                    </div>
                                                                 </>
                                                             }
                                                         </>
