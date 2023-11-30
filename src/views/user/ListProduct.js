@@ -618,7 +618,7 @@ const Product = () => {
                               <Link to={`/shoes/productdetail/${product.id}`}>
                                 <h3 className="product-card__title">
                                   {/* SAVILLE CAPTOE OXFORD - OF32 */}
-                                  {`${product.name} ${product.cushion} ${product.designStyle} ${product.brand}`}
+                                  {`${product.name} ${product.brand} ${product.origin}`}
                                 </h3>
                               </Link>
                               <div className="product-price">
