@@ -17,7 +17,7 @@ import ReactPaginate from "react-paginate";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import axiosInstance from "services/custommize-axios";
-import { QrReader } from 'react-qr-reader';
+// import { QrReader } from 'react-qr-reader';
 // reactstrap components
 import {
   Row,
@@ -1423,7 +1423,7 @@ const Staff = () => {
                 </h3>
               </ModalHeader>
               <ModalBody>
-                <div className="mt--4">
+                {/* <div className="mt--4">
                   <QrReader
                     delay={300}
                     onError={handleError}
@@ -1431,7 +1431,7 @@ const Staff = () => {
                     style={{ width: '100%' }}
                   />
                   <p>{result}</p>
-                </div>
+                </div> */}
               </ModalBody>
               <ModalFooter>
                 <Button color="danger" outline size="sm" bloc onClick={toggleQR}>
