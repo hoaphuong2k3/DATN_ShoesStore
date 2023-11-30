@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { getAllShoes } from "services/Product2Service";
+import { getAllShoesUser } from "services/Product2Service";
 import { getAllShoesDetail } from "services/ShoesDetailService.js";
 import { getAllColorId, getAllSizeId } from "services/ProductAttributeService";
 import {
@@ -152,15 +152,10 @@ const Products = ({ onSelectProducts }) => {
         getListCushion();
     }, []);
 
-
-    //Sort
-    const [sort, setSort] = useState('');
-    const [sortStyle, setSortStyle] = useState('');
-
     //getListShoes
     const getAll = async () => {
         try {
-            let res = await getAllShoes(page, size, search, sort, sortStyle);
+            let res = await getAllShoesUser(page, size, search);
             if (res && res.data && res.data.content) {
                 setListShoes(res.data.content);
                 console.log(res.data);
@@ -173,7 +168,7 @@ const Products = ({ onSelectProducts }) => {
     }
     useEffect(() => {
         getAll(page, size);
-    }, [search, sort, sortStyle]);
+    }, [search]);
 
     const handlePageChange = ({ selected }) => {
         setSearch(prevSearch => ({ ...prevSearch, page: selected }));
@@ -244,6 +239,7 @@ const Products = ({ onSelectProducts }) => {
                 if (selectedSize && selectedColor) {
                     const confirmationData = {
                         shoesDetailId: selectedShoesDetailId,
+                        shoesName: shoesdetail.shoesDetailSearchResponse.shoesName,
                         sizeName: selectedSize.name,
                         colorName: selectedColor.name,
                         quantity: inputQuantity,
@@ -439,7 +435,7 @@ const Products = ({ onSelectProducts }) => {
                         <Col lg={4}>
                             {shoesdetail.imageDTOS && (
                                 <>
-                                    <SlideShow 
+                                    <SlideShow
                                         images={shoesdetail.imageDTOS}
                                         imageSize={"100%"}
                                     />
@@ -451,25 +447,33 @@ const Products = ({ onSelectProducts }) => {
                             <div className="mb-2 p-2" style={{ borderRadius: 5, boxShadow: "0 0 10px rgba(0, 0, 0, 0.1)" }}>
                                 {shoesdetail.shoesDetailSearchResponse && (
                                     <>
-                                        {shoesdetail.shoesDetailSearchResponse.discountPrice !== null && shoesdetail.shoesDetailSearchResponse.discountPrice !== 0 && (
-                                            <div style={{ fontWeight: 'bold', color: 'red' }}>
-                                                Giá sale: {formatter.format(shoesdetail.shoesDetailSearchResponse.discountPrice)}
-                                            </div>
-                                        )}
-                                        <div >
-                                            Giá gốc:
-                                            <span style={{ textDecoration: shoesdetail.shoesDetailSearchResponse.discountPrice ? 'line-through' : 'none', fontWeight: "bold", marginLeft: 12 }}>
-                                                {formatter.format(shoesdetail.shoesDetailSearchResponse.price)}
-                                            </span>
+                                        {shoesdetail.shoesDetailSearchResponse.discountPrice !== null && shoesdetail.shoesDetailSearchResponse.discountPrice !== shoesdetail.shoesDetailSearchResponse.price ? (
+                                            <>
+                                                <div style={{ fontWeight: 'bold', color: 'red' }}>
+                                                    Giá sale: {formatter.format(shoesdetail.shoesDetailSearchResponse.discountPrice)}
+                                                </div>
 
-                                        </div>
-                                        {shoesdetail.shoesDetailSearchResponse.discountPrice !== null && shoesdetail.shoesDetailSearchResponse.discountPrice !== 0 && (
-                                            <div>Tiết kiệm: {formatter.format(shoesdetail.shoesDetailSearchResponse.price - shoesdetail.shoesDetailSearchResponse.discountPrice)}</div>
+                                                <div>
+                                                    Giá gốc:
+                                                    <span style={{ textDecoration: 'line-through', fontWeight: "bold", marginLeft: 12 }}>
+                                                        {formatter.format(shoesdetail.shoesDetailSearchResponse.price)}
+                                                    </span>
+                                                    <div>Tiết kiệm: {formatter.format(shoesdetail.shoesDetailSearchResponse.price - shoesdetail.shoesDetailSearchResponse.discountPrice)}</div>
+                                                </div>
+                                            </>
+                                        ) : (
+
+                                            <div>
+                                                Giá gốc:
+                                                <span style={{ fontWeight: "bold", marginLeft: 12 }}>
+                                                    {formatter.format(shoesdetail.shoesDetailSearchResponse.price)}
+                                                </span>
+                                            </div>
                                         )}
                                     </>
                                 )}
-
                             </div>
+
 
                             <div className='row p-2'>
                                 <span className='col-3'>Màu sắc :  </span>
@@ -518,12 +522,13 @@ const Products = ({ onSelectProducts }) => {
                                         style={{ width: "50px" }}
                                         value={inputQuantity}
                                         onChange={(e) => setInputQuantity(parseInt(e.target.value, 10) || 1)}
-                                    />
+                                    /> sản phẩm
 
+                                    {/* &nbsp;&nbsp;
                                     {sl === false
-                                        ? <span> {shoesdetail.quantity} &nbsp;sản phẩm</span>
-                                        : <span style={{ color: "red" }}>Hết hàng</span>
-                                    }
+                                        ? <span> {shoesdetail.shoesDetailSearchResponse.quantity} &nbsp;sản phẩm có sẵn</span>
+                                        : <span style={{ color: "red" }}>Sản phẩm này đã hết hàng</span>
+                                    } */}
                                 </span>
                             </div>
                         </Col>
