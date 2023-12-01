@@ -28,7 +28,6 @@ const Confirm = () => {
     const [deliveryData, setDeliveryData] = useState({});
     const [selectedIds, setSelectedIds] = useState([]);
     const [isProductDeleted, setIsProductDeleted] = useState(false);
-    const [totalProductPrice, setTotalProductPrice] = useState(0);
 
     const [provinces, setProvinces] = useState([]);
     const [districts, setDistricts] = useState([]);
@@ -121,6 +120,7 @@ const Confirm = () => {
         code: "",
         fullnameClient: "",
         phoneNumber: "",
+        totalMoney: "",
         totalPayment: "",
         paymentMethod: "",
         percentVoucher: "",
@@ -183,13 +183,13 @@ const Confirm = () => {
                 confirm.percentVoucher,
                 confirm.priceVoucher
             );
-            setTotalProductPrice(productPrice);
 
             setFormData({
                 id: confirm.id,
                 code: confirm.code,
                 fullnameClient: confirm.fullnameClient,
                 phoneNumber: confirm.phoneNumber,
+                totalMoney: productPrice,
                 totalPayment: totalMoney,
                 paymentMethod: confirm.paymentMethod,
                 percentVoucher: confirm.percentVoucher,
@@ -300,10 +300,10 @@ const Confirm = () => {
                     response.data.data.total
                 );
 
-                setTotalProductPrice(updatedProductPrice);
                 setFormData((prevFormData) => ({
                     ...prevFormData,
-                    totalMoney: updatedTotalMoney,
+                    totalPayment: updatedTotalMoney,
+                    totalMoney: updatedProductPrice
                 }));
             }
         } catch (error) {
@@ -430,8 +430,9 @@ const Confirm = () => {
                 idOrder: deliveryData.idOrder
             });
 
-            const updatedMoneyValue = Math.floor(formData.totalMoney);
-            await axiosInstance.put(`/order/admin/update/total-money/${formData.id}?money=${updatedMoneyValue}`);
+            const updatedMoney = Math.floor(formData.totalMoney);
+            const updatedPayment = Math.floor(formData.totalPayment);
+            await axiosInstance.put(`/order/admin/update/total-money/${formData.id}?total-money=${updatedMoney}&total-payment=${updatedPayment}`);
             fetchData();
             setModal(false);
         } catch (error) {
@@ -460,18 +461,16 @@ const Confirm = () => {
 
             const updatedTotalMoney = calculateTotalMoney(
                 updatedProductPrice,
-                deliveryResponse.data.deliveryCost,
+                deliveryResponse.data.deliveryCost || shippingTotal,
                 formData.percentPeriod,
                 formData.percentVoucher,
                 formData.priceVoucher,
-                true,
-                shippingTotal
 
             );
 
-            setTotalProductPrice(updatedProductPrice);
             setFormData((prevFormData) => ({
                 ...prevFormData,
+                totalMoney: updatedProductPrice,
                 totalPayment: updatedTotalMoney,
             }));
             setOrderData(orderResponse);
@@ -831,7 +830,8 @@ const Confirm = () => {
                                                 <Input
                                                     size="sm"
                                                     type="number"
-                                                    value={totalProductPrice}
+                                                    value={Math.floor(formData.totalMoney)}
+                                                    onChange={(e) => setFormData({ ...formData, totalMoney: e.target.value })}
                                                 />
                                                 <InputGroupAddon addonType="append">
                                                     <InputGroupText>VND</InputGroupText>
@@ -965,12 +965,10 @@ const Confirm = () => {
                                                         <td>
                                                             <Row className="col">
                                                                 <Col md={4}>
-
                                                                     <img src={`https://s3-ap-southeast-1.amazonaws.com/imageshoestore/${product.imgUri}`}
                                                                         alt=""
                                                                         style={{ width: "60px", height: "45px" }}
                                                                     />
-
                                                                 </Col>
                                                                 <Col md={8} className="pl-4">
                                                                     <h5>{product.shoesName}</h5>
@@ -1005,8 +1003,8 @@ const Confirm = () => {
                                                             ) : null}
                                                         </td>
 
-                                                        <td className="text-right">{formatter.format(product.price)}</td>
-                                                        <td className="text-right">{formatter.format(product.totalPrice)}</td>
+                                                        <td className="text-right">{formatter.format(product.price)} </td>
+                                                        <td className="text-right text-danger">{formatter.format(product.totalPrice)}</td>
                                                         <td className="text-right">
                                                             {formData.paymentMethod === 1 && (
                                                                 <>

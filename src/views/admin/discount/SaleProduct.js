@@ -321,42 +321,47 @@ const SaleProduct = () => {
         // idShoe: [],
     });
 
-    const handleRowClick = (discount) => {
+    const handleRowClick = async (discount) => {
+        // Lấy chi tiết khuyến mãi từ API
+        const promoDetailsResponse = await axiosInstance.get(`/promos/detailPromo/${discount.id}`);
+        const promoDetailsData = promoDetailsResponse.data;
+    
+        const apiProductIds = promoDetailsData ? promoDetailsData.map(product => product.id) : [];
+        setSelectedShoesIds(apiProductIds);
+    
+        const productIds = promoDetailsData.map(product => product.idShoeDetail);
+        setSelectedDetailIds(productIds);
+     
+        setFormData({
+          id: discount.id,
+          code: discount.code,
+          name: discount.name,
+          startDate: discount.startDate,
+          endDate: discount.endDate,
+          description: discount.description,
+          minPrice: discount.minPrice,
+          status: discount.status
+        });
+    
         if (discount.salePercent !== null) {
-            setFormData({
-                id: discount.id,
-                code: discount.code,
-                name: discount.name,
-                startDate: discount.startDate,
-                endDate: discount.endDate,
-                description: discount.description,
-                salePercent: discount.salePercent,
-                salePrice: "",
-                minPrice: discount.minPrice,
-                sale: true,
-                status: discount.status
-            });
+          setFormData(prevFormData => ({
+            ...prevFormData,
+            salePercent: discount.salePercent,
+            salePrice: "",
+            sale: true,
+          }));
         }
         if (discount.salePrice !== null) {
-            setFormData({
-                id: discount.id,
-                code: discount.code,
-                name: discount.name,
-                startDate: discount.startDate,
-                endDate: discount.endDate,
-                description: discount.description,
-                salePercent: "",
-                salePrice: discount.salePrice,
-                minPrice: discount.minPrice || "",
-                sale: false,
-                status: discount.status
-            });
+          setFormData(prevFormData => ({
+            ...prevFormData,
+            salePercent: "",
+            salePrice: discount.salePrice,
+            sale: false,
+          }));
         }
-
-        // setSelectedShoesIds(discount.idShoe || []);
-        setSelectedDetailIds(discount.idShoe || []);
+    
         setModal(true);
-    };
+      };
 
     //reset
     const resetForm = () => {
@@ -1041,7 +1046,7 @@ const SaleProduct = () => {
             <Modal
                 isOpen={fourModal}
                 toggle={toggleFourModal}
-                style={{ maxWidth: '800px' }}
+                style={{ maxWidth: '900px' }}
                 backdrop={false}
             >
                 <ModalHeader toggle={toggleFourModal}>
@@ -1049,16 +1054,16 @@ const SaleProduct = () => {
                 </ModalHeader>
                 <ModalBody style={{ paddingTop: 0, paddingBottom: 0 }}>
                     <Table>
-                        <thead className="thead-light text-center">
+                        <thead className="thead-light">
                             <tr>
-                                <th scope="col">STT</th>
-                                <th scope="col">Mã</th>
-                                <th scope="col">Ảnh</th>
-                                <th scope="col">Tên sản phẩm</th>
-                                <th scope="col">Size</th>
-                                <th scope="col">Màu</th>
-                                <th scope="col">Hãng</th>
-                                <th scope="col">Xuất xứ</th>
+                                <th className="text-dark">STT</th>
+                                <th className="text-dark">Mã</th>
+                                <th className="text-dark">Ảnh</th>
+                                <th className="text-dark">Tên sản phẩm</th>
+                                <th className="text-dark">Size</th>
+                                <th className="text-dark">Màu</th>
+                                <th className="text-dark">Giá gốc</th>
+                                <th className="text-dark">Giá mới</th>
                             </tr>
                         </thead>
                         {selectedProduct &&
@@ -1070,9 +1075,8 @@ const SaleProduct = () => {
                                     <td>{product.name}</td>
                                     <td>{product.size}</td>
                                     <td>{product.color}</td>
-                                    <td>{product.brand}</td>
-                                    <td>{product.origin}</td>
-                                    
+                                    <td>{formatter.format(product.originPrice)}</td>
+                                    <td>{formatter.format(product.discountPrice)}</td>                                                           
                                 </tr>
                             ))}
                     </Table>

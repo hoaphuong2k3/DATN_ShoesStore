@@ -5,11 +5,14 @@ import { format } from 'date-fns';
 import { vi } from 'date-fns/locale';
 
 // reactstrap components
+import { ToastContainer, toast } from "react-toastify";
+import 'react-confirm-alert/src/react-confirm-alert.css';
+import 'react-toastify/dist/ReactToastify.css';
+import ReactPaginate from 'react-paginate';
 import { Badge, Row, Col, Button, Table, Input, FormGroup, InputGroup, InputGroupAddon, InputGroupText, Modal, ModalBody, ModalFooter, ModalHeader, Label, Form } from "reactstrap";
 import { FaRegEdit, FaSearch } from 'react-icons/fa';
-import ReactPaginate from 'react-paginate';
 
-const Success = () => {
+const Shipping = () => {
 
     const [modal, setModal] = useState(false);
     const toggle = () => setModal(!modal);
@@ -22,13 +25,12 @@ const Success = () => {
         currency: "VND",
     });
 
+    const storedUserId = localStorage.getItem("userId");
     const [confirm, setConfirm] = useState([]);
     const [selectedOrderId, setSelectedOrderId] = useState(null);
     const [orderData, setOrderData] = useState({});
     const [deliveryData, setDeliveryData] = useState({});
-    const [hasDeliveryData, setHasDeliveryData] = useState(false);
     const [selectedIds, setSelectedIds] = useState([]);
-    const [totalProductPrice, setTotalProductPrice] = useState(0);
 
     const [provinces, setProvinces] = useState([]);
     const [districts, setDistricts] = useState([]);
@@ -40,8 +42,6 @@ const Success = () => {
 
     const [selectAllChecked, setSelectAllChecked] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
-
-
 
     const fetchDataFromAPI = async (url, stateSetter) => {
         try {
@@ -93,7 +93,7 @@ const Success = () => {
 
     useEffect(() => {
         fetchData();
-    }, [selectedProvince, selectedDistrict, queryParams]);
+    }, [selectedProvince, selectedDistrict]);
 
     const handlePageChange = ({ selected }) => {
         setQueryParams(prevParams => ({ ...prevParams, page: selected }));
@@ -111,45 +111,17 @@ const Success = () => {
     const [formData, setFormData] = useState({
         id: null,
         code: "",
-        fullname: "",
+        fullnameClient: "",
         phoneNumber: "",
         totalMoney: "",
+        totalPayment: "",
         paymentMethod: "",
         percentVoucher: "",
         priceVoucher: "",
         percentPeriod: "",
+        nameFreeGift: "",
+        imageFreeGift: ""
     });
-
-    //TotalMoney
-    const calculateTotalMoney = (productPrice, deliveryCost, percentPeriod, percentVoucher, priceVoucher, hasShipping = false, shippingTotal = 0) => {
-        let totalMoney;
-
-        if (percentPeriod !== null) {
-            if (priceVoucher !== null) {
-                totalMoney = productPrice - (productPrice * percentPeriod / 100) - priceVoucher;
-            } else if (percentVoucher !== null) {
-                totalMoney = productPrice - productPrice * ((percentPeriod + percentVoucher) / 100);
-            } else {
-                totalMoney = productPrice - (productPrice * percentPeriod / 100);
-            }
-        } else {
-            if (priceVoucher !== null) {
-                totalMoney = productPrice - priceVoucher;
-            } else if (percentVoucher !== null) {
-                totalMoney = productPrice - (productPrice * percentVoucher / 100);
-            } else {
-                totalMoney = productPrice;
-            }
-        }
-
-        if (hasShipping) {
-            totalMoney = totalMoney + Math.floor(shippingTotal);
-        } else {
-            totalMoney = totalMoney + Math.floor(deliveryCost);
-        }
-
-        return totalMoney;
-    };
 
     //detail
     const handleRowClick = async (id, confirm) => {
@@ -161,40 +133,26 @@ const Success = () => {
                 axiosInstance.get(`/order/admin/delivery/${id}`),
             ]);
 
-            // Kiểm tra nếu có dữ liệu từ API đơn hàng
-            if (orderResponse && orderResponse.length > 0) {
-                const productPrice = orderResponse.reduce((total, product) => {
-                    return total + product.totalPrice;
-                }, 0);
+            setFormData({
+                id: confirm.id,
+                code: confirm.code,
+                fullnameClient: confirm.fullnameClient,
+                phoneNumber: confirm.phoneNumber,
+                totalMoney: confirm.totalMoney,
+                totalPayment: confirm.totalPayment,
+                paymentMethod: confirm.paymentMethod,
+                percentVoucher: confirm.percentVoucher,
+                priceVoucher: confirm.priceVoucher,
+                percentPeriod: confirm.percentPeriod,
+                nameFreeGift: confirm.nameFreeGift,
+                imageFreeGift: confirm.imageFreeGift
+            });
 
-                const totalMoney = calculateTotalMoney(
-                    productPrice,
-                    deliveryResponse?.data?.deliveryCost || 0,
-                    confirm.percentPeriod,
-                    confirm.percentVoucher,
-                    confirm.priceVoucher
-                );
+            setOrderData(orderResponse);
 
-                setTotalProductPrice(productPrice);
-
-                setFormData({
-                    id: confirm.id,
-                    code: confirm.code,
-                    fullname: confirm.fullname,
-                    phoneNumber: confirm.phoneNumber,
-                    totalMoney: totalMoney,
-                    paymentMethod: confirm.paymentMethod,
-                    percentVoucher: confirm.percentVoucher,
-                    priceVoucher: confirm.priceVoucher,
-                    percentPeriod: confirm.percentPeriod,
-                });
-
-                setOrderData(orderResponse);
-            }
 
             // Kiểm tra nếu có dữ liệu từ API vận chuyển
             if (deliveryResponse && deliveryResponse.data) {
-                setHasDeliveryData(true);
                 setDeliveryData(deliveryResponse.data);
 
                 const deliveryAddress = deliveryResponse.data.deliveryAddress;
@@ -205,9 +163,6 @@ const Success = () => {
                 setSelectedWard(selectedWard);
                 setSelectedDistrict(selectedDistrict);
                 setSelectedProvince(selectedProvince);
-            } else {
-                setDeliveryData(null);
-                setHasDeliveryData(false);
             }
 
             setModal(true);
@@ -316,25 +271,27 @@ const Success = () => {
                                             </td>
                                             <td className="text-center">{calculateIndex(index)}</td>
                                             <td>{confirm.code}</td>
-                                            <td>{confirm.fullname}</td>
+                                            <td>{confirm.fullnameClient}</td>
                                             <td>{confirm.phoneNumber}</td>
-                                            <td className="text-right">{formatter.format(confirm.totalMoney)}</td>
+                                            <td className="text-right">{formatter.format(confirm.totalPayment)}</td>
                                             <td className="text-center">
                                                 <Badge color={paymentMethodColors[confirm.paymentMethod]?.color || "secondary"}>
                                                     {paymentMethodColors[confirm.paymentMethod]?.label || "Không xác định"}
                                                 </Badge>
                                             </td>
 
-                                            <td>{confirm.updatedBy}</td>
+                                            <td>{confirm.fullnameStaff}</td>
                                             <td>{format(new Date(confirm.createdTime), 'dd-MM-yyyy HH:mm', { locale: vi })}</td>
                                             <td>{format(new Date(confirm.updatedTime), 'dd-MM-yyyy HH:mm', { locale: vi })}</td>
-                                            <td className="text-center" style={{ position: "sticky", zIndex: '1', right: '0', background: "#fff" }}>
+                                            <td className="text-center d-flex" style={{ position: "sticky", zIndex: '1', right: '0', background: "#fff" }}>
                                                 <Button color="link" size="sm" onClick={() => handleRowClick(confirm.id, confirm)}><FaRegEdit /></Button>
                                             </td>
                                         </tr>
                                     ))}
                         </tbody>
                     </Table>
+
+                    <ToastContainer />
 
                     <Row className="mt-4">
                         <Col lg={6}>
@@ -408,7 +365,7 @@ const Success = () => {
                                             />
                                         </FormGroup>
                                         <Row>
-                                            {formData.fullname && (
+                                            {formData.fullnameClient && (
                                                 <Col md={6}>
                                                     <FormGroup>
                                                         <Label>
@@ -417,7 +374,7 @@ const Success = () => {
                                                         <Input
                                                             size="sm"
                                                             type="text"
-                                                            value={formData.fullname}
+                                                            value={formData.fullnameClient}
                                                             readOnly style={{ backgroundColor: "#fff" }}
                                                         />
                                                     </FormGroup>
@@ -439,118 +396,113 @@ const Success = () => {
                                                 </Col>
                                             )}
                                         </Row>
-                                        {hasDeliveryData && (
-                                            <>
-                                                <Row>
-                                                    <Col md={12}>
-                                                        <h3 className="heading-small text-dark">Thông tin phiếu giao</h3>
-                                                    </Col>
-                                                </Row>
-                                                <Row >
-                                                    <Col md={6}>
-                                                        <FormGroup>
-                                                            <Label>
-                                                                Người nhận
-                                                            </Label>
-                                                            <Input
-                                                                size="sm"
-                                                                type="text"
-                                                                value={deliveryData.recipientName}
-                                                                readOnly style={{ backgroundColor: "#fff" }}
-                                                            />
-                                                        </FormGroup>
-                                                    </Col>
-                                                    <Col md={6}>
-                                                        <FormGroup>
-                                                            <Label>
-                                                                Số điện thoại
-                                                            </Label>
-                                                            <Input
-                                                                size="sm"
-                                                                type="tel"
-                                                                value={deliveryData.recipientPhone}
-                                                                readOnly style={{ backgroundColor: "#fff" }}
-                                                            />
-                                                        </FormGroup>
-                                                    </Col>
-                                                </Row>
-                                                <Row >
-                                                    <Col md={6}>
-                                                        <FormGroup>
-                                                            <Label>
-                                                                Địa chỉ
-                                                            </Label>
-                                                            <Input
-                                                                className="mb-2"
-                                                                size="sm"
-                                                                type="select"
-                                                                style={{ fontSize: 13 }}
-                                                                value={selectedProvince}
-                                                            >
-                                                                <option value="">Chọn tỉnh/thành phố</option>
-                                                                {provinces.map((province) => (
-                                                                    <option key={province.ProvinceID} value={province.ProvinceID}>
-                                                                        {province.ProvinceName}
-                                                                    </option>
-                                                                ))}
-                                                            </Input>
+                                        <Row>
+                                            <Col md={12}>
+                                                <h3 className="heading-small text-dark">Thông tin phiếu giao</h3>
+                                            </Col>
+                                        </Row>
+                                        <Row >
+                                            <Col md={6}>
+                                                <FormGroup>
+                                                    <Label>
+                                                        Người nhận
+                                                    </Label>
+                                                    <Input
+                                                        size="sm"
+                                                        type="text"
+                                                        value={deliveryData.recipientName}
+                                                        readOnly style={{ backgroundColor: "#fff" }}
+                                                    />
+                                                </FormGroup>
+                                            </Col>
+                                            <Col md={6}>
+                                                <FormGroup>
+                                                    <Label>
+                                                        Số điện thoại
+                                                    </Label>
+                                                    <Input
+                                                        size="sm"
+                                                        type="tel"
+                                                        value={deliveryData.recipientPhone}
+                                                        readOnly style={{ backgroundColor: "#fff" }}
+                                                    />
+                                                </FormGroup>
+                                            </Col>
+                                        </Row>
+                                        <Row >
+                                            <Col md={6}>
+                                                <FormGroup>
+                                                    <Label>
+                                                        Địa chỉ
+                                                    </Label>
+                                                    <Input
+                                                        className="mb-2"
+                                                        size="sm"
+                                                        type="select"
+                                                        style={{ fontSize: 13 }}
+                                                        value={selectedProvince}
+                                                    >
+                                                        <option value="">Chọn tỉnh/thành phố</option>
+                                                        {provinces.map((province) => (
+                                                            <option key={province.ProvinceID} value={province.ProvinceID}>
+                                                                {province.ProvinceName}
+                                                            </option>
+                                                        ))}
+                                                    </Input>
 
 
-                                                            <Input
-                                                                className="mb-2"
-                                                                size="sm"
-                                                                type="select"
-                                                                style={{ fontSize: 13 }}
-                                                                value={selectedDistrict}
-                                                                disabled={!selectedProvince}
-                                                            >
-                                                                <option value="">Chọn quận/huyện</option>
-                                                                {selectedProvince &&
-                                                                    districts.map((district) => (
-                                                                        <option key={district.DistrictID} value={district.DistrictID}>
-                                                                            {district.DistrictName}
-                                                                        </option>
-                                                                    ))}
-                                                            </Input>
+                                                    <Input
+                                                        className="mb-2"
+                                                        size="sm"
+                                                        type="select"
+                                                        style={{ fontSize: 13 }}
+                                                        value={selectedDistrict}
+                                                        disabled={!selectedProvince}
+                                                    >
+                                                        <option value="">Chọn quận/huyện</option>
+                                                        {selectedProvince &&
+                                                            districts.map((district) => (
+                                                                <option key={district.DistrictID} value={district.DistrictID}>
+                                                                    {district.DistrictName}
+                                                                </option>
+                                                            ))}
+                                                    </Input>
 
-                                                            <Input
-                                                                className="mb-2"
-                                                                size="sm"
-                                                                type="select"
-                                                                style={{ fontSize: 13 }}
-                                                                value={selectedWard}
-                                                                disabled={!selectedDistrict}
-                                                            >
-                                                                <option value="">Chọn xã/phường</option>
-                                                                {selectedDistrict &&
-                                                                    wards.map((ward) => (
-                                                                        <option key={ward.WardCode} value={ward.WardCode}>
-                                                                            {ward.WardName}
-                                                                        </option>
-                                                                    ))}
-                                                            </Input>
+                                                    <Input
+                                                        className="mb-2"
+                                                        size="sm"
+                                                        type="select"
+                                                        style={{ fontSize: 13 }}
+                                                        value={selectedWard}
+                                                        disabled={!selectedDistrict}
+                                                    >
+                                                        <option value="">Chọn xã/phường</option>
+                                                        {selectedDistrict &&
+                                                            wards.map((ward) => (
+                                                                <option key={ward.WardCode} value={ward.WardCode}>
+                                                                    {ward.WardName}
+                                                                </option>
+                                                            ))}
+                                                    </Input>
 
-                                                        </FormGroup>
+                                                </FormGroup>
 
-                                                    </Col>
-                                                    <Col md={6}>
-                                                        <FormGroup>
-                                                            <Input className="mt-4"
-                                                                style={{ fontSize: 13, backgroundColor: "#fff" }}
-                                                                size="sm"
-                                                                rows="5"
-                                                                type="textarea"
-                                                                placeholder="Địa chỉ chi tiết..."
-                                                                id="detailedAddress"
-                                                                value={detailedAddress}
-                                                                readOnly
-                                                            />
-                                                        </FormGroup>
-                                                    </Col>
-                                                </Row>
-                                            </>
-                                        )}
-
+                                            </Col>
+                                            <Col md={6}>
+                                                <FormGroup>
+                                                    <Input className="mt-4"
+                                                        style={{ fontSize: 13, backgroundColor: "#fff" }}
+                                                        size="sm"
+                                                        rows="5"
+                                                        type="textarea"
+                                                        placeholder="Địa chỉ chi tiết..."
+                                                        id="detailedAddress"
+                                                        value={detailedAddress}
+                                                        readOnly
+                                                    />
+                                                </FormGroup>
+                                            </Col>
+                                        </Row>
                                         <Row>
                                             <Col md={12}>
                                                 <h3 className="heading-small text-dark">Thanh toán</h3>
@@ -564,7 +516,7 @@ const Success = () => {
                                                 <Input
                                                     size="sm"
                                                     type="number"
-                                                    value={totalProductPrice}
+                                                    value={formData.totalMoney}
                                                     readOnly style={{ backgroundColor: "#fff" }}
                                                 />
                                                 <InputGroupAddon addonType="append">
@@ -575,20 +527,61 @@ const Success = () => {
 
 
                                         <Row >
+                                            {formData.percentPeriod && (
+                                                <Col md={6}>
+                                                    <FormGroup>
+                                                        <Label>
+                                                            Đợt giảm giá
+                                                        </Label>
+                                                        <InputGroup size="sm">
+                                                            <Input
+                                                                size="sm"
+                                                                type="number"
+                                                                value={formData.percentPeriod}
+                                                            />
+                                                            <InputGroupAddon addonType="append">
+                                                                <InputGroupText>%</InputGroupText>
+                                                            </InputGroupAddon>
+                                                        </InputGroup>
+                                                    </FormGroup>
+                                                </Col>
+                                            )}
+                                            {(formData.percentVoucher || formData.priceVoucher) && (
+                                                <Col md={6}>
+                                                    <FormGroup>
+                                                        <Label>
+                                                            Voucher từ shop
+                                                        </Label>
+                                                        <InputGroup size="sm">
+                                                            <Input
+                                                                size="sm"
+                                                                type="number"
+                                                                value={formData.percentVoucher || formData.priceVoucher || ""}
+                                                            />
+                                                            <InputGroupAddon addonType="append">
+                                                                <InputGroupText>{formData.percentVoucher ? "%" : "VND"}</InputGroupText>
+                                                            </InputGroupAddon>
+                                                        </InputGroup>
+                                                    </FormGroup>
+                                                </Col>
+                                            )}
+                                        </Row>
+
+                                        <Row >
                                             <Col md={6}>
                                                 <FormGroup>
                                                     <Label>
-                                                        Đợt giảm giá
+                                                        Phí vận chuyển
                                                     </Label>
                                                     <InputGroup size="sm">
                                                         <Input
                                                             size="sm"
                                                             type="number"
-                                                            value={formData.percentPeriod}
+                                                            value={Math.floor(deliveryData.deliveryCost)}
                                                             readOnly style={{ backgroundColor: "#fff" }}
                                                         />
                                                         <InputGroupAddon addonType="append">
-                                                            <InputGroupText>%</InputGroupText>
+                                                            <InputGroupText>VND</InputGroupText>
                                                         </InputGroupAddon>
                                                     </InputGroup>
                                                 </FormGroup>
@@ -596,59 +589,14 @@ const Success = () => {
                                             </Col>
                                             <Col md={6}>
                                                 <FormGroup>
-                                                    <Label>
-                                                        Voucher từ shop
-                                                    </Label>
-                                                    <InputGroup size="sm">
-                                                        <Input
-                                                            size="sm"
-                                                            type="number"
-                                                            value={formData.percentVoucher || formData.priceVoucher || ""}
-                                                            readOnly style={{ backgroundColor: "#fff" }}
-                                                        />
-                                                        <InputGroupAddon addonType="append">
-                                                            <InputGroupText>{formData.percentVoucher ? "%" : "VND"}</InputGroupText>
-                                                        </InputGroupAddon>
-                                                    </InputGroup>
+                                                    <img className="my-3 ml-3"
+                                                        width={"80%"}
+                                                        alt="..."
+                                                        src={require("../../../assets/img/theme/giaohangnhanh.webp")}
+                                                    />
                                                 </FormGroup>
                                             </Col>
                                         </Row>
-
-                                        {hasDeliveryData && (
-                                            <>
-                                                <Row >
-                                                    <Col md={6}>
-                                                        <FormGroup>
-                                                            <Label>
-                                                                Phí vận chuyển
-                                                            </Label>
-                                                            <InputGroup size="sm">
-                                                                <Input
-                                                                    size="sm"
-                                                                    type="number"
-                                                                    value={Math.floor(deliveryData.deliveryCost)}
-                                                                    readOnly style={{ backgroundColor: "#fff" }}
-                                                                />
-                                                                <InputGroupAddon addonType="append">
-                                                                    <InputGroupText>VND</InputGroupText>
-                                                                </InputGroupAddon>
-                                                            </InputGroup>
-                                                        </FormGroup>
-
-                                                    </Col>
-                                                    <Col md={6}>
-                                                        <FormGroup>
-                                                            <img className="my-3 ml-3"
-                                                                width={"80%"}
-                                                                alt="..."
-                                                                src={require("../../../assets/img/theme/giaohangnhanh.webp")}
-                                                            />
-                                                        </FormGroup>
-                                                    </Col>
-                                                </Row>
-                                            </>
-                                        )}
-
                                         <FormGroup>
                                             <Label>
                                                 Thành tiền
@@ -657,7 +605,7 @@ const Success = () => {
                                                 <Input
                                                     size="sm"
                                                     type="number"
-                                                    value={Math.floor(formData.totalMoney)}
+                                                    value={formData.totalPayment}
                                                     readOnly style={{ backgroundColor: "#fff" }}
 
                                                 />
@@ -700,9 +648,10 @@ const Success = () => {
                                                         <td>
                                                             <Row className="col">
                                                                 <Col md={4}>
-                                                                    <span className="avatar avatar-sm rounded-circle">
-                                                                        <img src={`https://s3-ap-southeast-1.amazonaws.com/imageshoestore/${product.imgUri}`} alt="" />
-                                                                    </span>
+                                                                    <img src={`https://s3-ap-southeast-1.amazonaws.com/imageshoestore/${product.imgUri}`}
+                                                                        alt=""
+                                                                        style={{ width: "60px", height: "45px" }}
+                                                                    />
                                                                 </Col>
                                                                 <Col md={8}>
                                                                     <h5>{product.shoesName}</h5>
@@ -720,11 +669,29 @@ const Success = () => {
                                                 ))}
                                         </tbody>
                                     </Table>
+                                    {formData.imageFreeGift && formData.nameFreeGift && (
+                                        <div style={{ padding: "15px 0 5px 0", boxShadow: "0 0 10px rgba(0, 0, 0, 0.1)" }}>
+                                            <div className="item d-flex">
+                                                <div className="product-container mr-4 ml-5">
+                                                    <img
+                                                        src={`data:image/jpeg;base64,${formData.imageFreeGift}`}
+                                                        alt={formData.nameFreeGift}
+                                                        style={{ width: "50px" }}
+                                                    />
+                                                    <div className="quantity-badge">
+                                                        <span className="quantity">1</span>
+                                                    </div>
+                                                </div>
+
+                                                <div>
+                                                    <div className="text-warning text-center" style={{ border: "1px solid", fontSize: 11, width: 60 }}>Quà tặng</div>
+                                                    <div className="small mt-1">{formData.nameFreeGift}</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
                                 </Col>
                             </Row>
-
-
-
                         </ModalBody >
                         <ModalFooter>
                             <div className="text-center">
@@ -741,4 +708,4 @@ const Success = () => {
     );
 };
 
-export default Success;
+export default Shipping;

@@ -37,7 +37,6 @@ const Waitting = () => {
     const [hasDeliveryData, setHasDeliveryData] = useState(false);
     const [selectedIds, setSelectedIds] = useState([]);
     const [isProductDeleted, setIsProductDeleted] = useState(false);
-    const [totalProductPrice, setTotalProductPrice] = useState(0);
 
     const [provinces, setProvinces] = useState([]);
     const [districts, setDistricts] = useState([]);
@@ -123,13 +122,16 @@ const Waitting = () => {
     const [formData, setFormData] = useState({
         id: null,
         code: "",
-        fullname: "",
+        fullnameClient: "",
         phoneNumber: "",
         totalMoney: "",
+        totalPayment: "",
         paymentMethod: "",
         percentVoucher: "",
         priceVoucher: "",
         percentPeriod: "",
+        nameFreeGift: "",
+        imageFreeGift: ""
     });
 
 
@@ -155,7 +157,7 @@ const Waitting = () => {
             }
         }
 
-        if (hasShipping) {
+        if (hasShipping === true) {
             totalMoney = totalMoney + Math.floor(shippingTotal);
         } else {
             totalMoney = totalMoney + Math.floor(deliveryCost);
@@ -180,26 +182,27 @@ const Waitting = () => {
                     return total + product.totalPrice;
                 }, 0);
 
-                const totalMoney = calculateTotalMoney(
+                const totalPayment = calculateTotalMoney(
                     productPrice,
-                    deliveryResponse?.data?.deliveryCost || 0,
+                    deliveryResponse.data.deliveryCost,
                     confirm.percentPeriod,
                     confirm.percentVoucher,
                     confirm.priceVoucher
                 );
 
-                setTotalProductPrice(productPrice);
-
                 setFormData({
                     id: confirm.id,
                     code: confirm.code,
-                    fullname: confirm.fullname,
+                    fullnameClient: confirm.fullnameClient,
                     phoneNumber: confirm.phoneNumber,
-                    totalMoney: totalMoney,
+                    totalMoney: productPrice,
+                    totalPayment: totalPayment,
                     paymentMethod: confirm.paymentMethod,
                     percentVoucher: confirm.percentVoucher,
                     priceVoucher: confirm.priceVoucher,
                     percentPeriod: confirm.percentPeriod,
+                    nameFreeGift: confirm.nameFreeGift,
+                    imageFreeGift: confirm.imageFreeGift
                 });
 
                 setOrderData(orderResponse);
@@ -313,10 +316,10 @@ const Waitting = () => {
                     response.data.data.total
                 );
 
-                setTotalProductPrice(updatedProductPrice);
                 setFormData((prevFormData) => ({
                     ...prevFormData,
-                    totalMoney: updatedTotalMoney,
+                    totalPayment: updatedTotalMoney,
+                    totalMoney: updatedProductPrice
                 }));
             }
         } catch (error) {
@@ -438,8 +441,9 @@ const Waitting = () => {
                 idOrder: deliveryData.idOrder
             });
 
-            const updatedMoneyValue = Math.floor(formData.totalMoney);
-            await axiosInstance.put(`/order/admin/update/total-money/${formData.id}?money=${updatedMoneyValue}`);
+            const updatedMoney = Math.floor(formData.totalMoney);
+            const updatedPayment = Math.floor(formData.totalPayment);
+            await axiosInstance.put(`/order/admin/update/total-money/${formData.id}?total-money=${updatedMoney}&total-payment=${updatedPayment}`);
             fetchData();
             setModal(false);
         } catch (error) {
@@ -468,19 +472,17 @@ const Waitting = () => {
 
             const updatedTotalMoney = calculateTotalMoney(
                 updatedProductPrice,
-                deliveryResponse.data.deliveryCost,
+                deliveryResponse.data.deliveryCost || shippingTotal,
                 formData.percentPeriod,
                 formData.percentVoucher,
                 formData.priceVoucher,
-                true,
-                shippingTotal
 
             );
 
-            setTotalProductPrice(updatedProductPrice);
             setFormData((prevFormData) => ({
                 ...prevFormData,
-                totalMoney: updatedTotalMoney,
+                totalPayment: updatedTotalMoney,
+                totalMoney: updatedProductPrice
             }));
             setOrderData(orderResponse);
 
@@ -592,16 +594,16 @@ const Waitting = () => {
                                             </td>
                                             <td className="text-center">{calculateIndex(index)}</td>
                                             <td>{confirm.code}</td>
-                                            <td>{confirm.fullname}</td>
+                                            <td>{confirm.fullnameClient}</td>
                                             <td>{confirm.phoneNumber}</td>
-                                            <td className="text-right">{formatter.format(confirm.totalMoney)}</td>
+                                            <td className="text-right">{formatter.format(confirm.totalPayment)}</td>
                                             <td className="text-center">
                                                 <Badge color={paymentMethodColors[confirm.paymentMethod]?.color || "secondary"}>
                                                     {paymentMethodColors[confirm.paymentMethod]?.label || "Không xác định"}
                                                 </Badge>
                                             </td>
 
-                                            <td>{confirm.updatedBy}</td>
+                                            <td>{confirm.fullnameStaff}</td>
                                             <td>{format(new Date(confirm.createdTime), 'dd-MM-yyyy HH:mm', { locale: vi })}</td>
                                             <td>{format(new Date(confirm.updatedTime), 'dd-MM-yyyy HH:mm', { locale: vi })}</td>
                                             <td className="text-center d-flex" style={{ position: "sticky", zIndex: '1', right: '0', background: "#fff" }}>
@@ -609,7 +611,7 @@ const Waitting = () => {
                                                     content="Xác nhận"
                                                     direction="up"
                                                 >
-                                                    <Button color="link" size="sm" onClick={() => handleConfirmDetail(confirm.id)}><FaRegHandPointLeft /></Button>         
+                                                    <Button color="link" size="sm" onClick={() => handleConfirmDetail(confirm.id)}><FaRegHandPointLeft /></Button>
                                                 </Tooltip>
                                                 <Button color="link" size="sm" onClick={() => handleRowClick(confirm.id, confirm)}><FaRegEdit /></Button>
                                             </td>
@@ -700,8 +702,9 @@ const Waitting = () => {
                                                 readOnly style={{ backgroundColor: "#fff" }}
                                             />
                                         </FormGroup>
+
                                         <Row>
-                                            {formData.fullname && (
+                                            {formData.fullnameClient && (
                                                 <Col md={6}>
                                                     <FormGroup>
                                                         <Label>
@@ -710,7 +713,7 @@ const Waitting = () => {
                                                         <Input
                                                             size="sm"
                                                             type="text"
-                                                            value={formData.fullname}
+                                                            value={formData.fullnameClient}
                                                             readOnly style={{ backgroundColor: "#fff" }}
                                                         />
                                                     </FormGroup>
@@ -732,140 +735,133 @@ const Waitting = () => {
                                                 </Col>
                                             )}
                                         </Row>
-
-                                        {hasDeliveryData && (
-                                            <>
-                                                <Row>
-                                                    <Col md={12}>
-                                                        <h3 className="heading-small text-dark">Thông tin phiếu giao</h3>
-                                                    </Col>
-                                                </Row>
-                                                <Row >
-                                                    <Col md={6}>
-                                                        <FormGroup>
-                                                            <Label>
-                                                                Người nhận
-                                                            </Label>
-                                                            <Input
-                                                                size="sm"
-                                                                type="text"
-                                                                value={deliveryData.recipientName}
-                                                                onChange={(e) => setDeliveryData({ ...deliveryData, recipientName: e.target.value })}
-                                                            />
-                                                        </FormGroup>
-                                                    </Col>
-                                                    <Col md={6}>
-                                                        <FormGroup>
-                                                            <Label>
-                                                                Số điện thoại
-                                                            </Label>
-                                                            <Input
-                                                                size="sm"
-                                                                type="tel"
-                                                                value={deliveryData.recipientPhone}
-                                                                onChange={(e) => setDeliveryData({ ...deliveryData, recipientPhone: e.target.value })}
-                                                            />
-                                                        </FormGroup>
-                                                    </Col>
-                                                </Row>
-                                                <Row >
-                                                    <Col md={6}>
-                                                        <FormGroup>
-                                                            <Label>
-                                                                Địa chỉ
-                                                            </Label>
-                                                            <Input
-                                                                className="mb-2"
-                                                                size="sm"
-                                                                type="select"
-                                                                style={{ fontSize: 13 }}
-                                                                value={selectedProvince}
-                                                                onChange={(e) => {
-                                                                    setSelectedProvince(e.target.value);
-                                                                    setSelectedDistrict("");
-                                                                    setSelectedWard("");
-                                                                }}
-                                                            >
-                                                                <option value="">Chọn tỉnh/thành phố</option>
-                                                                {provinces.map((province) => (
-                                                                    <option key={province.ProvinceID} value={province.ProvinceID}>
-                                                                        {province.ProvinceName}
-                                                                    </option>
-                                                                ))}
-                                                            </Input>
+                                        <Row>
+                                            <Col md={12}>
+                                                <h3 className="heading-small text-dark">Thông tin phiếu giao</h3>
+                                            </Col>
+                                        </Row>
+                                        <Row >
+                                            <Col md={6}>
+                                                <FormGroup>
+                                                    <Label>
+                                                        Người nhận
+                                                    </Label>
+                                                    <Input
+                                                        size="sm"
+                                                        type="text"
+                                                        value={deliveryData.recipientName}
+                                                        onChange={(e) => setDeliveryData({ ...deliveryData, recipientName: e.target.value })}
+                                                    />
+                                                </FormGroup>
+                                            </Col>
+                                            <Col md={6}>
+                                                <FormGroup>
+                                                    <Label>
+                                                        Số điện thoại
+                                                    </Label>
+                                                    <Input
+                                                        size="sm"
+                                                        type="tel"
+                                                        value={deliveryData.recipientPhone}
+                                                        onChange={(e) => setDeliveryData({ ...deliveryData, recipientPhone: e.target.value })}
+                                                    />
+                                                </FormGroup>
+                                            </Col>
+                                        </Row>
+                                        <Row >
+                                            <Col md={6}>
+                                                <FormGroup>
+                                                    <Label>
+                                                        Địa chỉ
+                                                    </Label>
+                                                    <Input
+                                                        className="mb-2"
+                                                        size="sm"
+                                                        type="select"
+                                                        style={{ fontSize: 13 }}
+                                                        value={selectedProvince}
+                                                        onChange={(e) => {
+                                                            setSelectedProvince(e.target.value);
+                                                            setSelectedDistrict("");
+                                                            setSelectedWard("");
+                                                        }}
+                                                    >
+                                                        <option value="">Chọn tỉnh/thành phố</option>
+                                                        {provinces.map((province) => (
+                                                            <option key={province.ProvinceID} value={province.ProvinceID}>
+                                                                {province.ProvinceName}
+                                                            </option>
+                                                        ))}
+                                                    </Input>
 
 
-                                                            <Input
-                                                                className="mb-2"
-                                                                size="sm"
-                                                                type="select"
-                                                                style={{ fontSize: 13 }}
-                                                                value={selectedDistrict}
-                                                                onChange={(e) => {
-                                                                    setSelectedDistrict(e.target.value);
-                                                                    setSelectedWard("");
-                                                                    setSelectedToDistrictID(e.target.value);
-                                                                }}
-                                                                disabled={!selectedProvince}
-                                                            >
-                                                                <option value="">Chọn quận/huyện</option>
-                                                                {selectedProvince &&
-                                                                    districts.map((district) => (
-                                                                        <option key={district.DistrictID} value={district.DistrictID}>
-                                                                            {district.DistrictName}
-                                                                        </option>
-                                                                    ))}
-                                                            </Input>
+                                                    <Input
+                                                        className="mb-2"
+                                                        size="sm"
+                                                        type="select"
+                                                        style={{ fontSize: 13 }}
+                                                        value={selectedDistrict}
+                                                        onChange={(e) => {
+                                                            setSelectedDistrict(e.target.value);
+                                                            setSelectedWard("");
+                                                            setSelectedToDistrictID(e.target.value);
+                                                        }}
+                                                        disabled={!selectedProvince}
+                                                    >
+                                                        <option value="">Chọn quận/huyện</option>
+                                                        {selectedProvince &&
+                                                            districts.map((district) => (
+                                                                <option key={district.DistrictID} value={district.DistrictID}>
+                                                                    {district.DistrictName}
+                                                                </option>
+                                                            ))}
+                                                    </Input>
 
-                                                            <Input
-                                                                className="mb-2"
-                                                                size="sm"
-                                                                type="select"
-                                                                style={{ fontSize: 13 }}
-                                                                value={selectedWard}
-                                                                onChange={(e) => {
-                                                                    setSelectedWard(e.target.value);
-                                                                    setSelectedToWardCode(e.target.value.toString());
-                                                                    handleApiCall();
-                                                                }}
-                                                                disabled={!selectedDistrict}
-                                                            >
-                                                                <option value="">Chọn xã/phường</option>
-                                                                {selectedDistrict &&
-                                                                    wards.map((ward) => (
-                                                                        <option key={ward.WardCode} value={ward.WardCode}>
-                                                                            {ward.WardName}
-                                                                        </option>
-                                                                    ))}
-                                                            </Input>
+                                                    <Input
+                                                        className="mb-2"
+                                                        size="sm"
+                                                        type="select"
+                                                        style={{ fontSize: 13 }}
+                                                        value={selectedWard}
+                                                        onChange={(e) => {
+                                                            setSelectedWard(e.target.value);
+                                                            setSelectedToWardCode(e.target.value.toString());
+                                                            handleApiCall();
+                                                        }}
+                                                        disabled={!selectedDistrict}
+                                                    >
+                                                        <option value="">Chọn xã/phường</option>
+                                                        {selectedDistrict &&
+                                                            wards.map((ward) => (
+                                                                <option key={ward.WardCode} value={ward.WardCode}>
+                                                                    {ward.WardName}
+                                                                </option>
+                                                            ))}
+                                                    </Input>
 
-                                                        </FormGroup>
+                                                </FormGroup>
 
-                                                    </Col>
-                                                    <Col md={6}>
-                                                        <FormGroup>
-                                                            <Input className="mt-4"
-                                                                style={{ fontSize: 13 }}
-                                                                size="sm"
-                                                                rows="5"
-                                                                type="textarea"
-                                                                placeholder="Địa chỉ chi tiết..."
-                                                                id="detailedAddress"
-                                                                value={detailedAddress}
-                                                                onChange={(e) => setDetailedAddress(e.target.value)}
-                                                            />
-                                                        </FormGroup>
-                                                    </Col>
-                                                </Row>
-                                            </>
-
-                                        )}
+                                            </Col>
+                                            <Col md={6}>
+                                                <FormGroup>
+                                                    <Input className="mt-4"
+                                                        style={{ fontSize: 13 }}
+                                                        size="sm"
+                                                        rows="5"
+                                                        type="textarea"
+                                                        placeholder="Địa chỉ chi tiết..."
+                                                        id="detailedAddress"
+                                                        value={detailedAddress}
+                                                        onChange={(e) => setDetailedAddress(e.target.value)}
+                                                    />
+                                                </FormGroup>
+                                            </Col>
+                                        </Row>
                                         <Row>
                                             <Col md={12}>
                                                 <h3 className="heading-small text-dark">Thanh toán</h3>
                                             </Col>
                                         </Row>
-
                                         <FormGroup>
                                             <Label>
                                                 Tổng tiền sản phẩm
@@ -874,7 +870,8 @@ const Waitting = () => {
                                                 <Input
                                                     size="sm"
                                                     type="number"
-                                                    value={totalProductPrice}
+                                                    value={Math.floor(formData.totalMoney)}
+                                                    onChange={(e) => setFormData({ ...formData, totalMoney: e.target.value })}
                                                 />
                                                 <InputGroupAddon addonType="append">
                                                     <InputGroupText>VND</InputGroupText>
@@ -884,19 +881,62 @@ const Waitting = () => {
 
 
                                         <Row >
+                                            {formData.percentPeriod && (
+                                                <Col md={6}>
+                                                    <FormGroup>
+                                                        <Label>
+                                                            Đợt giảm giá
+                                                        </Label>
+                                                        <InputGroup size="sm">
+                                                            <Input
+                                                                size="sm"
+                                                                type="number"
+                                                                value={formData.percentPeriod}
+                                                            />
+                                                            <InputGroupAddon addonType="append">
+                                                                <InputGroupText>%</InputGroupText>
+                                                            </InputGroupAddon>
+                                                        </InputGroup>
+                                                    </FormGroup>
+                                                </Col>
+                                            )}
+                                            {(formData.percentVoucher || formData.priceVoucher) && (
+                                                <Col md={6}>
+                                                    <FormGroup>
+                                                        <Label>
+                                                            Voucher từ shop
+                                                        </Label>
+                                                        <InputGroup size="sm">
+                                                            <Input
+                                                                size="sm"
+                                                                type="number"
+                                                                value={formData.percentVoucher || formData.priceVoucher || ""}
+                                                            />
+                                                            <InputGroupAddon addonType="append">
+                                                                <InputGroupText>{formData.percentVoucher ? "%" : "VND"}</InputGroupText>
+                                                            </InputGroupAddon>
+                                                        </InputGroup>
+                                                    </FormGroup>
+                                                </Col>
+                                            )}
+                                        </Row>
+
+                                        <Row >
                                             <Col md={6}>
                                                 <FormGroup>
                                                     <Label>
-                                                        Đợt giảm giá
+                                                        Phí vận chuyển
                                                     </Label>
                                                     <InputGroup size="sm">
                                                         <Input
                                                             size="sm"
                                                             type="number"
-                                                            value={formData.percentPeriod}
+                                                            value={hasShippingData ? Math.floor(shippingTotal) : Math.floor(deliveryData.deliveryCost)}
+                                                            onChange={(e) => setDeliveryData({ ...deliveryData, deliveryCost: e.target.value })}
+                                                            readOnly style={{ backgroundColor: "#fff" }}
                                                         />
                                                         <InputGroupAddon addonType="append">
-                                                            <InputGroupText>%</InputGroupText>
+                                                            <InputGroupText>VND</InputGroupText>
                                                         </InputGroupAddon>
                                                     </InputGroup>
                                                 </FormGroup>
@@ -904,58 +944,14 @@ const Waitting = () => {
                                             </Col>
                                             <Col md={6}>
                                                 <FormGroup>
-                                                    <Label>
-                                                        Voucher từ shop
-                                                    </Label>
-                                                    <InputGroup size="sm">
-                                                        <Input
-                                                            size="sm"
-                                                            type="number"
-                                                            value={formData.percentVoucher || formData.priceVoucher || ""}
-                                                        />
-                                                        <InputGroupAddon addonType="append">
-                                                            <InputGroupText>{formData.percentVoucher ? "%" : "VND"}</InputGroupText>
-                                                        </InputGroupAddon>
-                                                    </InputGroup>
+                                                    <img className="my-3 ml-3"
+                                                        width={"80%"}
+                                                        alt="..."
+                                                        src={require("../../../assets/img/theme/giaohangnhanh.webp")}
+                                                    />
                                                 </FormGroup>
                                             </Col>
                                         </Row>
-                                        {hasDeliveryData && (
-                                            <>
-                                                <Row >
-                                                    <Col md={6}>
-                                                        <FormGroup>
-                                                            <Label>
-                                                                Phí vận chuyển
-                                                            </Label>
-                                                            <InputGroup size="sm">
-                                                                <Input
-                                                                    size="sm"
-                                                                    type="number"
-                                                                    value={hasShippingData ? Math.floor(shippingTotal) : Math.floor(deliveryData.deliveryCost)}
-                                                                    onChange={(e) => setDeliveryData({ ...deliveryData, deliveryCost: e.target.value })}
-                                                                    readOnly style={{ backgroundColor: "#fff" }}
-                                                                />
-                                                                <InputGroupAddon addonType="append">
-                                                                    <InputGroupText>VND</InputGroupText>
-                                                                </InputGroupAddon>
-                                                            </InputGroup>
-                                                        </FormGroup>
-
-                                                    </Col>
-                                                    <Col md={6}>
-                                                        <FormGroup>
-                                                            <img className="my-3 ml-3"
-                                                                width={"80%"}
-                                                                alt="..."
-                                                                src={require("../../../assets/img/theme/giaohangnhanh.webp")}
-                                                            />
-                                                        </FormGroup>
-                                                    </Col>
-                                                </Row>
-                                            </>
-                                        )}
-
                                         <FormGroup>
                                             <Label>
                                                 Thành tiền
@@ -964,8 +960,8 @@ const Waitting = () => {
                                                 <Input
                                                     size="sm"
                                                     type="number"
-                                                    value={Math.floor(formData.totalMoney)}
-                                                    onChange={(e) => setFormData({ ...formData, totalMoney: e.target.value })}
+                                                    value={Math.floor(formData.totalPayment)}
+                                                    onChange={(e) => setFormData({ ...formData, totalPayment: e.target.value })}
                                                     readOnly style={{ backgroundColor: "#fff" }}
 
                                                 />
@@ -1009,11 +1005,14 @@ const Waitting = () => {
                                                         <td>
                                                             <Row className="col">
                                                                 <Col md={4}>
-                                                                <span className="avatar avatar-sm rounded-circle">
-                                                                        <img src={`https://s3-ap-southeast-1.amazonaws.com/imageshoestore/${product.imgUri}`} alt="" />
-                                                                    </span>
+
+                                                                    <img src={`https://s3-ap-southeast-1.amazonaws.com/imageshoestore/${product.imgUri}`}
+                                                                        alt=""
+                                                                        style={{ width: "60px", height: "45px" }}
+                                                                    />
+
                                                                 </Col>
-                                                                <Col md={8}>
+                                                                <Col md={8} className="pl-4">
                                                                     <h5>{product.shoesName}</h5>
                                                                     <small className="mr-1">Màu: {product.colorName}</small>
                                                                     <small>Size: {product.sizeName}</small>
@@ -1023,7 +1022,7 @@ const Waitting = () => {
 
                                                         </td>
                                                         <td className="text-center">
-                                                            {formData && formData.paymentMethod === 1 ? (
+                                                            {formData.paymentMethod === 1 ? (
                                                                 <>
                                                                     <button
                                                                         className="mr-3"
@@ -1049,19 +1048,41 @@ const Waitting = () => {
                                                         <td className="text-right">{formatter.format(product.price)}</td>
                                                         <td className="text-right">{formatter.format(product.totalPrice)}</td>
                                                         <td className="text-right">
-                                                            <Button className="pt-0" color="link" size="sm" onClick={() => handleDeleteProduct(product.id)}
-                                                            ><FaTrash />
-                                                            </Button>
+                                                            {formData.paymentMethod === 1 && (
+                                                                <>
+                                                                    <Button className="pt-0" color="link" size="sm" onClick={() => handleDeleteProduct(product.id)}
+                                                                    ><FaTrash />
+                                                                    </Button>
+                                                                </>
+                                                            )}
                                                         </td>
                                                     </tr>
                                                 ))}
                                         </tbody>
                                     </Table>
+                                    {formData.imageFreeGift && formData.nameFreeGift && (
+                                        <div style={{ padding: "15px 0 5px 0", boxShadow: "0 0 10px rgba(0, 0, 0, 0.1)" }}>
+                                            <div className="item d-flex">
+                                                <div className="product-container mr-4 ml-5">
+                                                    <img
+                                                        src={`data:image/jpeg;base64,${formData.imageFreeGift}`}
+                                                        alt={formData.nameFreeGift}
+                                                        style={{ width: "50px" }}
+                                                    />
+                                                    <div className="quantity-badge">
+                                                        <span className="quantity">1</span>
+                                                    </div>
+                                                </div>
+
+                                                <div>
+                                                    <div className="text-warning text-center" style={{ border: "1px solid", fontSize: 11, width: 60 }}>Quà tặng</div>
+                                                    <div className="small mt-1">{formData.nameFreeGift}</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
                                 </Col>
                             </Row>
-
-
-
                         </ModalBody >
                         <ModalFooter>
                             <div className="text-center">

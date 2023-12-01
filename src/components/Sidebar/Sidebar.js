@@ -192,7 +192,7 @@ const Sidebar1 = (props) => {
                 label={"Quản lý khuyến mại"}
                 icon={<RiPriceTag2Line />}
               >
-                <MenuItem icon={<RiPriceTag3Line />}><NavLink style={{ fontSize: 15, color: "black" }} to="/admin/discount" tag={Link}>Phiếu giảm giá</NavLink></MenuItem>
+                <MenuItem icon={<RiPriceTag3Line />}><NavLink style={{ fontSize: 15, color: "black" }} to="/admin/discount" tag={Link}>Voucher</NavLink></MenuItem>
                 <MenuItem icon={<RiPriceTag3Line />}><NavLink style={{ fontSize: 15, color: "black" }} to="/admin/promotion" tag={Link}>Đợt giảm giá</NavLink></MenuItem>
                 <MenuItem icon={<RiPriceTag3Line />}><NavLink style={{ fontSize: 15, color: "black" }} to="/admin/free-gift" tag={Link}>Quà tặng</NavLink></MenuItem>
               </SubMenu>

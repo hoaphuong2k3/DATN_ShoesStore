@@ -482,6 +482,24 @@ const Checkout = () => {
     }
   };
 
+  const [paymentLink, setPaymentLink] = useState('');
+  const handlePaymentMethodChange = () => {
+    setSelectedPaymentMethod(2);
+    const totalPrice = totalPaymentFinal();
+    try {
+      const paymentPromise = axiosInstance.get(`/payment/pay?totalPrice=${totalPrice}`)
+      console.log(paymentPromise);
+      paymentPromise.then((response) => {
+        const paymentLink = response;
+        setPaymentLink(paymentLink);
+        window.open(paymentLink, '_blank');
+      });
+    } catch (error) {
+      console.error('Lỗi khi gọi API:', error);
+    }
+  };
+
+
   return (
     <>
       <Header />
@@ -787,9 +805,8 @@ const Checkout = () => {
                       className="ml-1"
                       value={2}
                       checked={selectedPaymentMethod === 2}
-                      onChange={(e) =>
-                        setSelectedPaymentMethod(parseInt(e.target.value))
-                      }
+                      onChange={(e) => setSelectedPaymentMethod(parseInt(e.target.value))}
+                      onClick={handlePaymentMethodChange}
                     />
                     <Label className="ml-4">Thẻ Master/Ví điện tử</Label>
 
