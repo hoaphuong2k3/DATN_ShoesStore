@@ -580,7 +580,7 @@ const Staff = () => {
                         <InputGroup size="sm">
                           <Input
                             type="search"
-                            placeholder="Tìm kiếm mã, tên nhân viên..."
+                            placeholder="Tìm kiếm nhân viên..."
                             value={searchValue}
                             onChange={(e) => setSearchValue(e.target.value)}
                           />
