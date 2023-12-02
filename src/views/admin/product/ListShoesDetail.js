@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { findShoes } from "services/Product2Service";
-import { getAllShoesDetail } from "services/ShoesDetailService.js";
+import { getAllShoesDetail, getAllShoesDetail3 } from "services/ShoesDetailService.js";
 import ReactPaginate from 'react-paginate';
 import { FaEdit, FaTrash, FaLock, FaLockOpen, FaAngleDown, FaAngleUp, FaFilter, FaSearch, FaQrcode } from 'react-icons/fa';
 import { getAllColorId, getAllSizeId, getAllColor, getAllSize } from "services/ProductAttributeService";
@@ -130,7 +130,7 @@ const ListShoesDetail = () => {
     //getAll
     const getAll = async () => {
         try {
-            let res = await getAllShoesDetail(id, page, size, search);
+            let res = await getAllShoesDetail3(id, page, size, search, sort, sortStyle);
             console.log("res6:", res);
             if (res && res.data && res.data.content) {
                 setListShoesDetail(res.data.content);
@@ -955,7 +955,15 @@ const ListShoesDetail = () => {
         padding: "4px"
     };
     //Slide show
-
+    const [sort, setSort] = useState('');
+    const [sortStyle, setSortStyle] = useState('');
+    const onClickSort = (a, b) => {
+        setSort(a);
+        setSortStyle(b);
+    }
+    useEffect(() => {
+        getAll();
+    }, [sort, sortStyle]);
 
     return (
         <>
@@ -1184,12 +1192,18 @@ const ListShoesDetail = () => {
                                                         <th>STT</th>
                                                         <th>Trạng thái</th>
                                                         <th>Ảnh</th>
-                                                        <th>Mã</th>
-                                                        <th>Màu</th>
-                                                        <th>Size</th>
-                                                        <th>Số lượng</th>
-                                                        <th>Giá gốc</th>
-                                                        <th>Giá KM</th>
+                                                        <th>Mã  <i class="fa-solid fa-arrow-up" onClick={() => onClickSort('code', 'asc')} />
+                                                            <i class="fa-solid fa-arrow-down" onClick={() => onClickSort('code', 'desc')} /></th>
+                                                        <th>Màu  <i class="fa-solid fa-arrow-up" onClick={() => onClickSort('color', 'asc')} />
+                                                            <i class="fa-solid fa-arrow-down" onClick={() => onClickSort('color', 'desc')} /></th>
+                                                        <th>Size  <i class="fa-solid fa-arrow-up" onClick={() => onClickSort('size', 'asc')} />
+                                                            <i class="fa-solid fa-arrow-down" onClick={() => onClickSort('size', 'desc')} /></th>
+                                                        <th>Số lượng  <i class="fa-solid fa-arrow-up" onClick={() => onClickSort('quantity', 'asc')} />
+                                                            <i class="fa-solid fa-arrow-down" onClick={() => onClickSort('quantity', 'desc')} /></th>
+                                                        <th>Giá gốc  <i class="fa-solid fa-arrow-up" onClick={() => onClickSort('price', 'asc')} />
+                                                            <i class="fa-solid fa-arrow-down" onClick={() => onClickSort('price', 'desc')} /></th>
+                                                        <th>Giá giảm  <i class="fa-solid fa-arrow-up" onClick={() => onClickSort('discountPrice', 'asc')} />
+                                                            <i class="fa-solid fa-arrow-down" onClick={() => onClickSort('discountPrice', 'desc')} /></th>
                                                         <th>QR Code</th>
                                                         <th colSpan={2} style={{ position: "sticky", zIndex: '1', right: '0' }}>Thao tác</th>
                                                     </tr>
