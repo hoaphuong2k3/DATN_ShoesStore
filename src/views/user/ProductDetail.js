@@ -2,7 +2,7 @@ import 'assets/scss/detailsp.scss';
 import { Container, Row, Card, CardBody, Col } from "reactstrap";
 import Header from "components/Headers/ProductHeader.js";
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import axiosInstance from "services/custommize-axios";
 import { getAllShoesDetail } from "services/ShoesDetailService.js";
 import { useParams, useNavigate } from 'react-router-dom';
 import { CartContext } from "contexts/Cart.js";
@@ -184,7 +184,16 @@ const DetailProduct = () => {
       window.location.href = "/login";
     }
   }
-
+  const [voucher, setVoucher] = useState([]);
+  const fetchPromo = async () => {
+    try {
+      const res = await axiosInstance.get(`/vouchers/getAllIsActive?id=${storedUserId}`);
+      setVoucher(res.data);
+      console.log("Promo:", res.data);
+    } catch (error) {
+      console.error('Lỗi khi tải lại dữ liệu khách hàng:', error);
+    }
+  };
 
   return (
     <>
@@ -230,11 +239,16 @@ const DetailProduct = () => {
                                   <div className='giachuagiam' >
                                     {/* Giá chuwq giảm */}
                                     {formatter.format(shoesdetail.shoesDetailSearchResponse.price)}
-
                                   </div>
                                   <div className='flex items-center'>
                                     {/* Giá  giảm */}
                                     <span className='giagiam'>{shoesdetail.shoesDetailSearchResponse.discountPrice === null ? "0 đ" : formatter.format(shoesdetail.shoesDetailSearchResponse.discountPrice)}</span>
+                                    {
+                                      shoesdetail.shoesDetailSearchResponse.type === 1 && <span className='sokhuyenmai'> Giảm {shoesdetail.shoesDetailSearchResponse.discountPrice === null ? 100 : (shoesdetail.shoesDetailSearchResponse.discountPrice / shoesdetail.shoesDetailSearchResponse.price) * 100}%</span>
+                                    }
+                                    {
+                                      shoesdetail.shoesDetailSearchResponse.type === 2 && <span className='sokhuyenmai'> Giảm {shoesdetail.shoesDetailSearchResponse.discountPrice === null ? shoesdetail.shoesDetailSearchResponse.price : (shoesdetail.shoesDetailSearchResponse.price - shoesdetail.shoesDetailSearchResponse.discountPrice)}đ</span>
+                                    }
                                     <span className='sokhuyenmai'> Giảm {shoesdetail.shoesDetailSearchResponse.discountPrice === null ? 100 : (shoesdetail.shoesDetailSearchResponse.discountPrice / shoesdetail.shoesDetailSearchResponse.price) * 100}%</span>
                                   </div>
                                 </>
@@ -315,7 +329,7 @@ const DetailProduct = () => {
                               <span className='giatrithuoctinh'>
                                 <span className='voucher'> Giảm 10%</span>
                                 <span className='voucher'> Giảm 20%</span>
-                                <spam> Xem tất cả</spam>
+                                <span> Xem tất cả</span>
                               </span>
                             </div>
                           </div>

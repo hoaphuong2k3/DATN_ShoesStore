@@ -431,14 +431,15 @@ const ListShoesDetail = () => {
 
     const exportExcel = async () => {
         try {
-            const requestData = ListShoesDetail; // Dữ liệu trong ListShoesDetail
+            const requestData = ListShoesDetail.map(item => (
+                item.shoesDetailSearchResponse
+            ));
             const res = await axios.post(`http://localhost:33321/api/admin/shoesdetail/export/excel`, requestData, {
                 responseType: 'blob',
                 headers: {
                     'Content-Type': 'application/json',
                 },
             });
-
             const blob = new Blob([res.data], { type: 'application/excel' });
 
             // Tạo một URL cho Blob và tạo một thẻ a để download
@@ -522,8 +523,11 @@ const ListShoesDetail = () => {
 
     const xuatPDF = async () => {
         try {
-            const requestData = ListShoesDetail;
-            const res = await axios.post(`http://localhost:33321/api/admin/shoesdetail/export/pdf`, requestData, {
+            const requestData = ListShoesDetail.map(item => (
+                item.shoesDetailSearchResponse
+            ));
+            console.log(requestData);
+            const res = await axios.post(`http://localhost:33321/api/admin/shoesdetail/export/pdf/${id}`, requestData, {
                 responseType: 'blob',
                 headers: {
                     'Content-Type': 'application/json',
@@ -845,7 +849,7 @@ const ListShoesDetail = () => {
             setSelectedItems([]);
             setShowActions(false);
         } else {
-            setSelectedItems(ListShoesDetail.map(listShoes => listShoes.id));
+            setSelectedItems(ListShoesDetail.map(listShoes => listShoes.shoesDetailSearchResponse.id));
             setShowActions(true);
         }
         setSelectAll(!selectAll);
@@ -1104,12 +1108,14 @@ const ListShoesDetail = () => {
                                                     >
                                                         Xuất PDF
                                                     </Button>
-                                                    <Button
-                                                        className="btn btn-outline-primary"
-                                                        size="sm"
-                                                    >
-                                                        Báo cáo
-                                                    </Button>
+                                                    {search.status === "2" &&
+                                                        <Button
+                                                            className="btn btn-outline-primary"
+                                                            size="sm"
+                                                        >
+                                                            Báo cáo
+                                                        </Button>
+                                                    }
                                                 </div>
                                             </div>
                                         </Row>
@@ -1118,7 +1124,7 @@ const ListShoesDetail = () => {
                                         <div className="col">
 
                                             <Row className="align-items-center my-3">
-                                                <div className="col d-flex">
+                                                <div className="col-3 d-flex">
                                                     <Button color="warning" outline size="sm" onClick={toggleThirdModal}>
                                                         <FaFilter size="16px" className="mr-1" />Bộ lọc
                                                     </Button>
@@ -1126,20 +1132,19 @@ const ListShoesDetail = () => {
                                                     <Button color="warning" outline size="sm" onClick={toggle3}>
                                                         <FaQrcode className="mr-1" />QR Code
                                                     </Button>
-
-                                                    <Col>
-                                                        <InputGroup size="sm">
-                                                            <Input type="search"
-                                                                placeholder="Tìm kiếm theo mã..."
-                                                            />
-                                                            <InputGroupAddon addonType="append">
-                                                                <InputGroupText>
-                                                                    <FaSearch />
-                                                                </InputGroupText>
-                                                            </InputGroupAddon>
-                                                        </InputGroup>
-                                                    </Col>
                                                 </div>
+                                                <Col >
+                                                    <InputGroup size="sm">
+                                                        <Input type="search"
+                                                            placeholder="Tìm kiếm theo mã..."
+                                                        />
+                                                        <InputGroupAddon addonType="append">
+                                                            <InputGroupText>
+                                                                <FaSearch />
+                                                            </InputGroupText>
+                                                        </InputGroupAddon>
+                                                    </InputGroup>
+                                                </Col>
                                                 <Col>
                                                     <Input type="select" name="status" style={{ width: "150px" }} size="sm" onChange={(e) => onInputChange(e)} >
                                                         <option value=" ">Tất cả</option>
@@ -1879,15 +1884,11 @@ const ListShoesDetail = () => {
                                                 })}
                                         >
                                             <option value='1'>
-                                                Đang bán
+                                                Hoạt động
                                             </option>
                                             <option value='0'>
-                                                Ngừng bán
+                                                Ngừng hoạt động
                                             </option>
-                                            <option value='2'>
-                                                Hết hàng
-                                            </option>
-
                                         </Input>
                                     </FormGroup>
                                 </Col>
