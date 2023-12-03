@@ -104,7 +104,7 @@ const Login = () => {
       const { id, token, authorities, userId } = response.data;
 
       login({ id, token, authorities, userId }); // Lưu ID, token và vai trò người dùng vào Context
-
+      console.log(token);
       toast.success("Đăng nhập thành công!");
 
       // Kiểm tra vai trò người dùng và chuyển hướng đến trang tương ứng
@@ -232,9 +232,9 @@ const Login = () => {
         </Card>
         <Row className="mt-3">
           <Col xs="6">
-            
-              <small className="text-light" onClick={toggle} style={{cursor: "pointer"}}>Quên mật khẩu?</small>
-            
+
+            <small className="text-light" onClick={toggle} style={{ cursor: "pointer" }}>Quên mật khẩu?</small>
+
           </Col>
           <Col className="text-right" xs="6">
             <Link className="text-light" to="/register" tag={Link}>
@@ -256,12 +256,12 @@ const Login = () => {
           <h3 className="heading-small text-dark mb-0">Đặt lại mật khẩu</h3>
         </ModalHeader>
         <ModalBody>
-            <ForgotPass/>    
+          <ForgotPass />
         </ModalBody >
         <ModalFooter>
-            <Button color="danger" outline onClick={toggle} size="sm">
-              Đóng
-            </Button>
+          <Button color="danger" outline onClick={toggle} size="sm">
+            Đóng
+          </Button>
         </ModalFooter>
       </Modal >
     </>

@@ -554,7 +554,33 @@ const ListShoesDetail = () => {
         }
     };
     //End exportexcel
-
+    //Báo cáo 
+    const token = localStorage.token;
+    const baoCaoPDF = async () => {
+        try {
+            const requestData = ListShoesDetail.map(item => (
+                {
+                    code: item.shoesDetailSearchResponse.code,
+                    size: item.shoesDetailSearchResponse.size,
+                    color: item.shoesDetailSearchResponse.color,
+                    price: item.shoesDetailSearchResponse.price,
+                    createdBy: item.shoesDetailSearchResponse.createdBy,
+                    createdTime: item.shoesDetailSearchResponse.createdTime
+                }
+            ));
+            console.log(requestData);
+            const res = await axios.post(`http://localhost:33321/api/staff/shoesdetail/report/pattern/${id}`, { "staffShoesDetailReports": requestData }, {
+                responseType: 'blob',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+            });
+        } catch (error) {
+            console.error(error);
+        }
+    };
+    //End Báo cáo
     // Thêm mới 1 ctsp
     const [modalAdd, setModalAdd] = useState(false);
     const toggle = () => setModalAdd(!modalAdd);
@@ -1123,6 +1149,7 @@ const ListShoesDetail = () => {
                                                         <Button
                                                             className="btn btn-outline-primary"
                                                             size="sm"
+                                                            onClick={baoCaoPDF}
                                                         >
                                                             Báo cáo
                                                         </Button>

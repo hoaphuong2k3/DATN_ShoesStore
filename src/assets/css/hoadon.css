@@ -25,8 +25,8 @@
 }
 
 #progressbar-2 #step2:before {
-  content: '\e58b';
-  font-family: "Font Awesome Free 6.5.1 ";
+  content: '\f1b9';
+  font-family: "Font Awesome 5 Free";
   color: #fff;
   font-size: 24px;
   width: 37px;
@@ -94,7 +94,7 @@
 #progressbar-2 li:nth-child(3):after {
   left: 1%;
   width: 100%;
-  background: #c5cae9 !important;
+  /* background: #c5cae9 !important; */
 }
 
 #progressbar-2 li:nth-child(4):after {
