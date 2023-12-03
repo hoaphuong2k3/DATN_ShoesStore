@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
+import * as yup from 'yup';
 import axios from "axios";
 import {
     Button,
@@ -90,24 +92,71 @@ const Products = () => {
 
     };
 
-    //newPass
-    const handleComplete = async () => {
 
+    // Validate Password
+    const [errors, setErrors] = useState({});
+
+    const schema = yup.object().shape({
+        newPassword: yup.string()
+            .min(8, 'Mật khẩu phải có ít nhất 8 ký tự')
+            .max(20, 'Mật khẩu không được quá 20 ký tự')
+            .matches(
+                /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+{}\[\]:;<>,.?~\\/-]).{8,20}$/,
+                'Mật khẩu từ 8-20 ký tự, phải chứa ít nhất 1 chữ hoa, 1 chữ thường, 1 số, và 1 ký tự đặc biệt')
+            .required('Vui lòng nhập mật khẩu'),
+        confirmPassword: yup.string()
+            .oneOf([yup.ref('newPassword'), null], 'Mật khẩu xác nhận không khớp')
+            .required('Vui lòng xác nhận mật khẩu'),
+    });
+
+    const validateInput = async () => {
         try {
-            await axios.put("http://localhost:33321/api/staff/forgotPassword",
-                { newPassword, confirmPassword },
-                { headers: { "Content-Type": "application/json" } }
-            );
-
-            toast.success("Đặt lại mật khẩu thành công!");
-            setModal2(false);
-            navigate("/");
-
+            await schema.validate({ newPassword, confirmPassword }, { abortEarly: false });
+            setErrors({});
+            return true;
         } catch (error) {
-
-            console.error("Lỗi cuộc gọi API:", error);
-            toast.error("Có lỗi xảy ra. Vui lòng thử lại!");
+            const validationErrors = {};
+            error.inner.forEach(err => {
+                validationErrors[err.path] = err.message;
+            });
+            setErrors(validationErrors);
+            return false;
         }
+    };
+
+    // Reset Password
+    const handleComplete = async () => {
+        const isInputValid = await validateInput();
+
+        if (isInputValid) {
+            try {
+                // Assume the API endpoint for resetting password is correct
+                await axios.put("http://localhost:33321/api/staff/forgotPassword",
+                    { newPassword, confirmPassword },
+                    { headers: { "Content-Type": "application/json" } }
+                );
+
+                toast.success("Đặt lại mật khẩu thành công!");
+                setModal2(false);
+                navigate("/");
+
+            } catch (error) {
+                console.error("Lỗi cuộc gọi API:", error);
+                toast.error("Có lỗi xảy ra. Vui lòng thử lại!");
+            }
+        } else {
+            toast.error("Vui lòng nhập mật khẩu hợp lệ.");
+        }
+    };
+
+    const [showPassword, setShowPassword] = useState(true);
+    const togglePasswordVisibility = () => {
+        setShowPassword((prev) => !prev);
+    };
+
+    const [showRessPass, setRessShowPass] = useState(true);
+    const toggleRessPassword = () => {
+        setRessShowPass((prev) => !prev);
     };
 
     return (
@@ -187,10 +236,21 @@ const Products = () => {
                             </InputGroupAddon>
                             <Input
                                 placeholder="Mật khẩu mới"
-                                type="password"
+                                name="newPassword"
+                                type={showPassword ? "password" : "text"}
                                 value={newPassword}
                                 onChange={(e) => setNewPassword(e.target.value)}
+                                className={errors.newPassword ? "form-control is-invalid" : "form-control"}
                             />
+                            <InputGroupAddon addonType="append">
+                                <InputGroupText
+                                    style={{ cursor: "pointer" }}
+                                    onClick={togglePasswordVisibility}
+                                >
+                                    {showPassword ? <FaEyeSlash /> : <FaEye />}
+                                </InputGroupText>
+                            </InputGroupAddon>
+                            {errors.newPassword && <div className="invalid-feedback ml-3 mr-4">{errors.newPassword}</div>}
                         </InputGroup>
                     </FormGroup>
                     <FormGroup>
@@ -202,10 +262,21 @@ const Products = () => {
                             </InputGroupAddon>
                             <Input
                                 placeholder="Nhập lại mật khẩu"
-                                type="password"
+                                name="confirmPassword"
+                                type={showRessPass ? "password" : "text"}
                                 value={confirmPassword}
                                 onChange={(e) => setConfirmPassword(e.target.value)}
+                                className={errors.confirmPassword ? "form-control is-invalid" : "form-control"}
                             />
+                            <InputGroupAddon addonType="append">
+                                <InputGroupText
+                                    style={{ cursor: "pointer" }}
+                                    onClick={toggleRessPassword}
+                                >
+                                    {showRessPass ? <FaEyeSlash /> : <FaEye />}
+                                </InputGroupText>
+                            </InputGroupAddon>
+                            {errors.confirmPassword && <div className="invalid-feedback ml-3">{errors.confirmPassword}</div>}
                         </InputGroup>
                     </FormGroup>
                 </ModalBody>
