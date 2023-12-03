@@ -1145,7 +1145,7 @@ const ListShoesDetail = () => {
                                                     >
                                                         Xuất PDF
                                                     </Button>
-                                                    {search.status === "2" && ListShoesDetail && ListShoesDetail.length > 0 &&
+                                                    {search.status === "-1" && ListShoesDetail && ListShoesDetail.length > 0 &&
                                                         <Button
                                                             className="btn btn-outline-primary"
                                                             size="sm"
@@ -1188,7 +1188,7 @@ const ListShoesDetail = () => {
                                                         <option value=" ">Tất cả</option>
                                                         <option value="1">Đang kinh doanh</option>
                                                         <option value="0">Ngừng kinh doanh</option>
-                                                        <option value="2">Hết hàng</option>
+                                                        <option value="-1">Hết hàng</option>
                                                     </Input>
                                                 </Col>
 
@@ -1261,9 +1261,15 @@ const ListShoesDetail = () => {
                                                                     </td>
                                                                     <th scope="row"> {index + 1}</th>
                                                                     <td>
-                                                                        <Badge color={statusMapping[item.shoesDetailSearchResponse.status]?.color || statusMapping.default.color}>
-                                                                            {statusMapping[item.shoesDetailSearchResponse.status]?.label || statusMapping.default.label}
-                                                                        </Badge>
+                                                                        {item.shoesDetailSearchResponse.status === (-1) ?
+                                                                            <Badge color={statusMapping[2]?.color || statusMapping.default.color}>
+                                                                                {statusMapping[2]?.label || statusMapping.default.label}
+                                                                            </Badge>
+                                                                            :
+                                                                            <Badge color={statusMapping[item.shoesDetailSearchResponse.status]?.color || statusMapping.default.color}>
+                                                                                {statusMapping[item.shoesDetailSearchResponse.status]?.label || statusMapping.default.label}
+                                                                            </Badge> 
+                                                                        }
                                                                     </td>
                                                                     <td>
                                                                         <SlideShow images={item.imageDTOS} imageSize={"80px"} />

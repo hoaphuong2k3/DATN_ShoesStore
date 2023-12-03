@@ -100,11 +100,10 @@ const Login = () => {
         password,
         rememberMe: rememberMe === "on",
       });
-
+  
       const { id, token, authorities, userId } = response.data;
 
       login({ id, token, authorities, userId }); // Lưu ID, token và vai trò người dùng vào Context
-      console.log(token);
       toast.success("Đăng nhập thành công!");
 
       // Kiểm tra vai trò người dùng và chuyển hướng đến trang tương ứng
