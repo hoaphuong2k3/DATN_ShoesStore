@@ -154,11 +154,12 @@ const ListShoesDetail = () => {
         }
     }
     useEffect(() => {
+        console.log("search", ListShoesDetail);
     }, [ListShoesDetail]);
     useEffect(() => {
-        console.log(search);
         getAll();
     }, [search]);
+
     useEffect(() => {
         console.log("size", size);
         getAll();
@@ -785,7 +786,8 @@ const ListShoesDetail = () => {
                     sizeId: addone.sizeId,
                     colorId: addone.colorId,
                     quantity: addone.quantity,
-                    price: addone.price
+                    price: addone.price,
+                    status: addone.status
                 });
                 toggleEdit();
                 getAll();
@@ -860,8 +862,9 @@ const ListShoesDetail = () => {
                 try {
                     await axios.delete(`http://localhost:33321/api/admin/shoesdetail/delete`, { data: selectedItems });
                     getAll();
-                    getListCheck();
                     setSelectedItems([]);
+                    setShowActions(false);
+                    getListCheck();
                     toast.success("Xóa thành công ");
                 } catch (error) {
                     let errorMessage = "Lỗi từ máy chủ";
@@ -1046,14 +1049,14 @@ const ListShoesDetail = () => {
                                                         <label>{dataShoesById.cushionName}</label>
                                                     </Col>
                                                 </Row>
-                                                <Row>
+                                                {/* <Row>
                                                     <Col lg="2">
                                                         <label className="form-control-label">Mô tả:  </label>
                                                     </Col>
                                                     <Col lg="10">
                                                         <label>{dataShoesById.description}</label>
                                                     </Col>
-                                                </Row>
+                                                </Row> */}
                                             </Col>
                                         </Row>
                                     </div>
@@ -1116,7 +1119,7 @@ const ListShoesDetail = () => {
                                                     >
                                                         Xuất PDF
                                                     </Button>
-                                                    {search.status === "2" &&
+                                                    {search.status === "2" && ListShoesDetail && ListShoesDetail.length > 0 &&
                                                         <Button
                                                             className="btn btn-outline-primary"
                                                             size="sm"
