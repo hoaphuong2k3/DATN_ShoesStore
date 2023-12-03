@@ -72,7 +72,7 @@ const Promotion = () => {
 
     const statusMapping = {
         1: { color: 'danger', label: 'Kích hoạt' },
-        0: { color: 'success', label: 'Chờ kích hoạt' },
+        '-1': { color: 'success', label: 'Ngừng kích hoạt' },
     };
 
     //sắp xếp

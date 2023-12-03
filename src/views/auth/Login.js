@@ -24,6 +24,7 @@ import {
   ModalHeader
 } from "reactstrap";
 
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 import ForgotPass from "../auth/ForgotPass.js";
 
 const Login = () => {
@@ -124,6 +125,10 @@ const Login = () => {
   const [modal, setModal] = useState(false);
   const toggle = () => setModal(!modal);
 
+  const [showPassword, setShowPassword] = useState(true);
+  const togglePasswordVisibility = () => {
+    setShowPassword((prev) => !prev);
+  };
 
   return (
     <>
@@ -200,12 +205,20 @@ const Login = () => {
                   </InputGroupAddon>
                   <Input
                     placeholder="Password"
-                    type="password"
+                    type={showPassword ? "password" : "text"}
                     autoComplete="new-password"
                     name="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                   />
+                  <InputGroupAddon addonType="append">
+                    <InputGroupText
+                      style={{ cursor: "pointer" }}
+                      onClick={togglePasswordVisibility}
+                    >
+                      {showPassword ? <FaEyeSlash /> : <FaEye />}
+                    </InputGroupText>
+                  </InputGroupAddon>
                 </InputGroup>
               </FormGroup>
               <div className="custom-control custom-control-alternative custom-checkbox">
@@ -232,9 +245,9 @@ const Login = () => {
         </Card>
         <Row className="mt-3">
           <Col xs="6">
-            
-              <small className="text-light" onClick={toggle} style={{cursor: "pointer"}}>Quên mật khẩu?</small>
-            
+
+            <small className="text-light" onClick={toggle} style={{ cursor: "pointer" }}>Quên mật khẩu?</small>
+
           </Col>
           <Col className="text-right" xs="6">
             <Link className="text-light" to="/register" tag={Link}>
@@ -256,12 +269,12 @@ const Login = () => {
           <h3 className="heading-small text-dark mb-0">Đặt lại mật khẩu</h3>
         </ModalHeader>
         <ModalBody>
-            <ForgotPass/>    
+          <ForgotPass />
         </ModalBody >
         <ModalFooter>
-            <Button color="danger" outline onClick={toggle} size="sm">
-              Đóng
-            </Button>
+          <Button color="danger" outline onClick={toggle} size="sm">
+            Đóng
+          </Button>
         </ModalFooter>
       </Modal >
     </>
