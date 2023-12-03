@@ -292,10 +292,21 @@ const Promotion = () => {
         fetchData();
     };
     const openlock = async (id) => {
-        try {       
+        try {
+            const selectedDiscount = discounts.find(discount => discount.id === id);
+
+            const today = new Date();
+            const startDate = new Date(selectedDiscount.startDate);
+            const endDate = new Date(selectedDiscount.endDate);
+
+            if (endDate >= today &&  startDate <= endDate) {
                 await axiosInstance.patch(`/admin/discount-period/setDiscountPeriodRun/${id}`);
                 toast.success("Cập nhật thành công");
                 fetchData();
+            } else {
+                toast.error("Ngày kết thúc không hợp lệ");
+            }
+
         } catch (error) {
             console.error("Lỗi khi cập nhật trạng thái:", error);
             if (error.response) {
