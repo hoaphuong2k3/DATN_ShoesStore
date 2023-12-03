@@ -5,9 +5,19 @@ import { format } from 'date-fns';
 import { vi } from 'date-fns/locale';
 import { connect } from 'react-redux';
 import { updateData } from './actions';
+import 'assets/css/hoadon.css';
 // reactstrap components
 import { Badge, Row, Col, Button, Table, Input, FormGroup, CardBody, CardFooter, InputGroup, InputGroupAddon, Card, InputGroupText, Modal, ModalBody, ModalFooter, ModalHeader, Label, Form, CardHeader } from "reactstrap";
 import { FaRegEdit, FaSearch, FaMinus, FaPlus, FaTrash } from 'react-icons/fa';
+import {
+    MDBCard,
+    MDBCardBody,
+    MDBCol,
+    MDBContainer,
+    MDBIcon,
+    MDBRow,
+    MDBTypography,
+} from "mdb-react-ui-kit";
 
 const Confirm = (props) => {
     const formatter = new Intl.NumberFormat("vi-VN", {
@@ -37,18 +47,15 @@ const Confirm = (props) => {
     useEffect(() => {
         getAllConfirm();
     }, [props.activeTab]);
+    const [itemDetail, setItemDetail] = useState({});
     const [modalDetail, setModalDetail] = useState(false);
     const toggleDetail = () => {
         setModalDetail(!modalDetail);
-        // fetchData();
     };
-    const steps = [
-        { label: 'Đơn hàng đã đặt', date: '01:32 25-10-2023', status: 'finish' },
-        { label: 'Đơn hàng đã thanh toán (₫5.600)', date: '01:33 25-10-2023', status: 'finish' },
-        { label: 'Đã giao cho ĐVVC', date: '15:19 25-10-2023', status: 'finish' },
-        { label: 'Đã nhận được hàng', date: '07:48 30-10-2023', status: 'finish' },
-        { label: 'Đánh giá', date: '', status: 'pending' },
-    ];
+    const handleDetail = (item) => {
+        setItemDetail(item);
+        setModalDetail(true);
+    }
     return (
         <>
             <Row >
@@ -70,7 +77,7 @@ const Confirm = (props) => {
                         </Col>
                     </Row>
                     {list && list.length > 0 && list.map((item, index) => (
-                        <Card className="mb-4 shadow" onClick={toggleDetail}>
+                        <Card className="mb-4 shadow" onClick={() => handleDetail(item)}>
                             <CardHeader>
                                 <Row>
                                     <Col lg="3"><b>{item.code}</b></Col>
@@ -117,7 +124,7 @@ const Confirm = (props) => {
                                                         </>
                                                         :
                                                         <>
-                                                            {itemC.discountPrice < itemC.price &&
+                                                            {itemC.discountPrice < itemC.price ?
                                                                 <>
                                                                     <span className="d-flex justify-content-end">
                                                                         <div className="mt-1" style={{ color: "gray", fontSize: "12px", textDecoration: "line-through" }}>
@@ -127,6 +134,11 @@ const Confirm = (props) => {
                                                                             {formatter.format(itemC.discountPrice)}
                                                                         </div>
                                                                     </span>
+                                                                </> :
+                                                                <>
+                                                                    <div className="d-flex justify-content-end" style={{ color: "red" }}>
+                                                                        {formatter.format(itemC.price)}
+                                                                    </div>
                                                                 </>
                                                             }
                                                         </>
@@ -157,7 +169,7 @@ const Confirm = (props) => {
                 toggle={toggleDetail}
                 backdrop={"static"}
                 keyboard={false}
-                style={{ maxWidth: "900px" }}
+                style={{ maxWidth: "1000px" }}
             >
                 <ModalHeader toggle={toggleDetail}>
                     <h3 className="heading-small text-muted mb-0">
@@ -165,49 +177,178 @@ const Confirm = (props) => {
                     </h3>
                 </ModalHeader>
                 <ModalBody>
-                    <div className="mt--4">
-                        <div className="bHBbO4">
-                            <div className="stepper">
-                                {steps.map((step, index) => (
-                                    <div
-                                        key={index}
-                                        className={`stepper__step stepper__step--${step.status}`}
-                                        aria-label={`${step.label}, ${step.date}`}
-                                        tabIndex="0"
+                    <>
+                        <MDBContainer className="mt--5 mb-5">
+                            <MDBRow className="justify-content-center align-items-center">
+                                <MDBCol size="12">
+                                    <MDBCard
+                                        className="card-stepper text-black border-0"
+                                        style={{ borderRadius: "16px" }}
                                     >
-                                        <div className={`stepper__step-icon stepper__step-icon--${step.status}`}>
-                                            {/* Your SVG icon here */}
-                                            {step.status === 'finish' ? (
-                                                <svg enable-background="new 0 0 32 32" viewBox="0 0 32 32" x="0" y="0">
-                                                    {/* SVG path for finished step */}
-                                                </svg>
-                                            ) : (
-                                                <svg enable-background="new 0 0 32 32" viewBox="0 0 32 32" x="0" y="0">
-                                                    {/* SVG path for pending step */}
-                                                </svg>
-                                            )}
+                                        <div className="p-5 pt--5">
+                                            <ul
+                                                id="progressbar-2"
+                                                className="d-flex justify-content-between mx-0 mt-0 mb-5 px-0 pt-0 pb-2"
+                                            >
+                                                <li className="step0 active text-center" id="step1" ></li>
+                                                <li className="step0 text-muted text-center" id="step2"></li>
+                                                <li className="step0 text-muted text-center" id="step3"></li>
+                                                <li className="step0 text-muted text-center" id="step4"></li>
+                                                <li className="step0 text-muted text-end" id="step5"></li>
+                                            </ul>
+                                            <div className="d-flex justify-content-between mt--5">
+                                                <div className="d-lg-flex align-items-center ml--4">
+                                                    <b>Chờ xác nhận</b>
+                                                </div>
+                                                <div className="d-lg-flex align-items-center">
+                                                    <b>Chờ vận chuyển</b>
+                                                </div>
+                                                <div className="d-lg-flex align-items-center">
+                                                    <b>Đang vận chuyển</b>
+                                                </div>
+                                                <div className="d-lg-flex align-items-center">
+                                                    <b>Hoàn thành</b>
+                                                </div>
+                                                <div className="d-lg-flex align-items-center mr--6">
+                                                    <b>Nhận hàng thành công</b>
+                                                </div>
+                                            </div>
+                                            <div className="d-flex justify-content-between">
+                                                <div className="d-lg-flex align-items-center ml--5">
+                                                    {formatDate(itemDetail.createTime)}
+                                                </div>
+                                            </div>
                                         </div>
-                                        <div className="stepper__step-text">{step.label}</div>
-                                        <div className="stepper__step-date">{step.date}</div>
-                                    </div>
+                                    </MDBCard>
+                                </MDBCol>
+                            </MDBRow>
+                        </MDBContainer>
+                        <Card className="shadow mt--5">
+                            <CardHeader>
+                                <b>THÔNG TIN ĐƠN HÀNG</b>
+                            </CardHeader>
+                            <CardBody>
+                                <Row className="mb-3">
+                                    <Col lg={1}></Col>
+                                    <Col lg={2}><b>Mã hóa đơn:</b></Col>
+                                    <Col lg={3}>{itemDetail.code}</Col>
+                                    <Col lg={1}></Col>
+                                    <Col lg={2}><b>Trạng thái:</b></Col>
+                                    <Col lg={3}>
+                                        <Badge color={'success'}>
+                                            Chờ xác nhận
+                                        </Badge>
+                                    </Col>
+                                </Row>
+                                <Row className="mb-3">
+                                    <Col lg={1}></Col>
+                                    <Col lg={2}><b>Họ và tên:</b></Col>
+                                    <Col lg={3}>{itemDetail.code}</Col>
+                                    <Col lg={1}></Col>
+                                    <Col lg={2}><b>Số điện thoại:</b></Col>
+                                    <Col lg={3}>{itemDetail.code}</Col>
+                                </Row>
+                                <Row>
+                                    <Col lg={1}></Col>
+                                    <Col lg={2}><b>Địa chỉ:</b></Col>
+                                    <Col lg={9}>{itemDetail.code}</Col>
+                                </Row>
+
+                            </CardBody>
+                        </Card>
+                        <Card className="shadow mt-2">
+                            <CardBody>
+                                {itemDetail.listCart && itemDetail.listCart.length > 0 && itemDetail.listCart.map((itemC, i) => (
+                                    <>
+                                        <Row key={itemC.id} className="">
+                                            <Col lg={1} className="text-center">
+                                                {i + 1}
+                                            </Col>
+                                            <Col lg="2">
+                                                <img src={`https://s3-ap-southeast-1.amazonaws.com/imageshoestore/${itemC.imgUri}`} alt="" wight="70px" height="70px" />
+                                            </Col>
+                                            <Col lg="6">
+                                                <div>
+                                                    <b style={{ fontSize: "18px" }}>Tên sp</b>
+                                                </div>
+                                                <div style={{ color: "gray", fontSize: "14px" }}>
+                                                    Size: {itemC.sizeName}, Màu :{itemC.colorName}
+                                                </div>
+                                                <div style={{ color: "black", fontSize: "14px" }}>
+                                                    X {itemC.quantity}
+                                                </div>
+                                            </Col>
+                                            <Col lg="3">
+                                                {
+                                                    itemC.discountPrice === null
+                                                        ?
+                                                        <>
+                                                            <div className="d-flex justify-content-end" style={{ color: "red" }}>
+                                                                {formatter.format(itemC.price)}
+                                                            </div>
+                                                        </>
+                                                        :
+                                                        <>
+                                                            {itemC.discountPrice < itemC.price ?
+                                                                <>
+                                                                    <span className="d-flex justify-content-end">
+                                                                        <div className="mt-1" style={{ color: "gray", fontSize: "12px", textDecoration: "line-through" }}>
+                                                                            {formatter.format(itemC.price)}
+                                                                        </div>&nbsp;&nbsp;
+                                                                        <div style={{ color: "red" }}>
+                                                                            {formatter.format(itemC.discountPrice)}
+                                                                        </div>
+                                                                    </span>
+                                                                </> :
+                                                                <>
+                                                                    <div className="d-flex justify-content-end" style={{ color: "red" }}>
+                                                                        {formatter.format(itemC.price)}
+                                                                    </div>
+                                                                </>
+                                                            }
+                                                        </>
+                                                }
+                                            </Col>
+                                        </Row>
+                                        {(i + 1) < itemDetail.listCart.length && <hr />}
+                                    </>
                                 ))}
-                                <div className="stepper__line">
-                                    <div className="stepper__line-background" style={{ background: 'rgb(224, 224, 224)' }}></div>
-                                    <div
-                                        className="stepper__line-foreground"
-                                        style={{ width: 'calc((100% - 140px) * 1)', background: 'rgb(45, 194, 88)' }}
-                                    ></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                            </CardBody>
+                            <CardFooter>
+                                <Row>
+                                    <Col lg="12" className="d-flex justify-content-end">
+                                        <span style={{ fontSize: "13px" }} className="mt-2">Tiền hàng: &nbsp;&nbsp;&nbsp;&nbsp;</span>
+                                        <span style={{ color: "red", fontSize: "20px" }}>{formatter.format(itemDetail.totalMoney)}</span>
+                                    </Col>
+                                </Row>
+                                <Row>
+                                    <Col lg="12" className="d-flex justify-content-end">
+                                        <span style={{ fontSize: "13px" }} className="mt-2">Phí vận chuyển: &nbsp;&nbsp;&nbsp;&nbsp;</span>
+                                        <span style={{ color: "red", fontSize: "20px" }}>{formatter.format(itemDetail.totalMoney)}</span>
+                                    </Col>
+                                </Row>
+                                <Row>
+                                    <Col lg="12" className="d-flex justify-content-end">
+                                        <span style={{ fontSize: "13px" }} className="mt-2">Tiền giảm: &nbsp;&nbsp;&nbsp;&nbsp;</span>
+                                        <span style={{ color: "red", fontSize: "20px" }}>{formatter.format(itemDetail.totalMoney)}</span>
+                                    </Col>
+                                </Row>
+                                <Row>
+                                    <Col lg="12" className="d-flex justify-content-end">
+                                        <span style={{ fontSize: "13px" }} className="mt-2">Thành tiền: &nbsp;</span>
+                                        <span style={{ color: "red", fontSize: "24px" }}>{formatter.format(itemDetail.totalMoney)}</span>
+                                    </Col>
+                                </Row>
+                            </CardFooter>
+                        </Card>
+                    </>
                 </ModalBody>
                 <ModalFooter>
                     <Button color="danger" outline size="sm" bloc onClick={toggleDetail}>
                         Đóng
                     </Button>
                 </ModalFooter>
-            </Modal>
+            </Modal >
         </>
     );
 };

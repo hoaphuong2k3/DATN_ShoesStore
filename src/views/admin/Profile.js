@@ -31,7 +31,6 @@ import {
 import ProfileHeader from "components/Headers/ProfileHeader";
 
 const Profile = () => {
-
   const storedUserId = localStorage.getItem("userId");
   const [admins, setAdmins] = useState(null);
 
@@ -41,7 +40,7 @@ const Profile = () => {
       handleProvinceChange(response.data.proviceCode);
       handleDistrictChange(response.data.districtCode);
       setAdmins(response.data);
-      
+
       console.log(response.data.proviceCode);
       console.log(storedUserId);
       console.log(response.data);
@@ -101,7 +100,7 @@ const Profile = () => {
     setFormData((prevData) => ({
       ...prevData,
       address: {
-        ...prevData.address, 
+        ...prevData.address,
         districtCode: selectedDistrictCode,
         communeCode: "",
       },
@@ -127,7 +126,7 @@ const Profile = () => {
         ).then((res) => res.blob());
         const file = new File([blob], "image.jpg", { type: "image/jpeg" });
         setFile(file);
-      }else {
+      } else {
         const defaultAvatar = getDefaultAvatar(admins && admins.gender);
         const blob = await fetch(defaultAvatar).then((res) => res.blob());
         const file = new File([blob], "image.jpg", { type: "image/jpeg" });
@@ -262,6 +261,7 @@ const Profile = () => {
   // changePassword
 
   const [formPass, setFormPass] = useState({
+    oldPassword: "",
     newPassword: "",
     confirmPassword: "",
   });
@@ -270,6 +270,7 @@ const Profile = () => {
     try {
       const requestBody = {
         id: storedUserId,
+        oldPassword: formPass.oldPassword,
         newPassword: formPass.newPassword,
         confirmPassword: formPass.confirmPassword,
       };
@@ -624,6 +625,36 @@ const Profile = () => {
                   {/* <!-- Form Group --> */}
                   <div class="row form-group">
                     <label
+                      for="oldPassword"
+                      class="col-sm-3 col-form-label input-label"
+                    >
+                      Mật khẩu cũ
+                    </label>
+
+                    <div class="col-sm-9">
+                      <Input
+                        type="password"
+                        class="js-pwstrength form-control"
+                        name="oldPassword"
+                        id="oldPassword"
+                        placeholder="Nhập mật khẩu cũ"
+                        aria-label="Enter new password"
+                        onChange={(e) =>
+                          setFormPass({
+                            ...formPass,
+                            oldPassword: e.target.value,
+                          })
+                        }
+                      />
+
+                      <p id="passwordStrengthVerdict" class="form-text mb-2" />
+
+                      <div id="passwordStrengthProgress"></div>
+                    </div>
+                  </div>
+
+                  <div class="row form-group">
+                    <label
                       for="newPassword"
                       class="col-sm-3 col-form-label input-label"
                     >
@@ -753,7 +784,7 @@ const Profile = () => {
                           />
                         )}
                         <Label htmlFor="file-input" style={buttonStyle}>
-                          <FaCamera size={15}/>
+                          <FaCamera size={15} />
                         </Label>
 
                         <Input

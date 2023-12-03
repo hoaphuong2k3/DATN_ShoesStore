@@ -348,34 +348,6 @@ const Products = () => {
       console.error(error);
     }
   };
-  const xuatPDF = async () => {
-    try {
-      const requestData = listShoes;
-      const res = await axios.post(`http://localhost:33321/api/admin/shoes/export/pdf`, requestData, {
-        responseType: 'blob',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      const blob = new Blob([res.data], { type: 'application/pdf' });
-
-      // Tạo một URL cho Blob và tạo một thẻ a để download
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.style.display = 'none';
-      a.href = url;
-      a.download = 'Export_Shoes.pdf';
-      document.body.appendChild(a);
-      a.click();
-
-      // Giải phóng tài nguyên
-      window.URL.revokeObjectURL(url);
-
-    } catch (error) {
-      console.error(error);
-    }
-  };
   return (
     <>
       {/* Page content */}
@@ -428,13 +400,6 @@ const Products = () => {
                         onClick={xuatExcel}
                       >
                         Xuất Excel
-                      </Button>
-                      <Button
-                        className="btn btn-outline-primary"
-                        size="sm"
-                        onClick={xuatPDF}
-                      >
-                        Xuất PDF
                       </Button>
                     </div>
                   </div>

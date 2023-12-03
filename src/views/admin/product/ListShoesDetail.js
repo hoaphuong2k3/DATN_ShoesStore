@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { findShoes } from "services/Product2Service";
-import { getAllShoesDetail } from "services/ShoesDetailService.js";
+import { getAllShoesDetail, getAllShoesDetail3 } from "services/ShoesDetailService.js";
 import ReactPaginate from 'react-paginate';
 import { FaEdit, FaTrash, FaLock, FaLockOpen, FaAngleDown, FaAngleUp, FaFilter, FaSearch, FaQrcode } from 'react-icons/fa';
 import { getAllColorId, getAllSizeId, getAllColor, getAllSize } from "services/ProductAttributeService";
@@ -130,7 +130,7 @@ const ListShoesDetail = () => {
     //getAll
     const getAll = async () => {
         try {
-            let res = await getAllShoesDetail(id, page, size, search);
+            let res = await getAllShoesDetail3(id, page, size, search, sort, sortStyle);
             console.log("res6:", res);
             if (res && res.data && res.data.content) {
                 setListShoesDetail(res.data.content);
@@ -154,11 +154,12 @@ const ListShoesDetail = () => {
         }
     }
     useEffect(() => {
+        console.log("search", ListShoesDetail);
     }, [ListShoesDetail]);
     useEffect(() => {
-        console.log(search);
         getAll();
     }, [search]);
+
     useEffect(() => {
         console.log("size", size);
         getAll();
@@ -431,14 +432,15 @@ const ListShoesDetail = () => {
 
     const exportExcel = async () => {
         try {
-            const requestData = ListShoesDetail; // Dữ liệu trong ListShoesDetail
+            const requestData = ListShoesDetail.map(item => (
+                item.shoesDetailSearchResponse
+            ));
             const res = await axios.post(`http://localhost:33321/api/admin/shoesdetail/export/excel`, requestData, {
                 responseType: 'blob',
                 headers: {
                     'Content-Type': 'application/json',
                 },
             });
-
             const blob = new Blob([res.data], { type: 'application/excel' });
 
             // Tạo một URL cho Blob và tạo một thẻ a để download
@@ -522,8 +524,11 @@ const ListShoesDetail = () => {
 
     const xuatPDF = async () => {
         try {
-            const requestData = ListShoesDetail;
-            const res = await axios.post(`http://localhost:33321/api/admin/shoesdetail/export/pdf`, requestData, {
+            const requestData = ListShoesDetail.map(item => (
+                item.shoesDetailSearchResponse
+            ));
+            console.log(requestData);
+            const res = await axios.post(`http://localhost:33321/api/admin/shoesdetail/export/pdf/${id}`, requestData, {
                 responseType: 'blob',
                 headers: {
                     'Content-Type': 'application/json',
@@ -781,7 +786,8 @@ const ListShoesDetail = () => {
                     sizeId: addone.sizeId,
                     colorId: addone.colorId,
                     quantity: addone.quantity,
-                    price: addone.price
+                    price: addone.price,
+                    status: addone.status
                 });
                 toggleEdit();
                 getAll();
@@ -845,7 +851,7 @@ const ListShoesDetail = () => {
             setSelectedItems([]);
             setShowActions(false);
         } else {
-            setSelectedItems(ListShoesDetail.map(listShoes => listShoes.id));
+            setSelectedItems(ListShoesDetail.map(listShoes => listShoes.shoesDetailSearchResponse.id));
             setShowActions(true);
         }
         setSelectAll(!selectAll);
@@ -856,8 +862,9 @@ const ListShoesDetail = () => {
                 try {
                     await axios.delete(`http://localhost:33321/api/admin/shoesdetail/delete`, { data: selectedItems });
                     getAll();
-                    getListCheck();
                     setSelectedItems([]);
+                    setShowActions(false);
+                    getListCheck();
                     toast.success("Xóa thành công ");
                 } catch (error) {
                     let errorMessage = "Lỗi từ máy chủ";
@@ -951,7 +958,15 @@ const ListShoesDetail = () => {
         padding: "4px"
     };
     //Slide show
-
+    const [sort, setSort] = useState('');
+    const [sortStyle, setSortStyle] = useState('');
+    const onClickSort = (a, b) => {
+        setSort(a);
+        setSortStyle(b);
+    }
+    useEffect(() => {
+        getAll();
+    }, [sort, sortStyle]);
 
     return (
         <>
@@ -1034,14 +1049,14 @@ const ListShoesDetail = () => {
                                                         <label>{dataShoesById.cushionName}</label>
                                                     </Col>
                                                 </Row>
-                                                <Row>
+                                                {/* <Row>
                                                     <Col lg="2">
                                                         <label className="form-control-label">Mô tả:  </label>
                                                     </Col>
                                                     <Col lg="10">
                                                         <label>{dataShoesById.description}</label>
                                                     </Col>
-                                                </Row>
+                                                </Row> */}
                                             </Col>
                                         </Row>
                                     </div>
@@ -1104,12 +1119,14 @@ const ListShoesDetail = () => {
                                                     >
                                                         Xuất PDF
                                                     </Button>
-                                                    <Button
-                                                        className="btn btn-outline-primary"
-                                                        size="sm"
-                                                    >
-                                                        Báo cáo
-                                                    </Button>
+                                                    {search.status === "2" && ListShoesDetail && ListShoesDetail.length > 0 &&
+                                                        <Button
+                                                            className="btn btn-outline-primary"
+                                                            size="sm"
+                                                        >
+                                                            Báo cáo
+                                                        </Button>
+                                                    }
                                                 </div>
                                             </div>
                                         </Row>
@@ -1118,7 +1135,7 @@ const ListShoesDetail = () => {
                                         <div className="col">
 
                                             <Row className="align-items-center my-3">
-                                                <div className="col d-flex">
+                                                <div className="col-3 d-flex">
                                                     <Button color="warning" outline size="sm" onClick={toggleThirdModal}>
                                                         <FaFilter size="16px" className="mr-1" />Bộ lọc
                                                     </Button>
@@ -1126,20 +1143,19 @@ const ListShoesDetail = () => {
                                                     <Button color="warning" outline size="sm" onClick={toggle3}>
                                                         <FaQrcode className="mr-1" />QR Code
                                                     </Button>
-
-                                                    <Col>
-                                                        <InputGroup size="sm">
-                                                            <Input type="search"
-                                                                placeholder="Tìm kiếm theo mã..."
-                                                            />
-                                                            <InputGroupAddon addonType="append">
-                                                                <InputGroupText>
-                                                                    <FaSearch />
-                                                                </InputGroupText>
-                                                            </InputGroupAddon>
-                                                        </InputGroup>
-                                                    </Col>
                                                 </div>
+                                                <Col >
+                                                    <InputGroup size="sm">
+                                                        <Input type="search"
+                                                            placeholder="Tìm kiếm theo mã..."
+                                                        />
+                                                        <InputGroupAddon addonType="append">
+                                                            <InputGroupText>
+                                                                <FaSearch />
+                                                            </InputGroupText>
+                                                        </InputGroupAddon>
+                                                    </InputGroup>
+                                                </Col>
                                                 <Col>
                                                     <Input type="select" name="status" style={{ width: "150px" }} size="sm" onChange={(e) => onInputChange(e)} >
                                                         <option value=" ">Tất cả</option>
@@ -1179,12 +1195,18 @@ const ListShoesDetail = () => {
                                                         <th>STT</th>
                                                         <th>Trạng thái</th>
                                                         <th>Ảnh</th>
-                                                        <th>Mã</th>
-                                                        <th>Màu</th>
-                                                        <th>Size</th>
-                                                        <th>Số lượng</th>
-                                                        <th>Giá gốc</th>
-                                                        <th>Giá KM</th>
+                                                        <th>Mã  <i class="fa-solid fa-arrow-up" onClick={() => onClickSort('code', 'asc')} />
+                                                            <i class="fa-solid fa-arrow-down" onClick={() => onClickSort('code', 'desc')} /></th>
+                                                        <th>Màu  <i class="fa-solid fa-arrow-up" onClick={() => onClickSort('color', 'asc')} />
+                                                            <i class="fa-solid fa-arrow-down" onClick={() => onClickSort('color', 'desc')} /></th>
+                                                        <th>Size  <i class="fa-solid fa-arrow-up" onClick={() => onClickSort('size', 'asc')} />
+                                                            <i class="fa-solid fa-arrow-down" onClick={() => onClickSort('size', 'desc')} /></th>
+                                                        <th>Số lượng  <i class="fa-solid fa-arrow-up" onClick={() => onClickSort('quantity', 'asc')} />
+                                                            <i class="fa-solid fa-arrow-down" onClick={() => onClickSort('quantity', 'desc')} /></th>
+                                                        <th>Giá gốc  <i class="fa-solid fa-arrow-up" onClick={() => onClickSort('price', 'asc')} />
+                                                            <i class="fa-solid fa-arrow-down" onClick={() => onClickSort('price', 'desc')} /></th>
+                                                        <th>Giá giảm  <i class="fa-solid fa-arrow-up" onClick={() => onClickSort('discountPrice', 'asc')} />
+                                                            <i class="fa-solid fa-arrow-down" onClick={() => onClickSort('discountPrice', 'desc')} /></th>
                                                         <th>QR Code</th>
                                                         <th colSpan={2} style={{ position: "sticky", zIndex: '1', right: '0' }}>Thao tác</th>
                                                     </tr>
@@ -1879,15 +1901,11 @@ const ListShoesDetail = () => {
                                                 })}
                                         >
                                             <option value='1'>
-                                                Đang bán
+                                                Hoạt động
                                             </option>
                                             <option value='0'>
-                                                Ngừng bán
+                                                Ngừng hoạt động
                                             </option>
-                                            <option value='2'>
-                                                Hết hàng
-                                            </option>
-
                                         </Input>
                                     </FormGroup>
                                 </Col>
