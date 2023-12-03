@@ -623,10 +623,11 @@ const Product = () => {
                               </Link>
                               <div className="product-price">
                                 <strong className="text-danger">
-                                  {formatter.format(product.discountPriceMin)} -{" "}
+                                  {product.discountPriceMin < product.discountPriceMax && <>{formatter.format(product.discountPriceMin)} -{" "}</>}
                                   {formatter.format(product.discountPriceMax)}
                                 </strong>
                                 <span>
+                                  {product.priceMax < product.priceMin && <>{formatter.format(product.priceMax)} -{" "}</>}
                                   {formatter.format(product.priceMin)}
                                 </span>
                               </div>

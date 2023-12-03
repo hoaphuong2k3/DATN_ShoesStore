@@ -310,7 +310,6 @@ const Client = () => {
   const statusMapping = {
     1: { color: 'success', label: 'Đang hoạt động' },
     0: { color: 'danger', label: 'Ngừng hoạt động' },
-
   };
   //Kết thúc hàm khóa khách hàng
 
