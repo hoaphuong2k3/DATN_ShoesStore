@@ -1301,7 +1301,7 @@ const ListShoesDetail = () => {
                                                                                 <FaLockOpen color="primary" />
                                                                             </Button>
                                                                         }
-                                                                        {(item.shoesDetailSearchResponse.status === 1 || item.shoesDetailSearchResponse.status === 2) &&
+                                                                        {(item.shoesDetailSearchResponse.status === 1 || item.shoesDetailSearchResponse.status === (-1)) &&
                                                                             <Button color="link" size="sm" onClick={() => lock(item.shoesDetailSearchResponse.id)} >
                                                                                 <FaLock color="primary" />
                                                                             </Button>
