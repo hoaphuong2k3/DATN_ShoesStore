@@ -554,7 +554,33 @@ const ListShoesDetail = () => {
         }
     };
     //End exportexcel
-
+    //Báo cáo 
+    const token = localStorage.token;
+    const baoCaoPDF = async () => {
+        try {
+            const requestData = ListShoesDetail.map(item => (
+                {
+                    code: item.shoesDetailSearchResponse.code,
+                    size: item.shoesDetailSearchResponse.size,
+                    color: item.shoesDetailSearchResponse.color,
+                    price: item.shoesDetailSearchResponse.price,
+                    createdBy: item.shoesDetailSearchResponse.createdBy,
+                    createdTime: item.shoesDetailSearchResponse.createdTime
+                }
+            ));
+            console.log(requestData);
+            const res = await axios.post(`http://localhost:33321/api/staff/shoesdetail/report/pattern/${id}`, { "staffShoesDetailReports": requestData }, {
+                responseType: 'blob',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+            });
+        } catch (error) {
+            console.error(error);
+        }
+    };
+    //End Báo cáo
     // Thêm mới 1 ctsp
     const [modalAdd, setModalAdd] = useState(false);
     const toggle = () => setModalAdd(!modalAdd);
@@ -1119,10 +1145,11 @@ const ListShoesDetail = () => {
                                                     >
                                                         Xuất PDF
                                                     </Button>
-                                                    {search.status === "2" && ListShoesDetail && ListShoesDetail.length > 0 &&
+                                                    {search.status === "-1" && ListShoesDetail && ListShoesDetail.length > 0 &&
                                                         <Button
                                                             className="btn btn-outline-primary"
                                                             size="sm"
+                                                            onClick={baoCaoPDF}
                                                         >
                                                             Báo cáo
                                                         </Button>
@@ -1161,7 +1188,7 @@ const ListShoesDetail = () => {
                                                         <option value=" ">Tất cả</option>
                                                         <option value="1">Đang kinh doanh</option>
                                                         <option value="0">Ngừng kinh doanh</option>
-                                                        <option value="2">Hết hàng</option>
+                                                        <option value="-1">Hết hàng</option>
                                                     </Input>
                                                 </Col>
 
@@ -1234,9 +1261,15 @@ const ListShoesDetail = () => {
                                                                     </td>
                                                                     <th scope="row"> {index + 1}</th>
                                                                     <td>
-                                                                        <Badge color={statusMapping[item.shoesDetailSearchResponse.status]?.color || statusMapping.default.color}>
-                                                                            {statusMapping[item.shoesDetailSearchResponse.status]?.label || statusMapping.default.label}
-                                                                        </Badge>
+                                                                        {item.shoesDetailSearchResponse.status === (-1) ?
+                                                                            <Badge color={statusMapping[2]?.color || statusMapping.default.color}>
+                                                                                {statusMapping[2]?.label || statusMapping.default.label}
+                                                                            </Badge>
+                                                                            :
+                                                                            <Badge color={statusMapping[item.shoesDetailSearchResponse.status]?.color || statusMapping.default.color}>
+                                                                                {statusMapping[item.shoesDetailSearchResponse.status]?.label || statusMapping.default.label}
+                                                                            </Badge> 
+                                                                        }
                                                                     </td>
                                                                     <td>
                                                                         <SlideShow images={item.imageDTOS} imageSize={"80px"} />
@@ -1268,7 +1301,7 @@ const ListShoesDetail = () => {
                                                                                 <FaLockOpen color="primary" />
                                                                             </Button>
                                                                         }
-                                                                        {(item.shoesDetailSearchResponse.status === 1 || item.shoesDetailSearchResponse.status === 2) &&
+                                                                        {(item.shoesDetailSearchResponse.status === 1 || item.shoesDetailSearchResponse.status === (-1)) &&
                                                                             <Button color="link" size="sm" onClick={() => lock(item.shoesDetailSearchResponse.id)} >
                                                                                 <FaLock color="primary" />
                                                                             </Button>
