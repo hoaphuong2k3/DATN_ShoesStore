@@ -6,9 +6,12 @@ import {
   CardHeader,
   CardBody,
   FormGroup,
+  InputGroupAddon,
+  InputGroupText,
   Form,
   Input,
   Container,
+  InputGroup,
   Row,
   Label,
   Col,
@@ -25,6 +28,8 @@ import {
   FaUser,
   FaLock,
   FaEnvelope,
+  FaEyeSlash,
+  FaEye,
 } from "react-icons/fa";
 
 // core components
@@ -292,6 +297,11 @@ const Profile = () => {
   const [activeLink, setActiveLink] = useState("content");
   const handleLinkClick = (linkId) => {
     setActiveLink(linkId);
+  };
+
+  const [showPassword, setShowPassword] = useState(true);
+  const togglePasswordVisibility = () => {
+    setShowPassword((prev) => !prev);
   };
 
   return (
@@ -631,25 +641,31 @@ const Profile = () => {
                       Mật khẩu cũ
                     </label>
 
-                    <div class="col-sm-9">
-                      <Input
-                        type="password"
-                        class="js-pwstrength form-control"
-                        name="oldPassword"
-                        id="oldPassword"
-                        placeholder="Nhập mật khẩu cũ"
-                        aria-label="Enter new password"
-                        onChange={(e) =>
-                          setFormPass({
-                            ...formPass,
-                            oldPassword: e.target.value,
-                          })
-                        }
-                      />
-
-                      <p id="passwordStrengthVerdict" class="form-text mb-2" />
-
-                      <div id="passwordStrengthProgress"></div>
+                    <div className="col-sm-8 d-flex">
+                      <InputGroup>
+                        <Input
+                          type={showPassword ? "password" : "text"}
+                          className="js-pwstrength form-control"
+                          name="oldPassword"
+                          id="oldPassword"
+                          placeholder="Nhập mật khẩu cũ"
+                          aria-label="Enter new password"
+                          onChange={(e) =>
+                            setFormPass({
+                              ...formPass,
+                              oldPassword: e.target.value,
+                            })
+                          }
+                        />
+                        <InputGroupAddon addonType="append">
+                          <InputGroupText
+                            style={{ cursor: "pointer" }}
+                            onClick={togglePasswordVisibility}
+                          >
+                            {showPassword ? <FaEyeSlash /> : <FaEye />}
+                          </InputGroupText>
+                        </InputGroupAddon>
+                      </InputGroup>
                     </div>
                   </div>
 
@@ -661,23 +677,36 @@ const Profile = () => {
                       Mật khẩu mới
                     </label>
 
-                    <div class="col-sm-9">
-                      <Input
-                        type="password"
-                        class="js-pwstrength form-control"
-                        name="newPassword"
-                        id="newPassword"
-                        placeholder="Enter new password"
-                        aria-label="Enter new password"
-                        onChange={(e) =>
-                          setFormPass({
-                            ...formPass,
-                            newPassword: e.target.value,
-                          })
-                        }
-                      />
+                    <div className="col-sm-8">
+                      <InputGroup>
+                        <Input
+                          type={showPassword ? "password" : "text"}
+                          className="js-pwstrength form-control"
+                          name="newPassword"
+                          id="newPassword"
+                          placeholder="Nhập mật khẩu mới"
+                          aria-label="Enter new password"
+                          onChange={(e) =>
+                            setFormPass({
+                              ...formPass,
+                              newPassword: e.target.value,
+                            })
+                          }
+                        />
+                        <InputGroupAddon addonType="append">
+                          <InputGroupText
+                            style={{ cursor: "pointer" }}
+                            onClick={togglePasswordVisibility}
+                          >
+                            {showPassword ? <FaEyeSlash /> : <FaEye />}
+                          </InputGroupText>
+                        </InputGroupAddon>
+                      </InputGroup>
 
-                      <p id="passwordStrengthVerdict" class="form-text mb-2" />
+                      <p
+                        id="passwordStrengthVerdict"
+                        className="form-text mb-2"
+                      />
 
                       <div id="passwordStrengthProgress"></div>
                     </div>
@@ -693,14 +722,15 @@ const Profile = () => {
                       Nhập lại mật khẩu
                     </label>
 
-                    <div class="col-sm-9">
+                    <div class="col-sm-8">
                       <div class="mb-3">
+                        <InputGroup>
                         <Input
                           type="password"
                           class="form-control"
                           name="confirmPassword"
                           id="confirmPasswordLabel"
-                          placeholder="Confirm your new password"
+                          placeholder="Xác nhận mật khẩu mới"
                           aria-label="Confirm your new password"
                           onChange={(e) =>
                             setFormPass({
@@ -709,6 +739,15 @@ const Profile = () => {
                             })
                           }
                         />
+                        <InputGroupAddon addonType="append">
+                          <InputGroupText
+                            style={{ cursor: "pointer" }}
+                            onClick={togglePasswordVisibility}
+                          >
+                            {showPassword ? <FaEyeSlash /> : <FaEye />}
+                          </InputGroupText>
+                        </InputGroupAddon>
+                        </InputGroup>
                       </div>
 
                       <h5>Yêu cầu về mật khẩu:</h5>
