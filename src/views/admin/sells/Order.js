@@ -413,6 +413,11 @@ const Order = () => {
 
         if (showShippingForm) {
 
+            if (recipientName.length === 0 || recipientPhone.length === 0) {
+                alert("Điền hết thông tin phiếu giao");
+                return;
+              }
+
             const newDeliveryAddress = buildDeliveryAddress();
             setDeliveryData({ ...deliveryData, deliveryAddress: newDeliveryAddress });
             deliveryOrderDTO = {
