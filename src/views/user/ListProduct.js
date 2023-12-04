@@ -581,7 +581,7 @@ const Product = () => {
                         >
                           Giá:
                         </Label>
-                        <Row>
+                        {/* <Row>
                           <Col xl={5}>
                             <Input
                               className="form-control-alternative"
@@ -607,12 +607,11 @@ const Product = () => {
                               onChange={(e) => onPriceChange(e)}
                             />
                           </Col>
-                        </Row>
+                        </Row> */}
 
                         <Row>
                           <Col>
                             <FormGroup>
-                              <Label for="slider">Giá</Label>
                               <Slider
                                 range
                                 min={500000}
@@ -621,7 +620,6 @@ const Product = () => {
                                 defaultValue={[500000, 20000000]}
                                 value={sliderValue}
                                 onChange={handleSliderChange}
-                                // tipFormatter={formatter}
                               />
 
                             </FormGroup>
