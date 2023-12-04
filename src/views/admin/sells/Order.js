@@ -402,9 +402,9 @@ const Order = () => {
     let idDiscountPeriods;
     if (promo) {
         idDiscountPeriods = promo.id;
-      } else {
+    } else {
         idDiscountPeriods = null;
-      }
+    }
 
     const createOrder = async () => {
 
@@ -412,6 +412,11 @@ const Order = () => {
         let deliveryOrderDTO = null;
 
         if (showShippingForm) {
+
+            if (recipientName.length === 0 || recipientPhone.length === 0) {
+                alert("Điền hết thông tin phiếu giao");
+                return;
+              }
 
             const newDeliveryAddress = buildDeliveryAddress();
             setDeliveryData({ ...deliveryData, deliveryAddress: newDeliveryAddress });
@@ -449,6 +454,8 @@ const Order = () => {
             resetShip();
             setShowShippingForm(false);
             setPaymentMethod(4);
+            setCustomerPayment(0);
+
         } catch (error) {
             // Xử lý lỗi nếu có
             console.error('Lỗi khi tạo hóa đơn:', error);
@@ -459,10 +466,6 @@ const Order = () => {
     const [customerPayment, setCustomerPayment] = useState(0);
     const [changeAmount, setChangeAmount] = useState(0);
 
-    const handleCustomerPaymentChange = (e) => {
-        const paymentAmount = parseFloat(e.target.value) || 0;
-        setCustomerPayment(paymentAmount);
-    };
     useEffect(() => {
         const remainingAmount = customerPayment - calculateTotalMoney();
         setChangeAmount(remainingAmount < 0 ? 0 : remainingAmount);
@@ -920,7 +923,9 @@ const Order = () => {
                                             <Input
                                                 type="text"
                                                 value={customerPayment}
-                                                onChange={handleCustomerPaymentChange}
+                                                onChange={(e) => {
+                                                    setCustomerPayment(e.target.value)
+                                                }}
                                                 style={{ textAlign: 'right' }}
                                                 disabled={isBankTransfer}
                                             />

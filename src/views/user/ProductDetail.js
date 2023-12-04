@@ -403,7 +403,7 @@ const DetailProduct = () => {
                     {/* ===========================cart box */}
                     <div className='card-box'>
                       <div className='row'>
-                        <div className='col-10'>
+                        <div className='col-9'>
                           <div>
                             <h3 className='mt-3 mb-2'>
                               MÔ TẢ SẢN PHẨM
@@ -482,10 +482,10 @@ const DetailProduct = () => {
 
 
                         </div>
-                        <div className='col-2'>
+                        <div className='col-3'>
                           <div>
-                            <div>
-                              Danh sách vouchers
+                            <div className='text-muted'>
+                             Top sản phẩm nổi bật
                             </div>
                           </div>
                         </div>
