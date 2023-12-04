@@ -1,5 +1,5 @@
 import 'assets/scss/detailsp.scss';
-import { Container, Row, Card, CardBody, Col } from "reactstrap";
+import { Container, Row, Card, CardBody, Col, ButtonGroup, Button } from "reactstrap";
 import Header from "components/Headers/ProductHeader.js";
 import React, { useState, useEffect } from "react";
 import axiosInstance from "services/custommize-axios";
@@ -9,6 +9,7 @@ import { CartContext } from "contexts/Cart.js";
 import { getAllColorId, getAllSizeId } from "services/ProductAttributeService";
 import { findShoes } from "services/Product2Service";
 import { toast } from 'react-toastify';
+import { Rate } from 'antd';
 
 const DetailProduct = () => {
   const storedUserId = localStorage.getItem("userId");
@@ -317,23 +318,7 @@ const DetailProduct = () => {
                               </div>
                             </Col>
                           </Row>
-
-
                           {/* End thuộc tính */}
-
-                          {/* Start mã giảm giá */}
-                          {/* ======================= */}
-                          <div>
-                            <div className='tong' >
-                              <span className='tenthuoctinh'>Mã giảm giá :   </span>
-                              <span className='giatrithuoctinh'>
-                                <span className='voucher'> Giảm 10%</span>
-                                <span className='voucher'> Giảm 20%</span>
-                                <span> Xem tất cả</span>
-                              </span>
-                            </div>
-                          </div>
-                          {/* end mã giảm giá */}
 
                           {/* start size */}
                           {/* ===================== */}
@@ -402,7 +387,6 @@ const DetailProduct = () => {
                             </div>
                           }
                           <div className='text-center btnInDetailSP'>
-                            {/* <button onClick={addToCart} className='btn btn-primary'>Thêm vào giỏ hàng</button> */}
                             <CartContext.Consumer>
                               {({ addToCart }) => (
                                 <button className='btn btn-primary' onClick={() => handleAddCart()} disabled={sl === false ? false : true}>
@@ -421,9 +405,9 @@ const DetailProduct = () => {
                       <div className='row'>
                         <div className='col-10'>
                           <div>
-                            <div>
+                            <h3 className='mt-3 mb-2'>
                               MÔ TẢ SẢN PHẨM
-                            </div>
+                            </h3>
                             <div>
                               <div class="f7AU53">
                                 <p class="irIKAp">Chuck Taylor Run Star Motion Create Next Comfort với Thiết kế đôi phá mới,Phản ánh năng lượng của đường phố thành phố, các đường nét vui tươi và méo mó của Run Star Motion được xây dựng cho chuyển động trong tương lai.&nbsp;Được tái tạo từ trong ra ngoài, thế đứng nâng cao và đế giữa bằng bọt CX giúp mang lại cảm giác thoải mái cấp độ tiếp theo cho mỗi sải chân.&nbsp;Phần trên vẫn đúng với bản gốc, được đặt cạnh nhau bởi các chi tiết thiết kế tương lai để thể hiện bản thân một cách táo bạo.&nbsp;Một bệ phóng đại, gợn sóng và các vấu kéo điêu khắc nâng bạn lên và giữ cho bạn vững vàng với lực kéo vượt trội,</p>
@@ -438,6 +422,65 @@ const DetailProduct = () => {
                             </div>
 
                           </div>
+
+                          <div className='mt-5'>
+                            <h3 className=' mb-2'>
+                              ĐÁNH GIÁ SẢN PHẨM
+                            </h3>
+
+                            <Card body>
+                              <Row className='col'>
+                                <Col lg={4} className='text-center mt-3'>
+                                  <Rate allowHalf defaultValue={4.5} style={{ color: '#ee4d2d', fontSize: '24px' }} />
+                                </Col>
+                                <Col lg={8}>
+
+                                  <Row>
+                                    <Col lg={12}>
+                                      <ButtonGroup className='d-flex'>
+                                        <Button className='flex-fill mr-2' color='warning' size='sm' outline style={{ borderRadius: 0 }}>
+                                          Tất cả
+                                        </Button>
+                                        <Button className='flex-fill mr-2' color='warning' size='sm' outline>
+                                          5 sao
+                                        </Button>
+                                        <Button className='flex-fill mr-2' color='warning' size='sm' outline>
+                                          4 sao
+                                        </Button>
+                                        <Button className='flex-fill mr-2' color='warning' size='sm' outline>
+                                          3 sao
+                                        </Button>
+                                        <Button className='flex-fill mr-2' color='warning' size='sm' outline>
+                                          2 sao
+                                        </Button>
+                                        <Button className='flex-fill mr-2' color='warning' size='sm' outline style={{ borderRadius: 0 }}>
+                                          1 sao
+                                        </Button>
+                                      </ButtonGroup>
+                                    </Col>
+
+                                    <Col lg={12} className='mt-2'>
+                                      <ButtonGroup>
+
+                                        <Button className='mr-2' color='warning' size='sm' outline style={{ borderRadius: 0 }}>
+                                          Có bình luận
+                                        </Button>
+                                        <Button color='warning' outline size='sm' style={{ borderRadius: 0 }}>
+                                          Có hình ảnh/video
+                                        </Button>
+                                      </ButtonGroup>
+                                    </Col>
+                                  </Row>
+                                </Col>
+                              </Row>
+
+
+
+
+                            </Card>
+                          </div>
+
+
                         </div>
                         <div className='col-2'>
                           <div>
@@ -448,11 +491,7 @@ const DetailProduct = () => {
                         </div>
                       </div>
                     </div>
-                    <div>
-                      <div>
-                        CÁC SẢN PHẨM LIÊN QUAN
-                      </div>
-                    </div>
+
                   </div>
                 </>
               </CardBody>

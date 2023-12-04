@@ -8,10 +8,13 @@ import {
   Col,
   Input,
   Label,
+  CustomInput,
+  FormGroup
 } from "reactstrap";
 import Header from "components/Headers/UserHeader2.js";
 import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
+import { Slider } from 'antd';
 import "assets/css/listProduct.css";
 // list
 import {
@@ -174,6 +177,18 @@ const Product = () => {
     cushion: false,
   });
 
+  const [sliderValue, setSliderValue] = useState([500000, 20000000]);
+
+  useEffect(() => {
+    console.log("Setting Default Values");
+    setSearch({ ...search, fromPrice: sliderValue[0], toPrice: sliderValue[1] });
+  }, [sliderValue]);
+
+  const handleSliderChange = (value) => {
+    setSliderValue(value);
+  };
+
+  
   return (
     <>
       <Header />
@@ -189,8 +204,8 @@ const Product = () => {
                       <h3 className="titleFilter ml-4 mt-3">
                         <img
                           className="icon"
-                          src="https://cdn-icons-png.flaticon.com/128/7855/7855877.png"
-                        ></img>
+                          src="https://cdn-icons-png.flaticon.com/128/7855/7855877.png" alt=""
+                        />
                         Bộ Lọc Tìm Kiếm
                       </h3>
                       <hr color="orange" width="250px" className="m-0 mb-3" />
@@ -591,6 +606,25 @@ const Product = () => {
                               value={search.toPrice}
                               onChange={(e) => onPriceChange(e)}
                             />
+                          </Col>
+                        </Row>
+
+                        <Row>
+                          <Col>
+                            <FormGroup>
+                              <Label for="slider">Giá</Label>
+                              <Slider
+                                range
+                                min={500000}
+                                max={20000000}
+                                step={500000}
+                                defaultValue={[500000, 20000000]}
+                                value={sliderValue}
+                                onChange={handleSliderChange}
+                                // tipFormatter={formatter}
+                              />
+
+                            </FormGroup>
                           </Col>
                         </Row>
                       </div>
