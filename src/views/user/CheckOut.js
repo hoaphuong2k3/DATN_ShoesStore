@@ -205,9 +205,17 @@ const Checkout = () => {
 
 
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(null);
+  const [recipientName, setRecipientName] = useState('');
+  const [recipientPhone, setRecipientPhone] = useState('');
+
   const handleOrder = async () => {
     if (selectedPaymentMethod === null) {
       alert("Vui lòng chọn phương thức thanh toán");
+      return;
+    }
+
+    if (recipientName.length === 0 || recipientPhone.length === 0) {
+      alert("Điền hết thông tin phiếu giao");
       return;
     }
 
@@ -240,10 +248,6 @@ const Checkout = () => {
     }
 
     try {
-      const recipientName =
-        document.getElementById("recipientName")?.value || "";
-      const recipientPhone =
-        document.getElementById("recipientPhone")?.value || "";
       const data = {
         idClient: storedUserId,
         idStaff: null,
@@ -631,8 +635,8 @@ const Checkout = () => {
                               <Input
                                 type="text"
                                 className="form-control"
-                                id="recipientName"
-                                name="name"
+                                value={recipientName}
+                                onChange={(e) => setRecipientName(e.target.value)}
                                 required
                                 placeholder="Họ và tên"
                               />
@@ -644,8 +648,8 @@ const Checkout = () => {
                               <Input
                                 type="tel"
                                 className="form-control"
-                                id="recipientPhone"
-                                name="phone"
+                                value={recipientPhone}
+                                onChange={(e) => setRecipientPhone(e.target.value)}
                                 required
                                 placeholder="Điện thoại"
                               />
@@ -691,15 +695,17 @@ const Checkout = () => {
                         )}
                       </Button>
 
-                      <div className="mt-2" style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
-                        {checkout.totalPoints !== 0 && (
-                          <>
+
+                      {checkout.totalPoints !== 0  && (
+                        
+                        <>
+                          <div className="mt-2" style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
                             <small className="mr-1">Xu tích lũy: {displayedPoints}</small>
                             <Toggle size="sm" defaultChecked={false} onChange={handleToggleChange} />
-                          </>
+                          </div>
+                        </>
 
-                        )}
-                      </div>
+                      )}
 
                       <div className="text-right">
                         <small className="text-danger">Nhận hàng hoàn xu: {checkout.points}</small>
@@ -824,7 +830,7 @@ const Checkout = () => {
             </Card>
           </div>
         </Row>
-      </Container>
+      </Container >
 
       <Modal isOpen={modal} toggle={toggle} style={{ maxWidth: '400px' }}>
         <ModalHeader toggle={toggle}>
