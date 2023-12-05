@@ -51,7 +51,7 @@ const Promotion = () => {
     const [selectedGiftId, setSelectedGiftId] = useState(null);
     const [clickedOnce, setClickedOnce] = useState(false);
     const [searchValue, setSearchValue] = useState("");
-
+    const [reloadInterval, setReloadInterval] = useState(null);
 
     const [queryParams, setQueryParams] = useState({
         page: 0,
@@ -100,6 +100,18 @@ const Promotion = () => {
     };
     useEffect(() => {
         fetchData();
+        // Khởi tạo interval khi component được tạo
+        const intervalId = setInterval(() => {
+            fetchData();
+            console.log("test");
+        }, 1000);
+
+        // Lưu intervalId vào state để sau này có thể xóa interval
+        setReloadInterval(intervalId);
+
+        return () => {
+            clearInterval(intervalId);
+        };
     }, [queryParams, queryParams2]);
 
     const handlePageChange = ({ selected }) => {
@@ -299,7 +311,7 @@ const Promotion = () => {
             const startDate = new Date(selectedDiscount.startDate);
             const endDate = new Date(selectedDiscount.endDate);
 
-            if (endDate >= today &&  startDate <= endDate) {
+            if (endDate >= today && startDate <= endDate) {
                 await axiosInstance.patch(`/admin/discount-period/setDiscountPeriodRun/${id}`);
                 toast.success("Cập nhật thành công");
                 fetchData();
