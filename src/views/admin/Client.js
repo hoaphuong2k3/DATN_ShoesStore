@@ -1149,18 +1149,18 @@ const Client = () => {
         </ModalBody>
         <ModalFooter>
           <div className="text-center">
-            <Button color="danger" onClick={(e) => saveAddress(e)}>
+            <Button color="primary" onClick={(e) => saveAddress(e)} size="sm">
               {formData.id ? "Cập nhật" : "Thêm mới"}
             </Button>{' '}
             {formData.id
               ?
               ""
               :
-              <Button color="primary" onClick={resetFormData}>
+              <Button color="primary" onClick={resetFormData} size="sm">
                 Reset
               </Button>
             }
-            <Button color="danger" onClick={toggleAddAdress} >
+            <Button color="danger" onClick={toggleAddAdress} size="sm">
               Close
             </Button>
           </div>
@@ -1187,7 +1187,7 @@ const Client = () => {
               </label>
             </span>
             <span className="col-3 d-flex justify-content-end">
-              <Button color="primary" onClick={toggleAddAdress} size="sm"  >
+              <Button color="primary" onClick={toggleAddAdress} size="sm" outline >
                 + Thêm
               </Button>
             </span>
@@ -1211,11 +1211,11 @@ const Client = () => {
                           </div>
                         </Col>
                         <Col lg="3" className="mr--1">
-                          <Button color="info" size="sm" onClick={() => CLickUpdateAddress(item)}>
-                            <FaEdit />
+                          <Button color="link" size="sm" onClick={() => CLickUpdateAddress(item)}>
+                            <FaEdit color="orange" />
                           </Button>
-                          <Button color="danger" size="sm" onClick={() => deleteAddress(item.id)}>
-                            <FaTrash />
+                          <Button color="link" size="sm" onClick={() => deleteAddress(item.id)}>
+                            <FaTrash color="red" />
                           </Button>
                         </Col>
                       </Row>
@@ -1229,7 +1229,7 @@ const Client = () => {
         </ModalBody>
         <ModalFooter>
           <div className="text-center">
-            <Button color="danger" onClick={toggleAdress} >
+            <Button color="danger" onClick={toggleAdress} size="sm">
               Close
             </Button>
           </div>
