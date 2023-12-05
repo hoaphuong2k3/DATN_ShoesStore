@@ -348,6 +348,20 @@ const Products = () => {
       console.error(error);
     }
   };
+  //Báo cáo 
+  const token = localStorage.token;
+  const baoCaoExcel = async () => {
+    try {
+      await axios.post(`http://localhost:33321/api/staff/shoesdetail/report`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  //End Báo cáo
   return (
     <>
       {/* Page content */}
@@ -400,6 +414,13 @@ const Products = () => {
                         onClick={xuatExcel}
                       >
                         Xuất Excel
+                      </Button>
+                      <Button
+                        className="btn btn-outline-primary"
+                        size="sm"
+                        onClick={baoCaoExcel}
+                      >
+                        Báo cáo
                       </Button>
                     </div>
                   </div>
