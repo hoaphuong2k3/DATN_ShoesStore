@@ -84,13 +84,14 @@ const Staff = () => {
           fullname: queryParams.fullname || null,
           phonenumber: queryParams.phonenumber || null,
           email: queryParams.email || null,
-          gender: queryParams.gender === "" ? null : queryParams.gender,
-        },
+          gender: queryParams.gender === "" ? null : queryParams.gender
+        }
       });
-      setAdmins(response.content);
-      console.log(response.content);
-      setTotalElements(response.totalElements);
-      setTotalPages(response.totalPages);
+
+      setTotalElements(response.data.totalElements);
+      setTotalPages(response.data.totalPages);
+      console.log(response);
+      setAdmins(response.data.content);
     } catch (error) {
       console.error("Lỗi khi lấy dữ liệu:", error);
     }
@@ -115,7 +116,7 @@ const Staff = () => {
         console.error("Lỗi khi lấy dữ liệu tỉnh/thành phố:", error);
       }
     };
-
+    fetchData();
     fetchAddress();
   }, []);
 
@@ -453,21 +454,32 @@ const Staff = () => {
 
   // lọc status
   const [selectedStatus, setSelectedStatus] = useState("");
+  const [filterAdmins, setfilterAdmins] = useState([]);
+  useEffect(() => {
+    console.log(admins, selectedStatus);
 
-  const filterAdmins = admins.filter((admin) => {
-    if (selectedStatus !== "" && admin.status.toString() !== selectedStatus) {
-      return false;
+    if (admins) {
+      const filterAdmin = admins.filter((admin) => {
+        if (selectedStatus !== "" && admin.status.toString() !== selectedStatus) {
+          return false;
+        }
+        if (
+          searchValue !== "" &&
+          !admin.fullname.toLowerCase().includes(searchValue.toLowerCase())
+        ) {
+          return false;
+        }
+        return true;
+      });
+
+      setfilterAdmins(filterAdmin);
+    } else {
+      console.error("Biến 'admins' không được định nghĩa hoặc có giá trị là undefined.");
     }
 
-    if (
-      searchValue !== "" &&
-      !admin.fullname.toLowerCase().includes(searchValue.toLowerCase())
-    ) {
-      return false;
-    }
+  }, [admins, selectedStatus]);
 
-    return true;
-  });
+
 
   // Lọc
   const handleFilter = () => {
@@ -829,7 +841,7 @@ const Staff = () => {
                         Đang xem{" "}
                         <b>{queryParams.page * queryParams.size + 1}</b> đến{" "}
                         <b>
-                          {queryParams.page * queryParams.size + admins.length}
+                          {admins && (queryParams.page * queryParams.size + admins.length)}
                         </b>{" "}
                         trong tổng số
                         <b> {totalElements}</b> mục
