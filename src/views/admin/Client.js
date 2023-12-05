@@ -1207,7 +1207,7 @@ const Client = () => {
                       <Row>
                         <Col lg="9"  >
                           <div style={{ fontSize: 13 }} className="text-small text-muted mb-0">
-                            {item.addressDetail},&nbsp;{item.communeCode},&nbsp;{item.districtCode},&nbsp;{item.proviceCode}
+                            {item.address}&nbsp;-&nbsp;{item.addressDetail}
                           </div>
                         </Col>
                         <Col lg="3" className="mr--1">
