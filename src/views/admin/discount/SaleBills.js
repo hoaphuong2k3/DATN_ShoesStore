@@ -41,6 +41,7 @@ const SaleBills = () => {
     const [selectAll, setSelectAll] = useState(false);
     const [selectedItems, setSelectedItems] = useState([]);
     const [searchValue, setSearchValue] = useState("");
+    const [reloadInterval, setReloadInterval] = useState(null);
 
     const [queryParams, setQueryParams] = useState({
         page: 0,
@@ -72,6 +73,18 @@ const SaleBills = () => {
     };
     useEffect(() => {
         fetchData();
+        // Khởi tạo interval khi component được tạo
+        const intervalId = setInterval(() => {
+            fetchData();
+            console.log("test");
+        }, 1000);
+
+        // Lưu intervalId vào state để sau này có thể xóa interval
+        setReloadInterval(intervalId);
+
+        return () => {
+            clearInterval(intervalId);
+        };
     }, [queryParams]);
 
     const handlePageChange = ({ selected }) => {

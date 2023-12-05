@@ -55,6 +55,7 @@ const SaleProduct = () => {
     const [shoesDetailMapping, setShoesDetailMapping] = useState({});
     const [selectedShoesDetails, setSelectedShoesDetails] = useState([]);
     const [selectedProduct, setSelectedProduct] = useState(null);
+    const [reloadInterval, setReloadInterval] = useState(null);
 
 
     const [search2, setSearch2] = useState({
@@ -161,6 +162,18 @@ const SaleProduct = () => {
 
     useEffect(() => {
         fetchData();
+        // Khởi tạo interval khi component được tạo
+        const intervalId = setInterval(() => {
+            fetchData();
+            console.log("test");
+        }, 1000);
+
+        // Lưu intervalId vào state để sau này có thể xóa interval
+        setReloadInterval(intervalId);
+
+        return () => {
+            clearInterval(intervalId);
+        };
     }, [queryParams]);
 
     //phân trang
@@ -325,43 +338,43 @@ const SaleProduct = () => {
         // Lấy chi tiết khuyến mãi từ API
         const promoDetailsResponse = await axiosInstance.get(`/promos/detailPromo/${discount.id}`);
         const promoDetailsData = promoDetailsResponse.data;
-    
+
         const apiProductIds = promoDetailsData ? promoDetailsData.map(product => product.id) : [];
         setSelectedShoesIds(apiProductIds);
-    
+
         const productIds = promoDetailsData.map(product => product.idShoeDetail);
         setSelectedDetailIds(productIds);
-     
+
         setFormData({
-          id: discount.id,
-          code: discount.code,
-          name: discount.name,
-          startDate: discount.startDate,
-          endDate: discount.endDate,
-          description: discount.description,
-          minPrice: discount.minPrice,
-          status: discount.status
+            id: discount.id,
+            code: discount.code,
+            name: discount.name,
+            startDate: discount.startDate,
+            endDate: discount.endDate,
+            description: discount.description,
+            minPrice: discount.minPrice,
+            status: discount.status
         });
-    
+
         if (discount.salePercent !== null) {
-          setFormData(prevFormData => ({
-            ...prevFormData,
-            salePercent: discount.salePercent,
-            salePrice: "",
-            sale: true,
-          }));
+            setFormData(prevFormData => ({
+                ...prevFormData,
+                salePercent: discount.salePercent,
+                salePrice: "",
+                sale: true,
+            }));
         }
         if (discount.salePrice !== null) {
-          setFormData(prevFormData => ({
-            ...prevFormData,
-            salePercent: "",
-            salePrice: discount.salePrice,
-            sale: false,
-          }));
+            setFormData(prevFormData => ({
+                ...prevFormData,
+                salePercent: "",
+                salePrice: discount.salePrice,
+                sale: false,
+            }));
         }
-    
+
         setModal(true);
-      };
+    };
 
     //reset
     const resetForm = () => {
@@ -1076,7 +1089,7 @@ const SaleProduct = () => {
                                     <td>{product.size}</td>
                                     <td>{product.color}</td>
                                     <td>{formatter.format(product.originPrice)}</td>
-                                    <td>{formatter.format(product.discountPrice)}</td>                                                           
+                                    <td>{formatter.format(product.discountPrice)}</td>
                                 </tr>
                             ))}
                     </Table>
