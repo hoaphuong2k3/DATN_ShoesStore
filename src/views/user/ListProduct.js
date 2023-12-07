@@ -177,10 +177,9 @@ const Product = () => {
     cushion: false,
   });
 
-  const [sliderValue, setSliderValue] = useState([500000, 20000000]);
+  const [sliderValue, setSliderValue] = useState([1000000, 15000000]);
 
   useEffect(() => {
-    console.log("Setting Default Values");
     setSearch({ ...search, fromPrice: sliderValue[0], toPrice: sliderValue[1] });
   }, [sliderValue]);
 
@@ -579,45 +578,21 @@ const Product = () => {
                           for="find_code"
                           className="font-weight-bold text-dark ml-2"
                         >
-                          Giá:
+                          Giá: 
+
+                          <span className="ml-1">{formatter.format(search.fromPrice)}</span> - 
+                          <span>{formatter.format(search.toPrice)}</span>
                         </Label>
-                        {/* <Row>
-                          <Col xl={5}>
-                            <Input
-                              className="form-control-alternative"
-                              name="fromPrice"
-                              placeholder="Từ"
-                              value={search.fromPrice}
-                              onChange={(e) => onPriceChange(e)}
-                            />
-                          </Col>
-                          <Label
-                            for="find_code"
-                            xl={1}
-                            className="form-control-label text-center"
-                          >
-                            <i class="fa-solid fa-arrow-right"></i>
-                          </Label>
-                          <Col xl={5}>
-                            <Input
-                              className="form-control-alternative"
-                              name="toPrice"
-                              placeholder="Đến"
-                              value={search.toPrice}
-                              onChange={(e) => onPriceChange(e)}
-                            />
-                          </Col>
-                        </Row> */}
+                
 
                         <Row>
                           <Col>
                             <FormGroup>
                               <Slider
                                 range
-                                min={500000}
-                                max={20000000}
+                                min={1000000}
+                                max={15000000}
                                 step={500000}
-                                defaultValue={[500000, 20000000]}
                                 value={sliderValue}
                                 onChange={handleSliderChange}
                               />

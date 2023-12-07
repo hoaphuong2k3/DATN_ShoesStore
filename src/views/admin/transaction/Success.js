@@ -527,7 +527,7 @@ const Shipping = () => {
 
 
                                         <Row >
-                                            {formData.percentPeriod && (
+                                            {formData.percentPeriod && formData.percentPeriod !== -1 && (
                                                 <Col md={6}>
                                                     <FormGroup>
                                                         <Label>

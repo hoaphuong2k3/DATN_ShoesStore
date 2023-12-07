@@ -139,7 +139,7 @@ const Waitting = () => {
     const calculateTotalMoney = (productPrice, deliveryCost, percentPeriod, percentVoucher, priceVoucher, hasShipping = false, shippingTotal = 0) => {
         let totalMoney;
 
-        if (percentPeriod !== null) {
+        if (percentPeriod !== null && percentPeriod !== -1) {
             if (priceVoucher !== null) {
                 totalMoney = productPrice - (productPrice * percentPeriod / 100) - priceVoucher;
             } else if (percentVoucher !== null) {
@@ -881,7 +881,7 @@ const Waitting = () => {
 
 
                                         <Row >
-                                            {formData.percentPeriod && (
+                                            {formData.percentPeriod && formData.percentPeriod !== -1 && (
                                                 <Col md={6}>
                                                     <FormGroup>
                                                         <Label>
