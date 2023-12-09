@@ -68,9 +68,9 @@ const Login = () => {
 
       toast.success("Đăng nhập thành công!");
 
-      if (authorities.some((authority) => authority.authority === "ADMIN") || authorities.some((authority) => authority.authority === "STAFF")) {
+      if (authorities.some((authority) => authority.authority === "ROLE_ADMIN") || authorities.some((authority) => authority.authority === "ROLE_STAFF")) {
         navigate("/admin");
-      } else if (authorities.some((authority) => authority.authority === "USER")) {
+      } else if (authorities.some((authority) => authority.authority === "ROLE_USER")) {
         navigate("/shoes");
       } else {
         navigate("/");
@@ -101,16 +101,16 @@ const Login = () => {
         password,
         rememberMe: rememberMe === "on",
       });
-  
+
       const { id, token, authorities, userId } = response.data;
 
       login({ id, token, authorities, userId }); // Lưu ID, token và vai trò người dùng vào Context
       toast.success("Đăng nhập thành công!");
 
       // Kiểm tra vai trò người dùng và chuyển hướng đến trang tương ứng
-      if (authorities.some((authority) => authority.authority === "ADMIN") || authorities.some((authority) => authority.authority === "STAFF")) {
+      if (authorities.some((authority) => authority.authority === "ROLE_ADMIN") || authorities.some((authority) => authority.authority === "ROLE_STAFF")) {
         navigate("/admin");
-      } else if (authorities.some((authority) => authority.authority === "USER")) {
+      } else if (authorities.some((authority) => authority.authority === "ROLE_USER")) {
         navigate("/shoes");
       } else {
         navigate("/");

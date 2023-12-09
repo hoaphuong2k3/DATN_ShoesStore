@@ -18,6 +18,7 @@ import {
   Container,
   Row,
   Col,
+  Modal, ModalBody, ModalFooter, ModalHeader
 } from "reactstrap";
 
 // core components
@@ -27,16 +28,62 @@ import {
   chartExample1,
   chartExample2,
 } from "variables/charts.js";
-import { getMonth } from 'date-fns';
+import { format, parseISO, getMonth, startOfMonth, endOfMonth, eachDayOfInterval, isBefore } from 'date-fns';
 import Header from "components/Headers/AdminHeader.js";
 
 const Index = (props) => {
   const [activeNav, setActiveNav] = useState(1);
-  const [chartExample1Data, setChartExample1Data] = useState("data1");
+  const [chartExample1Data, setChartExample1Data] = useState({
+    labels: [],
+    datasets: [
+      {
+        label: "Performance",
+        data: [],
+      },
+    ],
+  });
 
   if (window.Chart) {
-    parseOptions(Chart, chartOptions());
+    parseOptions(window.Chart, chartOptions());
   }
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axiosInstance.get(
+          "/statistics/data-product"
+        );
+        const dataFromApi = response.data;
+
+        const today = new Date();
+        const firstDayOfMonth = startOfMonth(today);
+        const lastDayOfMonth = isBefore(today, endOfMonth(today))
+          ? today
+          : endOfMonth(today);
+        const allDaysOfMonth = eachDayOfInterval({ start: firstDayOfMonth, end: lastDayOfMonth });
+        const labels = allDaysOfMonth.map((day) => format(day, 'dd-MM'));
+        const datasets = [
+          {
+            label: "Doanh thu",
+            data: allDaysOfMonth.map((day) => {
+              const isoDate = format(day, 'yyyy-MM-dd');
+              const matchingData = dataFromApi.find((item) => item.createdTime === isoDate);
+              return matchingData ? matchingData.totalPayment : 0;
+            }),
+          },
+        ];
+
+        setChartExample1Data({
+          labels: labels,
+          datasets: datasets,
+        });
+      } catch (error) {
+        console.error("Lỗi khi lấy dữ liệu:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const toggleNavs = (e, index) => {
     e.preventDefault();
@@ -64,13 +111,30 @@ const Index = (props) => {
     fetchData();
   }, []);
 
+  const [modal, setModal] = useState(false);
+  const toggleModal = () => setModal(!modal);
+
+  const [modalData, setModalData] = useState(null);
+  const openModal = async (productId) => {
+    try {
+      // Thực hiện yêu cầu API
+      const response = await axiosInstance.get(`/statistics/detail-product/${productId}`);
+      setModalData(response.data);
+      console.log(response.data);
+      toggleModal();
+    } catch (error) {
+      console.error("Lỗi khi thực hiện yêu cầu API:", error);
+    }
+  };
+
+
   return (
     <>
       <Header />
       {/* Page content */}
       <Container className="mt--7" fluid>
         <Row>
-          <Col className="mb-5 mb-xl-0" xl="8">
+          <Col className="mb-5 mb-xl-0" xl="12">
             <Card className="bg-gradient-default shadow">
               <CardHeader className="bg-transparent">
                 <Row className="align-items-center">
@@ -79,63 +143,35 @@ const Index = (props) => {
                       Doanh thu T{getMonthDes()}
                     </h6>
                   </div>
-                  <div className="col">
-                    <Nav className="justify-content-end" pills>
-                      <NavItem>
-                        <NavLink
-                          className={classnames("py-2 px-3", {
-                            active: activeNav === 1,
-                          })}
-                          href="#pablo"
-                          onClick={(e) => toggleNavs(e, 1)}
-                        >
-                          <span className="d-none d-md-block">Month</span>
-                          <span className="d-md-none">M</span>
-                        </NavLink>
-                      </NavItem>
-                      <NavItem>
-                        <NavLink
-                          className={classnames("py-2 px-3", {
-                            active: activeNav === 2,
-                          })}
-                          data-toggle="tab"
-                          href="#pablo"
-                          onClick={(e) => toggleNavs(e, 2)}
-                        >
-                          <span className="d-none d-md-block">Week</span>
-                          <span className="d-md-none">W</span>
-                        </NavLink>
-                      </NavItem>
-                    </Nav>
-                  </div>
+                
                 </Row>
               </CardHeader>
               <CardBody>
                 {/* Chart */}
                 <div className="chart">
                   <Line
-                    data={chartExample1[chartExample1Data]}
-                    options={chartExample1.options}
+                    data={chartExample1Data}
+                    options={chartOptions().defaults}
                     getDatasetAtEvent={(e) => console.log(e)}
                   />
                 </div>
               </CardBody>
             </Card>
           </Col>
-          <Col xl="4">
+        </Row>
+        <Row className="mt-5">
+        <Col className="mb-5 mb-xl-0" xl="8">
             <Card className="shadow">
               <CardHeader className="bg-transparent">
                 <Row className="align-items-center">
-                  <div className="col">
-                    <h6 className="text-uppercase text-muted ls-1 mb-1">
-                      Performance
+                <div className="col">
+                    <h6 className="text-uppercase text-white ls-1 mb-1">
+                      Doanh thu Năm
                     </h6>
-                    <h2 className="mb-0">Total orders</h2>
                   </div>
                 </Row>
               </CardHeader>
               <CardBody>
-                {/* Chart */}
                 <div className="chart">
                   <Bar
                     data={chartExample2.data}
@@ -145,9 +181,8 @@ const Index = (props) => {
               </CardBody>
             </Card>
           </Col>
-        </Row>
-        <Row className="mt-5">
-          <Col className="mb-5 mb-xl-0" xl="8">
+
+          <Col className="mb-5 mb-xl-0" xl="4">
             <Card className="shadow">
               <CardHeader className="border-0">
                 <Row className="align-items-center">
@@ -170,9 +205,11 @@ const Index = (props) => {
                     <tr key={product.id}>
                       <th scope="row" className="text-center">{index + 1}</th>
                       <td>{product.name}</td>
-                      <td className="text-right pr-6">{product.totalQuantity}</td>
+                      <td className="text-right pr-6">{product.totalQuantity || 0}</td>
                       <td className="text-center">
-                        <i class="fa-solid fa-lines-leaning text-success mr-3" />
+                        <Button color="link" onClick={() => openModal(product.id)}>
+                          <i class="fa-solid fa-lines-leaning" />
+                        </Button>
                       </td>
                     </tr>
                   ))}
@@ -186,6 +223,39 @@ const Index = (props) => {
           </Col>
         </Row>
       </Container>
+
+      <Modal isOpen={modal} toggle={toggleModal}>
+        <ModalHeader toggle={toggleModal}>Chi tiết</ModalHeader>
+        <ModalBody>
+          <Table className="align-items-center table-flush" responsive>
+            <thead className="thead-light">
+              <tr>
+                <th scope="col" className="text-center">STT</th>
+                <th scope="col">Tên sản phẩm</th>
+                <th scope="col">Size</th>
+                <th scope="col">Màu</th>
+                <th scope="col">Số lượng bán ra</th>
+              </tr>
+            </thead>
+            <tbody>
+              {Array.isArray(modalData) && modalData.map((product, index) => (
+                <tr key={product.id}>
+                  <th scope="row" className="text-center">{index + 1}</th>
+                  <td>{product.name}</td>
+                  <td>{product.size}</td>
+                  <td>{product.color}</td>
+                  <td className="text-right pr-6">{product.quantity || 0}</td>
+                </tr>
+              ))}
+            </tbody>
+          </Table>
+        </ModalBody>
+        <ModalFooter>
+          <Button color="primary" onClick={toggleModal}>
+            Đóng
+          </Button>
+        </ModalFooter>
+      </Modal>
     </>
   );
 };
