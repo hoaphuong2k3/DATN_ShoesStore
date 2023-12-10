@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
-import axios from "services/custommize-axios";
+import axios from 'axios';
 import axiosInstance from "services/custommize-axios";
 import { format } from 'date-fns';
 import { vi } from 'date-fns/locale';
 import { connect } from 'react-redux';
 import { updateData } from './actions';
+import 'assets/scss/detailsp.scss';
 import 'assets/css/hoadon.css';
 // reactstrap components
 import { Badge, Row, Col, Button, Table, Input, FormGroup, CardBody, CardFooter, InputGroup, InputGroupAddon, Card, InputGroupText, Modal, ModalBody, ModalFooter, ModalHeader, Label, Form, CardHeader } from "reactstrap";
@@ -18,6 +19,7 @@ import {
     MDBRow,
     MDBTypography,
 } from "mdb-react-ui-kit";
+import { toast } from 'react-toastify';
 
 const Confirm = (props) => {
     const formatter = new Intl.NumberFormat("vi-VN", {
@@ -33,7 +35,7 @@ const Confirm = (props) => {
     const storedUserId = localStorage.getItem("userId");
     const getAllConfirm = async () => {
         try {
-            const response = await axios.get(`http://localhost:33321/api/order/order-detail/${storedUserId}?status=0`);
+            const response = await axiosInstance.get(`http://localhost:33321/api/order/order-detail/${storedUserId}?status=0`);
             console.log(response)
             if (response && response.content) {
                 setList(response.content);
@@ -52,10 +54,80 @@ const Confirm = (props) => {
     const toggleDetail = () => {
         setModalDetail(!modalDetail);
     };
-    const handleDetail = (item) => {
-        setItemDetail(item);
+    const [detailDiaChi, setDetailDiaChi] = useState("");
+    const getOneOrder = async (id) => {
+        try {
+            const response = await axiosInstance.get(`http://localhost:33321/api/order/detail-bill/${id}`);
+            console.log(response)
+            if (response && response.data) {
+                setItemDetail(response.data);
+                const addressParts = response.data.addressDelivery.split(', ');
+                const [selectedProvince, selectedDistrict, selectedWard, detailedAddress] = addressParts.reverse();
+                console.log(detailedAddress, selectedProvince, selectedDistrict, selectedWard)
+                try {
+                    const response = await axios.get('https://online-gateway.ghn.vn/shiip/public-api/master-data/province', {
+                        headers: {
+                            'token': '44022259-5cfb-11ee-96dc-de6f804954c9'
+                        }
+                    });
+                    const filteredProvince = response.data.data.filter(user => selectedProvince === user.ProvinceID.toString());
+                    console.log("địa chỉ", response.data.data)
+                    console.log(filteredProvince);
+                    try {
+                        const res = await axios.get(`https://online-gateway.ghn.vn/shiip/public-api/master-data/district?province_id=${selectedProvince}`, {
+                            headers: {
+                                'token': '44022259-5cfb-11ee-96dc-de6f804954c9'
+                            }
+                        });
+                        const filteredDistrict = res.data.data.filter(user => selectedDistrict === user.DistrictID.toString());
+                        try {
+                            const res2 = await axios.get(`https://online-gateway.ghn.vn/shiip/public-api/master-data/ward?district_id=${selectedDistrict}`, {
+                                headers: {
+                                    'token': '44022259-5cfb-11ee-96dc-de6f804954c9'
+                                }
+                            });
+                            const filteredWard = res2.data.data.filter(user => selectedWard === user.WardCode.toString());
+                            setDetailDiaChi(`${detailedAddress}, ${filteredWard[0].WardName}, ${filteredDistrict[0].DistrictName}, ${filteredProvince[0].ProvinceName}`)
+
+                        } catch (error) {
+                            console.error(`Lỗi khi lấy dữ liệu từ xã`, error);
+                        }
+                    } catch (error) {
+                        console.error(`Lỗi khi lấy dữ liệu từ huyện `, error);
+                    }
+                } catch (error) {
+                    console.error(`Lỗi khi lấy dữ liệu tỉnh:`, error);
+                }
+            }
+        } catch (error) {
+            console.error("Error:", error);
+            console.error("Response data:", error.response.data);
+        }
+    }
+    const handleDetail = (id) => {
+        getOneOrder(id);
         setModalDetail(true);
     }
+    const huyDonHang = async (id) => {
+        if (window.confirm("Bạn chắc chắn muốn hủy đơn hàng này ?")) {
+            try {
+                await axiosInstance.put(`/order/confirm`, {
+                    "idClient": storedUserId,
+                    "idOrder": id,
+                    "status": 7
+                });
+                getAllConfirm();
+                toast.success("Hủy đơn hàng thành công");
+            } catch (error) {
+                let errorMessage = "Lỗi từ máy chủ";
+                if (error.response && error.response.data && error.response.data.message) {
+                    errorMessage = error.response.data.message;
+                }
+                toast.error(errorMessage);
+            }
+        }
+    }
+
     return (
         <>
             <Row >
@@ -77,7 +149,7 @@ const Confirm = (props) => {
                         </Col>
                     </Row>
                     {list && list.length > 0 && list.map((item, index) => (
-                        <Card className="mb-4 shadow" onClick={() => handleDetail(item)}>
+                        <Card className="mb-4 shadow">
                             <CardHeader>
                                 <Row>
                                     <Col lg="3"><b>{item.code}</b></Col>
@@ -95,7 +167,7 @@ const Confirm = (props) => {
                                     </Col>
                                 </Row>
                             </CardHeader>
-                            <CardBody>
+                            <CardBody onClick={() => handleDetail(item.id)}>
                                 {item.listCart && item.listCart.length > 0 && item.listCart.map((itemC, i) => (
                                     <>
                                         <Row key={itemC.id} className="">
@@ -104,7 +176,7 @@ const Confirm = (props) => {
                                             </Col>
                                             <Col lg="7">
                                                 <div>
-                                                    <b style={{ fontSize: "18px" }}>Tên sp</b>
+                                                    <b style={{ fontSize: "18px" }}>{itemC.shoesName}</b>
                                                 </div>
                                                 <div style={{ color: "gray", fontSize: "14px" }}>
                                                     Size: {itemC.sizeName}, Màu :{itemC.colorName}
@@ -148,6 +220,12 @@ const Confirm = (props) => {
                                         {(i + 1) < item.listCart.length && <hr />}
                                     </>
                                 ))}
+                                <Row>
+                                    <Col lg="12" className="d-flex justify-content-end">
+                                        <span style={{ fontSize: "13px" }} className="mt-2">Thành tiền:&nbsp;</span>
+                                        <span style={{ color: "red", fontSize: "24px" }}>{formatter.format(item.totalPayment)}</span>
+                                    </Col>
+                                </Row>
                             </CardBody>
                             <CardFooter>
                                 <Row>
@@ -155,10 +233,15 @@ const Confirm = (props) => {
                                         <b> Ngày mua: </b> {formatDate(item.createTime)}
                                     </Col>
                                     <Col lg="8" className="d-flex justify-content-end">
-                                        <span style={{ fontSize: "13px" }} className="mt-2">Thành tiền: &nbsp;</span>
-                                        <span style={{ color: "red", fontSize: "24px" }}>{formatter.format(item.totalMoney)}</span>
+                                        <button class="evo-button mobile-viewmore" aria-label="35" aria-disabled="false"
+                                            style={{ backgroundColor: '#cccccc' }}
+                                            onClick={() => huyDonHang(item.id)}
+                                        >
+                                            Hủy đơn hàng
+                                        </button>
                                     </Col>
                                 </Row>
+
                             </CardFooter>
                         </Card>
                     ))}
@@ -243,15 +326,15 @@ const Confirm = (props) => {
                                 <Row className="mb-3">
                                     <Col lg={1}></Col>
                                     <Col lg={2}><b>Họ và tên:</b></Col>
-                                    <Col lg={3}>{itemDetail.code}</Col>
+                                    <Col lg={3}>{itemDetail.nameDelivery}</Col>
                                     <Col lg={1}></Col>
                                     <Col lg={2}><b>Số điện thoại:</b></Col>
-                                    <Col lg={3}>{itemDetail.code}</Col>
+                                    <Col lg={3}>{itemDetail.phonenumberDelivery}</Col>
                                 </Row>
                                 <Row>
                                     <Col lg={1}></Col>
                                     <Col lg={2}><b>Địa chỉ:</b></Col>
-                                    <Col lg={9}>{itemDetail.code}</Col>
+                                    <Col lg={9}>{detailDiaChi}</Col>
                                 </Row>
 
                             </CardBody>
@@ -269,7 +352,7 @@ const Confirm = (props) => {
                                             </Col>
                                             <Col lg="6">
                                                 <div>
-                                                    <b style={{ fontSize: "18px" }}>Tên sp</b>
+                                                    <b style={{ fontSize: "18px" }}>{itemC.shoesName}</b>
                                                 </div>
                                                 <div style={{ color: "gray", fontSize: "14px" }}>
                                                     Size: {itemC.sizeName}, Màu :{itemC.colorName}
@@ -316,27 +399,37 @@ const Confirm = (props) => {
                             </CardBody>
                             <CardFooter>
                                 <Row>
-                                    <Col lg="12" className="d-flex justify-content-end">
-                                        <span style={{ fontSize: "13px" }} className="mt-2">Tiền hàng: &nbsp;&nbsp;&nbsp;&nbsp;</span>
+                                    <Col lg="10" className="d-flex justify-content-end">
+                                        <span style={{ fontSize: "13px" }} className="mt-2">Tiền hàng: &nbsp;&nbsp;</span>
+                                    </Col>
+                                    <Col lg="2" className="d-flex justify-content-end">
                                         <span style={{ color: "red", fontSize: "20px" }}>{formatter.format(itemDetail.totalMoney)}</span>
                                     </Col>
                                 </Row>
                                 <Row>
-                                    <Col lg="12" className="d-flex justify-content-end">
-                                        <span style={{ fontSize: "13px" }} className="mt-2">Phí vận chuyển: &nbsp;&nbsp;&nbsp;&nbsp;</span>
-                                        <span style={{ color: "red", fontSize: "20px" }}>{formatter.format(itemDetail.totalMoney)}</span>
+                                    <Col lg="10" className="d-flex justify-content-end">
+                                        <span style={{ fontSize: "13px" }} className="mt-2">Phí vận chuyển: &nbsp;&nbsp;</span>
+                                    </Col>
+                                    <Col lg="2" className="d-flex justify-content-end">
+                                        <span style={{ color: "red", fontSize: "20px" }}>{formatter.format(itemDetail.shipPrice)}</span>
                                     </Col>
                                 </Row>
+                                {(itemDetail.totalPayment - itemDetail.shipPrice - itemDetail.totalMoney > 0) &&
+                                    <Row>
+                                        <Col lg="10" className="d-flex justify-content-end">
+                                            <span style={{ fontSize: "13px" }} className="mt-2">Tiền giảm: &nbsp;&nbsp;</span>
+                                        </Col>
+                                        <Col lg="2" className="d-flex justify-content-end">
+                                            <span style={{ color: "red", fontSize: "20px" }}>{formatter.format(itemDetail.totalPayment - itemDetail.shipPrice - itemDetail.totalMoney)}</span>
+                                        </Col>
+                                    </Row>
+                                }
                                 <Row>
-                                    <Col lg="12" className="d-flex justify-content-end">
-                                        <span style={{ fontSize: "13px" }} className="mt-2">Tiền giảm: &nbsp;&nbsp;&nbsp;&nbsp;</span>
-                                        <span style={{ color: "red", fontSize: "20px" }}>{formatter.format(itemDetail.totalMoney)}</span>
-                                    </Col>
-                                </Row>
-                                <Row>
-                                    <Col lg="12" className="d-flex justify-content-end">
+                                    <Col lg="10" className="d-flex justify-content-end">
                                         <span style={{ fontSize: "13px" }} className="mt-2">Thành tiền: &nbsp;</span>
-                                        <span style={{ color: "red", fontSize: "24px" }}>{formatter.format(itemDetail.totalMoney)}</span>
+                                    </Col>
+                                    <Col lg="2" className="d-flex justify-content-end">
+                                        <span style={{ color: "red", fontSize: "24px" }}>{formatter.format(itemDetail.totalPayment)}</span>
                                     </Col>
                                 </Row>
                             </CardFooter>

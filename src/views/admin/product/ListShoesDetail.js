@@ -14,6 +14,7 @@ import Switch from 'react-input-switch';
 import axios from "axios";
 import SlideShow from './SlideShow';
 import QrReader from 'react-qr-reader';
+import axiosInstance from "services/custommize-axios";
 
 const ListShoesDetail = () => {
 
@@ -406,7 +407,7 @@ const ListShoesDetail = () => {
             }
             const shoesDataJson = JSON.stringify(listAddMany);
             formData1.append('data', shoesDataJson);
-            await axios.post(`http://localhost:33321/api/admin/shoesdetail/${id}`, formData1);
+            await axiosInstance.post(`/admin/shoesdetail/${id}`, formData1);
             getListCheck();
             getAll();
             setSelectedImages([]);
@@ -421,11 +422,11 @@ const ListShoesDetail = () => {
     };
     //Khóa
     const lock = async (id) => {
-        await axios.put(`http://localhost:33321/api/admin/shoesdetail/stop-business/${id}`);
+        await axiosInstance.put(`/admin/shoesdetail/stop-business/${id}`);
         getAll();
     };
     const openlock = async (id) => {
-        await axios.put(`http://localhost:33321/api/admin/shoesdetail/on-business/${id}`);
+        await axiosInstance.put(`/admin/shoesdetail/on-business/${id}`);
         getAll();
     };
     //End Hiển Thi Combobox
@@ -435,7 +436,7 @@ const ListShoesDetail = () => {
             const requestData = ListShoesDetail.map(item => (
                 item.shoesDetailSearchResponse
             ));
-            const res = await axios.post(`http://localhost:33321/api/admin/shoesdetail/export/excel`, requestData, {
+            const res = await axiosInstance.post(`/admin/shoesdetail/export/excel`, requestData, {
                 responseType: 'blob',
                 headers: {
                     'Content-Type': 'application/json',
@@ -474,7 +475,7 @@ const ListShoesDetail = () => {
             formData.append('file', selectedFile);
             try {
                 console.log(formData)
-                const response = await axios.post(`http://localhost:33321/api/admin/shoesdetail/import-excel`, formData, {
+                const response = await axiosInstance.post(`/admin/shoesdetail/import-excel`, formData, {
                     headers: {
                         'Content-Type': 'multipart/form-data',
                     },
@@ -498,7 +499,7 @@ const ListShoesDetail = () => {
 
     const taiMau = async () => {
         try {
-            const res = await axios.get(`http://localhost:33321/api/admin/shoesdetail/export/pattern`, {
+            const res = await axiosInstance.get(`/admin/shoesdetail/export/pattern`, {
                 responseType: 'blob'
             });
 
@@ -528,7 +529,7 @@ const ListShoesDetail = () => {
                 item.shoesDetailSearchResponse
             ));
             console.log(requestData);
-            const res = await axios.post(`http://localhost:33321/api/admin/shoesdetail/export/pdf/${id}`, requestData, {
+            const res = await axiosInstance.post(`/admin/shoesdetail/export/pdf/${id}`, requestData, {
                 responseType: 'blob',
                 headers: {
                     'Content-Type': 'application/json',
@@ -569,7 +570,7 @@ const ListShoesDetail = () => {
                 }
             ));
             console.log(requestData);
-            const res = await axios.post(`http://localhost:33321/api/staff/shoesdetail/report/pattern/${id}`, { "staffShoesDetailReports": requestData }, {
+            const res = await axiosInstance.post(`/admin/shoesdetail/report/pattern/${id}`, { "staffShoesDetailReports": requestData }, {
                 responseType: 'blob',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -672,7 +673,7 @@ const ListShoesDetail = () => {
                         status: addone.status
                     }]);
                     formData1.append('data', shoesDataJson);
-                    await axios.post(`http://localhost:33321/api/admin/shoesdetail/${id}`, formData1);
+                    await axiosInstance.post(`/admin/shoesdetail/${id}`, formData1);
                     toggle();
                     getAll();
                     toast.success("Thêm thành công!");
@@ -693,15 +694,15 @@ const ListShoesDetail = () => {
     };
     const openEdit = async (id) => {
         try {
-            const res = await axios.get(`http://localhost:33321/api/admin/shoesdetail/${id}`);
+            const res = await axiosInstance.get(`/admin/shoesdetail/${id}`);
             console.log("res:", res);
             setAddOne({
-                id: res.data.data.id,
-                sizeId: res.data.data.sizeId,
-                colorId: res.data.data.colorId,
-                quantity: res.data.data.quantity,
-                price: res.data.data.price,
-                status: res.data.data.status
+                id: res.data.id,
+                sizeId: res.data.sizeId,
+                colorId: res.data.colorId,
+                quantity: res.data.quantity,
+                price: res.data.price,
+                status: res.data.status
             })
             try {
                 const res1 = await getAllImage(id);
@@ -724,6 +725,7 @@ const ListShoesDetail = () => {
             }
 
         } catch (error) {
+            console.log(error);
             let errorMessage = "Lỗi từ máy chủ";
             if (error.response && error.response.data && error.response.data.message) {
                 errorMessage = error.response.data.message;
@@ -808,7 +810,7 @@ const ListShoesDetail = () => {
     const saveEdit = async () => {
         try {
             if (selectedImages.length >= 3) {
-                await axios.put(`http://localhost:33321/api/admin/shoesdetail/${addone.id}`, {
+                await axiosInstance.put(`/admin/shoesdetail/${addone.id}`, {
                     sizeId: addone.sizeId,
                     colorId: addone.colorId,
                     quantity: addone.quantity,
@@ -844,7 +846,7 @@ const ListShoesDetail = () => {
     const handleDelete = async () => {
         try {
             console.log(iddeleteshoes);
-            await axios.delete(`http://localhost:33321/api/admin/shoesdetail/delete`, { data: iddeleteshoes });
+            await axiosInstance.delete(`/admin/shoesdetail/delete`, { data: iddeleteshoes });
             getAll();
             getListCheck();
             setIdDeleteShoes([]);
@@ -886,7 +888,7 @@ const ListShoesDetail = () => {
         if (selectedItems.length > 0) {
             if (window.confirm("Bạn có chắc chắn muốn xóa các chi tiết  sản phẩm đã chọn không?")) {
                 try {
-                    await axios.delete(`http://localhost:33321/api/admin/shoesdetail/delete`, { data: selectedItems });
+                    await axiosInstance.delete(`/admin/shoesdetail/delete`, { data: selectedItems });
                     getAll();
                     setSelectedItems([]);
                     setShowActions(false);
@@ -1268,7 +1270,7 @@ const ListShoesDetail = () => {
                                                                             :
                                                                             <Badge color={statusMapping[item.shoesDetailSearchResponse.status]?.color || statusMapping.default.color}>
                                                                                 {statusMapping[item.shoesDetailSearchResponse.status]?.label || statusMapping.default.label}
-                                                                            </Badge> 
+                                                                            </Badge>
                                                                         }
                                                                     </td>
                                                                     <td>

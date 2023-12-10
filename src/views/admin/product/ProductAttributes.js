@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import ReactPaginate from 'react-paginate';
-import { postCreateBrands, getAllBrand, updateBrand, deleteBrand, getAllColor1, getAllSize } from "services/ProductAttributeService";
+import {
+  getAllBrand1, getAllOrigin1, getAllDesignStyle1, getAllSkinType1, getAllToe1, getAllSole1, getAllLining1, getAllCushion1, getAllSize1, getAllColor1
+} from "services/ProductAttributeService";
 // reactstrap components
 import { FaEdit, FaTrash } from 'react-icons/fa';
 import {
@@ -13,6 +15,7 @@ import {
 import { toast } from 'react-toastify';
 import Header from "components/Headers/Header.js";
 import axios from "axios";
+import axiosInstance from "services/custommize-axios";
 
 
 const ProductAttributes = () => {
@@ -40,28 +43,155 @@ const ProductAttributes = () => {
   });
 
   const [list, setList] = useState([]);
-  const handleDeleteBrands = async (id) => {
+  const handleDelete = async (id) => {
     if (selecttt === 'color') {
-      try {
-        const response = await axios.delete(`http://localhost:33321/api/admin/color/delete`, { data: [id] });
-        getColor();
-        toast.success("Xóa thành công thành công");
-      } catch (error) {
-        let errorMessage = "Lỗi từ máy chủ";
-        if (error.response && error.response.data && error.response.data.message) {
-          errorMessage = error.response.data.message;
+      if (window.confirm("Bạn có chắc chắn muốn xóa không?")) {
+        try {
+          const response = await axiosInstance.delete(`/admin/color/delete`, { data: [id] });
+          getColor();
+          toast.success("Xóa màu sắc thành công");
+        } catch (error) {
+          let errorMessage = "Lỗi từ máy chủ";
+          if (error.response && error.response.data && error.response.data.message) {
+            errorMessage = error.response.data.message;
+          }
+          toast.error(errorMessage);
         }
-        toast.error(errorMessage);
       }
     } else if (selecttt === 'brand') {
-      getCategory();
+      if (window.confirm("Bạn có chắc chắn muốn xóa không?")) {
+        try {
+          const response = await axiosInstance.delete(`/admin/brand/delete`, { data: [id] });
+          getColor();
+          toast.success("Xóa thương hiệu thành công");
+        } catch (error) {
+          let errorMessage = "Lỗi từ máy chủ";
+          if (error.response && error.response.data && error.response.data.message) {
+            errorMessage = error.response.data.message;
+          }
+          toast.error(errorMessage);
+        }
+      }
+    } else if (selecttt === 'origin') {
+      if (window.confirm("Bạn có chắc chắn muốn xóa không?")) {
+        try {
+          const response = await axiosInstance.delete(`/admin/origin/delete`, { data: [id] });
+          getOrigin();
+          toast.success("Xóa xuất xứ thành công");
+        } catch (error) {
+          let errorMessage = "Lỗi từ máy chủ";
+          if (error.response && error.response.data && error.response.data.message) {
+            errorMessage = error.response.data.message;
+          }
+          toast.error(errorMessage);
+        }
+      }
+    } else if (selecttt === 'design_style') {
+      if (window.confirm("Bạn có chắc chắn muốn xóa không?")) {
+        try {
+          const response = await axiosInstance.delete(`/admin/design-style/delete`, { data: [id] });
+          getDesignStyle();
+          toast.success("Xóa thiết kế thành công");
+        } catch (error) {
+          let errorMessage = "Lỗi từ máy chủ";
+          if (error.response && error.response.data && error.response.data.message) {
+            errorMessage = error.response.data.message;
+          }
+          toast.error(errorMessage);
+        }
+      }
+    } else if (selecttt === 'skin_type') {
+      if (window.confirm("Bạn có chắc chắn muốn xóa không?")) {
+        try {
+          const response = await axiosInstance.delete(`/admin/skin-tyle/delete`, { data: [id] });
+          getSkinType();
+          toast.success("Xóa da giày thành công");
+        } catch (error) {
+          let errorMessage = "Lỗi từ máy chủ";
+          if (error.response && error.response.data && error.response.data.message) {
+            errorMessage = error.response.data.message;
+          }
+          toast.error(errorMessage);
+        }
+      }
+    } else if (selecttt === 'sole') {
+      if (window.confirm("Bạn có chắc chắn muốn xóa không?")) {
+        try {
+          const response = await axiosInstance.delete(`/admin/sole/delete`, { data: [id] });
+          getSole();
+          toast.success("Xóa đế giày thành công");
+        } catch (error) {
+          let errorMessage = "Lỗi từ máy chủ";
+          if (error.response && error.response.data && error.response.data.message) {
+            errorMessage = error.response.data.message;
+          }
+          toast.error(errorMessage);
+        }
+      }
+    } else if (selecttt === 'toe') {
+      if (window.confirm("Bạn có chắc chắn muốn xóa không?")) {
+        try {
+          const response = await axiosInstance.delete(`/admin/toe/delete`, { data: [id] });
+          getToe();
+          toast.success("Xóa mũi giày thành công");
+        } catch (error) {
+          let errorMessage = "Lỗi từ máy chủ";
+          if (error.response && error.response.data && error.response.data.message) {
+            errorMessage = error.response.data.message;
+          }
+          toast.error(errorMessage);
+        }
+      }
+    } else if (selecttt === 'lining') {
+      if (window.confirm("Bạn có chắc chắn muốn xóa không?")) {
+        try {
+          const response = await axiosInstance.delete(`/admin/lining/delete`, { data: [id] });
+          getLining();
+          toast.success("Xóa lót giày thành công");
+        } catch (error) {
+          let errorMessage = "Lỗi từ máy chủ";
+          if (error.response && error.response.data && error.response.data.message) {
+            errorMessage = error.response.data.message;
+          }
+          toast.error(errorMessage);
+        }
+      }
+    } else if (selecttt === 'cushion') {
+      if (window.confirm("Bạn có chắc chắn muốn xóa không?")) {
+        try {
+          const response = await axiosInstance.delete(`/admin/cushion/delete`, { data: [id] });
+          getCushion();
+          toast.success("Xóa đệm giày thành công");
+        } catch (error) {
+          let errorMessage = "Lỗi từ máy chủ";
+          if (error.response && error.response.data && error.response.data.message) {
+            errorMessage = error.response.data.message;
+          }
+          toast.error(errorMessage);
+        }
+      }
+    } else if (selecttt === 'size') {
+      //size
+      if (window.confirm("Bạn có chắc chắn muốn xóa không?")) {
+        try {
+          const response = await axiosInstance.delete(`/admin/size/delete`, { data: [id] });
+          getSize();
+          toast.success("Xóa size giày thành công");
+        } catch (error) {
+          let errorMessage = "Lỗi từ máy chủ";
+          if (error.response && error.response.data && error.response.data.message) {
+            errorMessage = error.response.data.message;
+          }
+          toast.error(errorMessage);
+        }
+      }
     }
   }
 
   const handleProductAttribites = async () => {
     if (selecttt === 'color') {
       try {
-        const response = await axios.post(`http://localhost:33321/api/admin/color`, formData);
+        const response = await axiosInstance.post(`/admin/color`, formData);
         toggle();
         setformData({ ...setformData, name: "" });
         getColor();
@@ -74,18 +204,143 @@ const ProductAttributes = () => {
         toast.error(errorMessage);
       }
     } else if (selecttt === 'brand') {
-      getCategory();
+      try {
+        const response = await axiosInstance.post(`/admin/brand`, formData);
+        toggle();
+        setformData({ ...setformData, name: "" });
+        getBrand();
+        toast.success("Thêm mới thương hiệu thành công");
+      } catch (error) {
+        let errorMessage = "Lỗi từ máy chủ";
+        if (error.response && error.response.data && error.response.data.message) {
+          errorMessage = error.response.data.message;
+        }
+        toast.error(errorMessage);
+      }
+    } else if (selecttt === 'origin') {
+      try {
+        const response = await axiosInstance.post(`/admin/origin`, formData);
+        toggle();
+        setformData({ ...setformData, name: "" });
+        getOrigin();
+        toast.success("Thêm mới xuất xứ thành công");
+      } catch (error) {
+        let errorMessage = "Lỗi từ máy chủ";
+        if (error.response && error.response.data && error.response.data.message) {
+          errorMessage = error.response.data.message;
+        }
+        toast.error(errorMessage);
+      }
+    } else if (selecttt === 'design_style') {
+      try {
+        const response = await axiosInstance.post(`/admin/design-style`, formData);
+        toggle();
+        setformData({ ...setformData, name: "" });
+        getDesignStyle();
+        toast.success("Thêm mới thiết kế thành công");
+      } catch (error) {
+        let errorMessage = "Lỗi từ máy chủ";
+        if (error.response && error.response.data && error.response.data.message) {
+          errorMessage = error.response.data.message;
+        }
+        toast.error(errorMessage);
+      }
+    } else if (selecttt === 'skin_type') {
+      try {
+        const response = await axiosInstance.post(`/admin/skin-tyle`, formData);
+        toggle();
+        setformData({ ...setformData, name: "" });
+        getSkinType();
+        toast.success("Thêm mới loại da thành công");
+      } catch (error) {
+        let errorMessage = "Lỗi từ máy chủ";
+        if (error.response && error.response.data && error.response.data.message) {
+          errorMessage = error.response.data.message;
+        }
+        toast.error(errorMessage);
+      }
+    } else if (selecttt === 'sole') {
+      try {
+        const response = await axiosInstance.post(`/admin/sole`, formData);
+        toggle();
+        setformData({ ...setformData, name: "" });
+        getSole();
+        toast.success("Thêm mới đế giày thành công");
+      } catch (error) {
+        let errorMessage = "Lỗi từ máy chủ";
+        if (error.response && error.response.data && error.response.data.message) {
+          errorMessage = error.response.data.message;
+        }
+        toast.error(errorMessage);
+      }
+    } else if (selecttt === 'toe') {
+      try {
+        const response = await axiosInstance.post(`/admin/toe`, formData);
+        toggle();
+        setformData({ ...setformData, name: "" });
+        getToe();
+        toast.success("Thêm mới mũi giày thành công");
+      } catch (error) {
+        let errorMessage = "Lỗi từ máy chủ";
+        if (error.response && error.response.data && error.response.data.message) {
+          errorMessage = error.response.data.message;
+        }
+        toast.error(errorMessage);
+      }
+    } else if (selecttt === 'lining') {
+      try {
+        const response = await axiosInstance.post(`/admin/lining`, formData);
+        toggle();
+        setformData({ ...setformData, name: "" });
+        getLining();
+        toast.success("Thêm mới lót giày thành công");
+      } catch (error) {
+        let errorMessage = "Lỗi từ máy chủ";
+        if (error.response && error.response.data && error.response.data.message) {
+          errorMessage = error.response.data.message;
+        }
+        toast.error(errorMessage);
+      }
+    } else if (selecttt === 'cushion') {
+      try {
+        const response = await axiosInstance.post(`/admin/cushion`, formData);
+        toggle();
+        setformData({ ...setformData, name: "" });
+        getCushion();
+        toast.success("Thêm mới đệm giày thành công");
+      } catch (error) {
+        let errorMessage = "Lỗi từ máy chủ";
+        if (error.response && error.response.data && error.response.data.message) {
+          errorMessage = error.response.data.message;
+        }
+        toast.error(errorMessage);
+      }
+    } else if (selecttt === 'size') {
+      //size
+      try {
+        const response = await axiosInstance.post(`/admin/size`, formData);
+        toggle();
+        setformData({ ...setformData, name: "" });
+        getSize();
+        toast.success("Thêm mới size thành công");
+      } catch (error) {
+        let errorMessage = "Lỗi từ máy chủ";
+        if (error.response && error.response.data && error.response.data.message) {
+          errorMessage = error.response.data.message;
+        }
+        toast.error(errorMessage);
+      }
     }
   }
-  const handleEditBrands = (brand) => {
-    setDataEdit(brand);
-    setformData({ ...setformData, name: brand.name });
+  const handleEdit = (item) => {
+    setDataEdit(item);
+    setformData({ ...setformData, name: item.name });
     toggleEdit();
   }
   const EditProductAttribites = async () => {
     if (selecttt === 'color') {
       try {
-        await axios.put(`http://localhost:33321/api/admin/color/${dataEdit.id}`, formData);
+        await axiosInstance.put(`/admin/color/${dataEdit.id}`, formData);
         toggleEdit();
         getColor();
         setformData({ ...formData, name: "" })
@@ -99,21 +354,171 @@ const ProductAttributes = () => {
         toast.error(errorMessage);
       }
     } else if (selecttt === 'brand') {
-      getCategory();
+      try {
+        await axiosInstance.put(`/admin/brand/${dataEdit.id}`, formData);
+        toggleEdit();
+        getBrand();
+        setformData({ ...formData, name: "" })
+        setDataEdit({});
+        toast.success("Sửa thương hiệu thành công");
+      } catch (error) {
+        let errorMessage = "Lỗi từ máy chủ";
+        if (error.response && error.response.data && error.response.data.message) {
+          errorMessage = error.response.data.message;
+        }
+        toast.error(errorMessage);
+      }
+    } else if (selecttt === 'origin') {
+      try {
+        await axiosInstance.put(`/admin/origin/${dataEdit.id}`, formData);
+        toggleEdit();
+        getOrigin();
+        setformData({ ...formData, name: "" })
+        setDataEdit({});
+        toast.success("Sửa xuất xứ thành công");
+      } catch (error) {
+        let errorMessage = "Lỗi từ máy chủ";
+        if (error.response && error.response.data && error.response.data.message) {
+          errorMessage = error.response.data.message;
+        }
+        toast.error(errorMessage);
+      }
+    } else if (selecttt === 'design_style') {
+      try {
+        await axiosInstance.put(`/admin/design-style/${dataEdit.id}`, formData);
+        toggleEdit();
+        getDesignStyle();
+        setformData({ ...formData, name: "" })
+        setDataEdit({});
+        toast.success("Sửa thiết kế thành công");
+      } catch (error) {
+        let errorMessage = "Lỗi từ máy chủ";
+        if (error.response && error.response.data && error.response.data.message) {
+          errorMessage = error.response.data.message;
+        }
+        toast.error(errorMessage);
+      }
+    } else if (selecttt === 'skin_type') {
+      try {
+        await axiosInstance.put(`/admin/skin-tyle/${dataEdit.id}`, formData);
+        toggleEdit();
+        getSkinType();
+        setformData({ ...formData, name: "" })
+        setDataEdit({});
+        toast.success("Sửa loại da thành công");
+      } catch (error) {
+        let errorMessage = "Lỗi từ máy chủ";
+        if (error.response && error.response.data && error.response.data.message) {
+          errorMessage = error.response.data.message;
+        }
+        toast.error(errorMessage);
+      }
+    } else if (selecttt === 'sole') {
+      try {
+        await axiosInstance.put(`/admin/sole/${dataEdit.id}`, formData);
+        toggleEdit();
+        getSole();
+        setformData({ ...formData, name: "" })
+        setDataEdit({});
+        toast.success("Sửa đế giày thành công");
+      } catch (error) {
+        let errorMessage = "Lỗi từ máy chủ";
+        if (error.response && error.response.data && error.response.data.message) {
+          errorMessage = error.response.data.message;
+        }
+        toast.error(errorMessage);
+      }
+    } else if (selecttt === 'toe') {
+      try {
+        await axiosInstance.put(`/admin/toe/${dataEdit.id}`, formData);
+        toggleEdit();
+        getToe();
+        setformData({ ...formData, name: "" })
+        setDataEdit({});
+        toast.success("Sửa mũi giày thành công");
+      } catch (error) {
+        let errorMessage = "Lỗi từ máy chủ";
+        if (error.response && error.response.data && error.response.data.message) {
+          errorMessage = error.response.data.message;
+        }
+        toast.error(errorMessage);
+      }
+    } else if (selecttt === 'lining') {
+      try {
+        await axiosInstance.put(`/admin/lining/${dataEdit.id}`, formData);
+        toggleEdit();
+        getLining();
+        setformData({ ...formData, name: "" })
+        setDataEdit({});
+        toast.success("Sửa lót giày thành công");
+      } catch (error) {
+        let errorMessage = "Lỗi từ máy chủ";
+        if (error.response && error.response.data && error.response.data.message) {
+          errorMessage = error.response.data.message;
+        }
+        toast.error(errorMessage);
+      }
+    } else if (selecttt === 'cushion') {
+      try {
+        await axiosInstance.put(`/admin/cushion/${dataEdit.id}`, formData);
+        toggleEdit();
+        getCushion();
+        setformData({ ...formData, name: "" })
+        setDataEdit({});
+        toast.success("Sửa đệm giày thành công");
+      } catch (error) {
+        let errorMessage = "Lỗi từ máy chủ";
+        if (error.response && error.response.data && error.response.data.message) {
+          errorMessage = error.response.data.message;
+        }
+        toast.error(errorMessage);
+      }
+    } else if (selecttt === 'size') {
+      //size
+      try {
+        await axiosInstance.put(`/admin/size/${dataEdit.id}`, formData);
+        toggleEdit();
+        getSize();
+        setformData({ ...formData, name: "" })
+        setDataEdit({});
+        toast.success("Sửa size giày thành công");
+      } catch (error) {
+        let errorMessage = "Lỗi từ máy chủ";
+        if (error.response && error.response.data && error.response.data.message) {
+          errorMessage = error.response.data.message;
+        }
+        toast.error(errorMessage);
+      }
     }
 
   }
 
 
   useEffect(() => {
-
-    getCategory();
+    getColor();
   }, []);
   const getAll = () => {
     if (selecttt === 'color') {
       getColor();
     } else if (selecttt === 'brand') {
-      getCategory();
+      getBrand();
+    } else if (selecttt === 'origin') {
+      getOrigin();
+    } else if (selecttt === 'design_style') {
+      getDesignStyle();
+    } else if (selecttt === 'skin_type') {
+      getSkinType();
+    } else if (selecttt === 'sole') {
+      getSole();
+    } else if (selecttt === 'toe') {
+      getToe();
+    } else if (selecttt === 'lining') {
+      getLining();
+    } else if (selecttt === 'cushion') {
+      getCushion();
+    } else if (selecttt === 'size') {
+      //size
+      getSize();
     }
   }
   useEffect(() => {
@@ -122,6 +527,7 @@ const ProductAttributes = () => {
   useEffect(() => {
     getAll();
   }, [selecttt]);
+  //call api get-all
   const getColor = async () => {
     try {
       let res = await getAllColor1(page, size, search);
@@ -134,17 +540,116 @@ const ProductAttributes = () => {
       setList([]);
     }
   };
-  const getCategory = async () => {
+  const getBrand = async () => {
     try {
-      let res = await getAllBrand();
-      if (res && res.data) {
-        setList(res.data);
+      let res = await getAllBrand1(page, size, search);
+      if (res && res.data && res.data.content) {
+        setList(res.data.content);
+        setTotalElenments(res.data.totalElements);
+        setTotalPages(res.data.totalPages);
+      }
+    } catch (error) {
+      setList([]);
+    }
+  };
+  const getOrigin = async () => {
+    try {
+      let res = await getAllOrigin1(page, size, search);
+      if (res && res.data && res.data.content) {
+        setList(res.data.content);
+        setTotalElenments(res.data.totalElements);
+        setTotalPages(res.data.totalPages);
+      }
+    } catch (error) {
+      setList([]);
+    }
+  };
+  const getDesignStyle = async () => {
+    try {
+      let res = await getAllDesignStyle1(page, size, search);
+      if (res && res.data && res.data.content) {
+        setList(res.data.content);
+        setTotalElenments(res.data.totalElements);
+        setTotalPages(res.data.totalPages);
+      }
+    } catch (error) {
+      setList([]);
+    }
+  };
+  const getSkinType = async () => {
+    try {
+      let res = await getAllSkinType1(page, size, search);
+      if (res && res.data && res.data.content) {
+        setList(res.data.content);
+        setTotalElenments(res.data.totalElements);
+        setTotalPages(res.data.totalPages);
+      }
+    } catch (error) {
+      setList([]);
+    }
+  };
+  const getToe = async () => {
+    try {
+      let res = await getAllToe1(page, size, search);
+      if (res && res.data && res.data.content) {
+        setList(res.data.content);
+        setTotalElenments(res.data.totalElements);
+        setTotalPages(res.data.totalPages);
+      }
+    } catch (error) {
+      setList([]);
+    }
+  };
+  const getSole = async () => {
+    try {
+      let res = await getAllSole1(page, size, search);
+      if (res && res.data && res.data.content) {
+        setList(res.data.content);
+        setTotalElenments(res.data.totalElements);
+        setTotalPages(res.data.totalPages);
+      }
+    } catch (error) {
+      setList([]);
+    }
+  };
+  const getLining = async () => {
+    try {
+      let res = await getAllLining1(page, size, search);
+      if (res && res.data && res.data.content) {
+        setList(res.data.content);
+        setTotalElenments(res.data.totalElements);
+        setTotalPages(res.data.totalPages);
+      }
+    } catch (error) {
+      setList([]);
+    }
+  };
+  const getCushion = async () => {
+    try {
+      let res = await getAllCushion1(page, size, search);
+      if (res && res.data && res.data.content) {
+        setList(res.data.content);
+        setTotalElenments(res.data.totalElements);
+        setTotalPages(res.data.totalPages);
+      }
+    } catch (error) {
+      setList([]);
+    }
+  };
+  const getSize = async () => {
+    try {
+      let res = await getAllSize1(page, size, search);
+      if (res && res.data && res.data.content) {
+        setList(res.data.content);
+        setTotalElenments(res.data.totalElements);
+        setTotalPages(res.data.totalPages);
       }
     } catch (error) {
       setList([]);
     }
   };
 
+  //end call api get-all
   useEffect(() => {
     getAll();
   }, [size]);
@@ -178,7 +683,10 @@ const ProductAttributes = () => {
                           Màu
                         </option>
                         <option value="brand">
-                          Hãng
+                          Thương hiệu
+                        </option>
+                        <option value="origin">
+                          Xuất xứ
                         </option>
                         <option value="design_style">
                           Thiết kế
@@ -189,8 +697,14 @@ const ProductAttributes = () => {
                         <option value="sole">
                           Đế giày
                         </option>
+                        <option value="toe">
+                          Mũi giày
+                        </option>
                         <option value="lining">
                           Lót giày
+                        </option>
+                        <option value="cushion">
+                          Đệm giày
                         </option>
                         <option value="size">
                           Size
@@ -249,7 +763,6 @@ const ProductAttributes = () => {
                       <th>STT</th>
                       <th>Mã</th>
                       <th>Tên</th>
-                      {selecttt === 'brand' && <th>Ảnh</th>}
                       <th colSpan={2}>Thao tác</th>
                     </tr>
                   </thead>
@@ -271,21 +784,11 @@ const ProductAttributes = () => {
                             <th scope="row"> {index + 1}</th>
                             <td>{item.code}</td>
                             <td>{item.name}</td>
-                            {selecttt === 'brand' &&
-                              <td>
-                                <img
-                                  src="/path/to/your/image.jpg" // Đặt đường dẫn tới hình ảnh của bạn ở đây
-                                  alt="Mô tả hình ảnh"
-                                  width="300" // Tuỳ chỉnh kích thước nếu cần
-                                  height="200"
-                                />
-                              </td>
-                            }
                             <td>
-                              <Button color="link" onClick={() => handleEditBrands(item)} size="sm">
+                              <Button color="link" onClick={() => handleEdit(item)} size="sm">
                                 <FaEdit color="primary" />
                               </Button>
-                              <Button color="link" size="sm" onClick={() => handleDeleteBrands(item.id)}>
+                              <Button color="link" size="sm" onClick={() => handleDelete(item.id)}>
                                 <FaTrash color="primary" />
                               </Button>
 
