@@ -352,7 +352,7 @@ const Products = () => {
   const token = localStorage.token;
   const baoCaoExcel = async () => {
     try {
-      await axios.post(`http://localhost:33321/api/staff/shoesdetail/report`, {
+      await axios.post(`http://localhost:33321/api/admin/shoesdetail/report`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }

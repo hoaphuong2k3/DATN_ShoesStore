@@ -3,7 +3,7 @@ import { Container, Row, Card, CardBody, Col, ButtonGroup, Button } from "reacts
 import Header from "components/Headers/ProductHeader.js";
 import React, { useState, useEffect } from "react";
 import axiosInstance from "services/custommize-axios";
-import { getAllShoesDetail } from "services/ShoesDetailService.js";
+import { getOneShoesDetailUsers, getOneShoesUser } from "services/ShoesDetailService.js";
 import { useParams, useNavigate } from 'react-router-dom';
 import { CartContext } from "contexts/Cart.js";
 import { getAllColorId, getAllSizeId } from "services/ProductAttributeService";
@@ -49,11 +49,14 @@ const DetailProduct = () => {
     const getAll = async () => {
       console.log("colorId:sizeId:", idColor, idSize)
       try {
-        let res = await getAllShoesDetail(id, 0, 5, { colorId: idColor, sizeId: idSize });
-        if (res && res.data && res.data.content) {
-          setshoesdetail(res.data.content[0]);
-          console.log(res.data.content)
-          setSL(false);
+        let res = await getOneShoesDetailUsers({ "shoesId": id, "sizeId": idSize, "colorId": idColor });
+        if (res && res.data) {
+          setshoesdetail(res.data);
+          if (res.data.detailResponse.quantity > 0) {
+            setSL(false);
+          } else {
+            setSL(true);
+          }
         }
       } catch (error) {
         console.error(error);
@@ -79,7 +82,7 @@ const DetailProduct = () => {
   }
   const getDetail = async () => {
     try {
-      let res = await findShoes(id);
+      let res = await getOneShoesUser(id);
       if (res && res.data) {
         setProductDetail(res.data);
       }
@@ -128,7 +131,7 @@ const DetailProduct = () => {
           },
           body: JSON.stringify({
             "key": storedUserId,
-            "id": shoesdetail.shoesDetailSearchResponse.id,
+            "id": shoesdetail.detailResponse.id,
             "quantity": quantity
           }),
         });
@@ -162,7 +165,7 @@ const DetailProduct = () => {
           },
           body: JSON.stringify({
             "key": storedUserId,
-            "id": shoesdetail.shoesDetailSearchResponse.id,
+            "id": shoesdetail.detailResponse.id,
             "quantity": quantity
           }),
         });
@@ -211,16 +214,16 @@ const DetailProduct = () => {
                       <div className='row'>
                         <div className='col-5'>
                           {
-                            shoesdetail && shoesdetail.imageDTOS && shoesdetail.imageDTOS.length > 0
+                            shoesdetail && shoesdetail.images && shoesdetail.images.length > 0
                               ?
-                              <img alt="" src={`https://s3-ap-southeast-1.amazonaws.com/imageshoestore/${shoesdetail.imageDTOS[0].imgURI}`} height={450} width={450} />
+                              <img alt="" src={`https://s3-ap-southeast-1.amazonaws.com/imageshoestore/${shoesdetail.images[0].imgURI}`} height={450} width={450} />
                               :
                               <img alt="" src={`https://s3-ap-southeast-1.amazonaws.com/imageshoestore/${productDetail.imgURI}`} height={450} width={450} />
                           }
 
                           <p className='mt-3 text-center'>
                             {
-                              shoesdetail && shoesdetail.imageDTOS && shoesdetail.imageDTOS.length > 0 && shoesdetail.imageDTOS.map(item => (
+                              shoesdetail && shoesdetail.images && shoesdetail.images.length > 0 && shoesdetail.images.map(item => (
                                 <img alt="" src={`https://s3-ap-southeast-1.amazonaws.com/imageshoestore/${item.imgURI}`} height={88} width={88} />
                               ))
                             }
@@ -229,35 +232,35 @@ const DetailProduct = () => {
                         <div className='col-7'>
                           <div className='tensp'>
                             {/* Tên sản phẩm */}
-                            <span>{productDetail.name}, Hãng {productDetail.brandName}, Xuất xứ {productDetail.originName}</span>
+                            <span>{productDetail.name}, Hãng {productDetail.brand}, Xuất xứ {productDetail.origin}</span>
                           </div>
                           <br />
                           {/* start Giá sản phảm */}
                           <div className='giasp'>
                             {
-                              (shoesdetail.shoesDetailSearchResponse && shoesdetail.shoesDetailSearchResponse.discountPrice < shoesdetail.shoesDetailSearchResponse.price) ?
+                              (shoesdetail.detailResponse && shoesdetail.detailResponse.discountPrice < shoesdetail.detailResponse.price) ?
                                 <>
                                   <div className='giachuagiam' >
                                     {/* Giá chuwq giảm */}
-                                    {formatter.format(shoesdetail.shoesDetailSearchResponse.price)}
+                                    {formatter.format(shoesdetail.detailResponse.price)}
                                   </div>
                                   <div className='flex items-center'>
                                     {/* Giá  giảm */}
-                                    <span className='giagiam'>{shoesdetail.shoesDetailSearchResponse.discountPrice === null ? "0 đ" : formatter.format(shoesdetail.shoesDetailSearchResponse.discountPrice)}</span>
+                                    <span className='giagiam'>{shoesdetail.detailResponse.discountPrice === null ? "0 đ" : formatter.format(shoesdetail.detailResponse.discountPrice)}</span>
                                     {
-                                      shoesdetail.shoesDetailSearchResponse.type === 1 && <span className='sokhuyenmai'> Giảm {shoesdetail.shoesDetailSearchResponse.discountPrice === null ? 100 : (shoesdetail.shoesDetailSearchResponse.discountPrice / shoesdetail.shoesDetailSearchResponse.price) * 100}%</span>
+                                      shoesdetail.detailResponse.type === 1 && <span className='sokhuyenmai'> Giảm {shoesdetail.detailResponse.discountPrice === null ? 100 : (shoesdetail.detailResponse.discountPrice / shoesdetail.detailResponse.price) * 100}%</span>
                                     }
                                     {
-                                      shoesdetail.shoesDetailSearchResponse.type === 2 && <span className='sokhuyenmai'> Giảm {shoesdetail.shoesDetailSearchResponse.discountPrice === null ? shoesdetail.shoesDetailSearchResponse.price : (shoesdetail.shoesDetailSearchResponse.price - shoesdetail.shoesDetailSearchResponse.discountPrice)}đ</span>
+                                      shoesdetail.detailResponse.type === 2 && <span className='sokhuyenmai'> Giảm {shoesdetail.detailResponse.discountPrice === null ? shoesdetail.detailResponse.price : (shoesdetail.detailResponse.price - shoesdetail.detailResponse.discountPrice)}đ</span>
                                     }
-                                    <span className='sokhuyenmai'> Giảm {shoesdetail.shoesDetailSearchResponse.discountPrice === null ? 100 : (shoesdetail.shoesDetailSearchResponse.discountPrice / shoesdetail.shoesDetailSearchResponse.price) * 100}%</span>
+                                    <span className='sokhuyenmai'> Giảm {shoesdetail.detailResponse.discountPrice === null ? 100 : (shoesdetail.detailResponse.discountPrice / shoesdetail.detailResponse.price) * 100}%</span>
                                   </div>
                                 </>
                                 :
                                 <>
                                   <div className='flex items-center'>
                                     {/* Giá  giảm */}
-                                    <span className='giagiam'>{shoesdetail.shoesDetailSearchResponse && shoesdetail.shoesDetailSearchResponse.price > 0 ? formatter.format(shoesdetail.shoesDetailSearchResponse.price) : "0 đ"}</span>
+                                    <span className='giagiam'>{shoesdetail.detailResponse && shoesdetail.detailResponse.price > 0 ? formatter.format(shoesdetail.detailResponse.price) : "0 đ"}</span>
                                   </div>
                                 </>
                             }
@@ -272,49 +275,49 @@ const DetailProduct = () => {
                             <Col lg="6">
                               <div className='tong' >
                                 <span className='tenthuoctinh'>Thương hiệu :  </span>
-                                <span className='giatrithuoctinh'>{productDetail.brandName}</span>
+                                <span className='giatrithuoctinh'>{productDetail.brand}</span>
                               </div>
                             </Col>
                             <Col lg='6'>
                               <div className='tong'>
                                 <span className='tenthuoctinh'>Xuất xứ :  </span>
-                                <span className='giatrithuoctinh'>{productDetail.originName}</span>
+                                <span className='giatrithuoctinh'>{productDetail.origin}</span>
                               </div>
                             </Col>
                             <Col lg='6'>
                               <div className='tong'>
                                 <span className='tenthuoctinh'>Thiết kế :   </span>
-                                <span className='giatrithuoctinh'>{productDetail.designStyleName}</span>
+                                <span className='giatrithuoctinh'>{productDetail.designStyle}</span>
                               </div>
                             </Col>
                             <Col lg='6'>
                               <div className='tong'>
                                 <span className='tenthuoctinh'>Loại da : </span>
-                                <span className='giatrithuoctinh'>{productDetail.skinTypeName}</span>
+                                <span className='giatrithuoctinh'>{productDetail.skinType}</span>
                               </div>
                             </Col>
                             <Col lg='6'>
                               <div className='tong'>
                                 <span className='tenthuoctinh'>Mũi giày : </span>
-                                <span className='giatrithuoctinh'>{productDetail.toeName}</span>
+                                <span className='giatrithuoctinh'>{productDetail.toe}</span>
                               </div>
                             </Col>
                             <Col lg='6'>
                               <div className='tong'>
                                 <span className='tenthuoctinh'>Đế giày : </span>
-                                <span className='giatrithuoctinh'>{productDetail.soleName}</span>
+                                <span className='giatrithuoctinh'>{productDetail.sole}</span>
                               </div>
                             </Col>
                             <Col lg='6'>
                               <div className='tong'>
                                 <span className='tenthuoctinh'>Lót giày :  </span>
-                                <span className='giatrithuoctinh'>{productDetail.liningName}</span>
+                                <span className='giatrithuoctinh'>{productDetail.lining}</span>
                               </div>
                             </Col>
                             <Col lg='6'>
                               <div className='tong'>
                                 <span className='tenthuoctinh'>Đệm giày : </span>
-                                <span className='giatrithuoctinh'>{productDetail.cushionName}</span>
+                                <span className='giatrithuoctinh'>{productDetail.cushion}</span>
                               </div>
                             </Col>
                           </Row>
@@ -360,10 +363,11 @@ const DetailProduct = () => {
                             </div>
                           </div>
                           {/* end size */}
-                          {shoesdetail.shoesDetailSearchResponse &&
-                            <div>
-                              <div className='tong'>
-                                <span className='tenthuoctinh'>Số lượng :  </span>
+
+                          <div>
+                            <div className='tong'>
+                              <span className='tenthuoctinh'>Số lượng :  </span>
+                              {shoesdetail.detailResponse && sl === false &&
                                 <span className='giatrithuoctinh' >
                                   <button className='btntanggiam' onClick={handleDecrease}>-</button>
                                   <input
@@ -375,17 +379,17 @@ const DetailProduct = () => {
                                     value={quantity}
                                     readOnly
                                   />
-                                  <button className='btntanggiam' onClick={handleIncrease} disabled={quantity === shoesdetail.shoesDetailSearchResponse.quantity ? true : false}>+</button>
+                                  <button className='btntanggiam' onClick={handleIncrease} disabled={quantity === shoesdetail.detailResponse.quantity ? true : false}>+</button>
                                   &nbsp;&nbsp;
-                                  {sl === false
-                                    ? <span> {shoesdetail.shoesDetailSearchResponse.quantity} &nbsp;sản phẩm có sẵn</span>
-                                    : <span style={{ color: "red" }}>Sản phẩm này đã hết hàng</span>
+                                  {sl === false &&
+                                    <span> {shoesdetail.detailResponse.quantity} &nbsp;sản phẩm có sẵn</span>
                                   }
-
                                 </span>
-                              </div>
+                              }
+                              {sl === true && <span style={{ color: "red" }}> &nbsp; &nbsp; Sản phẩm này đã hết hàng</span>}
                             </div>
-                          }
+                          </div>
+
                           <div className='text-center btnInDetailSP'>
                             <CartContext.Consumer>
                               {({ addToCart }) => (
@@ -485,7 +489,7 @@ const DetailProduct = () => {
                         <div className='col-3'>
                           <div>
                             <div className='text-muted'>
-                             Top sản phẩm nổi bật
+                              Top sản phẩm nổi bật
                             </div>
                           </div>
                         </div>
@@ -498,7 +502,7 @@ const DetailProduct = () => {
             </Card>
           </div>
         </Row>
-      </Container>
+      </Container >
     </>
   );
 };
