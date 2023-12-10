@@ -5,6 +5,7 @@ import { format } from 'date-fns';
 import { vi } from 'date-fns/locale';
 import { connect } from 'react-redux';
 import { updateData } from './actions';
+import 'assets/scss/detailsp.scss';
 import 'assets/css/hoadon.css';
 // reactstrap components
 import { Badge, Row, Col, Button, Table, Input, FormGroup, CardBody, CardFooter, InputGroup, InputGroupAddon, Card, InputGroupText, Modal, ModalBody, ModalFooter, ModalHeader, Label, Form, CardHeader } from "reactstrap";
@@ -18,6 +19,7 @@ import {
     MDBRow,
     MDBTypography,
 } from "mdb-react-ui-kit";
+import { toast } from 'react-toastify';
 
 const Confirm = (props) => {
     const formatter = new Intl.NumberFormat("vi-VN", {
@@ -96,8 +98,6 @@ const Confirm = (props) => {
                 } catch (error) {
                     console.error(`Lỗi khi lấy dữ liệu tỉnh:`, error);
                 }
-
-
             }
         } catch (error) {
             console.error("Error:", error);
@@ -107,6 +107,25 @@ const Confirm = (props) => {
     const handleDetail = (id) => {
         getOneOrder(id);
         setModalDetail(true);
+    }
+    const huyDonHang = async (id) => {
+        if (window.confirm("Bạn chắc chắn muốn hủy đơn hàng này ?")) {
+            try {
+                await axiosInstance.put(`/order/confirm`, {
+                    "idClient": storedUserId,
+                    "idOrder": id,
+                    "status": 7
+                });
+                getAllConfirm();
+                toast.success("Hủy đơn hàng thành công");
+            } catch (error) {
+                let errorMessage = "Lỗi từ máy chủ";
+                if (error.response && error.response.data && error.response.data.message) {
+                    errorMessage = error.response.data.message;
+                }
+                toast.error(errorMessage);
+            }
+        }
     }
 
     return (
@@ -130,7 +149,7 @@ const Confirm = (props) => {
                         </Col>
                     </Row>
                     {list && list.length > 0 && list.map((item, index) => (
-                        <Card className="mb-4 shadow" onClick={() => handleDetail(item.id)}>
+                        <Card className="mb-4 shadow">
                             <CardHeader>
                                 <Row>
                                     <Col lg="3"><b>{item.code}</b></Col>
@@ -148,7 +167,7 @@ const Confirm = (props) => {
                                     </Col>
                                 </Row>
                             </CardHeader>
-                            <CardBody>
+                            <CardBody onClick={() => handleDetail(item.id)}>
                                 {item.listCart && item.listCart.length > 0 && item.listCart.map((itemC, i) => (
                                     <>
                                         <Row key={itemC.id} className="">
@@ -201,6 +220,12 @@ const Confirm = (props) => {
                                         {(i + 1) < item.listCart.length && <hr />}
                                     </>
                                 ))}
+                                <Row>
+                                    <Col lg="12" className="d-flex justify-content-end">
+                                        <span style={{ fontSize: "13px" }} className="mt-2">Thành tiền:&nbsp;</span>
+                                        <span style={{ color: "red", fontSize: "24px" }}>{formatter.format(item.totalPayment)}</span>
+                                    </Col>
+                                </Row>
                             </CardBody>
                             <CardFooter>
                                 <Row>
@@ -208,10 +233,15 @@ const Confirm = (props) => {
                                         <b> Ngày mua: </b> {formatDate(item.createTime)}
                                     </Col>
                                     <Col lg="8" className="d-flex justify-content-end">
-                                        <span style={{ fontSize: "13px" }} className="mt-2">Thành tiền:&nbsp;</span>
-                                        <span style={{ color: "red", fontSize: "24px" }}>{formatter.format(item.totalPayment)}</span>
+                                        <button class="evo-button mobile-viewmore" aria-label="35" aria-disabled="false"
+                                            style={{ backgroundColor: '#cccccc' }}
+                                            onClick={() => huyDonHang(item.id)}
+                                        >
+                                            Hủy đơn hàng
+                                        </button>
                                     </Col>
                                 </Row>
+
                             </CardFooter>
                         </Card>
                     ))}
