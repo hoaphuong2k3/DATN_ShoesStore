@@ -57,7 +57,7 @@ const CreateOrderPage = () => {
             <Card className="shadow">
               <CardHeader className="bg-transparent">
                 <Col>
-                  <Button size="sm" color="primary" outline onClick={handleCreateOrder}>
+                  <Button className="bg-gradient-info" size="sm" style={{ color: "#fff" }} onClick={handleCreateOrder}>
                     + Tạo mới hóa đơn
                   </Button>
                 </Col>
