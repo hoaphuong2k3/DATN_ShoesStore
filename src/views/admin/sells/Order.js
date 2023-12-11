@@ -9,7 +9,7 @@ import Toggle from 'react-toggle';
 import QRCode from 'qrcode.react';
 import QrReader from 'react-qr-reader';
 import {
-    Row, Col, Button, Card, CardBody, CardHeader, Table, InputGroup, Input,
+    Row, Col, Button, Card, CardBody, CardHeader, Table, InputGroup, Input, ButtonGroup,
     Form, FormGroup, Label, Modal, ModalBody, ModalHeader, ModalFooter
 } from "reactstrap";
 import SlideShow from '../product/SlideShow.js';
@@ -416,7 +416,7 @@ const Order = () => {
             if (recipientName.length === 0 || recipientPhone.length === 0) {
                 alert("Điền hết thông tin phiếu giao");
                 return;
-              }
+            }
 
             const newDeliveryAddress = buildDeliveryAddress();
             setDeliveryData({ ...deliveryData, deliveryAddress: newDeliveryAddress });
@@ -480,10 +480,10 @@ const Order = () => {
         <Row className="my-4">
             <Col lg={12} className="text-right">
                 <Button color="warning" outline size="sm" onClick={toggle3}>
-                    <FaQrcode className="mr-1" />QR Code sản phẩm
+                    <FaQrcode className="mr-1" />QR Code
                 </Button>
                 <Button color="primary" outline size="sm" onClick={toggle}>
-                    + Thêm sản phẩm
+                    + Danh mục
                 </Button>
             </Col>
 
@@ -604,7 +604,7 @@ const Order = () => {
                 <Col lg={7}>
 
                     <Col lg="12">
-                        <Card style={{ border: "1px solid #ccc", boxShadow: "0 0 10px rgba(0, 0, 0, 0.2)" }}>
+                        <Card style={{ boxShadow: "0 0 10px rgba(0, 0, 0, 0.2)" }}>
                             <CardHeader>
                                 <Row>
                                     <Col md={7} >
@@ -706,7 +706,7 @@ const Order = () => {
 
                     {showShippingForm && (
                         <Col lg="12" className="mt-3">
-                            <Card style={{ border: "1px solid #ccc", boxShadow: "0 0 10px rgba(0, 0, 0, 0.2)" }}>
+                            <Card style={{ boxShadow: "0 0 10px rgba(0, 0, 0, 0.2)" }}>
                                 <CardHeader>
                                     <Row className="col" style={{ justifyContent: "space-between" }}>
                                         <h4>Thông tin giao hàng</h4>
@@ -838,7 +838,7 @@ const Order = () => {
 
                 <Col lg={5}>
 
-                    <Card style={{ border: "1px solid #ccc", boxShadow: "0 0 10px rgba(0, 0, 0, 0.2)" }}>
+                    <Card style={{ boxShadow: "0 0 10px rgba(0, 0, 0, 0.2)" }}>
                         <CardHeader>
                             <Row className="col" style={{ justifyContent: "space-between" }}>
                                 <h4>Thanh toán</h4>
@@ -939,44 +939,65 @@ const Order = () => {
                                     </Col>
                                 </Row>
 
-                                <Row className="col ml-5">
-                                    <Col>
-                                        <Label check>
-                                            <Input
-                                                type="radio"
+                                <Row className="mb-1">
+                                    <Col xs={6}>
+                                        <ButtonGroup className="w-100">
+                                            <Button
                                                 name="money"
-                                                checked={paymentMethod === 4}
-                                                onChange={() => handlePaymentMethodChange(4)}
-                                            />
-                                            Tiền mặt
-                                        </Label>
+                                                active={paymentMethod === 4}
+                                                onClick={() => handlePaymentMethodChange(4)}
+                                                style={{
+                                                    borderRadius: 0,
+                                                    fontWeight: 400,
+                                                    backgroundColor: paymentMethod === 4 ? '#0099FF' : '', 
+                                                    color: paymentMethod === 4 ? '#fff' : '' 
+                                                }}
+                                            >
+                                                Tiền mặt
+                                            </Button>
+                                        </ButtonGroup>
                                     </Col>
-                                    <Col>
-                                        <Label check>
-                                            <Input
-                                                type="radio"
+                                    <Col xs={6}>
+                                        <ButtonGroup className="float-right w-100">
+                                            <Button
                                                 name="money"
-                                                checked={paymentMethod === 3}
-                                                onChange={() => handlePaymentMethodChange(3)}
-                                            />
-                                            Chuyển khoản
-                                        </Label>
+                                                active={paymentMethod === 3}
+                                                onClick={() => handlePaymentMethodChange(3)}
+                                                style={{
+                                                    borderRadius: 0,
+                                                    fontWeight: 400,
+                                                    backgroundColor: paymentMethod === 3 ? '#0099FF' : '', 
+                                                    color: paymentMethod === 3 ? '#fff' : '' 
+                                                }}
+                                            >
+                                                Chuyển khoản
+                                            </Button>
+                                        </ButtonGroup>
                                     </Col>
                                 </Row>
 
+
                                 {showShippingForm && (
-                                    <Row className="col ml-5">
+                                    <Row>
                                         <Col>
-                                            <Label check>
-                                                <Input
-                                                    type="radio"
+                                            <ButtonGroup className="w-100">
+                                                <Button
+
                                                     name="money"
-                                                    checked={paymentMethod === 1}
-                                                    onChange={() => handlePaymentMethodChange(1)}
-                                                />
-                                                Thanh toán sau khi nhận hàng
-                                            </Label>
+                                                    active={paymentMethod === 1}
+                                                    onClick={() => handlePaymentMethodChange(1)}
+                                                    style={{
+                                                        borderRadius: 0,
+                                                        fontWeight: 400,
+                                                        backgroundColor: paymentMethod === 1 ? '#0099FF' : '', 
+                                                        color: paymentMethod === 1 ? '#fff' : '' 
+                                                    }}
+                                                >
+                                                    Thanh toán sau khi nhận hàng
+                                                </Button>
+                                            </ButtonGroup>
                                         </Col>
+
                                     </Row>
                                 )}
 
@@ -987,8 +1008,8 @@ const Order = () => {
                 </Col>
             </Row>
 
-            <Col lg={12} className="my-3 text-center">
-                <Button size="sm" color="primary" onClick={createOrder}>Tạo hóa đơn</Button>
+            <Col lg={12} className="my-4 text-center">
+                <Button className="bg-gradient-info text-white text-uppercase" onClick={createOrder}>Xác nhận đơn</Button>
             </Col>
             <ToastContainer />
 

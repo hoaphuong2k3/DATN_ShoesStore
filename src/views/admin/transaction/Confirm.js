@@ -4,23 +4,20 @@ import axiosInstance from "services/custommize-axios";
 import { format } from 'date-fns';
 import { vi } from 'date-fns/locale';
 // reactstrap components
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import { confirmAlert } from 'react-confirm-alert';
 import 'react-confirm-alert/src/react-confirm-alert.css';
 import 'react-toastify/dist/ReactToastify.css';
-import Tooltip from 'react-tooltip-lite';
 import ReactPaginate from 'react-paginate';
-import { DatePicker } from 'antd';
+import { DatePicker, Tooltip, Popconfirm } from 'antd';
 import { Badge, Row, Col, Button, Table, Input, FormGroup, InputGroup, InputGroupAddon, InputGroupText, Modal, ModalBody, ModalFooter, ModalHeader, Label, Form } from "reactstrap";
 import { FaRegEdit, FaSearch, FaMinus, FaPlus, FaTrash, FaRegHandPointLeft } from 'react-icons/fa';
+
 
 const Confirm = () => {
 
     const [modal, setModal] = useState(false);
     const toggle = () => setModal(!modal);
-
-    const [modal2, setModal2] = useState(false);
-    const toggle2 = () => setModal2(!modal2);
 
     const storedUserId = localStorage.getItem("userId");
     const [totalPages, setTotalPages] = useState(0);
@@ -319,33 +316,19 @@ const Confirm = () => {
     //updateStatus
 
     const handleConfirmDetail = async (orderId) => {
-        confirmAlert({
-            title: 'Xác nhận',
-            message: 'Bạn có chắc chắn xác nhận đơn hàng này?',
-            buttons: [
-                {
-                    label: 'Có',
-                    onClick: async () => {
-                        try {
-                            await axiosInstance.put(`/order/admin/update-status/${orderId}/${storedUserId}?status=1`);
 
-                            toast.success('Đơn hàng đang chờ vận chuyển', { autoClose: 2000 });
-                            fetchData();
-                            window.location.reload();
-                        } catch (error) {
-                            console.error('Lỗi khi cập nhật trạng thái đơn hàng:', error);
-                            toast.error('Lỗi khi xác nhận đơn hàng');
+        try {
+            await axiosInstance.put(`/order/admin/update-status/${orderId}/${storedUserId}?status=1`);
 
-                        }
-                    },
-                },
-                {
-                    label: 'Không',
-                    onClick: () => {
-                    },
-                },
-            ],
-        });
+            toast.success('Đơn hàng đang chờ vận chuyển', { autoClose: 2000 });
+            fetchData();
+            window.location.reload();
+        } catch (error) {
+            console.error('Lỗi khi cập nhật trạng thái đơn hàng:', error);
+            toast.error('Lỗi khi xác nhận đơn hàng');
+
+        }
+
     };
 
 
@@ -506,50 +489,43 @@ const Confirm = () => {
     const [selectedDate, setSelectedDate] = useState(null);
 
     const handleExport = async () => {
-
-        if (!selectedDate) {
-            console.error('Vui lòng chọn ngày trước khi xuất dữ liệu.');
-            return;
-        }
-
-        const requestData = {
-            date: selectedDate.format('YYYY-MM-DD'), 
-            status: 0, 
-        };
-
-        console.log(requestData.date);
-
         try {
-            // Gọi API sử dụng axios
-            const response = await axiosInstance.get('/order/admin/export', requestData, {
+
+            let requestData = {
+                status: 0,
+            };
+
+            if (selectedDate) {
+                requestData.date = selectedDate.format('YYYY-MM-DD');
+            }
+
+            const response = await axiosInstance.get('/order/admin/export', {
+                params: requestData,
                 responseType: 'blob',
                 headers: {
-                  'Content-Type': 'application/json',
+                    'Content-Type': 'application/json',
                 },
-              });
-        
-              const blob = new Blob([response.data], { type: 'application/excel' });
-        
-              // Tạo một URL cho Blob và tạo một thẻ a để download
-              const url = window.URL.createObjectURL(blob);
-              const a = document.createElement('a');
-              a.style.display = 'none';
-              a.href = url;
-              a.download = 'Export_Bills.xlsx';
-              document.body.appendChild(a);
-              a.click();
-        
-              // Giải phóng tài nguyên
-              window.URL.revokeObjectURL(url);
-            console.log('Dữ liệu xuất thành công:', response.data);
+            });
+
+            const blob = new Blob([response], { type: 'application/excel' });
+
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.style.display = 'none';
+            a.href = url;
+            a.download = 'duong.xlsx';
+            document.body.appendChild(a);
+            a.click();
+
+            window.URL.revokeObjectURL(url);
             toast.success('Xuất dữ liệu thành công!');
-            toggle2();
+            setSelectedDate(null);
         } catch (error) {
-            
             console.error('Lỗi khi xuất dữ liệu:', error);
             toast.error('Có lỗi xảy ra khi xuất dữ liệu.');
         }
     };
+
 
     return (
         <>
@@ -572,10 +548,17 @@ const Confirm = () => {
                         </Col>
 
                         <Col className="text-right">
-                            <Button color="secondary" outline size="sm" onClick={toggle2}>
-                                <i class="fa-solid fa-arrow-up-from-bracket" />&nbsp;
-                                Export
-                            </Button>
+                            <DatePicker value={selectedDate} onChange={(date) => setSelectedDate(date)} />
+                            <Popconfirm
+                                title="Xác nhận xuất dữ liệu?"
+                                onConfirm={handleExport}
+                                okText="Xác nhận"
+                                cancelText="Hủy"
+                            >
+                                <Button className="ml-2 bg-gradient-info" size="sm">
+                                    <i className="fa-solid fa-arrow-up-from-bracket" style={{ color: "#fff" }} />
+                                </Button>
+                            </Popconfirm>
                         </Col>
 
                     </Row>
@@ -630,11 +613,17 @@ const Confirm = () => {
 
                                             <td>{format(new Date(confirm.createdTime), 'dd-MM-yyyy HH:mm', { locale: vi })}</td>
                                             <td className="text-center d-flex">
-                                                <Tooltip
-                                                    content="Xác nhận"
-                                                    direction="up"
-                                                >
-                                                    <Button color="link" size="sm" onClick={() => handleConfirmDetail(confirm.id)}><FaRegHandPointLeft /></Button>
+                                                <Tooltip title="Xác nhận">
+                                                    <Popconfirm
+                                                        title="Xác nhận đơn hàng?"
+                                                        onConfirm={() => handleConfirmDetail(confirm.id)}
+                                                        okText="Xác nhận"
+                                                        cancelText="Hủy"
+                                                    >
+                                                        <Button color="link" size="sm">
+                                                            <FaRegHandPointLeft />
+                                                        </Button>
+                                                    </Popconfirm>
                                                 </Tooltip>
                                                 <Button color="link" size="sm" onClick={() => handleRowClick(confirm.id, confirm)}><FaRegEdit /></Button>
                                             </td>
@@ -653,7 +642,6 @@ const Confirm = () => {
 
                     </Row>
 
-                    <ToastContainer />
 
                     <Row className="mt-4">
                         <Col lg={6}>
@@ -1118,14 +1106,6 @@ const Confirm = () => {
 
                     </Modal >
 
-                    <Modal isOpen={modal2} toggle={toggle2} style={{ maxWidth: '235px', left: 'unset', right: 0, position: 'fixed',marginRight: 50, top: 70 }}>
-                        <ModalBody>
-                            <DatePicker onChange={(date) => setSelectedDate(date)}/>
-                            <Button className="ml-2" color="danger" size="sm" onClick={handleExport}>
-                                <i class="fa-solid fa-arrow-up-from-bracket" />
-                            </Button>
-                        </ModalBody>
-                    </Modal>
                 </Col>
             </Row>
         </>

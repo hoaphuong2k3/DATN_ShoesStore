@@ -13,7 +13,7 @@ import {
     Card, CardHeader, CardBody, Container, Row, Col, Form, FormGroup, InputGroup, InputGroupAddon, InputGroupText,
     Input, Button, Table, Modal, ModalBody, ModalFooter, ModalHeader, Badge, Label
 } from "reactstrap";
-
+import { Tooltip, Popconfirm } from 'antd';
 
 const Promotion = () => {
 
@@ -330,37 +330,31 @@ const Promotion = () => {
 
     //delete Promotion
     const deleteDiscount = (id) => {
-        if (window.confirm("Bạn có chắc chắn muốn xóa khuyến mại này không?")) {
-            axiosInstance.delete(`/admin/discount-period/deleteDiscountPeriod/${id}`)
-                .then(response => {
-                    fetchData();
-                    toast.success("Xóa thành công");
-                    resetForm();
-                })
-                .catch(error => {
-                    console.error('Lỗi khi xóa dữ liệu:', error);
-                });
-        }
+
+        axiosInstance.delete(`/admin/discount-period/deleteDiscountPeriod/${id}`)
+            .then(response => {
+                fetchData();
+                toast.success("Xóa thành công");
+                resetForm();
+            })
+            .catch(error => {
+                console.error('Lỗi khi xóa dữ liệu:', error);
+            });
+
     };
     const handleDeleteButtonClick = () => {
-        if (selectedItems.length > 0) {
-            const confirmed = window.confirm("Bạn có chắc chắn muốn xóa các khuyến mại đã chọn không?");
 
-            if (confirmed) {
-                const idsToDelete = selectedItems.join(',');
-
-                axiosInstance.delete(`/admin/discount-period/deleteDiscountPeriodAll?deleteAll=${idsToDelete}`)
-                    .then(response => {
-                        fetchData();
-                        toast.success("Xóa thành công");
-                        setSelectedItems([]);
-                        setSelectAll(false);
-                    })
-                    .catch(error => {
-                        console.error('Lỗi khi xóa dữ liệu:', error);
-                    });
-            }
-        }
+        const idsToDelete = selectedItems.join(',');
+        axiosInstance.delete(`/admin/discount-period/deleteDiscountPeriodAll?deleteAll=${idsToDelete}`)
+            .then(response => {
+                fetchData();
+                toast.success("Xóa thành công");
+                setSelectedItems([]);
+                setSelectAll(false);
+            })
+            .catch(error => {
+                console.error('Lỗi khi xóa dữ liệu:', error);
+            })
     };
 
     // FreeGift //
@@ -536,13 +530,16 @@ const Promotion = () => {
 
                                         <div className="col text-right">
                                             {showActions && (
-                                                <Button
-                                                    color="danger" outline
-                                                    size="sm"
-                                                    onClick={handleDeleteButtonClick}
+                                                <Popconfirm
+                                                    title="Bạn có chắc muốn xóa?"
+                                                    onConfirm={() => handleDeleteButtonClick()}
+                                                    okText="Xóa"
+                                                    cancelText="Hủy"
                                                 >
-                                                    Xóa tất cả
-                                                </Button>
+                                                    <Button color="danger" outline size="sm">
+                                                        Xóa tất cả
+                                                    </Button>
+                                                </Popconfirm>
                                             )}
                                         </div>
                                     </Row>
@@ -664,13 +661,30 @@ const Promotion = () => {
 
                                                             <td style={{ position: "sticky", zIndex: '1', right: '0', background: "#fff" }}>
                                                                 {discount.status === 0 &&
-                                                                    <Button color="link" size="sm" onClick={() => lock(discount.id)} ><FaLockOpen /></Button>
+                                                                    <Tooltip title="Ngừng kích hoạt">
+                                                                        <Button color="link" size="sm" ><FaLockOpen onClick={() => lock(discount.id)} /></Button>
+                                                                    </Tooltip>
                                                                 }
                                                                 {(discount.status === 1 || discount.status === 2) &&
-                                                                    <Button color="link" size="sm" onClick={() => openlock(discount.id)} ><FaLock /></Button>
+                                                                    <Tooltip title="Kích hoạt">
+                                                                        <Button color="link" size="sm" ><FaLock onClick={() => openlock(discount.id)} /></Button>
+                                                                    </Tooltip>
                                                                 }
-                                                                <Button color="link" size="sm" onClick={() => handleRowClick(discount)}><FaEdit /></Button>
-                                                                <Button color="link" size="sm" onClick={() => deleteDiscount(discount.id)}> <FaTrash /></Button>
+
+                                                                <Tooltip title="Chỉnh sửa">
+                                                                    <Button color="link" size="sm" onClick={() => handleRowClick(discount)}><FaEdit /></Button>
+                                                                </Tooltip>
+
+                                                                <Popconfirm
+                                                                    title="Bạn có chắc muốn xóa?"
+                                                                    onConfirm={() => deleteDiscount(discount.id)}
+                                                                    okText="Xóa"
+                                                                    cancelText="Hủy"
+                                                                >
+                                                                    <Tooltip title="Xóa">
+                                                                        <Button color="link" size="sm"><FaTrash /></Button>
+                                                                    </Tooltip>
+                                                                </Popconfirm>
                                                             </td>
 
                                                         </tr>
@@ -723,8 +737,6 @@ const Promotion = () => {
 
                                     </Row>
                                 </div>
-                                <ToastContainer />
-
 
                                 {/* Promotion */}
                                 <Modal

@@ -13,28 +13,22 @@ import EditProduct from "views/admin/product/EditProduct";
 import DetailProducts from "views/admin/product/DetailProduct.js";
 import ListShoesDetail from "views/admin/product/ListShoesDetail.js";
 import Discount from "views/admin/discount/Discount.js";
-import Delivery from "views/admin/transaction/Delivery.js";
 import Sell from "views/admin/sells/DirectSales.js";
-import Partner from "views/admin/Partner.js";
+
 var routes = [
   {
-    path: "/index",
+    path: "/chart",
     component: <Index />,
     layout: "/admin",
   },
   {
-    path: "/direct-sales",
+    path: "/index",
     component: <Sell />,
     layout: "/admin",
   },
   {
     path: "/bills",
     component: <Bills />,
-    layout: "/admin",
-  },
-  {
-    path: "/delivery",
-    component: <Delivery />,
     layout: "/admin",
   },
   {
@@ -100,11 +94,6 @@ var routes = [
   {
     path: "/shoesdetail/:id",
     component: <ListShoesDetail />,
-    layout: "/admin",
-  },
-  {
-    path: "/partner",
-    component: <Partner />,
     layout: "/admin",
   }
 ];

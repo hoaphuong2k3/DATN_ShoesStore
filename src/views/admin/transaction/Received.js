@@ -8,6 +8,8 @@ import { vi } from 'date-fns/locale';
 import { Badge, Row, Col, Button, Table, Input, FormGroup, InputGroup, InputGroupAddon, InputGroupText, Modal, ModalBody, ModalFooter, ModalHeader, Label, Form } from "reactstrap";
 import { FaRegEdit, FaSearch } from 'react-icons/fa';
 import ReactPaginate from 'react-paginate';
+import { toast } from "react-toastify";
+import { DatePicker, Popconfirm} from 'antd';
 
 const Received = ({ updateData }) => {
 
@@ -215,6 +217,47 @@ const Received = ({ updateData }) => {
         }
     };
 
+     //Export
+     const [selectedDate, setSelectedDate] = useState(null);
+
+     const handleExport = async () => {
+         try {
+           
+             let requestData = {
+                 status: 6,
+             };
+     
+             if (selectedDate) {
+                 requestData.date = selectedDate.format('YYYY-MM-DD');
+             }
+     
+             const response = await axiosInstance.get('/order/admin/export', {
+                 params: requestData,
+                 responseType: 'blob',
+                 headers: {
+                     'Content-Type': 'application/json',
+                 },
+             });
+     
+             const blob = new Blob([response], { type: 'application/excel' });
+     
+             const url = window.URL.createObjectURL(blob);
+             const a = document.createElement('a');
+             a.style.display = 'none';
+             a.href = url;
+             a.download = 'duong.xlsx';
+             document.body.appendChild(a);
+             a.click();
+     
+             window.URL.revokeObjectURL(url);
+             toast.success('Xuất dữ liệu thành công!');
+             setSelectedDate(null);
+         } catch (error) {
+             console.error('Lỗi khi xuất dữ liệu:', error);
+             toast.error('Có lỗi xảy ra khi xuất dữ liệu.');
+         }
+     };
+
     return (
         <>
             <Row >
@@ -233,6 +276,20 @@ const Received = ({ updateData }) => {
                                     </InputGroupText>
                                 </InputGroupAddon>
                             </InputGroup>
+                        </Col>
+
+                        <Col className="text-right">
+                            <DatePicker value={selectedDate} onChange={(date) => setSelectedDate(date)} />
+                            <Popconfirm
+                                title="Xác nhận xuất dữ liệu?"
+                                onConfirm={handleExport}
+                                okText="Xác nhận"
+                                cancelText="Hủy"
+                            >
+                                <Button className="ml-2 bg-gradient-info" size="sm">
+                                    <i className="fa-solid fa-arrow-up-from-bracket" style={{ color: "#fff" }} />
+                                </Button>
+                            </Popconfirm>
                         </Col>
 
                     </Row>
