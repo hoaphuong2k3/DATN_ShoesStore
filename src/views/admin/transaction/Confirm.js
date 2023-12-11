@@ -10,6 +10,7 @@ import 'react-confirm-alert/src/react-confirm-alert.css';
 import 'react-toastify/dist/ReactToastify.css';
 import Tooltip from 'react-tooltip-lite';
 import ReactPaginate from 'react-paginate';
+import { DatePicker } from 'antd';
 import { Badge, Row, Col, Button, Table, Input, FormGroup, InputGroup, InputGroupAddon, InputGroupText, Modal, ModalBody, ModalFooter, ModalHeader, Label, Form } from "reactstrap";
 import { FaRegEdit, FaSearch, FaMinus, FaPlus, FaTrash, FaRegHandPointLeft } from 'react-icons/fa';
 
@@ -17,6 +18,9 @@ const Confirm = () => {
 
     const [modal, setModal] = useState(false);
     const toggle = () => setModal(!modal);
+
+    const [modal2, setModal2] = useState(false);
+    const toggle2 = () => setModal2(!modal2);
 
     const storedUserId = localStorage.getItem("userId");
     const [totalPages, setTotalPages] = useState(0);
@@ -498,6 +502,55 @@ const Confirm = () => {
         }
     }, [isProductDeleted]);
 
+    //Export
+    const [selectedDate, setSelectedDate] = useState(null);
+
+    const handleExport = async () => {
+
+        if (!selectedDate) {
+            console.error('Vui lòng chọn ngày trước khi xuất dữ liệu.');
+            return;
+        }
+
+        const requestData = {
+            date: selectedDate.format('YYYY-MM-DD'), 
+            status: 0, 
+        };
+
+        console.log(requestData.date);
+
+        try {
+            // Gọi API sử dụng axios
+            const response = await axiosInstance.get('/order/admin/export', requestData, {
+                responseType: 'blob',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+              });
+        
+              const blob = new Blob([response.data], { type: 'application/excel' });
+        
+              // Tạo một URL cho Blob và tạo một thẻ a để download
+              const url = window.URL.createObjectURL(blob);
+              const a = document.createElement('a');
+              a.style.display = 'none';
+              a.href = url;
+              a.download = 'Export_Bills.xlsx';
+              document.body.appendChild(a);
+              a.click();
+        
+              // Giải phóng tài nguyên
+              window.URL.revokeObjectURL(url);
+            console.log('Dữ liệu xuất thành công:', response.data);
+            toast.success('Xuất dữ liệu thành công!');
+            toggle2();
+        } catch (error) {
+            
+            console.error('Lỗi khi xuất dữ liệu:', error);
+            toast.error('Có lỗi xảy ra khi xuất dữ liệu.');
+        }
+    };
+
     return (
         <>
             <Row >
@@ -516,6 +569,13 @@ const Confirm = () => {
                                     </InputGroupText>
                                 </InputGroupAddon>
                             </InputGroup>
+                        </Col>
+
+                        <Col className="text-right">
+                            <Button color="secondary" outline size="sm" onClick={toggle2}>
+                                <i class="fa-solid fa-arrow-up-from-bracket" />&nbsp;
+                                Export
+                            </Button>
                         </Col>
 
                     </Row>
@@ -1057,6 +1117,15 @@ const Confirm = () => {
                         </ModalFooter>
 
                     </Modal >
+
+                    <Modal isOpen={modal2} toggle={toggle2} style={{ maxWidth: '235px', left: 'unset', right: 0, position: 'fixed',marginRight: 50, top: 70 }}>
+                        <ModalBody>
+                            <DatePicker onChange={(date) => setSelectedDate(date)}/>
+                            <Button className="ml-2" color="danger" size="sm" onClick={handleExport}>
+                                <i class="fa-solid fa-arrow-up-from-bracket" />
+                            </Button>
+                        </ModalBody>
+                    </Modal>
                 </Col>
             </Row>
         </>

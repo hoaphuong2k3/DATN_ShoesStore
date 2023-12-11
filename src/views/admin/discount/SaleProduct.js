@@ -7,13 +7,17 @@ import "react-toastify/dist/ReactToastify.css";
 import axiosInstance from "services/custommize-axios";
 import { getAllShoes } from "services/Product2Service";
 import { getAllShoesDetail2 } from "services/ShoesDetailService.js";
+import {
+    getAllBrand, getAllOrigin, getAllDesignStyle, getAllSkinType,
+    getAllToe, getAllSole, getAllLining, getAllCushion
+} from "services/ProductAttributeService";
 import { format, parseISO } from 'date-fns';
 import { vi } from 'date-fns/locale';
 import "assets/css/pagination.css";
 // reactstrap components
 import {
     Row, Col, Form, FormGroup, Input, Button, Table, Badge, InputGroup, InputGroupAddon, InputGroupText,
-    Modal, ModalBody, ModalFooter, ModalHeader
+    Modal, ModalBody, ModalFooter, ModalHeader, Label
 } from "reactstrap";
 
 const SaleProduct = () => {
@@ -39,6 +43,9 @@ const SaleProduct = () => {
     const [fourModal, setFourModal] = useState(false);
     const toggleFourModal = () => setFourModal(!fourModal);
 
+    const [fiveModal, setFiveModal] = useState(false);
+    const toggleFiveModal = () => setFiveModal(!fiveModal);
+
     const [discounts, setDiscounts] = useState([]);
     const [totalElements, setTotalElements] = useState(0);
     const [totalPages, setTotalPages] = useState(0);
@@ -56,7 +63,15 @@ const SaleProduct = () => {
     const [selectedShoesDetails, setSelectedShoesDetails] = useState([]);
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [reloadInterval, setReloadInterval] = useState(null);
-
+    const [searchTerm, setSearchTerm] = useState('');
+    const [listBrand, setListBrand] = useState([]);
+    const [listorigin, setListOrigin] = useState([]);
+    const [listDesignStyle, setListDesignStyle] = useState([]);
+    const [listSkinStype, setListSkinType] = useState([]);
+    const [listToe, setListToe] = useState([]);
+    const [listSole, setListSole] = useState([]);
+    const [listLining, setListLining] = useState([]);
+    const [listCushion, setListCushion] = useState([]);
 
     const [search2, setSearch2] = useState({
         code: "",
@@ -83,8 +98,79 @@ const SaleProduct = () => {
         toDateStr: "",
         createdBy: ""
     });
+    const resetSearch = () => {
+        setSearch({
+            code: "",
+            name: "",
+            brandId: "",
+            originId: "",
+            designStyleId: "",
+            skinTypeId: "",
+            soleId: "",
+            liningId: "",
+            toeId: "",
+            cushionId: "",
+            fromPrice: "",
+            toPrice: "",
+            fromQuantity: "",
+            toQuantity: "",
+            fromDateStr: "",
+            toDateStr: "",
+            createdBy: ""
+        })
+    };
     const [sort, setSort] = useState('');
     const [sortStyle, setSortStyle] = useState('');
+
+    const getlistBrand = async () => {
+        let res = await getAllBrand();
+        console.log(res);
+        if (res && res.data) {
+            setListBrand(res.data);
+        }
+    }
+    const getListOrigin = async () => {
+        let res = await getAllOrigin();
+        if (res && res.data) {
+            setListOrigin(res.data);
+        }
+    }
+    const getListDesignStyle = async () => {
+        let res = await getAllDesignStyle();
+        if (res && res.data) {
+            setListDesignStyle(res.data);
+        }
+    }
+    const getListSkinType = async () => {
+        let res = await getAllSkinType();
+        if (res && res.data) {
+            setListSkinType(res.data);
+        }
+    }
+    const getListToe = async () => {
+        let res = await getAllToe();
+        if (res && res.data) {
+            setListToe(res.data);
+        }
+    }
+    const getListSole = async () => {
+        let res = await getAllSole();
+        if (res && res.data) {
+            setListSole(res.data);
+        }
+    }
+    const getListLining = async () => {
+        let res = await getAllLining();
+        if (res && res.data) {
+            setListLining(res.data);
+        }
+    }
+    const getListCushion = async () => {
+        let res = await getAllCushion();
+        if (res && res.data) {
+            setListCushion(res.data);
+        }
+    }
 
     const getAll1 = async () => {
         try {
@@ -96,9 +182,27 @@ const SaleProduct = () => {
             setListShoes([]);
         }
     }
+
     useEffect(() => {
         getAll1(page, size);
-    }, [search, sort, sortStyle]);
+        getlistBrand();
+        getListOrigin();
+        getListDesignStyle();
+        getListSkinType();
+        getListToe();
+        getListSole();
+        getListLining();
+        getListCushion();
+    }, []);
+
+    useEffect(() => {
+        getAll1(page, size);
+    },[search, sort, sortStyle]);
+    
+    const onInputChange = (e) => {
+        setSearch({ ...search, [e.target.name]: e.target.value });
+    };
+
 
     //loads productDetail
     const handleEditButtonClick = async (shoesId) => {
@@ -914,8 +1018,26 @@ const SaleProduct = () => {
                         <Row className="align-items-center mb-3">
                             <div className="col" style={{ display: "flex" }}>
                                 <h3 className="heading-small text-black mb-0">Áp dụng với sản phẩm:</h3>
-                            </div>
 
+                                <Col >
+                                    <InputGroup size="sm" style={{ width: 300, float: "right" }}>
+                                        <Input type="search"
+                                            placeholder="Tìm kiếm mã, tên sản phẩm..."
+                                            value={searchTerm}
+                                            onChange={(e) => setSearchTerm(e.target.value)}
+                                        />
+                                        <InputGroupAddon addonType="append">
+                                            <InputGroupText>
+                                                <FaSearch />
+                                            </InputGroupText>
+                                        </InputGroupAddon>
+                                    </InputGroup>
+                                </Col>
+
+                                <Button color="link" outline size="sm" onClick={toggleFiveModal}>
+                                    <FaFilter size="16px" />
+                                </Button>
+                            </div>
                         </Row>
 
                         <Table bordered hover responsive>
@@ -946,34 +1068,39 @@ const SaleProduct = () => {
                                 </tr>
                             </thead>
                             <tbody>
-                                {listShoes.map((shoes, index) => (
-                                    <tr key={shoes.id}>
-                                        <td className="text-center">
-                                            <FormGroup check>
-                                                <Input
-                                                    type="checkbox"
-                                                    checked={selectedShoesIds.includes(shoes.id)}
-                                                    onChange={() => handleShoesCheckboxChange(shoes.id)}
-                                                />
-                                            </FormGroup>
-                                        </td>
-                                        <td>{shoes.code}</td>
-                                        <td>{shoes.name}</td>
-                                        <td>{shoes.brand}</td>
-                                        <td>{shoes.origin}</td>
-                                        <td>{shoes.designStyle}</td>
-                                        <td>{shoes.skinType}</td>
-                                        <td>{shoes.toe}</td>
-                                        <td>{shoes.sole}</td>
-                                        <td>{shoes.lining}</td>
-                                        <td>{shoes.cushion}</td>
+                                {listShoes
+                                    .filter((shoes) =>
+                                        shoes.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                                        shoes.name.toLowerCase().includes(searchTerm.toLowerCase())
+                                    )
+                                    .map((shoes, index) => (
+                                        <tr key={shoes.id}>
+                                            <td className="text-center">
+                                                <FormGroup check>
+                                                    <Input
+                                                        type="checkbox"
+                                                        checked={selectedShoesIds.includes(shoes.id)}
+                                                        onChange={() => handleShoesCheckboxChange(shoes.id)}
+                                                    />
+                                                </FormGroup>
+                                            </td>
+                                            <td>{shoes.code}</td>
+                                            <td>{shoes.name}</td>
+                                            <td>{shoes.brand}</td>
+                                            <td>{shoes.origin}</td>
+                                            <td>{shoes.designStyle}</td>
+                                            <td>{shoes.skinType}</td>
+                                            <td>{shoes.toe}</td>
+                                            <td>{shoes.sole}</td>
+                                            <td>{shoes.lining}</td>
+                                            <td>{shoes.cushion}</td>
 
-                                        <td className="text-right">{formatter.format(shoes.priceMin)} - {formatter.format(shoes.priceMax)}</td>
-                                        <td className="text-center" style={{ position: "sticky", zIndex: '1', right: '0', background: "#fff" }}>
-                                            <Button color="link" size="sm" onClick={() => handleEditButtonClick(shoes.id)}><FaEdit /></Button>
-                                        </td>
-                                    </tr>
-                                ))}
+                                            <td className="text-right">{formatter.format(shoes.priceMin)} - {formatter.format(shoes.priceMax)}</td>
+                                            <td className="text-center" style={{ position: "sticky", zIndex: '1', right: '0', background: "#fff" }}>
+                                                <Button color="link" size="sm" onClick={() => handleEditButtonClick(shoes.id)}><FaEdit /></Button>
+                                            </td>
+                                        </tr>
+                                    ))}
 
                             </tbody>
                         </Table>
@@ -1102,7 +1229,7 @@ const SaleProduct = () => {
                 </ModalFooter>
 
             </Modal>
-            {/* Lọc */}
+            {/* Lọc KM*/}
             <Modal
                 isOpen={thirdModal}
                 toggle={toggleThirdModal}
@@ -1218,6 +1345,262 @@ const SaleProduct = () => {
                             </Button>
                         </div>
                     </div>
+                </ModalFooter>
+
+            </Modal>
+
+            {/* Lọc Product */}
+            <Modal
+                isOpen={fiveModal}
+                toggle={toggleFiveModal}
+                style={{ maxWidth: '400px', right: 'unset', left: 0, position: 'fixed', marginLeft: '252px', marginRight: 0 }}
+                backdrop={false}
+            >
+                <ModalHeader toggle={toggleFiveModal}>
+                    <h3 className="heading-small text-muted mb-0">Bộ lọc tìm kiếm</h3>
+                </ModalHeader>
+                <ModalBody style={{ paddingTop: 0, paddingBottom: 0 }}>
+                    <Form>
+                        <Row>
+                            <Col lg="6">
+                                <FormGroup>
+                                    <label
+                                        className="form-control-label"
+                                        style={{ fontSize: 13 }}
+                                    >
+                                        Hãng
+                                    </label>
+                                    <Input id="btn_select_tt" type="select" name="brandId" value={search.brandId}
+                                        className="form-control-alternative"
+                                        size="sm"
+                                        onChange={(e) => onInputChange(e)}>
+                                        <option value=" "> -- Chọn --  </option>
+                                        {listBrand && listBrand.length > 0 &&
+                                            listBrand.map((item, index) => {
+                                                return (
+                                                    <option value={item.id} key={item.id} >
+                                                        {item.name}
+                                                    </option>
+                                                )
+
+                                            })
+                                        }
+                                    </Input>
+                                </FormGroup>
+                            </Col>
+                            <Col lg="6">
+                                <FormGroup>
+                                    <label
+                                        className="form-control-label"
+                                        style={{ fontSize: 13 }}
+                                    >
+                                        Xuất xứ
+                                    </label>
+                                    <Input id="btn_select_tt" name="originId" type="select" value={search.originId}
+                                        className="form-control-alternative"
+                                        size="sm"
+                                        onChange={(e) => onInputChange(e)}>
+                                        <option value="" > -- Chọn --  </option>
+                                        {listorigin && listorigin.length > 0 &&
+                                            listorigin.map((item, index) => {
+                                                return (
+                                                    <option value={item.id} key={item.id}>
+                                                        {item.name}
+                                                    </option>
+                                                )
+
+                                            })
+                                        }
+                                    </Input>
+                                </FormGroup>
+                            </Col>
+                            <Col lg="6">
+                                <FormGroup>
+                                    <label
+                                        className="form-control-label"
+                                        style={{ fontSize: 13 }}
+                                    >
+                                        Thiết kế
+                                    </label>
+                                    <Input id="btn_select_tt" name="designStyleId" type="select" value={search.designStyleId}
+                                        onChange={(e) => onInputChange(e)} className="form-control-alternative" size="sm">
+                                        <option value="" > -- Chọn --  </option>
+                                        {listDesignStyle && listDesignStyle.length > 0 &&
+                                            listDesignStyle.map((item, index) => {
+                                                return (
+                                                    <option value={item.id} key={item.id}>
+                                                        {item.name}
+                                                    </option>
+                                                )
+
+                                            })
+                                        }
+                                    </Input>
+                                </FormGroup>
+                            </Col>
+
+                            <Col lg="6">
+                                <FormGroup>
+                                    <label
+                                        className="form-control-label"
+                                        style={{ fontSize: 13 }}
+                                    >
+                                        Loại da
+                                    </label>
+                                    <Input id="btn_select_tt" name="skinTypeId" type="select" value={search.skinTypeId}
+                                        onChange={(e) => onInputChange(e)} className="form-control-alternative" size="sm">
+                                        <option value="" > -- Chọn --  </option>
+                                        {listSkinStype && listSkinStype.length > 0 &&
+                                            listSkinStype.map((item, index) => {
+                                                return (
+                                                    <option value={item.id} key={item.id}>
+                                                        {item.name}
+                                                    </option>
+                                                )
+
+                                            })
+                                        }
+                                    </Input>
+                                </FormGroup>
+                            </Col>
+                            <Col lg="6">
+                                <FormGroup>
+                                    <label
+                                        className="form-control-label"
+                                        style={{ fontSize: 13 }}
+                                    >
+                                        Mũi giày
+                                    </label>
+                                    <Input id="btn_select_tt" name="toeId" type="select" value={search.toeId}
+                                        onChange={(e) => onInputChange(e)} className="form-control-alternative" size="sm">
+                                        <option value="" > -- Chọn --  </option>
+                                        {listToe && listToe.length > 0 &&
+                                            listToe.map((item, index) => {
+                                                return (
+                                                    <option value={item.id} key={item.id}>
+                                                        {item.name}
+                                                    </option>
+                                                )
+
+                                            })
+                                        }
+                                    </Input>
+                                </FormGroup>
+                            </Col>
+                            <Col lg="6">
+                                <FormGroup>
+                                    <label
+                                        className="form-control-label"
+                                        style={{ fontSize: 13 }}
+                                    >
+                                        Đế giày
+                                    </label>
+                                    <Input id="btn_select_tt" name="soleId" type="select" value={search.soleId}
+                                        onChange={(e) => onInputChange(e)} className="form-control-alternative" size="sm">
+                                        <option value="" > -- Chọn --  </option>
+                                        {listSole && listSole.length > 0 &&
+                                            listSole.map((item, index) => {
+                                                return (
+                                                    <option value={item.id} key={item.id}>
+                                                        {item.name}
+                                                    </option>
+                                                )
+
+                                            })
+                                        }
+                                    </Input>
+                                </FormGroup>
+                            </Col>
+                            <Col lg="6">
+                                <FormGroup>
+                                    <label
+                                        className="form-control-label"
+                                        style={{ fontSize: 13 }}
+                                    >
+                                        Lót giày
+                                    </label>
+                                    <Input id="btn_select_tt" name="liningId" type="select" value={search.liningId}
+                                        onChange={(e) => onInputChange(e)} className="form-control-alternative" size="sm">
+                                        <option value="" > -- Chọn --  </option>
+                                        {listLining && listLining.length > 0 &&
+                                            listLining.map((item, index) => {
+                                                return (
+                                                    <option value={item.id} key={item.id}>
+                                                        {item.name}
+                                                    </option>
+                                                )
+
+                                            })
+                                        }
+                                    </Input>
+                                </FormGroup>
+                            </Col>
+
+                            <Col lg="6">
+                                <FormGroup>
+                                    <label
+                                        className="form-control-label"
+                                        style={{ fontSize: 13 }}
+                                    >
+                                        Đệm giày
+                                    </label>
+                                    <Input id="btn_select_tt" name="cushionId" type="select" value={search.cushionId}
+                                        onChange={(e) => onInputChange(e)} className="form-control-alternative" size="sm">
+                                        <option value=" "> -- Chọn --  </option>
+                                        {listCushion && listCushion.length > 0 &&
+                                            listCushion.map((item, index) => {
+                                                return (
+                                                    <option value={item.id} key={item.id}>
+                                                        {item.name}
+                                                    </option>
+                                                )
+
+                                            })
+                                        }
+                                    </Input>
+                                </FormGroup>
+                            </Col>
+
+                            <Col>
+                                <FormGroup>
+
+                                    <Row>
+                                        <Col xl={6}>
+                                            <Label style={{ fontSize: 13 }} className="form-control-label">
+                                                Giá từ:
+                                            </Label>
+                                            <Input size="sm"
+                                                className="form-control-alternative"
+                                                id="find_code"
+                                                name="fromPrice"
+                                                value={search.fromPrice}
+                                                onChange={(e) => onInputChange(e)}
+                                            />
+                                        </Col>
+
+                                        <Col xl={6}>
+                                            <Label style={{ fontSize: 13 }} className="form-control-label">
+                                                đến:
+                                            </Label>
+                                            <Input size="sm"
+                                                className="form-control-alternative"
+                                                id="find_code"
+                                                name="toPrice"
+                                                value={search.toPrice}
+                                                onChange={(e) => onInputChange(e)}
+                                            />
+                                        </Col>
+                                    </Row>
+                                </FormGroup>
+                            </Col>
+                        </Row>
+
+                    </Form>
+                </ModalBody>
+                <ModalFooter>
+                    <Button color="primary" outline size="sm" block onClick={resetSearch}>
+                        Làm mới
+                    </Button>
                 </ModalFooter>
 
             </Modal>

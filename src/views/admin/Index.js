@@ -1,8 +1,6 @@
 
 import React, { useState, useEffect } from "react";
 import axiosInstance from "services/custommize-axios";
-import classnames from "classnames";
-import Chart from "chart.js";
 import { Line, Bar } from "react-chartjs-2";
 // reactstrap components
 import {
@@ -10,10 +8,6 @@ import {
   Card,
   CardHeader,
   CardBody,
-  NavItem,
-  NavLink,
-  Nav,
-  Progress,
   Table,
   Container,
   Row,
@@ -25,19 +19,30 @@ import {
 import {
   chartOptions,
   parseOptions,
-  chartExample1,
-  chartExample2,
 } from "variables/charts.js";
-import { format, parseISO, getMonth, startOfMonth, endOfMonth, eachDayOfInterval, isBefore } from 'date-fns';
+import {
+  format, getMonth, startOfMonth, endOfMonth, eachDayOfInterval,
+  isBefore, startOfYear, endOfYear, eachMonthOfInterval
+} from 'date-fns';
 import Header from "components/Headers/AdminHeader.js";
 
 const Index = (props) => {
-  const [activeNav, setActiveNav] = useState(1);
+
   const [chartExample1Data, setChartExample1Data] = useState({
     labels: [],
     datasets: [
       {
-        label: "Performance",
+        label: "Doanh thu",
+        data: [],
+      },
+    ],
+  });
+
+  const [chartExample2, setChartExample2] = useState({
+    labels: [],
+    datasets: [
+      {
+        label: "Doanh thu",
         data: [],
       },
     ],
@@ -85,17 +90,53 @@ const Index = (props) => {
     fetchData();
   }, []);
 
-  const toggleNavs = (e, index) => {
-    e.preventDefault();
-    setActiveNav(index);
-    setChartExample1Data("data" + index);
-  };
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axiosInstance.get(
+          "/statistics/data-product-year"
+        );
+
+        const apiData = response.data;
+        const allMonthsOfYear = eachMonthOfInterval({
+          start: startOfYear(new Date()),
+          end: endOfYear(new Date())
+        });
+
+        // Điền vào dữ liệu tương ứng từ API hoặc set giá trị là 0 nếu không có dữ liệu
+        const labels = allMonthsOfYear.map((month) => format(month, 'MM'));
+        const datasets = [
+          {
+            label: "Doanh thu",
+            data: allMonthsOfYear.map((month) => {
+              const isoDate = format(month, 'MM-yyyy');
+              const matchingData = apiData.find((item) => item.data.length > 0 && item.data[0].createdTime === isoDate);
+              return matchingData ? matchingData.data[0].totalPayment : 0;
+            }),
+          },
+        ];
+        // Sửa đổi state để cập nhật dữ liệu của biểu đồ
+        setChartExample2({
+          labels: labels,
+          datasets: datasets,
+        });
+      } catch (error) {
+        console.error("Lỗi khi lấy dữ liệu:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const currentDate = new Date();
   const getMonthDes = () => {
     const monthNumber = getMonth(currentDate) + 1;
     const year = currentDate.getFullYear();
     return `${monthNumber}/${year}`;
+  };
+  const getYearDes = () => {
+    const year = currentDate.getFullYear();
+    return `${year}`;
   };
 
   const [productTop, setProductTop] = useState([]);
@@ -143,7 +184,7 @@ const Index = (props) => {
                       Doanh thu T{getMonthDes()}
                     </h6>
                   </div>
-                
+
                 </Row>
               </CardHeader>
               <CardBody>
@@ -160,13 +201,13 @@ const Index = (props) => {
           </Col>
         </Row>
         <Row className="mt-5">
-        <Col className="mb-5 mb-xl-0" xl="8">
+          <Col className="mb-5 mb-xl-0" xl="8">
             <Card className="shadow">
               <CardHeader className="bg-transparent">
                 <Row className="align-items-center">
-                <div className="col">
-                    <h6 className="text-uppercase text-white ls-1 mb-1">
-                      Doanh thu Năm
+                  <div className="col">
+                    <h6 className="text-uppercase ls-1 mb-1">
+                      Doanh thu Năm {getYearDes()}
                     </h6>
                   </div>
                 </Row>
@@ -174,20 +215,21 @@ const Index = (props) => {
               <CardBody>
                 <div className="chart">
                   <Bar
-                    data={chartExample2.data}
-                    options={chartExample2.options}
+                    data={chartExample2}
+                    options={chartOptions().defaults}
+                    getDatasetAtEvent={(e) => console.log(e)}
                   />
                 </div>
               </CardBody>
             </Card>
           </Col>
 
-          <Col className="mb-5 mb-xl-0" xl="4">
+          <Col xl="4">
             <Card className="shadow">
               <CardHeader className="border-0">
                 <Row className="align-items-center">
                   <div className="col">
-                    <h3 className="mb-0">Top 5 sản phẩm bán chạy nhất tháng {getMonthDes()}</h3>
+                    <h5 className="mb-0">Top 5 sản phẩm bán chạy nhất {getYearDes()}</h5>
                   </div>
                 </Row>
               </CardHeader>
@@ -213,8 +255,6 @@ const Index = (props) => {
                       </td>
                     </tr>
                   ))}
-
-
                 </tbody>
               </Table>
             </Card>

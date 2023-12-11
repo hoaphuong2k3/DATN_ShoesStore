@@ -132,7 +132,7 @@ const Header = () => {
                               {Math.abs(saleWeek.totalPayment - saleWeekBefore.totalPayment) <= 100 ? (
                                 <>{Math.round((saleWeek.totalPayment - saleWeekBefore.totalPayment) / saleWeekBefore.totalPayment * 100)}%</>
                               ) : (
-                                <>{Math.abs(saleWeek.totalPayment / saleWeekBefore.totalPayment).toFixed(2)} lần</>
+                                <>{Math.abs(saleWeek.totalPayment / saleWeekBefore.totalPayment).toFixed(1)} lần</>
                               )}
                             </>
                           ) : (

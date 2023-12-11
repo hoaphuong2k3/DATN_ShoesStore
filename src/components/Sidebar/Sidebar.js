@@ -29,11 +29,7 @@ import {
   RiStackLine,
   RiLineChartFill,
 } from "react-icons/ri";
-import {
-  SubMenu,
-  Menu,
-  MenuItem,
-} from "react-pro-sidebar";
+import { SubMenu, Menu, MenuItem } from "react-pro-sidebar";
 
 
 
@@ -64,7 +60,6 @@ const Sidebar1 = (props) => {
       className="navbar-vertical fixed-left navbar-light bg-white"
       expand="md"
       id="sidenav-main"
-      // style={{backgroundColor: ""}}
     >
       <Container fluid>
         {/* Toggler */}
@@ -77,14 +72,14 @@ const Sidebar1 = (props) => {
         </button>
         {/* Brand */}
         {logo ? (
-          <NavbarBrand className="pt-0" {...navbarBrandProps}>
+          <NavbarBrand className="p-0" {...navbarBrandProps}>
             <img 
               alt={logo.imgAlt}
               className="navbar-brand-img p-0"
               src={logo.imgSrc}
                style={{
-                width: "90%",
-                minHeight:"60px"
+                width: "80%",
+                minHeight:"58px"
                }}
             />
 
@@ -158,31 +153,29 @@ const Sidebar1 = (props) => {
           {/* Navigation */}
           <Nav navbar >
             <Menu style={{ fontSize: 15, color: "black" }}>
-              <MenuItem icon={<RiHome4Line />}>
+              <MenuItem icon={<RiHome4Line style={{color: "#1961fc"}}/>}>
                 <NavLink to="/admin/index" tag={Link} style={{ fontSize: 15, color: "black" }}>Tổng quan</NavLink>
               </MenuItem>
               <SubMenu
                 defaultOpen={false}
                 label={"Quản lý giao dịch"}
-                icon={<RiSwapBoxLine />}
+                icon={<RiSwapBoxLine style={{color: "#1961fc"}}/>}
               >
                 <MenuItem icon={<RiExchangeFundsLine />}><NavLink style={{ fontSize: 15, color: "black" }} to="/admin/direct-sales" tag={Link}>Bán hàng</NavLink></MenuItem>
                 <MenuItem icon={<RiExchangeFundsLine />}><NavLink style={{ fontSize: 15, color: "black" }} to="/admin/bills" tag={Link}>Hóa đơn</NavLink></MenuItem>
-                {/* <MenuItem icon={<RiExchangeFundsLine />}><NavLink style={{ fontSize: 15, color: "black" }} to="/admin/delivery" tag={Link}>Phiếu giao hàng</NavLink></MenuItem> */}
               </SubMenu>
               <SubMenu
                 defaultOpen={false}
                 label={"Quản lý sản phẩm"}
-                icon={<RiFolder2Line />}
+                icon={<RiFolder2Line style={{color: "#1961fc"}}/>}
               >
                 <MenuItem icon={<RiStackLine />}><NavLink style={{ fontSize: 15, color: "black" }} to="/admin/product" tag={Link}>Sản phẩm</NavLink></MenuItem>
                 <MenuItem icon={<RiStackLine />}><NavLink style={{ fontSize: 15, color: "black" }} to="/admin/product-attributes" tag={Link}>Thuộc tính</NavLink></MenuItem>
-                {/* <MenuItem icon={<RiStackLine />}><NavLink style={{ fontSize: 15, color: "black" }} to="/admin/product" tag={Link}>Thư viện hình ảnh</NavLink></MenuItem> */}
               </SubMenu>
               <SubMenu
                 defaultOpen={false}
                 label={"Quản lý tài khoản"}
-                icon={<RiTeamLine />}
+                icon={<RiTeamLine style={{color: "#1961fc"}}/>}
               >
                 <MenuItem icon={<RiFolderUserLine />}><NavLink style={{ fontSize: 15, color: "black" }} to="/admin/staff" tag={Link}>Nhân viên</NavLink></MenuItem>
                 <MenuItem icon={<RiFolderUserLine />}><NavLink style={{ fontSize: 15, color: "black" }} to="/admin/client" tag={Link}>Khách hàng</NavLink></MenuItem>
@@ -190,13 +183,12 @@ const Sidebar1 = (props) => {
               <SubMenu
                 defaultOpen={false}
                 label={"Quản lý khuyến mại"}
-                icon={<RiPriceTag2Line />}
+                icon={<RiPriceTag2Line style={{color: "#1961fc"}}/>}
               >
                 <MenuItem icon={<RiPriceTag3Line />}><NavLink style={{ fontSize: 15, color: "black" }} to="/admin/discount" tag={Link}>Voucher</NavLink></MenuItem>
                 <MenuItem icon={<RiPriceTag3Line />}><NavLink style={{ fontSize: 15, color: "black" }} to="/admin/promotion" tag={Link}>Đợt giảm giá</NavLink></MenuItem>
                 <MenuItem icon={<RiPriceTag3Line />}><NavLink style={{ fontSize: 15, color: "black" }} to="/admin/free-gift" tag={Link}>Quà tặng</NavLink></MenuItem>
               </SubMenu>
-              <MenuItem icon={<RiLineChartFill />}><NavLink style={{ fontSize: 15, color: "black" }} to="/admin/statistics" tag={Link}>Thống kê</NavLink></MenuItem>
             </Menu>
           </Nav>
 
