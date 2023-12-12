@@ -103,7 +103,7 @@ const ProductAttributes = () => {
     } else if (selecttt === 'skin_type') {
       if (window.confirm("Bạn có chắc chắn muốn xóa không?")) {
         try {
-          const response = await axiosInstance.delete(`/admin/skin-tyle/delete`, { data: [id] });
+          const response = await axiosInstance.delete(`/admin/skin-type/delete`, { data: [id] });
           getSkinType();
           toast.success("Xóa da giày thành công");
         } catch (error) {
@@ -247,7 +247,7 @@ const ProductAttributes = () => {
       }
     } else if (selecttt === 'skin_type') {
       try {
-        const response = await axiosInstance.post(`/admin/skin-tyle`, formData);
+        const response = await axiosInstance.post(`/admin/skin-type`, formData);
         toggle();
         setformData({ ...setformData, name: "" });
         getSkinType();
@@ -400,7 +400,7 @@ const ProductAttributes = () => {
       }
     } else if (selecttt === 'skin_type') {
       try {
-        await axiosInstance.put(`/admin/skin-tyle/${dataEdit.id}`, formData);
+        await axiosInstance.put(`/admin/skin-type/${dataEdit.id}`, formData);
         toggleEdit();
         getSkinType();
         setformData({ ...formData, name: "" })
@@ -492,7 +492,6 @@ const ProductAttributes = () => {
     }
 
   }
-
 
   useEffect(() => {
     getColor();

@@ -3,7 +3,6 @@ import axios from "axios";
 import axiosInstance from "services/custommize-axios";
 import { ToastContainer, toast } from "react-toastify";
 import { FaQrcode, FaUserPlus, FaUndoAlt, FaTrashAlt } from 'react-icons/fa';
-import { TbShoppingBagPlus } from 'react-icons/tb';
 import ReactPaginate from 'react-paginate';
 import Toggle from 'react-toggle';
 import QRCode from 'qrcode.react';
@@ -12,6 +11,7 @@ import {
     Row, Col, Button, Card, CardBody, CardHeader, Table, InputGroup, Input, ButtonGroup,
     Form, FormGroup, Label, Modal, ModalBody, ModalHeader, ModalFooter
 } from "reactstrap";
+import { Empty } from 'antd';
 import SlideShow from '../product/SlideShow.js';
 import Product from "views/admin/sells/ListProducts.js";
 
@@ -493,8 +493,16 @@ const Order = () => {
                     <CardBody>
                         {selectedProducts.length === 0 ? (
                             <div className="text-center text-muted">
-                                <TbShoppingBagPlus style={{ width: 100, height: 100 }} />
-                                <div>Chưa có sản phẩm trong giỏ.</div>
+                                <Empty description={
+                                    <span>
+                                        Chưa có sản phẩm trong giỏ
+                                    </span>
+                                } />
+
+                                <Button className="mt-1 text-white" style={{backgroundColor: "#0099FF"}} size="sm" onClick={toggle}>
+                                <i class="fa-solid fa-right-to-bracket" />&nbsp;
+                                    Danh mục
+                                </Button>
                             </div>
                         ) : (
                             <Table>
@@ -558,7 +566,7 @@ const Order = () => {
                         )}
 
                         {promo && promo.freeGiftImage && promo.freeGiftName && (
-                            <div style={{ padding: "15px 0 5px 0", boxShadow: "0 0 10px rgba(0, 0, 0, 0.1)" }}>
+                            <div style={{ padding: "15px 0 5px 0", boxShadow: "0 0 10px rgba(0, 0, 0, 0.1)", marginTop: 20 }}>
                                 <div className="item d-flex">
                                     <div className="product-container mr-5">
                                         <img
@@ -949,8 +957,8 @@ const Order = () => {
                                                 style={{
                                                     borderRadius: 0,
                                                     fontWeight: 400,
-                                                    backgroundColor: paymentMethod === 4 ? '#0099FF' : '', 
-                                                    color: paymentMethod === 4 ? '#fff' : '' 
+                                                    backgroundColor: paymentMethod === 4 ? '#0099FF' : '',
+                                                    color: paymentMethod === 4 ? '#fff' : ''
                                                 }}
                                             >
                                                 Tiền mặt
@@ -966,8 +974,8 @@ const Order = () => {
                                                 style={{
                                                     borderRadius: 0,
                                                     fontWeight: 400,
-                                                    backgroundColor: paymentMethod === 3 ? '#0099FF' : '', 
-                                                    color: paymentMethod === 3 ? '#fff' : '' 
+                                                    backgroundColor: paymentMethod === 3 ? '#0099FF' : '',
+                                                    color: paymentMethod === 3 ? '#fff' : ''
                                                 }}
                                             >
                                                 Chuyển khoản
@@ -989,8 +997,8 @@ const Order = () => {
                                                     style={{
                                                         borderRadius: 0,
                                                         fontWeight: 400,
-                                                        backgroundColor: paymentMethod === 1 ? '#0099FF' : '', 
-                                                        color: paymentMethod === 1 ? '#fff' : '' 
+                                                        backgroundColor: paymentMethod === 1 ? '#0099FF' : '',
+                                                        color: paymentMethod === 1 ? '#fff' : ''
                                                     }}
                                                 >
                                                     Thanh toán sau khi nhận hàng

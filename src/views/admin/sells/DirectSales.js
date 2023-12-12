@@ -4,7 +4,7 @@ import {
   Container, Card, CardHeader, CardBody
 } from "reactstrap";
 import classnames from "classnames";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import Order from "views/admin/sells/Order.js";
 import { VscClose } from "react-icons/vsc";
 
@@ -90,7 +90,6 @@ const CreateOrderPage = () => {
                         ))}
                       </TabContent>
                     </Col>
-                    <ToastContainer />
                   </Row>
                 </div>
               </CardBody>
