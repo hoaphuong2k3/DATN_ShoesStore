@@ -4,7 +4,7 @@ import {
   Container, Card, CardHeader, CardBody
 } from "reactstrap";
 import classnames from "classnames";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import Order from "views/admin/sells/Order.js";
 import { VscClose } from "react-icons/vsc";
 
@@ -57,7 +57,7 @@ const CreateOrderPage = () => {
             <Card className="shadow">
               <CardHeader className="bg-transparent">
                 <Col>
-                  <Button size="sm" color="primary" outline onClick={handleCreateOrder}>
+                  <Button className="bg-gradient-info" size="sm" style={{ color: "#fff" }} onClick={handleCreateOrder}>
                     + Tạo mới hóa đơn
                   </Button>
                 </Col>
@@ -90,7 +90,6 @@ const CreateOrderPage = () => {
                         ))}
                       </TabContent>
                     </Col>
-                    <ToastContainer />
                   </Row>
                 </div>
               </CardBody>
