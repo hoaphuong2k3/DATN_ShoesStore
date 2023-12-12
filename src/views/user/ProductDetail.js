@@ -45,6 +45,8 @@ const DetailProduct = () => {
   //End Xử lý btn tắng giảm
 
   const [sl, setSL] = useState(false);
+  const [list, setList] = useState([]);
+  const [averageVote, setAverageVote] = useState(null);
   useEffect(() => {
     const getAll = async () => {
       console.log("colorId:sizeId:", idColor, idSize)
@@ -56,6 +58,28 @@ const DetailProduct = () => {
             setSL(false);
           } else {
             setSL(true);
+          }
+          try {
+            const response = await axiosInstance.get(`/users/comment/getAll/${res.data.detailResponse.id}`);
+            console.log(response)
+            if (response && response.data) {
+              setList(response.data);
+              if (Array.isArray(response.data)) {
+                // Tính tổng các phần tử trong mảng vote
+                const totalVotes = response.data.reduce((accumulator, item) => accumulator + item.vote, 0);
+
+                // Tính giá trị trung bình với 1 chữ số sau thập phân
+                const averageVote = totalVotes / response.data.length;
+                const roundedAverageVote = averageVote.toFixed(1);
+
+                setAverageVote(roundedAverageVote);
+              } else {
+                console.error('response.data is not an array:', response.data);
+              }
+            }
+          } catch (error) {
+            console.error("Error:", error);
+            console.error("Response data:", error.response.data);
           }
         }
       } catch (error) {
@@ -198,6 +222,11 @@ const DetailProduct = () => {
       console.error('Lỗi khi tải lại dữ liệu khách hàng:', error);
     }
   };
+  const formatDate = (dateString) => {
+    const dateObject = new Date(dateString);
+    const formattedDate = `${dateObject.getFullYear()}/${(dateObject.getMonth() + 1).toString().padStart(2, '0')}/${dateObject.getDate().toString().padStart(2, '0')} ${dateObject.getHours().toString().padStart(2, '0')}:${dateObject.getMinutes().toString().padStart(2, '0')}:${dateObject.getSeconds().toString().padStart(2, '0')}`;
+    return formattedDate;
+  }
 
   return (
     <>
@@ -424,67 +453,100 @@ const DetailProduct = () => {
                                   &nbsp; + Phiếu bảo hành chính hãng&nbsp;(trừ hàng giảm giá từ 30% trở lên)</p>
                               </div>
                             </div>
-
                           </div>
+                          {list && list.length > 0 &&
+                            <Row>
+                              <div className='mt-5'>
+                                <h3 className=' mb-2'>
+                                  ĐÁNH GIÁ SẢN PHẨM
+                                </h3>
 
-                          <div className='mt-5'>
-                            <h3 className=' mb-2'>
-                              ĐÁNH GIÁ SẢN PHẨM
-                            </h3>
-
-                            <Card body>
-                              <Row className='col'>
-                                <Col lg={4} className='text-center mt-3'>
-                                  <Rate allowHalf defaultValue={4.5} style={{ color: '#ee4d2d', fontSize: '24px' }} />
-                                </Col>
-                                <Col lg={8}>
-
-                                  <Row>
-                                    <Col lg={12}>
-                                      <ButtonGroup className='d-flex'>
-                                        <Button className='flex-fill mr-2' color='warning' size='sm' outline style={{ borderRadius: 0 }}>
-                                          Tất cả
-                                        </Button>
-                                        <Button className='flex-fill mr-2' color='warning' size='sm' outline>
-                                          5 sao
-                                        </Button>
-                                        <Button className='flex-fill mr-2' color='warning' size='sm' outline>
-                                          4 sao
-                                        </Button>
-                                        <Button className='flex-fill mr-2' color='warning' size='sm' outline>
-                                          3 sao
-                                        </Button>
-                                        <Button className='flex-fill mr-2' color='warning' size='sm' outline>
-                                          2 sao
-                                        </Button>
-                                        <Button className='flex-fill mr-2' color='warning' size='sm' outline style={{ borderRadius: 0 }}>
-                                          1 sao
-                                        </Button>
-                                      </ButtonGroup>
+                                <Card body>
+                                  <Row className='col'>
+                                    <Col lg={4} className='text-center mt-3'>
+                                      <Rate allowHalf defaultValue={4.5} style={{ color: '#ee4d2d', fontSize: '24px' }} />
                                     </Col>
+                                    <Col lg={8}>
 
-                                    <Col lg={12} className='mt-2'>
-                                      <ButtonGroup>
+                                      <Row>
+                                        <Col lg={12}>
+                                          <ButtonGroup className='d-flex'>
+                                            <Button className='flex-fill mr-2' color='warning' size='sm' outline style={{ borderRadius: 0 }}>
+                                              Tất cả
+                                            </Button>
+                                            <Button className='flex-fill mr-2' color='warning' size='sm' outline>
+                                              5 sao
+                                            </Button>
+                                            <Button className='flex-fill mr-2' color='warning' size='sm' outline>
+                                              4 sao
+                                            </Button>
+                                            <Button className='flex-fill mr-2' color='warning' size='sm' outline>
+                                              3 sao
+                                            </Button>
+                                            <Button className='flex-fill mr-2' color='warning' size='sm' outline>
+                                              2 sao
+                                            </Button>
+                                            <Button className='flex-fill mr-2' color='warning' size='sm' outline style={{ borderRadius: 0 }}>
+                                              1 sao
+                                            </Button>
+                                          </ButtonGroup>
+                                        </Col>
 
-                                        <Button className='mr-2' color='warning' size='sm' outline style={{ borderRadius: 0 }}>
-                                          Có bình luận
-                                        </Button>
-                                        <Button color='warning' outline size='sm' style={{ borderRadius: 0 }}>
-                                          Có hình ảnh/video
-                                        </Button>
-                                      </ButtonGroup>
+                                        <Col lg={12} className='mt-2'>
+                                          <ButtonGroup>
+
+                                            <Button className='mr-2' color='warning' size='sm' outline style={{ borderRadius: 0 }}>
+                                              Có bình luận
+                                            </Button>
+                                            <Button color='warning' outline size='sm' style={{ borderRadius: 0 }}>
+                                              Có hình ảnh/video
+                                            </Button>
+                                          </ButtonGroup>
+                                        </Col>
+                                      </Row>
                                     </Col>
                                   </Row>
-                                </Col>
-                              </Row>
-
-
-
-
-                            </Card>
-                          </div>
-
-
+                                  {
+                                    list.map((item, index) => {
+                                      return (
+                                        <>
+                                          <Row className="mt-3">
+                                            <Col lg="1">
+                                              <Row>
+                                                {item.avatar === null ?
+                                                  <img src="https://thumbs.dreamstime.com/b/default-businessman-avatar-icon-vector-business-people-profile-concept-279597784.jpg" style={{ borderRadius: "50%", width: "80px", height: "80px" }} />
+                                                  :
+                                                  <img src="https://thumbs.dreamstime.com/b/default-businessman-avatar-icon-vector-business-people-profile-concept-279597784.jpg" style={{ borderRadius: "50%", width: "80px", height: "80px" }} />
+                                                }
+                                              </Row>
+                                            </Col>
+                                            <Col lg="10">
+                                              <Row className="m-3" style={{ color: 'black', fontSize: '14px' }}>
+                                                {item.userName}
+                                              </Row>
+                                              <Row className="m-3 mt--2">
+                                                <Rate
+                                                  value={item.vote}
+                                                  style={{ color: '#ee4d2d', fontSize: '14px' }}
+                                                />
+                                              </Row>
+                                              <Row style={{ color: 'gray', fontSize: '14px' }} className="m-3 mt--2">
+                                                {formatDate(item.createdDate)}
+                                              </Row>
+                                              <Row style={{ color: 'black' }} className="m-3">
+                                                {item.comment}
+                                              </Row>
+                                            </Col>
+                                          </Row>
+                                          {(index + 1) < list.length && <hr />}
+                                        </>
+                                      )
+                                    })
+                                  }
+                                </Card>
+                              </div>
+                            </Row>
+                          }
                         </div>
                         <div className='col-3'>
                           <div>
@@ -495,7 +557,6 @@ const DetailProduct = () => {
                         </div>
                       </div>
                     </div>
-
                   </div>
                 </>
               </CardBody>

@@ -38,10 +38,10 @@ const getAllDesignStyle1 = (page, size, search) => {
 
 //API Skin_Type
 const getAllSkinType = () => {
-    return axios.get(`/admin/skin-tyle/get-all`)
+    return axios.get(`/admin/skin-type/get-all`)
 }
 const getAllSkinType1 = (page, size, search) => {
-    return axios.post(`/admin/skin-tyle/search?page=${page}&size=${size}`, search)
+    return axios.post(`/admin/skin-type/search?page=${page}&size=${size}`, search)
 }
 
 //API Toe

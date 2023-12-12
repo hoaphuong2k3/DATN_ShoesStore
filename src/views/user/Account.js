@@ -254,14 +254,20 @@ const Account = ({ tab }) => {
   //Xử lý địa chỉ
   const [listAddress, setListAddress] = useState([]);
   const getAllAddress = async () => {
-    const res = await axiosInstance.get(`http://localhost:33321/api/address/${storedUserId}`);
-    console.log(res);
-    if (res && res.content) {
-      setListAddress(res.content);
-      console.log(res.content);
+    try {
+      const res = await axiosInstance.get(`http://localhost:33321/api/address/${storedUserId}`);
+      console.log(res);
+      if (res && res.content) {
+        setListAddress(res.content);
+        console.log(res.content);
+      }
+      console.log(listAddress);
+    } catch (error) {
+      setListAddress([]);
+      console.error("Error:", error);
+      console.error("Response data:", error.response.data);
     }
 
-    console.log(listAddress);
   }
   const fetchData2 = async () => {
     try {
