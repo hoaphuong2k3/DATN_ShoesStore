@@ -18,6 +18,7 @@ import ReactPaginate from "react-paginate";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import axiosInstance from "services/custommize-axios";
+import * as yup from "yup";
 import {
   Row,
   Card,
@@ -73,6 +74,37 @@ const Staff = () => {
     email: "",
     gender: "",
   });
+
+  // validate
+  const [errors, setErrors] = useState({});
+
+  const schema = yup.object().shape({
+    fullname: yup.string().required("Vui lòng nhập họ và tên"),
+    phoneNumber: yup
+      .string()
+      .matches(/^(84|0[3|5|7|8|9])+([0-9]{8})\b/, "Số điện thoại không hợp lệ")
+      .required("Vui lòng nhập số điện thoại"),
+    email: yup
+      .string()
+      .email("Địa chỉ email không hợp lệ")
+      .required("Vui lòng nhập địa chỉ email"),
+    username: yup.string().required("Vui lòng nhập tên đăng nhập"),
+  });
+
+  const validateInput = async () => {
+    try {
+      await schema.validate(formData, { abortEarly: false });
+      setErrors({});
+      return true;
+    } catch (error) {
+      const validationErrors = {};
+      error.inner.forEach((err) => {
+        validationErrors[err.path] = err.message;
+      });
+      setErrors(validationErrors);
+      return false;
+    }
+  };
 
   //load
   const fetchData = async () => {
@@ -276,44 +308,48 @@ const Staff = () => {
 
   //Add
   const saveAdmin = async () => {
-    try {
-      if (formData.id) {
-        await axiosInstance.put(`/staff/update`, formData);
-        changeAvatar();
-        fetchData();
-        toast.success("Cập nhật thành công!");
-      } else {
-        await axiosInstance.post("/staff/create", {
-          username: formData.username,
-          fullname: formData.fullname,
-          gender: formData.gender,
-          dateOfBirth: formData.dateOfBirth,
-          email: formData.email,
-          phoneNumber: formData.phoneNumber,
-          address: {
-            proviceCode: formData.address.proviceCode,
-            districtCode: formData.address.districtCode,
-            communeCode: formData.address.communeCode,
-            addressDetail: formData.address.addressDetail,
-            isDeleted: true,
-          },
-        });
+    if (await validateInput()) {
+      try {
+        if (formData.id) {
+          await axiosInstance.put(`/staff/update`, formData);
+          changeAvatar();
+          fetchData();
+          toast.success("Cập nhật thành công!");
+        } else {
+          await axiosInstance.post("/staff/create", {
+            username: formData.username,
+            fullname: formData.fullname,
+            gender: formData.gender,
+            dateOfBirth: formData.dateOfBirth,
+            email: formData.email,
+            phoneNumber: formData.phoneNumber,
+            address: {
+              proviceCode: formData.address.proviceCode,
+              districtCode: formData.address.districtCode,
+              communeCode: formData.address.communeCode,
+              addressDetail: formData.address.addressDetail,
+              isDeleted: true,
+            },
+          });
 
-        fetchData();
-        toast.success("Thêm mới thành công!");
-      }
+          fetchData();
+          toast.success("Thêm mới thành công!");
+        }
 
-      // Đóng modal và reset form
-      setModal(false);
-      resetForm();
-    } catch (error) {
-      console.error("Error:", error);
-      if (error.response) {
-        console.error("Response data:", error.response.data);
-        toast.error(error.response.data.message);
-      } else {
-        toast.error("Đã có lỗi xảy ra.");
+        // Đóng modal và reset form
+        setModal(false);
+        resetForm();
+      } catch (error) {
+        console.error("Error:", error);
+        if (error.response) {
+          console.error("Response data:", error.response.data);
+          toast.error(error.response.data.message);
+        } else {
+          toast.error("Đã có lỗi xảy ra.");
+        }
       }
+    } else {
+      toast.error("Vui lòng kiểm tra lại thông tin đăng ký");
     }
   };
 
@@ -457,7 +493,6 @@ const Staff = () => {
   const [filterAdmins, setfilterAdmins] = useState([]);
   useEffect(() => {
     console.log(admins, selectedStatus);
-
     if (admins) {
       const filterAdmin = admins.filter((admin) => {
         if (
@@ -477,11 +512,9 @@ const Staff = () => {
 
       setfilterAdmins(filterAdmin);
     } else {
-      console.error(
-        "Biến 'admins' không được định nghĩa hoặc có giá trị là undefined."
-      );
+      console.error("Biến 'admins' không được định nghĩa.");
     }
-  }, [admins, selectedStatus]);
+  });
 
   // Lọc
   const handleFilter = () => {
@@ -520,7 +553,6 @@ const Staff = () => {
       sortOrder: newSortOrder,
     });
   };
-
 
   return (
     <>
@@ -574,7 +606,7 @@ const Staff = () => {
                         <InputGroup size="sm">
                           <Input
                             type="search"
-                            placeholder="Tìm kiếm nhân viên..."
+                            placeholder="Tìm kiếm nhân viên theo tên "
                             value={searchValue}
                             onChange={(e) => setSearchValue(e.target.value)}
                           />
@@ -1410,7 +1442,6 @@ const Staff = () => {
                 </div>
               </ModalFooter>
             </Modal>
-            
           </Col>
         </Row>
       </Container>
