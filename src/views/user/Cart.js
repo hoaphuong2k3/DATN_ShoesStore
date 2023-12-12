@@ -12,9 +12,9 @@ import {
   ButtonDropdown,
 } from "reactstrap";
 import { Link } from "react-router-dom";
-import { useHistory } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import Header from "components/Headers/Header";
+import { ImSad } from "react-icons/im";
 // import { CartContext } from "contexts/Cart.js";
 import "assets/css/cart.css";
 
@@ -140,8 +140,9 @@ const Cart = () => {
   useEffect(() => {
     if (cartData) {
       const selectedIds = cartData.map((item) => item.id);
-      const allItemsSelected = selectedIds.length > 0 && selectedIds.length === selectedItems.length;
-  
+      const allItemsSelected =
+        selectedIds.length > 0 && selectedIds.length === selectedItems.length;
+
       setSelectAll(allItemsSelected);
     }
   }, [cartData, selectedItems]);
@@ -157,7 +158,7 @@ const Cart = () => {
     return total;
   };
 
-  const [isCheckoutError, setIsCheckoutError] = useState(true );
+  const [isCheckoutError, setIsCheckoutError] = useState(true);
 
   // checkout
   const handleCheckout = async () => {
@@ -215,12 +216,10 @@ const Cart = () => {
                       {cartData &&
                       Array.isArray(cartData) &&
                       cartData.length === 0 ? (
-                        <p>
-                          Bạn không có sản phẩm nào trong giỏ hàng của bạn.
-                          <br />
-                          Bấm vào <a href="/shoes/product">đây</a> để tiếp tục
-                          mua sắm{" "}
-                        </p>
+                        <div id="zero-product-container">
+                          <h4>Bạn không có sản phẩm nào trong giỏ hàng!</h4>
+                          <ImSad id="sad-icon" />
+                        </div>
                       ) : (
                         <Table className="cart-table full table--responsive">
                           <tbody>
@@ -270,12 +269,11 @@ const Cart = () => {
                                   <div className="col-right col-9">
                                     <div className="box-product">
                                       <p className="name">
-                                        <a
-                                          href="/shoes/product"
-                                          title={item.name}
+                                        <Link
+                                          to={`/shoes/productdetail/${item.id}`}
                                         >
                                           {item.name} - {item.code}
-                                        </a>
+                                        </Link>
                                         <div className="product-details text-muted d-flex mt-1">
                                           <p className="product-size small mr-1">
                                             Size: {item.size},
@@ -285,7 +283,10 @@ const Cart = () => {
                                           </p>
                                         </div>
                                       </p>
-                                      <p className="action">
+                                      <p
+                                        className="action"
+                                        style={{ fontSize: "15px" }}
+                                      >
                                         <p
                                           onClick={() =>
                                             handleRemoveItem(
@@ -301,7 +302,7 @@ const Cart = () => {
                                         </p>
                                       </p>
                                     </div>
-                                    <div className="box-price">
+                                    <div className="box-price mr-3">
                                       <p className="price">
                                         {formatter.format(item.price)}
                                       </p>
@@ -341,6 +342,14 @@ const Cart = () => {
                                         </Button>
                                       </div>
                                     </div>
+                                    <div
+                                      className="box-price ml-4"
+                                      style={{ paddingLeft: "7px" }}
+                                    >
+                                      <p className="price">
+                                        {formatter.format(item.totalPrice)}
+                                      </p>
+                                    </div>
                                   </div>
                                 </div>
                               ))}
@@ -373,10 +382,6 @@ const Cart = () => {
                       </div>
 
                       <div>
-                        {/* {isCheckoutError && (
-                          <p>Vui lòng chọn sản phẩm trước khi thanh toán!</p>
-                        )} */}
-
                         <Button
                           name="checkout"
                           onClick={() => handleCheckout()}

@@ -9,12 +9,12 @@ import {
   Input,
   Label,
   CustomInput,
-  FormGroup
+  FormGroup,
 } from "reactstrap";
 import Header from "components/Headers/UserHeader2.js";
 import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
-import { Slider } from 'antd';
+import { Slider } from "antd";
 import "assets/css/listProduct.css";
 // list
 import {
@@ -180,14 +180,17 @@ const Product = () => {
   const [sliderValue, setSliderValue] = useState([1000000, 15000000]);
 
   useEffect(() => {
-    setSearch({ ...search, fromPrice: sliderValue[0], toPrice: sliderValue[1] });
+    setSearch({
+      ...search,
+      fromPrice: sliderValue[0],
+      toPrice: sliderValue[1],
+    });
   }, [sliderValue]);
 
   const handleSliderChange = (value) => {
     setSliderValue(value);
   };
 
-  
   return (
     <>
       <Header />
@@ -203,7 +206,8 @@ const Product = () => {
                       <h3 className="titleFilter ml-4 mt-3">
                         <img
                           className="icon"
-                          src="https://cdn-icons-png.flaticon.com/128/7855/7855877.png" alt=""
+                          src="https://cdn-icons-png.flaticon.com/128/7855/7855877.png"
+                          alt=""
                         />
                         Bộ Lọc Tìm Kiếm
                       </h3>
@@ -228,16 +232,18 @@ const Product = () => {
                                 }
                               >
                                 <i
-                                  className={`fa-solid ${contentState.brand ? "fa-minus" : "fa-plus"
-                                    }`}
+                                  className={`fa-solid ${
+                                    contentState.brand ? "fa-minus" : "fa-plus"
+                                  }`}
                                 />
                               </button>
                             </li>
                           </ul>
                         </div>
                         <div
-                          className={`content ${contentState.brand ? "show" : "hide"
-                            }`}
+                          className={`content ${
+                            contentState.brand ? "show" : "hide"
+                          }`}
                         >
                           {listBrand.map((x) => (
                             <div key={x.id}>
@@ -273,16 +279,18 @@ const Product = () => {
                                 }
                               >
                                 <i
-                                  className={`fa-solid ${contentState.origin ? "fa-minus" : "fa-plus"
-                                    }`}
+                                  className={`fa-solid ${
+                                    contentState.origin ? "fa-minus" : "fa-plus"
+                                  }`}
                                 />
                               </button>
                             </li>
                           </ul>
                         </div>
                         <div
-                          className={`content ${contentState.origin ? "show" : "hide"
-                            }`}
+                          className={`content ${
+                            contentState.origin ? "show" : "hide"
+                          }`}
                         >
                           {listOrigin.map((x) => (
                             <div key={x.id}>
@@ -318,16 +326,18 @@ const Product = () => {
                                 }
                               >
                                 <i
-                                  className={`fa-solid ${contentState.design ? "fa-minus" : "fa-plus"
-                                    }`}
+                                  className={`fa-solid ${
+                                    contentState.design ? "fa-minus" : "fa-plus"
+                                  }`}
                                 />
                               </button>
                             </li>
                           </ul>
                         </div>
                         <div
-                          className={`content ${contentState.design ? "show" : "hide"
-                            }`}
+                          className={`content ${
+                            contentState.design ? "show" : "hide"
+                          }`}
                         >
                           {listDesignStyle.map((x) => (
                             <div key={x.id}>
@@ -363,16 +373,18 @@ const Product = () => {
                                 }
                               >
                                 <i
-                                  className={`fa-solid ${contentState.skin ? "fa-minus" : "fa-plus"
-                                    }`}
+                                  className={`fa-solid ${
+                                    contentState.skin ? "fa-minus" : "fa-plus"
+                                  }`}
                                 />
                               </button>
                             </li>
                           </ul>
                         </div>
                         <div
-                          className={`content ${contentState.skin ? "show" : "hide"
-                            }`}
+                          className={`content ${
+                            contentState.skin ? "show" : "hide"
+                          }`}
                         >
                           {listSkinStype.map((x) => (
                             <div key={x.id}>
@@ -408,16 +420,18 @@ const Product = () => {
                                 }
                               >
                                 <i
-                                  className={`fa-solid ${contentState.sole ? "fa-minus" : "fa-plus"
-                                    }`}
+                                  className={`fa-solid ${
+                                    contentState.sole ? "fa-minus" : "fa-plus"
+                                  }`}
                                 />
                               </button>
                             </li>
                           </ul>
                         </div>
                         <div
-                          className={`content ${contentState.sole ? "show" : "hide"
-                            }`}
+                          className={`content ${
+                            contentState.sole ? "show" : "hide"
+                          }`}
                         >
                           {listSole.map((x) => (
                             <div key={x.id}>
@@ -453,16 +467,18 @@ const Product = () => {
                                 }
                               >
                                 <i
-                                  className={`fa-solid ${contentState.lining ? "fa-minus" : "fa-plus"
-                                    }`}
+                                  className={`fa-solid ${
+                                    contentState.lining ? "fa-minus" : "fa-plus"
+                                  }`}
                                 />
                               </button>
                             </li>
                           </ul>
                         </div>
                         <div
-                          className={`content ${contentState.lining ? "show" : "hide"
-                            }`}
+                          className={`content ${
+                            contentState.lining ? "show" : "hide"
+                          }`}
                         >
                           {listLining.map((x) => (
                             <div key={x.id}>
@@ -498,16 +514,18 @@ const Product = () => {
                                 }
                               >
                                 <i
-                                  className={`fa-solid ${contentState.toe ? "fa-minus" : "fa-plus"
-                                    }`}
+                                  className={`fa-solid ${
+                                    contentState.toe ? "fa-minus" : "fa-plus"
+                                  }`}
                                 />
                               </button>
                             </li>
                           </ul>
                         </div>
                         <div
-                          className={`content ${contentState.toe ? "show" : "hide"
-                            }`}
+                          className={`content ${
+                            contentState.toe ? "show" : "hide"
+                          }`}
                         >
                           {listToe.map((x) => (
                             <div key={x.id}>
@@ -543,18 +561,20 @@ const Product = () => {
                                 }
                               >
                                 <i
-                                  className={`fa-solid ${contentState.cushion
-                                    ? "fa-minus"
-                                    : "fa-plus"
-                                    }`}
+                                  className={`fa-solid ${
+                                    contentState.cushion
+                                      ? "fa-minus"
+                                      : "fa-plus"
+                                  }`}
                                 />
                               </button>
                             </li>
                           </ul>
                         </div>
                         <div
-                          className={`content ${contentState.cushion ? "show" : "hide"
-                            }`}
+                          className={`content ${
+                            contentState.cushion ? "show" : "hide"
+                          }`}
                         >
                           {listCushion.map((x) => (
                             <div key={x.id}>
@@ -578,12 +598,12 @@ const Product = () => {
                           for="find_code"
                           className="font-weight-bold text-dark ml-2"
                         >
-                          Giá: 
-
-                          <span className="ml-1">{formatter.format(search.fromPrice)}</span> - 
-                          <span>{formatter.format(search.toPrice)}</span>
+                          Giá:
+                          <span className="ml-1">
+                            {formatter.format(search.fromPrice)}
+                          </span>{" "}
+                          -<span>{formatter.format(search.toPrice)}</span>
                         </Label>
-                
 
                         <Row>
                           <Col>
@@ -596,7 +616,6 @@ const Product = () => {
                                 value={sliderValue}
                                 onChange={handleSliderChange}
                               />
-
                             </FormGroup>
                           </Col>
                         </Row>
@@ -608,37 +627,84 @@ const Product = () => {
                       {errorMessage && <p>{errorMessage}</p>}
                       <ul></ul>
                     </div>
-                    <div className="row item mt-3">
+                    <div className="row product-blocks clearfix ">
                       {Array.isArray(products) ? (
                         products.map((product) => (
-                          <div key={product.id} className="col-md-3">
-                            <Link to={`/shoes/productdetail/${product.id}`}>
-                              <img
-                                src={`https://s3-ap-southeast-1.amazonaws.com/imageshoestore/${product.imgURI}`}
-                                alt=""
-                                className="zoom"
-                              />
-                            </Link>
-                            <br />
-                            <br />
-                            <div style={{ fontSize: "medium" }} className="p-2">
-                              <Link to={`/shoes/productdetail/${product.id}`}>
-                                <h3 className="product-card__title">
-                                  {/* SAVILLE CAPTOE OXFORD - OF32 */}
-                                  {`${product.name} ${product.brand} ${product.origin}`}
-                                </h3>
-                              </Link>
-                              <div className="product-price">
-                                <strong className="text-danger">
-                                  {product.discountPriceMin < product.discountPriceMax && <>{formatter.format(product.discountPriceMin)} -{" "}</>}
-                                  {formatter.format(product.discountPriceMax)}
-                                </strong>
-                                <span>
-                                  {product.priceMax < product.priceMin && <>{formatter.format(product.priceMax)} -{" "}</>}
-                                  {formatter.format(product.priceMin)}
-                                </span>
+                          <div className="col-3 mb-3">
+                            <Card
+                              className="product-card"
+                              style={{ height: "360px" }}
+                            >
+                              <span className="sale-box">- 22% </span>
+                              <div
+                                key={product.id}
+                                className="product-card__inner "
+                              >
+                                <Link to={`/shoes/productdetail/${product.id}`}>
+                                  <div className="product-card__image zoom">
+                                    <img
+                                      src={`https://s3-ap-southeast-1.amazonaws.com/imageshoestore/${product.imgURI}`}
+                                      alt=""
+                                      className="product-card-image-front img-responsive center-block mt-2 "
+                                    />
+                                  </div>
+                                </Link>
+                                <div className="mt-4 p-3 text-center ">
+                                  <h4 className="product-single__series text-uppercase">
+                                    {product.cushion}
+                                  </h4>
+                                  <Link
+                                    to={`/shoes/productdetail/${product.id}`}
+                                  >
+                                    <h3 className="product-card__title">
+                                      {/* SAVILLE CAPTOE OXFORD - OF32 */}
+                                      {`${product.name} ${product.cushion} ${product.designStyle} ${product.brand}`}
+                                    </h3>
+                                  </Link>
+                                  <div className="product-price d-inline">
+                                    {product.discountPriceMin ===
+                                      product.priceMin &&
+                                    product.discountPriceMax ===
+                                      product.priceMax ? (
+                                      <div className="discount-price">
+                                        <strong className="text-danger">
+                                          {formatter.format(
+                                            product.discountPriceMin
+                                          )}{" "}
+                                          -{" "}
+                                          {formatter.format(
+                                            product.discountPriceMax
+                                          )}
+                                        </strong>
+                                      </div>
+                                    ) : (
+                                      <div className="discount-and-original-price">
+                                        <div className="discount-price">
+                                          <strong className="text-danger">
+                                            {formatter.format(
+                                              product.discountPriceMin
+                                            )}{" "}
+                                            -{" "}
+                                            {formatter.format(
+                                              product.discountPriceMax
+                                            )}
+                                          </strong>
+                                        </div>
+                                        <div className="original-price">
+                                          <span>
+                                            {formatter.format(product.priceMin)}
+                                          </span>{" "}
+                                          -{" "}
+                                          <span>
+                                            {formatter.format(product.priceMax)}
+                                          </span>
+                                        </div>
+                                      </div>
+                                    )}
+                                  </div>
+                                </div>
                               </div>
-                            </div>
+                            </Card>
                           </div>
                         ))
                       ) : (

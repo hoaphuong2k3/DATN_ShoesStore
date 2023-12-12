@@ -174,7 +174,10 @@ const Home = () => {
                       {Array.isArray(products) ? (
                         products.map((product) => (
                           <div className="col-3">
-                            <Card className="product-card ">
+                            <Card
+                              className="product-card"
+                              style={{ height: "369px" }}
+                            >
                               <span className="sale-box">- 22% </span>
                               <div
                                 key={product.id}
@@ -201,19 +204,46 @@ const Home = () => {
                                       {`${product.name} ${product.cushion} ${product.designStyle} ${product.brand}`}
                                     </h3>
                                   </Link>
-                                  <div className="product-price">
-                                    <strong className="text-danger">
-                                      {formatter.format(
-                                        product.discountPriceMin
-                                      )}{" "}
-                                      -{" "}
-                                      {formatter.format(
-                                        product.discountPriceMax
-                                      )}
-                                    </strong>
-                                    <span>
-                                      {formatter.format(product.priceMin)}
-                                    </span>
+                                  <div className="product-price d-inline">
+                                    {product.discountPriceMin ===
+                                      product.priceMin &&
+                                    product.discountPriceMax ===
+                                      product.priceMax ? (
+                                      <div className="discount-price">
+                                        <strong className="text-danger">
+                                          {formatter.format(
+                                            product.discountPriceMin
+                                          )}{" "}
+                                          -{" "}
+                                          {formatter.format(
+                                            product.discountPriceMax
+                                          )}
+                                        </strong>
+                                      </div>
+                                    ) : (
+                                      <div className="discount-and-original-price">
+                                        <div className="discount-price">
+                                          <strong className="text-danger">
+                                            {formatter.format(
+                                              product.discountPriceMin
+                                            )}{" "}
+                                            -{" "}
+                                            {formatter.format(
+                                              product.discountPriceMax
+                                            )}
+                                          </strong>
+                                        </div>
+                                        <div className="original-price">
+                                          <span>
+                                            {formatter.format(product.priceMin)}
+                                          </span>{" "}
+                                          -{" "}
+                                          <span>
+                                            {formatter.format(product.priceMax)}
+                                          </span>
+                                        </div>
+                                      </div>
+                                    )}
                                   </div>
                                 </div>
                               </div>
@@ -228,7 +258,7 @@ const Home = () => {
                 </Col>
                 <Col md={12} className="d-flex justify-content-center">
                   <a
-                    href="san-pham-noi-bat"
+                    href="/shoes/product"
                     title="Xem tất cả NEW ARRIVALS"
                     className="evo-button mobile-viewmore mt-6 "
                   >
@@ -416,7 +446,10 @@ const Home = () => {
                       {Array.isArray(products) ? (
                         products.map((product) => (
                           <div className="col-3">
-                            <Card className="product-card ">
+                            <Card
+                              className="product-card"
+                              style={{ height: "369px" }}
+                            >
                               <span className="sale-box">- 22% </span>
                               <div
                                 key={product.id}
@@ -443,19 +476,46 @@ const Home = () => {
                                       {`${product.name} ${product.cushion} ${product.designStyle} ${product.brand}`}
                                     </h3>
                                   </Link>
-                                  <div className="product-price">
-                                    <strong className="text-danger">
-                                      {formatter.format(
-                                        product.discountPriceMin
-                                      )}{" "}
-                                      -{" "}
-                                      {formatter.format(
-                                        product.discountPriceMax
-                                      )}
-                                    </strong>
-                                    <span>
-                                      {formatter.format(product.priceMin)}
-                                    </span>
+                                  <div className="product-price d-inline">
+                                    {product.discountPriceMin ===
+                                      product.priceMin &&
+                                    product.discountPriceMax ===
+                                      product.priceMax ? (
+                                      <div className="discount-price">
+                                        <strong className="text-danger">
+                                          {formatter.format(
+                                            product.discountPriceMin
+                                          )}{" "}
+                                          -{" "}
+                                          {formatter.format(
+                                            product.discountPriceMax
+                                          )}
+                                        </strong>
+                                      </div>
+                                    ) : (
+                                      <div className="discount-and-original-price">
+                                        <div className="discount-price">
+                                          <strong className="text-danger">
+                                            {formatter.format(
+                                              product.discountPriceMin
+                                            )}{" "}
+                                            -{" "}
+                                            {formatter.format(
+                                              product.discountPriceMax
+                                            )}
+                                          </strong>
+                                        </div>
+                                        <div className="original-price">
+                                          <span>
+                                            {formatter.format(product.priceMin)}
+                                          </span>{" "}
+                                          -{" "}
+                                          <span>
+                                            {formatter.format(product.priceMax)}
+                                          </span>
+                                        </div>
+                                      </div>
+                                    )}
                                   </div>
                                 </div>
                               </div>
@@ -470,7 +530,7 @@ const Home = () => {
                 </Col>
                 <Col md={12} className="d-flex justify-content-center">
                   <a
-                    href="san-pham-noi-bat"
+                    href="/shoes/product"
                     title="Xem tất cả ESPADRILLES"
                     className="evo-button mobile-viewmore mt-6 "
                   >
@@ -539,17 +599,50 @@ const Home = () => {
                                           {`${product.name} ${product.cushion} ${product.designStyle} ${product.brand}`}
                                         </h3>
                                       </Link>
-                                      <div className="product-price">
-                                        <strong className="text-danger">
-                                          {formatter.format(
-                                            product.discountPriceMin
-                                          )}{" "}
-                                          -{" "}
-                                          {formatter.format(
-                                            product.discountPriceMax
-                                          )}
-                                        </strong>
-                                        {formatter.format(product.priceMin)}
+                                      <div className="product-price d-inline">
+                                        {product.discountPriceMin ===
+                                          product.priceMin &&
+                                        product.discountPriceMax ===
+                                          product.priceMax ? (
+                                          <div className="discount-price">
+                                            <strong className="text-danger">
+                                              {formatter.format(
+                                                product.discountPriceMin
+                                              )}{" "}
+                                              -{" "}
+                                              {formatter.format(
+                                                product.discountPriceMax
+                                              )}
+                                            </strong>
+                                          </div>
+                                        ) : (
+                                          <div className="discount-and-original-price">
+                                            <div className="discount-price">
+                                              <strong className="text-danger">
+                                                {formatter.format(
+                                                  product.discountPriceMin
+                                                )}{" "}
+                                                -{" "}
+                                                {formatter.format(
+                                                  product.discountPriceMax
+                                                )}
+                                              </strong>
+                                            </div>
+                                            <div className="original-price">
+                                              <span>
+                                                {formatter.format(
+                                                  product.priceMin
+                                                )}
+                                              </span>{" "}
+                                              -{" "}
+                                              <span>
+                                                {formatter.format(
+                                                  product.priceMax
+                                                )}
+                                              </span>
+                                            </div>
+                                          </div>
+                                        )}
                                       </div>
                                     </div>
                                   </div>
@@ -565,32 +658,29 @@ const Home = () => {
                   </div>
                 </Col>
               </div>
-
-              
             </Container>
           </Row>
-          
         </Container>
         <div className="sidebar_single_post">
-                <div className="container_">
-                  <div
-                    id="black-studio-tinymce-22"
-                    class="visible-all-devices widget"
-                  >
-                    <div class="textwidget">
-                      <ul>
-                        <li className="">Chất liệu 100% da thật</li>
-                        <li>Bảo trì trọn đời</li>
-                        <li>
-                          Miễn phí
-                          <br />
-                          giao hàng toàn quốc
-                        </li>
-                      </ul>
-                    </div>
-                  </div>
-                </div>
+          <div className="container_">
+            <div
+              id="black-studio-tinymce-22"
+              class="visible-all-devices widget"
+            >
+              <div class="textwidget">
+                <ul>
+                  <li className="">Chất liệu 100% da thật</li>
+                  <li>Bảo trì trọn đời</li>
+                  <li>
+                    Miễn phí
+                    <br />
+                    giao hàng toàn quốc
+                  </li>
+                </ul>
               </div>
+            </div>
+          </div>
+        </div>
       </Card>
     </>
   );
