@@ -5,19 +5,12 @@ import { format } from 'date-fns';
 import { vi } from 'date-fns/locale';
 import { connect } from 'react-redux';
 import { updateData } from './actions';
-import 'assets/scss/detailsp.scss';
 import 'assets/css/hoadon.css';
 // reactstrap components
 import { Badge, Row, Col, Button, Table, Input, FormGroup, CardBody, CardFooter, InputGroup, InputGroupAddon, Card, InputGroupText, Modal, ModalBody, ModalFooter, ModalHeader, Label, Form, CardHeader } from "reactstrap";
 import { FaRegEdit, FaSearch, FaMinus, FaPlus, FaTrash } from 'react-icons/fa';
 import {
-    MDBCard,
-    MDBCardBody,
-    MDBCol,
-    MDBContainer,
-    MDBIcon,
-    MDBRow,
-    MDBTypography,
+    MDBCard,MDBCardBody,MDBCol,MDBContainer,MDBIcon,MDBRow,MDBTypography,
 } from "mdb-react-ui-kit";
 import { toast } from 'react-toastify';
 
