@@ -464,7 +464,7 @@ const Products = () => {
                   </Row>
                   <Table className="align-items-center table-flush" responsive>
                     <thead className="thead-light">
-                      <tr>
+                      <tr className="text-center">
                         <th>
                           <FormGroup check className="pb-4">
                             <Input

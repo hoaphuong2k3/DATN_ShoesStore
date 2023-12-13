@@ -10,7 +10,6 @@ import Profile from "views/admin/Profile.js";
 import Statistical from "views/admin/Statistical.js";
 import AddProduct from "views/admin/product/AddProduct";
 import EditProduct from "views/admin/product/EditProduct";
-import DetailProducts from "views/admin/product/DetailProduct.js";
 import ListShoesDetail from "views/admin/product/ListShoesDetail.js";
 import Discount from "views/admin/discount/Discount.js";
 import Sell from "views/admin/sells/DirectSales.js";
@@ -84,11 +83,6 @@ var routes = [
   {
     path: "/product/edit/:id",
     component: <EditProduct />,
-    layout: "/admin",
-  },
-  {
-    path: "/product/detail/:id",
-    component: <DetailProducts />,
     layout: "/admin",
   },
   {

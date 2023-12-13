@@ -655,6 +655,185 @@ const ProductAttributes = () => {
   useEffect(() => {
     getAll();
   }, [page]);
+  const [showActions, setShowActions] = useState(false);
+  const [selectAll, setSelectAll] = useState(false);
+  const [selectedItems, setSelectedItems] = useState([]);
+  const handleCheckboxChange = (idProduct) => {
+    if (selectedItems.includes(idProduct)) {
+      setSelectedItems(selectedItems.filter((id) => id !== idProduct));
+      setShowActions(selectedItems.length - 1 > 0);
+    } else {
+      setSelectedItems([...selectedItems, idProduct]);
+      setShowActions(true);
+    }
+  };
+  const handleSelectAll = () => {
+    if (selectAll) {
+      setSelectedItems([]);
+      setShowActions(false);
+    } else {
+      setSelectedItems(list.map(item => item.id));
+      setShowActions(true);
+    }
+    setSelectAll(!selectAll);
+  };
+
+  const handleDeleteButtonClick = async () => {
+    if (selectedItems.length > 0) {
+      if (selecttt === 'color') {
+        if (window.confirm("Bạn có chắc chắn muốn xóa các màu sắc đã chọn không?")) {
+          try {
+            await axiosInstance.delete(`/admin/color/delete`, { data: selectedItems });
+            getColor();
+            setSelectedItems([]);
+            toast.success("Xóa màu sắc thành công");
+          } catch (error) {
+            let errorMessage = "Lỗi từ máy chủ";
+            if (error.response && error.response.data && error.response.data.message) {
+              errorMessage = error.response.data.message;
+            }
+            toast.error(errorMessage);
+          }
+        }
+      } else if (selecttt === 'brand') {
+        if (window.confirm("Bạn có chắc chắn muốn xóa các thương hiệu đã chọn không?")) {
+          try {
+            await axiosInstance.delete(`/admin/brand/delete`, { data: selectedItems });
+            getColor();
+            setSelectedItems([]);
+            toast.success("Xóa thương hiệu thành công");
+          } catch (error) {
+            let errorMessage = "Lỗi từ máy chủ";
+            if (error.response && error.response.data && error.response.data.message) {
+              errorMessage = error.response.data.message;
+            }
+            toast.error(errorMessage);
+          }
+        }
+      } else if (selecttt === 'origin') {
+        if (window.confirm("Bạn có chắc chắn muốn xóa các xuất xứ đã chọn không?")) {
+          try {
+            await axiosInstance.delete(`/admin/origin/delete`, { data: selectedItems });
+            getOrigin();
+            setSelectedItems([]);
+            toast.success("Xóa xuất xứ thành công");
+          } catch (error) {
+            let errorMessage = "Lỗi từ máy chủ";
+            if (error.response && error.response.data && error.response.data.message) {
+              errorMessage = error.response.data.message;
+            }
+            toast.error(errorMessage);
+          }
+        }
+      } else if (selecttt === 'design_style') {
+        if (window.confirm("Bạn có chắc chắn muốn xóa các thiết kế đã chọn không?")) {
+          try {
+            await axiosInstance.delete(`/admin/design-style/delete`, { data: selectedItems });
+            getDesignStyle();
+            setSelectedItems([]);
+            toast.success("Xóa thiết kế thành công");
+          } catch (error) {
+            let errorMessage = "Lỗi từ máy chủ";
+            if (error.response && error.response.data && error.response.data.message) {
+              errorMessage = error.response.data.message;
+            }
+            toast.error(errorMessage);
+          }
+        }
+      } else if (selecttt === 'skin_type') {
+        if (window.confirm("Bạn có chắc chắn muốn xóa các loại da đã chọn không?")) {
+          try {
+            await axiosInstance.delete(`/admin/skin-type/delete`, { data: selectedItems });
+            getSkinType();
+            setSelectedItems([]);
+            toast.success("Xóa da giày thành công");
+          } catch (error) {
+            let errorMessage = "Lỗi từ máy chủ";
+            if (error.response && error.response.data && error.response.data.message) {
+              errorMessage = error.response.data.message;
+            }
+            toast.error(errorMessage);
+          }
+        }
+      } else if (selecttt === 'sole') {
+        if (window.confirm("Bạn có chắc chắn muốn xóa các đế giày đã chọn không?")) {
+          try {
+            await axiosInstance.delete(`/admin/sole/delete`, { data: selectedItems });
+            getSole();
+            setSelectedItems([]);
+            toast.success("Xóa đế giày thành công");
+          } catch (error) {
+            let errorMessage = "Lỗi từ máy chủ";
+            if (error.response && error.response.data && error.response.data.message) {
+              errorMessage = error.response.data.message;
+            }
+            toast.error(errorMessage);
+          }
+        }
+      } else if (selecttt === 'toe') {
+        if (window.confirm("Bạn có chắc chắn muốn xóa các mũi giày đã chọn không?")) {
+          try {
+            await axiosInstance.delete(`/admin/toe/delete`, { data: selectedItems });
+            getToe();
+            setSelectedItems([]);
+            toast.success("Xóa mũi giày thành công");
+          } catch (error) {
+            let errorMessage = "Lỗi từ máy chủ";
+            if (error.response && error.response.data && error.response.data.message) {
+              errorMessage = error.response.data.message;
+            }
+            toast.error(errorMessage);
+          }
+        }
+      } else if (selecttt === 'lining') {
+        if (window.confirm("Bạn có chắc chắn muốn xóa các lót giày đã chọn không?")) {
+          try {
+            await axiosInstance.delete(`/admin/lining/delete`, { data: selectedItems });
+            getLining();
+            setSelectedItems([]);
+            toast.success("Xóa lót giày thành công");
+          } catch (error) {
+            let errorMessage = "Lỗi từ máy chủ";
+            if (error.response && error.response.data && error.response.data.message) {
+              errorMessage = error.response.data.message;
+            }
+            toast.error(errorMessage);
+          }
+        }
+      } else if (selecttt === 'cushion') {
+        if (window.confirm("Bạn có chắc chắn muốn xóa các đệm giày đã chọn không?")) {
+          try {
+            await axiosInstance.delete(`/admin/cushion/delete`, { data: selectedItems });
+            getCushion();
+            setSelectedItems([]);
+            toast.success("Xóa đệm giày thành công");
+          } catch (error) {
+            let errorMessage = "Lỗi từ máy chủ";
+            if (error.response && error.response.data && error.response.data.message) {
+              errorMessage = error.response.data.message;
+            }
+            toast.error(errorMessage);
+          }
+        }
+      } else if (selecttt === 'size') {
+        //size
+        if (window.confirm("Bạn có chắc chắn muốn xóa các size giày đã chọn không?")) {
+          try {
+            await axiosInstance.delete(`/admin/size/delete`, { data: selectedItems });
+            getSize();
+            setSelectedItems([]);
+            toast.success("Xóa size giày thành công");
+          } catch (error) {
+            let errorMessage = "Lỗi từ máy chủ";
+            if (error.response && error.response.data && error.response.data.message) {
+              errorMessage = error.response.data.message;
+            }
+            toast.error(errorMessage);
+          }
+        }
+      }
+    }
+  };
   return (
     <>
       <Container fluid>
@@ -745,7 +924,17 @@ const ProductAttributes = () => {
 
                     </CardTitle>
                   </div>
-
+                  <div className="col text-right">
+                    {showActions && (
+                      <Button
+                        color="danger" outline
+                        size="sm"
+                        onClick={handleDeleteButtonClick}
+                      >
+                        Xóa tất cả
+                      </Button>
+                    )}
+                  </div>
 
                 </Row>
                 {/*  */}
@@ -754,8 +943,12 @@ const ProductAttributes = () => {
                   <thead className="thead-light">
                     <tr>
                       <th className="text-center pb-4" >
-                        <FormGroup check>
-                          <Input type="checkbox" />
+                        <FormGroup check className="pb-4">
+                          <Input
+                            type="checkbox"
+                            checked={selectAll}
+                            onChange={handleSelectAll}
+                          />
                         </FormGroup>
 
                       </th>
@@ -776,8 +969,13 @@ const ProductAttributes = () => {
                         return (
                           <tr key={item.id} >
                             <td className="text-center">
-                              <FormGroup check>
-                                <Input type="checkbox" />
+                              <FormGroup check className="pb-4">
+                                <Input
+                                  type="checkbox"
+                                  checked={selectedItems.includes(item.id)}
+                                  onChange={() => handleCheckboxChange(item.id)}
+                                />
+
                               </FormGroup>
                             </td>
                             <th scope="row"> {index + 1}</th>

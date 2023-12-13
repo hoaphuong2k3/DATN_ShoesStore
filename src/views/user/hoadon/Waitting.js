@@ -267,7 +267,7 @@ const Waitting = (props) => {
                                                 className="d-flex justify-content-between mx-0 mt-0 mb-5 px-0 pt-0 pb-2"
                                             >
                                                 <li className="step0 active text-center" id="step1" ></li>
-                                                <li className="step0 text-muted text-center" id="step2"></li>
+                                                <li className="step0 active text-muted text-center" id="step2"></li>
                                                 <li className="step0 text-muted text-center" id="step3"></li>
                                                 <li className="step0 text-muted text-center" id="step4"></li>
                                                 <li className="step0 text-muted text-end" id="step5"></li>
@@ -312,7 +312,7 @@ const Waitting = (props) => {
                                     <Col lg={2}><b>Trạng thái:</b></Col>
                                     <Col lg={3}>
                                         <Badge color={'success'}>
-                                            Chờ xác nhận
+                                            Chờ vận chuyển
                                         </Badge>
                                     </Col>
                                 </Row>
