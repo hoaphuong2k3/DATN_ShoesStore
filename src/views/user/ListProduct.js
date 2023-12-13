@@ -12,6 +12,7 @@ import {
   FormGroup,
 } from "reactstrap";
 import Header from "components/Headers/UserHeader2.js";
+import SweetPagination from "sweetpagination";
 import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
 import { Slider } from "antd";
@@ -190,7 +191,9 @@ const Product = () => {
   const handleSliderChange = (value) => {
     setSliderValue(value);
   };
-
+  const [currentPageData, setCurrentPageData] = useState(new Array(2).fill());
+  // Example items, to simulate fetching from another resources.
+  const items = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
   return (
     <>
       <Header />
@@ -711,6 +714,20 @@ const Product = () => {
                         <p>Không có dữ liệu.</p>
                       )}
                     </div>
+                  </div>
+                  <div>
+                    {currentPageData.map((item) => (
+                      <div>
+                        <h3>Item #{item}</h3>
+                      </div>
+                    ))}
+
+                    <SweetPagination
+                      currentPageData={setCurrentPageData}
+                      dataPerPage={5}
+                      getData={items}
+                      navigation={true}
+                    />
                   </div>
                 </Row>
               </CardBody>

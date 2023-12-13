@@ -162,12 +162,19 @@ const Home = () => {
               <div className="Arrivals">
                 <Col md={12}>
                   <div className="section_product section_product_best_sell">
-                    <div className="section-head clearfix text-center">
-                      <h2 className="title_blog m-4">
+                    <div className="section-head clearfix">
+                      {/* <h2 className="title_blog m-4">
                         <a href="san-pham-noi-bat" title="NEW ARRIVALS">
                           <strong>NEW ARRIVALS</strong>
                         </a>
-                      </h2>
+                      </h2> */}
+                      <section class="title-section">
+                        <h2 class="title-header">
+                        <a href="/shoes/product" title="NEW ARRIVALS" className='text-dark'>
+                          NEW ARRIVALS
+                        </a>
+                        </h2>
+                      </section>
                       <div className="viewallcat hidden-xs"></div>
                     </div>
                     <div className="product-blocks clearfix row">
@@ -272,8 +279,8 @@ const Home = () => {
                   <div className="section_product section_product_best_sell">
                     <div className="section-head clearfix text-center">
                       <h2 className="title_blog m-4 mt-5 mb-3">
-                        <a href="san-pham-noi-bat" title="NEW ARRIVALS">
-                          <strong className="text-uppercase">
+                        <a href="/shoes/product" title="NEW ARRIVALS">
+                          <strong className="text-uppercase text-dark">
                             Leather Gent
                           </strong>
                         </a>
@@ -434,12 +441,14 @@ const Home = () => {
               <div className="Espadrilles">
                 <Col md={12}>
                   <div className="section_product section_product_best_sell">
-                    <div className="section-head clearfix text-center mt-5">
-                      <h2 className="title_blog m-4 mt-5">
-                        <a href="/shoes/product" title="Espadrilles">
-                          <strong>ESPADRILLES</strong>
+                    <div className="section-head clearfix mt-5">
+                    <section class="title-section">
+                        <h2 class="title-header">
+                        <a href="/shoes/product" title="Espadrilles" className='text-dark'>
+                         Espadrilles
                         </a>
-                      </h2>
+                        </h2>
+                      </section>
                       <div className="viewallcat hidden-xs"></div>
                     </div>
                     <div className="product-blocks clearfix row">
@@ -544,7 +553,7 @@ const Home = () => {
                   <div className="section_product section_product_best_sell ml-3">
                     <div className="section-head clearfix text-center mt-5">
                       <h2 className="title_blog m-4 mt-5">
-                        <a href="/shoes/product" title="Espadrilles">
+                        <a href="/shoes/product" title="outfit" className='text-dark'>
                           <strong>OUTFIT</strong>
                         </a>
                       </h2>
@@ -657,7 +666,7 @@ const Home = () => {
                     </div>
                   </div>
                 </Col>
-              </div>
+              </div>             
             </Container>
           </Row>
         </Container>

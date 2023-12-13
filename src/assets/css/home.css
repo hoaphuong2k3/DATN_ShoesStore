@@ -26,6 +26,7 @@
   color: green;
 }
 
+
 /* price */
 .product-card .product-card__inner .product-price {
   font-size: 12px;
@@ -91,17 +92,7 @@
   background-color: #000; /* Màu nền đen khi hover */
   color: #fff; /* Màu chữ trắng khi hover */
 }
-.title_blog a {
-  color: #1c1c1c;
-  letter-spacing: 3.2px;
-  font-size: 23px;
-  transition: color 0.45s ease;
-  font-weight: 350;
-}
 
-.title_blog a:hover {
-   color: green; /* Màu vàng nhạt */
-}
 .product-single__series {
     font-size: 13px;
     text-transform: uppercase;
@@ -249,5 +240,61 @@
   max-width: 380px;
   padding: 0em 0em 0em 9em;
 }
+
+.title-header {
+  position: relative;
+}
+.title-header::before {
+  content: "";
+  position: absolute;
+  top: 12px;
+  left: 10px;
+  width: 20%;
+  height: 2px;
+  background-color: #999999;
+}
+
+.title-section {
+  margin: 80px 0px 0px 0px;
+}
+
+/* h2.title-header {
+  font-size: 14px;
+  line-height: 20px;
+  color: #999999;
+  letter-spacing: 7.2px;
+  text-transform: uppercase;
+  padding: 0px 0px 3em 12em;
+  font-weight: bold;
+  position: relative;
+} */
+
+.title-header .title_blog a {
+  color: #1c1c1c;
+  letter-spacing: 3.2px;
+  font-size: 23px;
+  transition: color 0.45s ease;
+  font-weight: 400;
+  text-transform: uppercase;
+}
+
+.title-header a:hover {
+   color: green;
+}
+
+.title_blog a:hover{
+  color: green;
+}
+
+.title_blog a {
+  color: #1c1c1c;
+  letter-spacing: 3.2px;
+  font-size: 23px;
+  transition: color 0.45s ease;
+  font-weight: 350;
+}
+
+
+
 
   
