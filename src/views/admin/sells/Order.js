@@ -499,8 +499,8 @@ const Order = () => {
                                     </span>
                                 } />
 
-                                <Button className="mt-1 text-white" style={{backgroundColor: "#0099FF"}} size="sm" onClick={toggle}>
-                                <i class="fa-solid fa-right-to-bracket" />&nbsp;
+                                <Button className="mt-1 text-white" style={{ backgroundColor: "#0099FF" }} size="sm" onClick={toggle}>
+                                    <i class="fa-solid fa-right-to-bracket" />&nbsp;
                                     Danh mục
                                 </Button>
                             </div>
@@ -948,6 +948,20 @@ const Order = () => {
                                 </Row>
 
                                 <Row className="mb-1">
+                                    <small className="col text-danger text-right">
+                                        {selectedClient && (
+                                            <>
+                                                (Hoàn xu:
+                                                {totalAmount >= 10000000
+                                                    ? ` ${totalAmount * 0.02}`
+                                                    : ` ${totalAmount * 0.01}`
+                                                })
+                                            </>
+                                        )}
+                                    </small>
+                                </Row>
+
+                                <Row className="mb-1">
                                     <Col xs={6}>
                                         <ButtonGroup className="w-100">
                                             <Button
@@ -1019,7 +1033,7 @@ const Order = () => {
             <Col lg={12} className="my-4 text-center">
                 <Button className="bg-gradient-info text-white text-uppercase" onClick={createOrder}>Xác nhận đơn</Button>
             </Col>
-            <ToastContainer />
+
 
             {/* ListProduct */}
             <Modal
