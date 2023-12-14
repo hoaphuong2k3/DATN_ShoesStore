@@ -311,7 +311,7 @@ const Promotion = () => {
             const startDate = new Date(selectedDiscount.startDate);
             const endDate = new Date(selectedDiscount.endDate);
 
-            if (endDate >= today && startDate <= endDate) {
+            if (startDate <= endDate) {
                 await axiosInstance.patch(`/admin/discount-period/setDiscountPeriodRun/${id}`);
                 toast.success("Cập nhật thành công");
                 fetchData();

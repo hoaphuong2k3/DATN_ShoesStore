@@ -1532,7 +1532,7 @@ const ListShoesDetail = () => {
                                                                 ))}
                                                             </Table >
 
-                                                            <Col>
+                                                            <Col className="mb-5">
                                                                 <div className="d-flex justify-content-center">
                                                                     {selectedImages.length > 0 && selectedImages.filter((itemA) => itemA.i === itemColor.id).map((itemA, x) => (
                                                                         <div className="mr-4"
@@ -1596,7 +1596,7 @@ const ListShoesDetail = () => {
                                                         </>
                                                     ))}
 
-                                                    <Row className="text-center mt-5">
+                                                    <Row className="text-center">
                                                         <Col>
                                                             <Button onClick={onClickAddMany} color="primary">Thêm</Button>
                                                         </Col>

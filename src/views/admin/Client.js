@@ -272,7 +272,20 @@ const Client = () => {
     setFile(null);
   };
 
-
+  const getDefaultAvatar = (gender, avatar) => {
+    if (avatar) {
+      return `data:image/jpeg;base64,${avatar}`;
+    } else if (gender === true) {
+      // Nữ
+      return "https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcTu-uhxThn7kpatyW-egV5DpMNflanGQ_oeqUqmgEMx7KUkhyzF";
+    } else if (gender === false) {
+      // Nam
+      return "https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSbAVI8wgtBGopfLggnV-HvwW-_NYYvGxwAGRUBdHKwdSoPRjEX";
+    } else {
+      // Null
+      return "https://thumbs.dreamstime.com/b/default-businessman-avatar-icon-vector-business-people-profile-concept-279597784.jpg";
+    }
+  };
 
   const onInputChangeDataUpdate = (e) => {
     setEditClient({ ...editClient, [e.target.name]: e.target.value });
@@ -621,15 +634,15 @@ const Client = () => {
                           </FormGroup>
 
                         </th>
-                        <th scope="col">STT</th>
-                        <th scope="col">Trạng thái</th>
-                        <th scope="col">Ảnh</th>
-                        <th scope="col">Họ tên <i class="fa-solid fa-arrow-up"></i><i class="fa-solid fa-arrow-down"></i></th>
-                        <th scope="col">Email <i class="fa-solid fa-arrow-up"></i><i class="fa-solid fa-arrow-down"></i></th>
-                        <th scope="col">Số điện thoại <i class="fa-solid fa-arrow-up"></i><i class="fa-solid fa-arrow-down"></i></th>
-                        <th scope="col">Giới tính</th>
-                        <th scope="col">Ngày sinh <i class="fa-solid fa-arrow-up"></i><i class="fa-solid fa-arrow-down"></i></th>
-                        <th scope="col" style={{ position: "sticky", zIndex: '1', right: '0' }}>Thao tác</th>
+                        <th scope="col"style={{ color: "black" }}>STT</th>
+                        <th scope="col"style={{ color: "black" }}>Trạng thái</th>
+                        <th scope="col"style={{ color: "black" }}>Ảnh</th>
+                        <th scope="col"style={{ color: "black" }}>Họ tên <i class="fa-solid fa-arrow-up"></i><i class="fa-solid fa-arrow-down"></i></th>
+                        <th scope="col"style={{ color: "black" }}>Email <i class="fa-solid fa-arrow-up"></i><i class="fa-solid fa-arrow-down"></i></th>
+                        <th scope="col"style={{ color: "black" }}>Số điện thoại <i class="fa-solid fa-arrow-up"></i><i class="fa-solid fa-arrow-down"></i></th>
+                        <th scope="col"style={{ color: "black" }}>Giới tính</th>
+                        <th scope="col"style={{ color: "black" }}>Ngày sinh <i class="fa-solid fa-arrow-up"></i><i class="fa-solid fa-arrow-down"></i></th>
+                        <th scope="col"style={{ position: "sticky", zIndex: '1', right: '0', color: "black" }}>Thao tác</th>
 
                       </tr>
                     </thead>
@@ -655,10 +668,16 @@ const Client = () => {
                             </Badge>
                           </td>
                           <td>
-                            <span className="avatar avatar-sm rounded-circle">
-                              <img src={`data:image/jpeg;base64,${item.avatar}`} alt="" />
-                            </span>
-                          </td>
+                              <span className="avatar avatar-sm rounded-circle">
+                                <img
+                                  src={getDefaultAvatar(
+                                    item.gender,
+                                    item.avatar
+                                  )}
+                                  alt={item.username}
+                                />
+                              </span>
+                            </td>
                           <td>
                             {item.fullname}
                           </td>

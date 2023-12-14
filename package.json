@@ -59,6 +59,7 @@
     "file-saver": "^2.0.5",
     "install": "^0.13.0",
     "material": "^0.7.8",
+    "material-ui-pagination": "^1.1.6",
     "mdb-react-ui-kit": "^7.0.0",
     "moment": "2.29.4",
     "nouislider": "15.4.0",
