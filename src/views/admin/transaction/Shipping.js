@@ -724,6 +724,30 @@ const Shipping = () => {
                                                 </FormGroup>
                                             </Col>
                                         </Row>
+
+                                        {formData.percentPeriod && formData.percentPeriod === -1 && (
+                                            <Row>
+                                                <Col md={6}>
+                                                    <FormGroup>
+                                                        <Label>
+                                                            Giảm giá phí vận chuyển
+                                                        </Label>
+                                                        <InputGroup size="sm">
+                                                            <Input
+                                                                size="sm"
+                                                                type="number"
+                                                                value={Math.floor(deliveryData.deliveryCost)}
+                                                                readOnly style={{ backgroundColor: "#fff" }}
+                                                            />
+                                                            <InputGroupAddon addonType="append">
+                                                                <InputGroupText>VND</InputGroupText>
+                                                            </InputGroupAddon>
+                                                        </InputGroup>
+                                                    </FormGroup>
+                                                </Col>
+                                            </Row>
+                                        )}
+                                        
                                         <FormGroup>
                                             <Label>
                                                 Thành tiền

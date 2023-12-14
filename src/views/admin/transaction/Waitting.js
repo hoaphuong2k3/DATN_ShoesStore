@@ -147,6 +147,13 @@ const Waitting = () => {
             } else {
                 totalMoney = productPrice - (productPrice * percentPeriod / 100);
             }
+
+            if (hasShipping === true) {
+                totalMoney = totalMoney + Math.floor(shippingTotal);
+            } else {
+                totalMoney = totalMoney + Math.floor(deliveryCost);
+            }
+            
         } else {
             if (priceVoucher !== null) {
                 totalMoney = productPrice - priceVoucher;
@@ -157,11 +164,7 @@ const Waitting = () => {
             }
         }
 
-        if (hasShipping === true) {
-            totalMoney = totalMoney + Math.floor(shippingTotal);
-        } else {
-            totalMoney = totalMoney + Math.floor(deliveryCost);
-        }
+       
 
         return totalMoney;
     };
@@ -996,6 +999,30 @@ const Waitting = () => {
                                                 </FormGroup>
                                             </Col>
                                         </Row>
+
+                                        {formData.percentPeriod && formData.percentPeriod === -1 && (
+                                            <Row>
+                                                <Col md={6}>
+                                                    <FormGroup>
+                                                        <Label>
+                                                            Giảm giá phí vận chuyển
+                                                        </Label>
+                                                        <InputGroup size="sm">
+                                                            <Input
+                                                                size="sm"
+                                                                type="number"
+                                                                value={hasShippingData ? Math.floor(shippingTotal) : Math.floor(deliveryData.deliveryCost)}
+                                                                readOnly style={{ backgroundColor: "#fff" }}
+                                                            />
+                                                            <InputGroupAddon addonType="append">
+                                                                <InputGroupText>VND</InputGroupText>
+                                                            </InputGroupAddon>
+                                                        </InputGroup>
+                                                    </FormGroup>
+                                                </Col>
+                                            </Row>
+                                        )}
+
                                         <FormGroup>
                                             <Label>
                                                 Thành tiền
