@@ -424,10 +424,10 @@ const Staff = () => {
   };
 
   //delete
-  const deleteAdmin = (id) => {
+  const handleDelete = (id) => {
     if (window.confirm("Bạn có chắc chắn muốn xóa không?")) {
       axiosInstance
-        .patch(`/staff/delete/${id}`)
+        .patch("/staff/delete", { ids: [id] })
         .then((response) => {
           fetchData();
           toast.success("Xóa thành công");
@@ -438,29 +438,48 @@ const Staff = () => {
     }
   };
 
+  const handleDeleteButtonClick = async () => {
+    if (selectedId.length > 0) {
+      if (window.confirm("Bạn có chắc chắn muốn xóa nhân viên đã chọn không?")) {
+        try {
+          console.log(selectedId);
+          axiosInstance
+         .patch("/staff/delete", { ids: [selectedId] })
+          fetchData();
+          setSelectedId([]);
+          toast.success("Xóa thành công ");
+        } catch (error) {
+          let errorMessage = "Lỗi từ máy chủ";
+          if (error.response && error.response.data && error.response.data.message) {
+            errorMessage = error.response.data.message;
+          }
+          toast.error(errorMessage);
+        }
+
+      }
+    }
+  };
   // Select checkbox
   const [isCheckedAll, setIsCheckedAll] = useState(false);
   const [selectedId, setSelectedId] = useState([]);
   const [showActions, setShowActions] = useState(false);
 
-  const handleSelectAll = () => {
-    setIsCheckedAll(!isCheckedAll);
 
-    if (!isCheckedAll) {
-      const allStaff = admins.map((staff) => staff.id);
-      setSelectedId(allStaff);
-      setShowActions(true);
-    } else {
+  const handleSelectAll = () => {
+    if (isCheckedAll) {
       setSelectedId([]);
       setShowActions(false);
+    } else {
+      setSelectedId(admins.map(staff => staff.id));
+      setShowActions(true);
     }
+    setIsCheckedAll(!isCheckedAll);
   };
 
   const handleCheckboxChange = (idStaff) => {
     if (selectedId.includes(idStaff)) {
       setSelectedId(selectedId.filter((id) => id !== idStaff));
       setShowActions(selectedId.length - 1 > 0);
-      // setShowActions(false);
     } else {
       setSelectedId([...selectedId, idStaff]);
       setShowActions(true);
@@ -619,18 +638,13 @@ const Staff = () => {
                       </Col>{" "}
                       {/* Show Action */}
                       {showActions && (
-                        <Input
-                          type="select"
-                          className="ml-3"
-                          name="action"
-                          style={{ width: "150px" }}
+                        <Button
+                          color="danger" outline
                           size="sm"
-                          onChange={(e) => handleActionSelect(e.target.value)}
+                          onClick={handleDeleteButtonClick}
                         >
-                          <option value={""}>Chọn thao tác</option>
-                          <option value="deleteAll">Xóa tất cả</option>
-                          <option value="disableAll">Ngừng hoạt động</option>
-                        </Input>
+                          Xóa tất cả
+                        </Button>
                       )}
                       {/* End Show Action */}
                       {/* filter status */}
@@ -822,7 +836,7 @@ const Staff = () => {
                               <Button
                                 color="link"
                                 size="sm"
-                                onClick={() => deleteAdmin(admin.id)}
+                                onClick={() => handleDelete(admin.id)}
                               >
                                 <FaTrash />
                               </Button>
@@ -868,7 +882,7 @@ const Staff = () => {
                         <b> {totalElements}</b> mục
                       </div>
                     </Col>
-                    <Col style={{ fontSize: 14 }} lg={2}>
+                    <Col style={{ fontSize: 14 }} lg={2} className='d-flex justify-content-end'>
                       <Row>
                         <span>Xem </span>&nbsp;
                         <span>
@@ -877,7 +891,7 @@ const Staff = () => {
                             name="status"
                             style={{ width: "60px", fontSize: 14 }}
                             size="sm"
-                            className="mt--1"
+                            className="mt--1 "
                             onChange={handleSizeChange}
                           >
                             <option value="10">10</option>
@@ -893,7 +907,7 @@ const Staff = () => {
                     <Col
                       lg={4}
                       style={{ fontSize: 11 }}
-                      className="mt--1 text-right"
+                      className="mt--1 d-flex justify-content-end"
                     >
                       <ReactPaginate
                         breakLabel="..."
