@@ -122,7 +122,7 @@ const Success = (props) => {
                 if (response && response.data) {
                     setItemDetailDD(response.data);
                     if (Array.isArray(response.data.listCart)) {
-                        const updatedArray = response.data.listCart.map(item => ({ idShoesDetail: item.id, rating: 5 }));
+                        const updatedArray = response.data.listCart.map(item => ({ idShoesDetail: item.idShoesDetail, rating: 5 }));
                         setReviewList(updatedArray);
                     } else {
                         console.error('response.data is not an array:', response.data);
@@ -536,7 +536,7 @@ const Success = (props) => {
                                     <Col lg={4} className='text-center mt-3 ml--3'>
                                         <Rate
                                             value={Math.max(reviewList[i]?.rating || 5, 1)}
-                                            onChange={(value) => handleRatingChange(i, value, itemC.id)}
+                                            onChange={(value) => handleRatingChange(i, value, itemC.idShoesDetail)}
                                             style={{ color: '#ee4d2d', fontSize: '20px' }}
                                         />
                                     </Col>
@@ -554,7 +554,7 @@ const Success = (props) => {
                                                 type="textarea"
                                                 name="description"
                                                 value={reviewList[i]?.description || ''}
-                                                onChange={(e) => handleDescriptionChange(i, e, itemC.id)}
+                                                onChange={(e) => handleDescriptionChange(i, e, itemC.idShoesDetail)}
                                             />
                                         </FormGroup>
                                     </Col>
