@@ -1,7 +1,8 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
-import { ToastContainer } from 'react-toastify';
+import { ToastContainer, toast } from 'react-toastify';
+import { debounce } from 'lodash';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 import "assets/plugins/nucleo/css/nucleo.css";
@@ -13,41 +14,51 @@ import AuthLayout from "layouts/Auth.js";
 import UserLayout from "layouts/User.js";
 import "react-toastify/dist/ReactToastify.css";
 import { CartProvider } from "./contexts/Cart";
-import { AuthProvider } from 'services/AuthContext.js';
-import { Provider } from 'react-redux';
+import { AuthProvider, useAuth } from 'services/AuthContext.js';
 
-import store from './views/admin/transaction/store.js';
 const root = ReactDOM.createRoot(document.getElementById("root"));
+
+const showToast = debounce((message) => {
+  toast.error(message);
+}, 100);
+
+const PrivateRoute = ({ element, path }) => {
+  const { hasAdminOrStaffRole, token } = useAuth();
+
+  if (path.startsWith('/admin') && !hasAdminOrStaffRole() && !token) {
+    showToast("Bạn không có quyền truy cập");
+    return <Navigate to="/login" replace />;
+  }
+  return element;
+};
+
+
 
 root.render(
   <React.StrictMode>
-     <Provider store={store}>
-      <BrowserRouter>
-        <AuthProvider>
-          <CartProvider>
-            <Routes>
-              <Route path="/admin/*" element={<AdminLayout />} />
-              <Route path="/*" element={<AuthLayout />} />
-              <Route path="/shoes/*" element={<UserLayout />} />
-              <Route path="*" element={<Navigate to="/login" replace />} />
-            </Routes>
-          </CartProvider>
-        </AuthProvider>
-      </BrowserRouter>
-      <ToastContainer
-        position="top-right"
-        autoClose={5000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="light"
-      />  
-  </Provider>
+    <BrowserRouter>
+      <AuthProvider>
+        <CartProvider>
+          <Routes>
+            <Route path="/admin/*" element={<PrivateRoute element={<AdminLayout />} path="/admin/*" />} />
+            <Route path="/*" element={<AuthLayout />} />
+            <Route path="/shoes/*" element={<UserLayout />} />
+            <Route path="*" element={<Navigate to="/login" replace />} />
+          </Routes>
+        </CartProvider>
+      </AuthProvider>
+    </BrowserRouter>
+    <ToastContainer
+      position="top-right"
+      autoClose={5000}
+      hideProgressBar={false}
+      newestOnTop={false}
+      closeOnClick
+      rtl={false}
+      pauseOnFocusLoss
+      draggable
+      pauseOnHover
+      theme="light"
+    />
   </React.StrictMode>
- 
-
 );

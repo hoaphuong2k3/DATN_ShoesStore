@@ -72,13 +72,9 @@ const SaleBills = () => {
     };
     useEffect(() => {
         fetchData();
-        // Khởi tạo interval khi component được tạo
         const intervalId = setInterval(() => {
             fetchData();
-            console.log("test");
         }, 1000);
-
-        // Lưu intervalId vào state để sau này có thể xóa interval
         setReloadInterval(intervalId);
 
         return () => {
@@ -100,9 +96,9 @@ const SaleBills = () => {
     };
 
     const statusMapping = {
-        0: { color: 'danger', label: 'Kích hoạt' },
-        1: { color: 'success', label: 'Chờ kích hoạt' },
-        2: { color: 'warning', label: 'Ngừng kích hoạt' },
+        0: { color: 'success', label: 'Kích hoạt' },
+        1: { color: 'warning', label: 'Chờ kích hoạt' },
+        2: { color: 'danger', label: 'Ngừng kích hoạt' }
     };
 
     //sắp xếp
@@ -517,9 +513,9 @@ const SaleBills = () => {
                                         <td style={{ textAlign: "right" }}>{formatter.format(discount.minPrice)}</td>
                                         <td style={{ textAlign: "center" }}>
                                             {discount.salePercent ? (
-                                                <Badge color="info">Phần trăm</Badge>
+                                                <span>Phần trăm</span>
                                             ) : discount.salePrice ? (
-                                                <Badge color="success">Tiền mặt</Badge>
+                                                <span>Tiền mặt</span>
                                             ) : null}
                                         </td>
 

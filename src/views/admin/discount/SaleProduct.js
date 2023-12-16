@@ -4,7 +4,7 @@ import { FaSort } from "react-icons/fa6";
 import ReactPaginate from "react-paginate";
 import { toast } from "react-toastify";
 import axiosInstance from "services/custommize-axios";
-import { getAllShoes } from "services/Product2Service";
+import { getAllShoesUser } from "services/Product2Service";
 import { getAllShoesDetail2 } from "services/ShoesDetailService.js";
 import {
     getAllBrand, getAllOrigin, getAllDesignStyle, getAllSkinType,
@@ -26,6 +26,7 @@ const SaleProduct = () => {
     const toggle = () => setModal(!modal);
     const handleModal = () => {
         resetForm();
+        resetSearch();
         setModal(true);
     }
 
@@ -45,7 +46,7 @@ const SaleProduct = () => {
 
     const [fiveModal, setFiveModal] = useState(false);
     const toggleFiveModal = () => setFiveModal(!fiveModal);
-
+   
     const [discounts, setDiscounts] = useState([]);
     const [totalElements, setTotalElements] = useState(0);
     const [totalPages, setTotalPages] = useState(0);
@@ -119,8 +120,6 @@ const SaleProduct = () => {
             createdBy: ""
         })
     };
-    const [sort, setSort] = useState('');
-    const [sortStyle, setSortStyle] = useState('');
 
     const getlistBrand = async () => {
         let res = await getAllBrand();
@@ -174,7 +173,7 @@ const SaleProduct = () => {
 
     const getAll1 = async () => {
         try {
-            let res = await getAllShoes(page, size, search, sort, sortStyle);
+            let res = await getAllShoesUser(page, size, search);
             if (res && res.data && res.data.content) {
                 setListShoes(res.data.content);
             }
@@ -197,7 +196,7 @@ const SaleProduct = () => {
 
     useEffect(() => {
         getAll1(page, size);
-    }, [search, sort, sortStyle]);
+    }, [search]);
 
     const onInputChange = (e) => {
         setSearch({ ...search, [e.target.name]: e.target.value });
@@ -296,9 +295,9 @@ const SaleProduct = () => {
 
     //status
     const statusMapping = {
-        0: { color: 'danger', label: 'Kích hoạt' },
-        1: { color: 'success', label: 'Chờ kích hoạt' },
-        2: { color: 'warning', label: 'Ngừng kích hoạt' },
+        0: { color: 'success', label: 'Kích hoạt' },
+        1: { color: 'warning', label: 'Chờ kích hoạt' },
+        2: { color: 'danger', label: 'Ngừng kích hoạt' }
     };
 
     //sắp xếp
@@ -547,6 +546,7 @@ const SaleProduct = () => {
 
             setModal(false);
             resetForm();
+            resetSearch();
         } catch (error) {
             // Xử lý lỗi
             console.error("Error:", error);
@@ -757,11 +757,12 @@ const SaleProduct = () => {
                                         <td style={{ textAlign: "right" }}>{formatter.format(discount.minPrice)}</td>
                                         <td style={{ textAlign: "center" }}>
                                             {discount.salePercent ? (
-                                                <Badge color="info">Phần trăm</Badge>
+                                                <span>Phần trăm</span>
                                             ) : discount.salePrice ? (
-                                                <Badge color="success">Tiền mặt</Badge>
+                                                <span>Tiền mặt</span>
                                             ) : null}
                                         </td>
+
                                         <td style={{ textAlign: "right" }}>
                                             {discount.salePercent ? `${discount.salePercent}%` : ""}
                                             {discount.salePrice ? `${formatter.format(discount.salePrice)}` : ""}
