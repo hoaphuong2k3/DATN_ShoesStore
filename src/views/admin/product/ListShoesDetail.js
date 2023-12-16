@@ -608,7 +608,7 @@ const ListShoesDetail = () => {
             setSelectedImages([]);
         }
     }, [modalEdit]);
-    
+
     useEffect(() => {
         console.log(addone);
     }, [addone]);
@@ -1291,8 +1291,6 @@ const ListShoesDetail = () => {
                                                                             alt=""
                                                                             style={{ width: "80px" }}
                                                                         />
-
-
                                                                     </td>
                                                                     <td style={{ position: "sticky", zIndex: '1', right: '0', background: "#fff" }}>
                                                                         {/* <Button color="danger" to={`/admin/product/edit/${item.id}`} tag={Link} size="sm" disabled={item.status === 0 ? true : false}>
