@@ -1,0 +1,108 @@
+.panel-grid-cell .so-panel::before {
+    content: "";
+    display: block;
+}
+.widget-title {
+    position: absolute;
+    transform: rotate(-90deg);
+    border: 1px solid #999999;
+    padding: 21px 0px 21px 24px;
+    min-width: 350px;
+    left: 0em !important;
+    right: unset;
+    top: 10em !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+@media (min-width: 320px) and (max-width: 768px) {
+    .widget-title {
+      transform: none;
+      min-width: 320px;
+      padding: 21px 24px;
+      left: unset;
+      right: unset;
+      top: unset;
+      text-align: center;
+    }
+}
+
+.widget-title span{
+    font-size: 16px;
+    color: #999999;
+    line-height: 36px;
+    text-transform: uppercase;
+    font-weight: bold;
+    letter-spacing: 2.5px;
+    /* padding: 0px 0px 0px 20px; */
+}
+
+.title span{
+    font-size: 16px;
+    color: #999999;
+    line-height: 36px;
+    text-transform: uppercase;
+    font-weight: bold;
+    letter-spacing: 2.5px;
+    /* padding: 0px 0px 0px 20px; */
+}
+
+.label1 {
+    margin: 10px 100px 10px 0px;
+    font-size: 27px;
+    line-height: 36px;
+    transform: rotate(-0deg);
+    color: #999999;
+}
+.panel-grid-cell .so-panel::after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+.title small {
+    font-size: 14px;
+    color: #999999;
+    line-height: 36px;
+    text-transform: uppercase;
+    font-weight: bold;
+    letter-spacing: 7.2px;
+    display: block;
+}
+.textwidget {
+    margin: 2.5em 0px 5.5em 0px;
+}
+.panel-row-style{
+    align-items: flex-start;
+}
+.panel-grid-cell{
+    align-self: auto;
+}
+
+.title-header {
+    position: relative;
+  }
+  .title-header::before {
+    content: "";
+    position: absolute;
+    top: 12px;
+    left: 8px;
+    width: 13%;
+    height: 1px;
+    background-color: #999999;
+  }
+
+  .title-section {
+    margin: 80px 0px 0px 0px;
+  }
+  h2.title-header {
+    font-size: 14px;
+    line-height: 20px;
+    color: #999999;
+    letter-spacing: 7.2px;
+    text-transform: uppercase;
+    padding: 0px 0px 3em 12em;
+    font-weight: bold;
+    position: relative;
+  }

@@ -18,6 +18,7 @@ import ReactPaginate from "react-paginate";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import axiosInstance from "services/custommize-axios";
+import * as yup from "yup";
 import {
   Row,
   Card,
@@ -73,6 +74,37 @@ const Staff = () => {
     email: "",
     gender: "",
   });
+
+  // validate
+  const [errors, setErrors] = useState({});
+
+  const schema = yup.object().shape({
+    fullname: yup.string().required("Vui lòng nhập họ và tên"),
+    phoneNumber: yup
+      .string()
+      .matches(/^(84|0[3|5|7|8|9])+([0-9]{8})\b/, "Số điện thoại không hợp lệ")
+      .required("Vui lòng nhập số điện thoại"),
+    email: yup
+      .string()
+      .email("Địa chỉ email không hợp lệ")
+      .required("Vui lòng nhập địa chỉ email"),
+    username: yup.string().required("Vui lòng nhập tên đăng nhập"),
+  });
+
+  const validateInput = async () => {
+    try {
+      await schema.validate(formData, { abortEarly: false });
+      setErrors({});
+      return true;
+    } catch (error) {
+      const validationErrors = {};
+      error.inner.forEach((err) => {
+        validationErrors[err.path] = err.message;
+      });
+      setErrors(validationErrors);
+      return false;
+    }
+  };
 
   //load
   const fetchData = async () => {
@@ -276,44 +308,48 @@ const Staff = () => {
 
   //Add
   const saveAdmin = async () => {
-    try {
-      if (formData.id) {
-        await axiosInstance.put(`/staff/update`, formData);
-        changeAvatar();
-        fetchData();
-        toast.success("Cập nhật thành công!");
-      } else {
-        await axiosInstance.post("/staff/create", {
-          username: formData.username,
-          fullname: formData.fullname,
-          gender: formData.gender,
-          dateOfBirth: formData.dateOfBirth,
-          email: formData.email,
-          phoneNumber: formData.phoneNumber,
-          address: {
-            proviceCode: formData.address.proviceCode,
-            districtCode: formData.address.districtCode,
-            communeCode: formData.address.communeCode,
-            addressDetail: formData.address.addressDetail,
-            isDeleted: true,
-          },
-        });
+    if (await validateInput()) {
+      try {
+        if (formData.id) {
+          await axiosInstance.put(`/staff/update`, formData);
+          changeAvatar();
+          fetchData();
+          toast.success("Cập nhật thành công!");
+        } else {
+          await axiosInstance.post("/staff/create", {
+            username: formData.username,
+            fullname: formData.fullname,
+            gender: formData.gender,
+            dateOfBirth: formData.dateOfBirth,
+            email: formData.email,
+            phoneNumber: formData.phoneNumber,
+            address: {
+              proviceCode: formData.address.proviceCode,
+              districtCode: formData.address.districtCode,
+              communeCode: formData.address.communeCode,
+              addressDetail: formData.address.addressDetail,
+              isDeleted: true,
+            },
+          });
 
-        fetchData();
-        toast.success("Thêm mới thành công!");
-      }
+          fetchData();
+          toast.success("Thêm mới thành công!");
+        }
 
-      // Đóng modal và reset form
-      setModal(false);
-      resetForm();
-    } catch (error) {
-      console.error("Error:", error);
-      if (error.response) {
-        console.error("Response data:", error.response.data);
-        toast.error(error.response.data.message);
-      } else {
-        toast.error("Đã có lỗi xảy ra.");
+        // Đóng modal và reset form
+        setModal(false);
+        resetForm();
+      } catch (error) {
+        console.error("Error:", error);
+        if (error.response) {
+          console.error("Response data:", error.response.data);
+          toast.error(error.response.data.message);
+        } else {
+          toast.error("Đã có lỗi xảy ra.");
+        }
       }
+    } else {
+      toast.error("Vui lòng kiểm tra lại thông tin đăng ký");
     }
   };
 
@@ -388,10 +424,10 @@ const Staff = () => {
   };
 
   //delete
-  const deleteAdmin = (id) => {
+  const handleDelete = (id) => {
     if (window.confirm("Bạn có chắc chắn muốn xóa không?")) {
       axiosInstance
-        .patch(`/staff/delete/${id}`)
+        .patch("/staff/delete", { ids: [id] })
         .then((response) => {
           fetchData();
           toast.success("Xóa thành công");
@@ -402,29 +438,48 @@ const Staff = () => {
     }
   };
 
+  const handleDeleteButtonClick = async () => {
+    if (selectedId.length > 0) {
+      if (window.confirm("Bạn có chắc chắn muốn xóa nhân viên đã chọn không?")) {
+        try {
+          console.log(selectedId);
+          axiosInstance
+         .patch("/staff/delete", { ids: [selectedId] })
+          fetchData();
+          setSelectedId([]);
+          toast.success("Xóa thành công ");
+        } catch (error) {
+          let errorMessage = "Lỗi từ máy chủ";
+          if (error.response && error.response.data && error.response.data.message) {
+            errorMessage = error.response.data.message;
+          }
+          toast.error(errorMessage);
+        }
+
+      }
+    }
+  };
   // Select checkbox
   const [isCheckedAll, setIsCheckedAll] = useState(false);
   const [selectedId, setSelectedId] = useState([]);
   const [showActions, setShowActions] = useState(false);
 
-  const handleSelectAll = () => {
-    setIsCheckedAll(!isCheckedAll);
 
-    if (!isCheckedAll) {
-      const allStaff = admins.map((staff) => staff.id);
-      setSelectedId(allStaff);
-      setShowActions(true);
-    } else {
+  const handleSelectAll = () => {
+    if (isCheckedAll) {
       setSelectedId([]);
       setShowActions(false);
+    } else {
+      setSelectedId(admins.map(staff => staff.id));
+      setShowActions(true);
     }
+    setIsCheckedAll(!isCheckedAll);
   };
 
   const handleCheckboxChange = (idStaff) => {
     if (selectedId.includes(idStaff)) {
       setSelectedId(selectedId.filter((id) => id !== idStaff));
       setShowActions(selectedId.length - 1 > 0);
-      // setShowActions(false);
     } else {
       setSelectedId([...selectedId, idStaff]);
       setShowActions(true);
@@ -457,7 +512,6 @@ const Staff = () => {
   const [filterAdmins, setfilterAdmins] = useState([]);
   useEffect(() => {
     console.log(admins, selectedStatus);
-
     if (admins) {
       const filterAdmin = admins.filter((admin) => {
         if (
@@ -477,11 +531,9 @@ const Staff = () => {
 
       setfilterAdmins(filterAdmin);
     } else {
-      console.error(
-        "Biến 'admins' không được định nghĩa hoặc có giá trị là undefined."
-      );
+      console.error("Biến 'admins' không được định nghĩa.");
     }
-  }, [admins, selectedStatus]);
+  });
 
   // Lọc
   const handleFilter = () => {
@@ -520,7 +572,6 @@ const Staff = () => {
       sortOrder: newSortOrder,
     });
   };
-
 
   return (
     <>
@@ -574,7 +625,7 @@ const Staff = () => {
                         <InputGroup size="sm">
                           <Input
                             type="search"
-                            placeholder="Tìm kiếm nhân viên..."
+                            placeholder="Tìm kiếm nhân viên theo tên "
                             value={searchValue}
                             onChange={(e) => setSearchValue(e.target.value)}
                           />
@@ -587,18 +638,13 @@ const Staff = () => {
                       </Col>{" "}
                       {/* Show Action */}
                       {showActions && (
-                        <Input
-                          type="select"
-                          className="ml-3"
-                          name="action"
-                          style={{ width: "150px" }}
+                        <Button
+                          color="danger" outline
                           size="sm"
-                          onChange={(e) => handleActionSelect(e.target.value)}
+                          onClick={handleDeleteButtonClick}
                         >
-                          <option value={""}>Chọn thao tác</option>
-                          <option value="deleteAll">Xóa tất cả</option>
-                          <option value="disableAll">Ngừng hoạt động</option>
-                        </Input>
+                          Xóa tất cả
+                        </Button>
                       )}
                       {/* End Show Action */}
                       {/* filter status */}
@@ -790,7 +836,7 @@ const Staff = () => {
                               <Button
                                 color="link"
                                 size="sm"
-                                onClick={() => deleteAdmin(admin.id)}
+                                onClick={() => handleDelete(admin.id)}
                               >
                                 <FaTrash />
                               </Button>
@@ -836,7 +882,7 @@ const Staff = () => {
                         <b> {totalElements}</b> mục
                       </div>
                     </Col>
-                    <Col style={{ fontSize: 14 }} lg={2}>
+                    <Col style={{ fontSize: 14 }} lg={2} className='d-flex justify-content-end'>
                       <Row>
                         <span>Xem </span>&nbsp;
                         <span>
@@ -845,7 +891,7 @@ const Staff = () => {
                             name="status"
                             style={{ width: "60px", fontSize: 14 }}
                             size="sm"
-                            className="mt--1"
+                            className="mt--1 "
                             onChange={handleSizeChange}
                           >
                             <option value="10">10</option>
@@ -861,7 +907,7 @@ const Staff = () => {
                     <Col
                       lg={4}
                       style={{ fontSize: 11 }}
-                      className="mt--1 text-right"
+                      className="mt--1 d-flex justify-content-end"
                     >
                       <ReactPaginate
                         breakLabel="..."
@@ -1410,7 +1456,6 @@ const Staff = () => {
                 </div>
               </ModalFooter>
             </Modal>
-            
           </Col>
         </Row>
       </Container>
