@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import axiosInstance from "services/custommize-axios";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
+import * as yup from 'yup';
 import { FaQrcode, FaUserPlus, FaUndoAlt, FaTrashAlt } from 'react-icons/fa';
 import ReactPaginate from 'react-paginate';
 import Toggle from 'react-toggle';
@@ -9,7 +10,7 @@ import QRCode from 'qrcode.react';
 import QrReader from 'react-qr-reader';
 import {
     Row, Col, Button, Card, CardBody, CardHeader, Table, InputGroup, Input, ButtonGroup,
-    Form, FormGroup, Label, Modal, ModalBody, ModalHeader, ModalFooter
+    Form, FormGroup, Label, Modal, ModalBody, ModalHeader, ModalFooter, FormFeedback
 } from "reactstrap";
 import { Empty } from 'antd';
 import SlideShow from '../product/SlideShow.js';
@@ -125,6 +126,7 @@ const Order = () => {
     const [selectedToWardCode, setSelectedToWardCode] = useState("");
     const [recipientName, setRecipientName] = useState('');
     const [recipientPhone, setRecipientPhone] = useState('');
+    const [detailedAddress, setDetailedAddress] = useState('');
 
     const fetchDataFromAPI = async (url, stateSetter) => {
         try {
@@ -170,11 +172,9 @@ const Order = () => {
         setShippingTotal(0);
         setRecipientName("");
         setRecipientPhone("");
-        const detailedAddressElement = document.getElementById("detailedAddress")
+        setDetailedAddress("");
+        setValidationErrors({});
 
-        if (detailedAddressElement) {
-            detailedAddressElement.value = "";
-        }
     };
 
     const handleApiCall = async () => {
@@ -345,7 +345,6 @@ const Order = () => {
     const buildDeliveryAddress = () => {
         const addressParts = [];
 
-        const detailedAddress = document.getElementById("detailedAddress").value;
         if (detailedAddress) {
             addressParts.push(detailedAddress);
         }
@@ -406,29 +405,47 @@ const Order = () => {
         idDiscountPeriods = null;
     }
 
+    const [validationErrors, setValidationErrors] = useState({});
+
+    const shippingSchema = yup.object().shape({
+        recipientName: yup.string().required('Vui lòng nhập tên người nhận.'),
+        recipientPhone: yup.string().matches(/^(84|0[3|5|7|8|9])+([0-9]{8})\b/, 'Số điện thoại không hợp lệ.').required('Vui lòng nhập số điện thoại.'),
+        selectedProvince: yup.string().required('Vui lòng chọn tỉnh/thành phố.'),
+        selectedDistrict: yup.string().required('Vui lòng chọn quận/huyện.'),
+        selectedWard: yup.string().required('Vui lòng chọn xã/phường.'),
+        detailedAddress: yup.string().required('Vui lòng nhập địa chỉ chi tiết.'),
+    });
+
+
     const createOrder = async () => {
 
-        const idClient = selectedClient ? selectedClient.id : null;
-        let deliveryOrderDTO = null;
+        try {
 
-        if (showShippingForm) {
+            // Nếu dữ liệu hợp lệ, tiếp tục thực hiện createOrder
+            const idClient = selectedClient ? selectedClient.id : null;
+            let deliveryOrderDTO = null;
 
-            if (recipientName.length === 0 || recipientPhone.length === 0) {
-                alert("Điền hết thông tin phiếu giao");
-                return;
+            if (showShippingForm) {
+
+                await shippingSchema.validate({
+                    recipientName,
+                    recipientPhone,
+                    selectedProvince,
+                    selectedDistrict,
+                    selectedWard,
+                    detailedAddress,
+                }, { abortEarly: false });
+
+                const newDeliveryAddress = buildDeliveryAddress();
+                setDeliveryData({ ...deliveryData, deliveryAddress: newDeliveryAddress });
+                deliveryOrderDTO = {
+                    address: newDeliveryAddress,
+                    recipientName: recipientName,
+                    recipientPhone: recipientPhone,
+                    deliveryCost: shippingTotal,
+                };
             }
 
-            const newDeliveryAddress = buildDeliveryAddress();
-            setDeliveryData({ ...deliveryData, deliveryAddress: newDeliveryAddress });
-            deliveryOrderDTO = {
-                address: newDeliveryAddress,
-                recipientName: recipientName,
-                recipientPhone: recipientPhone,
-                deliveryCost: shippingTotal,
-            };
-        }
-
-        try {
             const orderResponse = await axiosInstance.post('/store/create', {
                 totalMoney: totalAmount,
                 totalPayment: calculateTotalMoney(),
@@ -456,10 +473,14 @@ const Order = () => {
             setPaymentMethod(4);
             setCustomerPayment(0);
 
-        } catch (error) {
-            // Xử lý lỗi nếu có
-            console.error('Lỗi khi tạo hóa đơn:', error);
+        } catch (validationError) {
+            const errors = {};
+            validationError.inner.forEach(error => {
+                errors[error.path] = error.message;
+            });
+            setValidationErrors(errors);
         }
+
     };
 
     //Tính toán
@@ -724,27 +745,36 @@ const Order = () => {
                                 </CardHeader>
                                 <CardBody style={{ fontSize: 14 }}>
                                     <Form>
-
                                         <Row>
                                             <Col lg="6">
                                                 <FormGroup>
                                                     <Label>Người nhận</Label>
-                                                    <Input type="text" size="sm"
+                                                    <Input
+                                                        type="text"
+                                                        size="sm"
                                                         value={recipientName}
                                                         onChange={(e) => setRecipientName(e.target.value)}
+                                                        invalid={!!validationErrors.recipientName}
                                                     />
+                                                    <FormFeedback>{validationErrors.recipientName}</FormFeedback>
                                                 </FormGroup>
                                             </Col>
                                             <Col lg="6">
                                                 <FormGroup>
                                                     <Label>Số điện thoại</Label>
-                                                    <Input type="tel" size="sm"
+                                                    <Input
+                                                        type="tel"
+                                                        size="sm"
                                                         value={recipientPhone}
                                                         onChange={(e) => setRecipientPhone(e.target.value)}
+                                                        invalid={!!validationErrors.recipientPhone}
                                                     />
+                                                    <FormFeedback>{validationErrors.recipientPhone}</FormFeedback>
                                                 </FormGroup>
                                             </Col>
                                         </Row>
+
+                                        {/* Các trường khác tương tự */}
 
                                         <Row>
                                             <Col lg="4">
@@ -760,6 +790,7 @@ const Order = () => {
                                                             setSelectedDistrict("");
                                                             setSelectedWard("");
                                                         }}
+                                                        invalid={!!validationErrors.selectedProvince}
                                                     >
                                                         <option value="">---Chọn---</option>
                                                         {provinces.map((province) => (
@@ -768,6 +799,7 @@ const Order = () => {
                                                             </option>
                                                         ))}
                                                     </Input>
+                                                    <FormFeedback>{validationErrors.selectedProvince}</FormFeedback>
                                                 </FormGroup>
                                             </Col>
                                             <Col lg="4">
@@ -784,6 +816,7 @@ const Order = () => {
                                                             setSelectedWard("");
                                                             setSelectedToDistrictID(e.target.value);
                                                         }}
+                                                        invalid={!!validationErrors.selectedDistrict}
                                                     >
                                                         <option value="">---Chọn---</option>
                                                         {selectedProvince &&
@@ -793,6 +826,7 @@ const Order = () => {
                                                                 </option>
                                                             ))}
                                                     </Input>
+                                                    <FormFeedback>{validationErrors.selectedDistrict}</FormFeedback>
                                                 </FormGroup>
                                             </Col>
                                             <Col lg="4">
@@ -809,6 +843,7 @@ const Order = () => {
                                                             setSelectedToWardCode(e.target.value.toString());
                                                             handleApiCall();
                                                         }}
+                                                        invalid={!!validationErrors.selectedWard}
                                                     >
                                                         <option value="">---Chọn---</option>
                                                         {selectedDistrict &&
@@ -818,20 +853,24 @@ const Order = () => {
                                                                 </option>
                                                             ))}
                                                     </Input>
+                                                    <FormFeedback>{validationErrors.selectedWard}</FormFeedback>
                                                 </FormGroup>
                                             </Col>
                                         </Row>
-
                                         <Row>
                                             <Col lg="12">
                                                 <FormGroup>
                                                     <Label>Địa chỉ</Label>
-                                                    <Input rows="2"
+                                                    <Input
+                                                        rows="2"
                                                         type="textarea"
                                                         size="sm"
-                                                        id="detailedAddress"
+                                                        value={detailedAddress} 
+                                                        onChange={(e) => setDetailedAddress(e.target.value)}
                                                         placeholder="Địa chỉ chi tiết..."
+                                                        invalid={!!validationErrors.detailedAddress}
                                                     />
+                                                    <FormFeedback>{validationErrors.detailedAddress}</FormFeedback>
                                                 </FormGroup>
                                             </Col>
                                         </Row>
@@ -851,7 +890,7 @@ const Order = () => {
                             <Row className="col" style={{ justifyContent: "space-between" }}>
                                 <h4>Thanh toán</h4>
                                 <FormGroup check>
-                                    <Label check>
+                                    <Label >
                                         <Input
                                             type="checkbox"
                                             checked={showShippingForm}
@@ -861,7 +900,7 @@ const Order = () => {
                                                     resetShip();
                                                 }
                                             }}
-                                        />Ship
+                                        /><i class="fa-solid fa-truck-fast" />
                                     </Label>
                                 </FormGroup>
                             </Row>

@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import axiosInstance from "services/custommize-axios";
 import { Line, Bar } from "react-chartjs-2";
 // reactstrap components
+import { DatePicker } from 'antd';
 import {
   Button,
   Card,
@@ -27,6 +28,10 @@ import {
 import Header from "components/Headers/AdminHeader.js";
 
 const Index = (props) => {
+
+  const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1);
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+  const [selectedYear2, setSelectedYear2] = useState(new Date().getFullYear());
 
   const [chartExample1Data, setChartExample1Data] = useState({
     labels: [],
@@ -55,18 +60,27 @@ const Index = (props) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axiosInstance.get(
-          "/statistics/data-product"
-        );
-        const dataFromApi = response.data;
+        const defaultMonth = selectedMonth !== null ? selectedMonth : new Date().getMonth() + 1;
+        const defaultYear = selectedYear !== null ? selectedYear : new Date().getFullYear();
 
-        const today = new Date();
-        const firstDayOfMonth = startOfMonth(today);
-        const lastDayOfMonth = isBefore(today, endOfMonth(today))
-          ? today
-          : endOfMonth(today);
+        const firstDayOfMonth = startOfMonth(new Date(defaultYear, defaultMonth - 1, 1));
+        const lastDayOfMonth = isBefore(new Date(), endOfMonth(new Date(defaultYear, defaultMonth - 1, 1)))
+          ? new Date()
+          : endOfMonth(new Date(defaultYear, defaultMonth - 1, 1));
+
         const allDaysOfMonth = eachDayOfInterval({ start: firstDayOfMonth, end: lastDayOfMonth });
         const labels = allDaysOfMonth.map((day) => format(day, 'dd-MM'));
+
+        const response = await axiosInstance.get(
+          "/statistics/data-product",
+          {
+            params: {
+              month: defaultMonth,
+              year: defaultYear,
+            },
+          }
+        );
+        const dataFromApi = response.data;
         const datasets = [
           {
             label: "Doanh thu",
@@ -88,23 +102,26 @@ const Index = (props) => {
     };
 
     fetchData();
-  }, []);
+  }, [selectedMonth, selectedYear]);
+
+
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axiosInstance.get(
-          "/statistics/data-product-year"
-        );
-
-        const apiData = response.data;
+        const defaultYear = selectedYear2 !== null ? selectedYear2 : new Date().getFullYear();
+        const firstMonthofYear = startOfYear(new Date(defaultYear, 0)); 
+        const lastMonthofYear = endOfYear(new Date(defaultYear, 11)); 
+  
         const allMonthsOfYear = eachMonthOfInterval({
-          start: startOfYear(new Date()),
-          end: endOfYear(new Date())
+          start: firstMonthofYear,
+          end: lastMonthofYear,
         });
-
-        // Điền vào dữ liệu tương ứng từ API hoặc set giá trị là 0 nếu không có dữ liệu
         const labels = allMonthsOfYear.map((month) => format(month, 'MM'));
+  
+        const response = await axiosInstance.get(`/statistics/data-product-year?year=${selectedYear2}`);
+        const apiData = response.data;
+        console.log(apiData);
         const datasets = [
           {
             label: "Doanh thu",
@@ -115,7 +132,7 @@ const Index = (props) => {
             }),
           },
         ];
-        // Sửa đổi state để cập nhật dữ liệu của biểu đồ
+  
         setChartExample2({
           labels: labels,
           datasets: datasets,
@@ -124,16 +141,14 @@ const Index = (props) => {
         console.error("Lỗi khi lấy dữ liệu:", error);
       }
     };
-
+  
     fetchData();
-  }, []);
+  }, [selectedYear2]);
+  
+
 
   const currentDate = new Date();
-  const getMonthDes = () => {
-    const monthNumber = getMonth(currentDate) + 1;
-    const year = currentDate.getFullYear();
-    return `${monthNumber}/${year}`;
-  };
+  
   const getYearDes = () => {
     const year = currentDate.getFullYear();
     return `${year}`;
@@ -181,8 +196,28 @@ const Index = (props) => {
                 <Row className="align-items-center">
                   <div className="col">
                     <h6 className="text-uppercase text-white ls-1 mb-1">
-                      Doanh thu T{getMonthDes()}
+                      <h6 className="text-uppercase text-white ls-1 mb-1">
+                        {`Doanh thu ${`Tháng ${selectedMonth}/${selectedYear}`}`}
+                      </h6>
+
                     </h6>
+                  </div>
+                  <div className="col text-right">
+                    <DatePicker className="bg-primary" 
+                      picker="month"
+                      onChange={(date, dateString) => {
+                        if (date) {
+                          const [year, month] = dateString.split("-");
+                          setSelectedMonth(parseInt(month, 10));
+                          setSelectedYear(parseInt(year, 10));
+                        } else {
+                          const currentDate = new Date();
+                          setSelectedMonth(currentDate.getMonth() + 1);
+                          setSelectedYear(currentDate.getFullYear());
+                        }
+                      }}
+                    />
+
                   </div>
 
                 </Row>
@@ -200,6 +235,7 @@ const Index = (props) => {
             </Card>
           </Col>
         </Row>
+
         <Row className="mt-5">
           <Col className="mb-5 mb-xl-0" xl="8">
             <Card className="shadow">
@@ -207,8 +243,22 @@ const Index = (props) => {
                 <Row className="align-items-center">
                   <div className="col">
                     <h6 className="text-uppercase ls-1 mb-1">
-                      Doanh thu Năm {getYearDes()}
+                    {`DOANH THU NĂM ${`${selectedYear2}`}`}
                     </h6>
+                  </div>
+                  <div className="col text-right">
+                    <DatePicker
+                      picker="year"
+                      onChange={(date, dateString) => {
+                        if (date) {
+                          const year = dateString;
+                          setSelectedYear2(parseInt(year, 10));
+                        } else {
+                          const currentDate = new Date();
+                          setSelectedYear2(currentDate.getFullYear());
+                        }
+                      }}
+                    />
                   </div>
                 </Row>
               </CardHeader>
