@@ -583,6 +583,15 @@ const ListShoesDetail = () => {
     };
     //End Báo cáo
     // Thêm mới 1 ctsp
+    const [addone, setAddOne] = useState({
+        id: "",
+        sizeId: "",
+        colorId: "",
+        quantity: "",
+        price: "",
+        status: "1"
+    });
+
     const [modalAdd, setModalAdd] = useState(false);
     const toggle = () => setModalAdd(!modalAdd);
     const [modalEdit, setModalEdit] = useState(false);
@@ -599,17 +608,11 @@ const ListShoesDetail = () => {
             setSelectedImages([]);
         }
     }, [modalEdit]);
+    
     useEffect(() => {
         console.log(addone);
     }, [addone]);
-    const [addone, setAddOne] = useState({
-        id: "",
-        sizeId: "",
-        colorId: "",
-        quantity: "",
-        price: "",
-        status: "1"
-    });
+
     const resetAddOne = () => {
         setAddOne({
             id: "",
