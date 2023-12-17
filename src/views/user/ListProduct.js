@@ -50,7 +50,7 @@ const Product = () => {
   const [totalPages, setTotalPages] = useState(0);
   const [totalElements, setTotalElenments] = useState(0);
   const [page, setPage] = useState(0);
-  const [size, setSize] = useState(4);
+  const [size, setSize] = useState(12);
   const [search, setSearch] = useState({
     name: "",
     brandId: null,
