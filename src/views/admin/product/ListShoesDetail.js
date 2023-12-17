@@ -3,12 +3,13 @@ import { useParams, useNavigate } from "react-router-dom";
 import { findShoes } from "services/Product2Service";
 import { getAllShoesDetail, getAllShoesDetail3 } from "services/ShoesDetailService.js";
 import ReactPaginate from 'react-paginate';
-import { FaEdit, FaTrash, FaLock, FaLockOpen, FaAngleDown, FaAngleUp, FaFilter, FaSearch, FaQrcode } from 'react-icons/fa';
+import { FaEdit, FaTrash, FaLock, FaLockOpen, FaAngleDown, FaAngleUp, FaFilter, FaSearch, FaQrcode, FaSort } from 'react-icons/fa';
 import { getAllColorId, getAllSizeId, getAllColor, getAllSize } from "services/ProductAttributeService";
 import { getAllImage, updateImage, postNewImage, deleteImage } from "services/ImageService";
 import {
     Card, CardBody, Container, Row, Col, FormGroup, Input, Button, Form, CardTitle, Label, Table, Badge, Modal, ModalHeader, ModalFooter, ModalBody, CardHeader, InputGroup, InputGroupAddon, InputGroupText
 } from "reactstrap";
+import { Tooltip, Popconfirm } from 'antd';
 import { toast } from 'react-toastify';
 import Switch from 'react-input-switch';
 import axios from "axios";
@@ -21,7 +22,7 @@ const ListShoesDetail = () => {
     const [modal3, setModal3] = useState(false);
     const toggle3 = () => setModal3(!modal3);
     const [result, setResult] = useState("");
-    let handleScan = data => {
+    let handleScan = (data) => {
         if (data) {
             setResult(data);
             setModal3(false);
@@ -837,27 +838,14 @@ const ListShoesDetail = () => {
 
     //Kết thúc thêm mới 1 ctsp
     //Start Delete
-    const [deleteshoes, setDeleteShoes] = useState([]);
-    const [iddeleteshoes, setIdDeleteShoes] = useState([]);
-    const [modalConfirmDelete, setModalConfirmDelete] = useState(false);
-    const toggleDelete = () => setModalConfirmDelete(!modalConfirmDelete);
-    const handleConfirmDelete = (shoes) => {
-        setDeleteShoes(shoes);
-        setIdDeleteShoes([...iddeleteshoes, shoes.id])
-        toggleDelete();
-    }
-    const handleDelete = async () => {
+
+    const handleDelete = async (id) => {
         try {
-            console.log(iddeleteshoes);
-            await axiosInstance.delete(`/admin/shoesdetail/delete`, { data: iddeleteshoes });
+            await axiosInstance.delete(`/admin/shoesdetail/delete`, { data: [id] });
             getAll();
             getListCheck();
-            setIdDeleteShoes([]);
-            toggleDelete();
             toast.success("Xóa thành công ");
         } catch (error) {
-            setIdDeleteShoes([]);
-            toggleDelete();
             let errorMessage = "Lỗi từ máy chủ";
             if (error.response && error.response.data && error.response.data.message) {
                 errorMessage = error.response.data.message;
@@ -991,9 +979,10 @@ const ListShoesDetail = () => {
     //Slide show
     const [sort, setSort] = useState('');
     const [sortStyle, setSortStyle] = useState('');
-    const onClickSort = (a, b) => {
+    const onClickSort = (a) => {
+        const newSortOrder = sort === a && sortStyle === 'asc' ? 'desc' : 'asc';
         setSort(a);
-        setSortStyle(b);
+        setSortStyle(newSortOrder);
     }
     useEffect(() => {
         getAll();
@@ -1096,8 +1085,6 @@ const ListShoesDetail = () => {
                         </Card>
                         {listCheck.length > 0 &&
                             <>
-
-
                                 <Card className="card-stats mb-xl-0">
                                     <CardHeader className="bg-transparent">
 
@@ -1214,7 +1201,7 @@ const ListShoesDetail = () => {
                                             </Row>
                                             <Table responsive className="align-items-center table-flush">
                                                 <thead className="thead-light">
-                                                    <tr>
+                                                    <tr className="text-center">
                                                         <th>
                                                             <FormGroup check className="pb-4">
                                                                 <Input
@@ -1224,23 +1211,35 @@ const ListShoesDetail = () => {
                                                                 />
                                                             </FormGroup>
                                                         </th>
-                                                        <th>STT</th>
-                                                        <th>Trạng thái</th>
-                                                        <th>Ảnh</th>
-                                                        <th>Mã  <i class="fa-solid fa-arrow-up" onClick={() => onClickSort('code', 'asc')} />
-                                                            <i class="fa-solid fa-arrow-down" onClick={() => onClickSort('code', 'desc')} /></th>
-                                                        <th>Màu  <i class="fa-solid fa-arrow-up" onClick={() => onClickSort('color', 'asc')} />
-                                                            <i class="fa-solid fa-arrow-down" onClick={() => onClickSort('color', 'desc')} /></th>
-                                                        <th>Size  <i class="fa-solid fa-arrow-up" onClick={() => onClickSort('size', 'asc')} />
-                                                            <i class="fa-solid fa-arrow-down" onClick={() => onClickSort('size', 'desc')} /></th>
-                                                        <th>Số lượng  <i class="fa-solid fa-arrow-up" onClick={() => onClickSort('quantity', 'asc')} />
-                                                            <i class="fa-solid fa-arrow-down" onClick={() => onClickSort('quantity', 'desc')} /></th>
-                                                        <th>Giá gốc  <i class="fa-solid fa-arrow-up" onClick={() => onClickSort('price', 'asc')} />
-                                                            <i class="fa-solid fa-arrow-down" onClick={() => onClickSort('price', 'desc')} /></th>
-                                                        <th>Giá giảm  <i class="fa-solid fa-arrow-up" onClick={() => onClickSort('discountPrice', 'asc')} />
-                                                            <i class="fa-solid fa-arrow-down" onClick={() => onClickSort('discountPrice', 'desc')} /></th>
-                                                        <th>QR Code</th>
-                                                        <th colSpan={2} style={{ position: "sticky", zIndex: '1', right: '0' }}>Thao tác</th>
+                                                        <th style={{ color: "black" }}>STT</th>
+                                                        <th style={{ color: "black" }}>Trạng thái</th>
+                                                        <th style={{ color: "black" }}>Ảnh</th>
+                                                        <th style={{ color: "black" }}>Mã <FaSort
+                                                            style={{ cursor: "pointer" }}
+                                                            className="text-muted"
+                                                            onClick={() => onClickSort("code")} /></th>
+                                                        <th style={{ color: "black" }}>Màu <FaSort
+                                                            style={{ cursor: "pointer" }}
+                                                            className="text-muted"
+                                                            onClick={() => onClickSort("color")} /></th>
+                                                        <th style={{ color: "black" }}>Size <FaSort
+                                                            style={{ cursor: "pointer" }}
+                                                            className="text-muted"
+                                                            onClick={() => onClickSort("size")} /></th>
+                                                        <th style={{ color: "black" }}>Số lượng <FaSort
+                                                            style={{ cursor: "pointer" }}
+                                                            className="text-muted"
+                                                            onClick={() => onClickSort("quantity")} /></th>
+                                                        <th style={{ color: "black" }}>Giá gốc <FaSort
+                                                            style={{ cursor: "pointer" }}
+                                                            className="text-muted"
+                                                            onClick={() => onClickSort("price")} /></th>
+                                                        <th style={{ color: "black" }}>Giá giảm <FaSort
+                                                            style={{ cursor: "pointer" }}
+                                                            className="text-muted"
+                                                            onClick={() => onClickSort("discountPrice")} /></th>
+                                                        <th style={{ color: "black" }}>QR Code</th>
+                                                        <th colSpan={2} style={{ position: "sticky", zIndex: '1', right: '0', color: "black" }}>Thao tác</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
@@ -1253,7 +1252,7 @@ const ListShoesDetail = () => {
                                                     {ListShoesDetail && ListShoesDetail.length > 0 &&
                                                         ListShoesDetail.map((item, index) => {
                                                             return (
-                                                                <tr key={item.id} >
+                                                                <tr key={item.id} className="text-center">
                                                                     <td className="text-center">
                                                                         <FormGroup check className="pb-4">
                                                                             <Input
@@ -1293,32 +1292,58 @@ const ListShoesDetail = () => {
                                                                         />
                                                                     </td>
                                                                     <td style={{ position: "sticky", zIndex: '1', right: '0', background: "#fff" }}>
-                                                                        {/* <Button color="danger" to={`/admin/product/edit/${item.id}`} tag={Link} size="sm" disabled={item.status === 0 ? true : false}>
-                                                                        <i class="fa-solid fa-pen" />
-                                                                    </Button> */}
-                                                                        <Button color="link" size="sm" disabled={item.shoesDetailSearchResponse.status === 0 ? true : false} onClick={() => openEdit(item.shoesDetailSearchResponse.id)}>
-                                                                            <FaEdit color="primary" />
-                                                                        </Button>
-                                                                        {item.shoesDetailSearchResponse.status === 0 &&
-                                                                            <Button color="link" size="sm" onClick={() => openlock(item.shoesDetailSearchResponse.id)}>
-                                                                                <FaLockOpen color="primary" />
+                                                                        <Tooltip title="Chỉnh sửa">
+                                                                            <Button color="link" size="sm" disabled={item.shoesDetailSearchResponse.status === 0 ? true : false} onClick={() => openEdit(item.shoesDetailSearchResponse.id)}>
+                                                                                <FaEdit color="primary" />
                                                                             </Button>
+                                                                        </Tooltip>
+                                                                        {item.shoesDetailSearchResponse.status === 0 &&
+                                                                            <Popconfirm
+                                                                                title="Bạn có chắc muốn kích hoạt sản phẩm này không?"
+                                                                                onConfirm={() => openlock(item.shoesDetailSearchResponse.id)}
+                                                                                okText="Xác nhận"
+                                                                                cancelText="Hủy"
+                                                                            >
+                                                                                <Tooltip title="Kích hoạt">
+                                                                                    <Button color="link" size="sm">
+                                                                                        <FaLockOpen color="primary" />
+                                                                                    </Button>
+                                                                                </Tooltip>
+                                                                            </Popconfirm>
                                                                         }
                                                                         {(item.shoesDetailSearchResponse.status === 1 || item.shoesDetailSearchResponse.status === (-1)) &&
-                                                                            <Button color="link" size="sm" onClick={() => lock(item.shoesDetailSearchResponse.id)} >
-                                                                                <FaLock color="primary" />
-                                                                            </Button>
+                                                                            <Popconfirm
+                                                                                title="Bạn có chắc muốn ngừng kích hoạt sản phẩm này không?"
+                                                                                onConfirm={() => lock(item.shoesDetailSearchResponse.id)}
+                                                                                okText="Xác nhận"
+                                                                                cancelText="Hủy"
+                                                                            >
+                                                                                <Tooltip title="Ngừng kích hoạt">
+                                                                                    <Button color="link" size="sm" >
+                                                                                        <FaLock color="primary" />
+                                                                                    </Button>
+                                                                                </Tooltip>
+                                                                            </Popconfirm>
                                                                         }
-                                                                        <Button color="link" size="sm" onClick={() => handleConfirmDelete(item.shoesDetailSearchResponse)}>
-                                                                            <FaTrash color="primary" />
-                                                                        </Button>
+                                                                        <Popconfirm
+                                                                            title={`Bạn có muốn xóa giày mã ${item.shoesDetailSearchResponse.code} giày này không ?`}
+                                                                            onConfirm={() => handleDelete(item.shoesDetailSearchResponse.id)}
+                                                                            okText="Xóa"
+                                                                            cancelText="Hủy"
+                                                                        >
+                                                                            <Tooltip title="Xóa">
+                                                                                <Button color="link" size="sm" >
+                                                                                    <FaTrash color="primary" />
+                                                                                </Button>
+                                                                            </Tooltip>
+                                                                        </Popconfirm>
+
                                                                     </td>
                                                                 </tr>
                                                             )
 
                                                         })
                                                     }
-
                                                 </tbody>
                                             </Table>
                                             <Row className="mt-4">
@@ -1491,7 +1516,6 @@ const ListShoesDetail = () => {
                                                                 </tr>
 
                                                                 {selectedValuesSize.map((value) => (
-
                                                                     <tbody>
                                                                         <tr key={value.id} >
                                                                             <td className="col-1">{value.name}</td>
@@ -1527,7 +1551,6 @@ const ListShoesDetail = () => {
                                                                                 </Input>
                                                                             </td>
                                                                         </tr>
-
                                                                     </tbody>
 
                                                                 ))}
@@ -2017,29 +2040,6 @@ const ListShoesDetail = () => {
                     </div>
                 </ModalFooter>
             </Modal >
-            <Modal
-                isOpen={modalConfirmDelete}
-                toggle={toggleDelete}
-                backdrop={'static'}
-                keyboard={false}
-            >
-                <ModalHeader>
-                    Thông báo
-                </ModalHeader>
-                <ModalBody>
-                    <h3>Bạn có muốn xóa giày mã {deleteshoes.code} giày này không ?</h3>
-                </ModalBody>
-                <ModalFooter>
-                    <div className="text-center">
-                        <Button color="danger" onClick={() => handleDelete()}>
-                            Xóa
-                        </Button>{' '}
-                        <Button color="danger" onClick={toggleDelete}>
-                            Hủy
-                        </Button>{' '}
-                    </div>
-                </ModalFooter>
-            </Modal>
             <Modal
                 isOpen={thirdModal}
                 toggle={toggleThirdModal}

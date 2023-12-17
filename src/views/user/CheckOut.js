@@ -161,6 +161,7 @@ const Checkout = () => {
   }, []);
 
   const calculatePayment = () => {
+    let shippingTotal = 0;
     return checkout.totalMoney +
       (checkout.periodType === 0
         ? -(checkout.totalMoney - checkout.totalPayment)

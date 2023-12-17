@@ -10,9 +10,10 @@ import {
 import Select from "react-select";
 import ReactPaginate from 'react-paginate';
 import { getAllClient, postNewClient, detailClient, updateClient, deleteClient } from "services/ClientService";
-import { FaEdit, FaTrash, FaSearch, FaFileAlt, FaCamera, FaLockOpen, FaLock, FaFilter, FaTimes } from 'react-icons/fa';
+import { FaEdit, FaTrash, FaSearch, FaFileAlt, FaCamera, FaLockOpen, FaLock, FaFilter, FaTimes, FaSort } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 import axiosInstance from "services/custommize-axios";
+import { Tooltip, Popconfirm } from 'antd';
 
 
 const Client = () => {
@@ -55,15 +56,19 @@ const Client = () => {
     size: 5,
     input: "",
     createdTime: "",
-    gender: ""
+    gender: "",
+    status: "",
+    dateOfBirth: ""
+
   });
   const onInputChangeSearch = (e) => {
-    setQueryParams({ ...queryParams, [e.target.name]: e.target.value });
+    setQueryParams({ ...queryParams, page: 0, [e.target.name]: e.target.value });
   }
 
   useEffect(() => {
+    console.log(queryParams);
     getAll();
-  }, [queryParams.input]);
+  }, [queryParams.input, queryParams.status]);
   const handlePageChange = ({ selected }) => {
     setQueryParams((prevParams) => ({ ...prevParams, page: selected }));
   };
@@ -73,16 +78,24 @@ const Client = () => {
     setQueryParams({ ...queryParams, size: newSize, page: 0 });
   };
   const resetFilters = () => {
-    document.getElementById("createdTime").value = "";
-    document.getElementById("genderMale").checked = false;
-    document.getElementById("genderFemale").checked = false;
     setQueryParams({
       page: 0,
       size: 5,
       input: "",
       createdTime: "",
-      gender: ""
+      gender: "",
+      status: "",
+      dateOfBirth: ""
     });
+    getAll({
+      page: 0,
+      size: 5,
+      input: "",
+      createdTime: "",
+      gender: "",
+      status: "",
+      dateOfBirth: ""
+    })
   };
   const getAll = async () => {
     try {
@@ -99,7 +112,7 @@ const Client = () => {
   }, []);
   useEffect(() => {
     getAll();
-  }, [queryParams.size, queryParams.page]);
+  }, [queryParams.size, queryParams.page, queryParams.sortField, queryParams.sortOrder]);
 
   useEffect(() => {
     console.log(client);
@@ -548,31 +561,21 @@ const Client = () => {
     }
   };
   //Kết thúc xử lý địa chỉ
-  const [selectedStatus, setSelectedStatus] = useState('');
   const handleFilter = () => {
-    // const fullname = document.getElementById("fullname").value;
-    const genderMale = document.getElementById("genderMale");
-    const genderFemale = document.getElementById("genderFemale");
-    const createTime = document.getElementById("createTime");
-    let gender = "";
-    if (genderMale.checked) {
-      gender = "false";
-    } else if (genderFemale.checked) {
-      gender = "true";
-    }
-
+    getAll();
+    toggleFilter(); // Đóng modal lọc
+  };
+  // Sắp xếp
+  const handleSort = (field) => {
+    const newSortOrder =
+      queryParams.sortField === field && queryParams.sortOrder === "asc"
+        ? "desc"
+        : "asc";
     setQueryParams({
       ...queryParams,
-      gender: gender || "",
-      createdTime: createTime || ""
+      sortField: field,
+      sortOrder: newSortOrder,
     });
-    getAll({
-      ...queryParams,
-      page: 0,
-      gender: gender || "",
-      createdTime: createTime || ""
-    });
-    toggleFilter(); // Đóng modal lọc
   };
 
   return (
@@ -630,6 +633,7 @@ const Client = () => {
                             type="search"
                             placeholder="Tìm kiếm theo tên, số điện thoại, email"
                             name="input"
+                            value={queryParams.input}
                             onChange={(e) => onInputChangeSearch(e)}
                           />
                           <InputGroupAddon addonType="append">
@@ -649,11 +653,8 @@ const Client = () => {
                           name="status"
                           style={{ width: "150px" }}
                           size="sm"
-                          value={selectedStatus}
-                          onChange={(e) => {
-                            const value = e.target.value;
-                            setSelectedStatus(value === "" ? "" : value);
-                          }}
+                          value={queryParams.status}
+                          onChange={(e) => onInputChangeSearch(e)}
                         >
                           <option value="">Tất cả</option>
                           <option value="0">Ngừng hoạt động</option>
@@ -674,9 +675,9 @@ const Client = () => {
 
                   <Table className="align-items-center table-flush" responsive>
                     <thead className="thead-light">
-                      <tr>
+                      <tr className="text-center" >
                         <th className="text-center" >
-                          <FormGroup check>
+                          <FormGroup check className="pb-4">
                             <Input
                               type="checkbox"
                               checked={isCheckedAll}
@@ -688,16 +689,36 @@ const Client = () => {
                         <th scope="col" style={{ color: "black" }}>STT</th>
                         <th scope="col" style={{ color: "black" }}>Trạng thái</th>
                         <th scope="col" style={{ color: "black" }}>Ảnh</th>
-                        <th scope="col" style={{ color: "black" }}>Họ tên <i class="fa-solid fa-arrow-up"></i><i class="fa-solid fa-arrow-down"></i></th>
-                        <th scope="col" style={{ color: "black" }}>Email <i class="fa-solid fa-arrow-up"></i><i class="fa-solid fa-arrow-down"></i></th>
-                        <th scope="col" style={{ color: "black" }}>Số điện thoại <i class="fa-solid fa-arrow-up"></i><i class="fa-solid fa-arrow-down"></i></th>
-                        <th scope="col" style={{ color: "black" }}>Giới tính</th>
-                        <th scope="col" style={{ color: "black" }}>Ngày sinh <i class="fa-solid fa-arrow-up"></i><i class="fa-solid fa-arrow-down"></i></th>
+                        <th scope="col" style={{ color: "black" }}>Họ tên <FaSort
+                          style={{ cursor: "pointer" }}
+                          className="text-muted"
+                          onClick={() => handleSort("fullname")}
+                        /></th>
+                        <th scope="col" style={{ color: "black" }}>Email <FaSort
+                          style={{ cursor: "pointer" }}
+                          className="text-muted"
+                          onClick={() => handleSort("email")}
+                        /></th>
+                        <th scope="col" style={{ color: "black" }}>Số điện thoại <FaSort
+                          style={{ cursor: "pointer" }}
+                          className="text-muted"
+                          onClick={() => handleSort("phone_number")}
+                        /></th>
+                        <th scope="col" style={{ color: "black" }}>Giới tính <FaSort
+                          style={{ cursor: "pointer" }}
+                          className="text-muted"
+                          onClick={() => handleSort("gender")}
+                        /></th>
+                        <th scope="col" style={{ color: "black" }}>Ngày sinh <FaSort
+                          style={{ cursor: "pointer" }}
+                          className="text-muted"
+                          onClick={() => handleSort("date_of_birth")}
+                        /></th>
                         <th scope="col" style={{ position: "sticky", zIndex: '1', right: '0', color: "black" }}>Thao tác</th>
 
                       </tr>
                     </thead>
-                    <tbody>
+                    <tbody className="text-center" >
                       {listClient.length <= 0 &&
                         <th className="text-center" colSpan={17}>
                           Không có dữ liệu
@@ -707,7 +728,7 @@ const Client = () => {
 
                         <tr key={item.id}>
                           <th className="text-center pb-4" >
-                            <FormGroup check>
+                            <FormGroup check className="pb-4" >
                               <Input
                                 type="checkbox"
                                 checked={selectedId.includes(item.id)}
@@ -745,26 +766,50 @@ const Client = () => {
                           </td>
                           <td>{item.dateOfBirth}</td>
                           <td style={{ position: "sticky", zIndex: '1', right: '0', backgroundColor: '#fff' }}>
-                            <Button color="link" size="sm"
-                              onClick={() => onClickListAdress(item.id)}>
-                              <i class="fa-regular fa-address-book" color="primary"></i>
-                            </Button>
-                            <Button color="link" size="sm" onClick={() => handleRowClick(item.id)} >
-                              <FaEdit />
-                            </Button>
-                            {item.status === 1 &&
-                              <Button color="link" size="sm" onClick={() => updateStatus(item.id, 0)}>
-                                <FaLock />
+                            <Tooltip title="Địa chỉ">
+                              <Button color="link" size="sm"
+                                onClick={() => onClickListAdress(item.id)}>
+                                <i class="fa-regular fa-address-book" color="primary"></i>
                               </Button>
+                            </Tooltip>
+                            <Tooltip title="Chỉnh sửa">
+                              <Button color="link" size="sm" onClick={() => handleRowClick(item.id)} >
+                                <FaEdit />
+                              </Button>
+                            </Tooltip>
+                            {item.status === 1 &&
+                              <Popconfirm
+                                title="Bạn có chắc muốn khóa khách hàng này không?"
+                                onConfirm={() => updateStatus(item.id, 0)}
+                                okText="Xác nhận "
+                                cancelText="Hủy"
+                              >
+                                <Tooltip title="Khóa">
+                                  <Button color="link" size="sm">
+                                    <FaLock />
+                                  </Button>
+                                </Tooltip>
+                              </Popconfirm>
                             }
                             {item.status === 0 &&
-                              <Button color="link" size="sm" onClick={() => updateStatus(item.id, 1)} >
-                                <FaLockOpen />
-                              </Button>
+                              <Popconfirm
+                                title="Bạn có chắc muốn mở khóa khóa khách hàng này không?"
+                                onConfirm={() => updateStatus(item.id, 1)}
+                                okText="Xác nhận"
+                                cancelText="Hủy"
+                              >
+                                <Tooltip title="Mở khóa">
+                                  <Button color="link" size="sm">
+                                    <FaLockOpen />
+                                  </Button>
+                                </Tooltip>
+                              </Popconfirm>
                             }
-                            <Button color="link" size="sm" onClick={() => onClickDeleteClient(item.id)}>
-                              <FaTrash />
-                            </Button>
+                            <Tooltip title="Xóa">
+                              <Button color="link" size="sm" onClick={() => onClickDeleteClient(item.id)}>
+                                <FaTrash />
+                              </Button>
+                            </Tooltip>
 
                           </td>
                         </tr>
@@ -1349,6 +1394,9 @@ const Client = () => {
                 className="form-control-alternative"
                 type="date"
                 size="sm"
+                name="dateOfBirth"
+                value={queryParams.dateOfBirth}
+                onChange={(e) => onInputChangeSearch(e)}
               />
             </FormGroup>
 
@@ -1364,7 +1412,9 @@ const Client = () => {
                     id="genderMale"
                     name="gender"
                     type="radio"
-                    value={false}
+                    value={true}
+                    checked={queryParams.gender === true || queryParams.gender === 'true'}
+                    onClick={(e) => onInputChangeSearch(e)}
                   />
                   Nam
                 </div>
@@ -1374,7 +1424,9 @@ const Client = () => {
                     id="genderFemale"
                     name="gender"
                     type="radio"
-                    value={true}
+                    value={false}
+                    checked={queryParams.gender === false || queryParams.gender === 'false'}
+                    onClick={(e) => onInputChangeSearch(e)}
                   />
                   Nữ
                 </div>
@@ -1407,8 +1459,11 @@ const Client = () => {
               <Input
                 id="createTime"
                 className="form-control-alternative"
+                name="createdTime"
                 type="date"
                 size="sm"
+                value={queryParams.createdTime}
+                onChange={(e) => onInputChangeSearch(e)}
               />
             </FormGroup>
           </Form>
