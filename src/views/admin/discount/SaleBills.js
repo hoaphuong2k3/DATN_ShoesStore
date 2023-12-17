@@ -4,12 +4,12 @@ import { FaSort } from "react-icons/fa6";
 import ReactPaginate from "react-paginate";
 import { toast } from "react-toastify";
 import axiosInstance from "services/custommize-axios";
-import { format, parseISO } from 'date-fns';
+import { format, parseISO, startOfToday } from 'date-fns';
 import { vi } from 'date-fns/locale';
-import { isToday } from 'date-fns';
+import * as yup from 'yup';
 // reactstrap components
 import {
-    Row, Col, Form, FormGroup, Input, Button, Table, Badge, Modal,
+    Row, Col, Form, FormGroup, Input, Button, Table, Badge, Modal, FormFeedback,
     ModalBody, ModalFooter, ModalHeader, InputGroup, InputGroupAddon, InputGroupText
 } from "reactstrap";
 import { Tooltip, Popconfirm } from 'antd';
@@ -20,6 +20,7 @@ const SaleBills = () => {
     const toggle = () => setModal(!modal);
     const handleModal = () => {
         resetForm();
+        setValidationErrors({});
         setModal(true);
     }
 
@@ -56,6 +57,19 @@ const SaleBills = () => {
         isdelete: 0,
     });
 
+    const [searchTerm, setSearchTerm] = useState('');
+    const filterDiscount = discounts.filter((discount) => {
+        if (searchTerm === '') {
+            return true;
+        } else {
+            return discount.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                discount.name.toLowerCase().includes(searchTerm.toLowerCase());
+        }
+    });
+    const handleSearch = (term) => {
+        setSearchTerm(term);
+        setQueryParams(prevParams => ({ ...prevParams, page: 0, searchTerm: term }));
+    };
 
     //loads table
     const fetchData = async () => {
@@ -80,7 +94,7 @@ const SaleBills = () => {
         return () => {
             clearInterval(intervalId);
         };
-    }, [queryParams]);
+    }, [queryParams, searchTerm]);
 
     const handlePageChange = ({ selected }) => {
         setQueryParams(prevParams => ({ ...prevParams, page: selected }));
@@ -163,15 +177,13 @@ const SaleBills = () => {
         setSelectAll(!selectAll);
     };
 
-
-
     //click on selected
     const [formData, setFormData] = useState({
         id: null,
         code: "",
         name: "",
         minPrice: "",
-        sale: false,
+        sale: true,
         quantity: 0,
         salePercent: "",
         salePrice: "",
@@ -240,11 +252,43 @@ const SaleBills = () => {
         return format(parsedDate, "yyyy-MM-dd HH:mm", { locale: vi });
     };
 
+    const [validationErrors, setValidationErrors] = useState({});
+    const discountSchema = yup.object().shape({
+        name: yup.string().required('Tên khuyến mãi không được bỏ trống'),
+        minPrice: yup.string().required('Hóa đơn tối thiểu không được bỏ trống'),
+        startDate: yup
+            .string()
+            .min(startOfToday().toISOString(), 'Ngày bắt đầu phải từ hôm nay trở đi.')
+            .nullable()
+            .required('Ngày bắt đầu không được để trống.'),
+        endDate: yup
+            .string()
+            .min(yup.ref('startDate'), 'Ngày kết thúc phải sau ngày bắt đầu.')
+            .nullable()
+            .required('Ngày kết thúc không được để trống.'),
+        // sale: yup.boolean(),
+        // salePrice: yup.string().when('sale', {
+        //   is: false,
+        //   then: yup.string().required('Trị giá không được bỏ trống').matches(/^\d+$/, 'Trị giá phải là số'),
+        // }),
+        // salePercent: yup.string().when('sale', {
+        //   is: true,
+        //   then: yup.string().required('Phần trăm không được bỏ trống').matches(/^\d+$/, 'Phần trăm phải là số'),
+        // }),
+
+        quantity: yup
+            .number()
+            .required('Số lượng không được để trống.'),
+        description: yup.string().required('Mô tả không được để trống.'),
+    });
+
     const saveDiscount = async () => {
         try {
+
+            await discountSchema.validate(formData, { abortEarly: false });
+
             const formattedStartDate = formatDateTime(formData.startDate);
             const formattedEndDate = formatDateTime(formData.endDate);
-
 
             if (formData.id) {
                 await axiosInstance.put(`/vouchers/updateVoucher`, {
@@ -263,7 +307,6 @@ const SaleBills = () => {
                 });
 
                 fetchData();
-
                 toast.success("Cập nhật thành công!");
             } else {
                 await axiosInstance.post('/vouchers/createVoucher', {
@@ -282,20 +325,18 @@ const SaleBills = () => {
                 fetchData();
                 toast.success("Thêm mới thành công!");
             }
-
-            // Đóng modal và reset form
             setModal(false);
             resetForm();
-        } catch (error) {
-            // Xử lý lỗi
-            console.error("Error:", error);
-            if (error.response) {
-                console.error("Response data:", error.response.data);
-                toast.error(error.response.data.message);
-            } else {
-                toast.error("Đã có lỗi xảy ra.");
-            }
+            setValidationErrors({});
+        } catch (validationError) {
+            const errors = {};
+            validationError.inner.forEach(error => {
+                errors[error.path] = error.message;
+            });
+            setValidationErrors(errors);
+            console.log(errors);
         }
+
     };
 
     //Update status
@@ -641,7 +682,9 @@ const SaleBills = () => {
                                             type="text"
                                             value={formData.name}
                                             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                            invalid={!!validationErrors.name}
                                         />
+                                        <FormFeedback>{validationErrors.name}</FormFeedback>
                                     </FormGroup>
                                 </Col>
 
@@ -655,10 +698,12 @@ const SaleBills = () => {
                                         </label>
                                         <Input
                                             className="form-control-alternative"
-                                            type="number"
+                                            type="text"
                                             value={formData.minPrice}
                                             onChange={(e) => setFormData({ ...formData, minPrice: e.target.value })}
+                                            invalid={!!validationErrors.minPrice}
                                         />
+                                        <FormFeedback>{validationErrors.minPrice}</FormFeedback>
                                     </FormGroup>
                                 </Col>
 
@@ -676,7 +721,9 @@ const SaleBills = () => {
                                             type="datetime-local"
                                             value={formData.startDate}
                                             onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
+                                            invalid={!!validationErrors.startDate}
                                         />
+                                        <FormFeedback>{validationErrors.startDate}</FormFeedback>
                                     </FormGroup>
                                 </Col>
                                 <Col lg="6">
@@ -693,7 +740,9 @@ const SaleBills = () => {
                                             type="datetime-local"
                                             value={formData.endDate}
                                             onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
+                                            invalid={!!validationErrors.endDate}
                                         />
+                                        <FormFeedback>{validationErrors.endDate}</FormFeedback>
                                     </FormGroup>
                                 </Col>
 
@@ -739,10 +788,12 @@ const SaleBills = () => {
                                             </label>
                                             <Input
                                                 className="form-control-alternative"
-                                                type="number"
+                                                type="text"
                                                 value={formData.salePercent}
                                                 onChange={(e) => setFormData({ ...formData, salePercent: e.target.value })}
+                                                invalid={!!validationErrors.salePercent}
                                             />
+                                            {validationErrors.salePercent && <FormFeedback>{validationErrors.salePercent}</FormFeedback>}
 
                                         </FormGroup>
                                     </Col>
@@ -758,10 +809,12 @@ const SaleBills = () => {
                                             </label>
                                             <Input
                                                 className="form-control-alternative"
-                                                type="number"
+                                                type="text"
                                                 value={formData.salePrice}
                                                 onChange={(e) => setFormData({ ...formData, salePrice: e.target.value })}
+                                                invalid={!!validationErrors.salePrice}
                                             />
+                                            {validationErrors.salePrice && <FormFeedback>{validationErrors.salePrice}</FormFeedback>}
                                         </FormGroup>
                                     </Col>
                                 )}
@@ -780,7 +833,9 @@ const SaleBills = () => {
                                             type="number"
                                             value={formData.quantity}
                                             onChange={(e) => setFormData({ ...formData, quantity: e.target.value })}
+                                            invalid={!!validationErrors.quantity}
                                         />
+                                        <FormFeedback>{validationErrors.quantity}</FormFeedback>
                                     </FormGroup>
                                 </Col>
 
@@ -799,7 +854,9 @@ const SaleBills = () => {
                                             type="textarea"
                                             value={formData.description}
                                             onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                                            invalid={!!validationErrors.description}
                                         />
+                                        <FormFeedback>{validationErrors.description}</FormFeedback>
                                     </FormGroup>
                                 </Col>
                             </Row>

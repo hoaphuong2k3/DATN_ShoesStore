@@ -50,7 +50,6 @@ const Promotion = () => {
     const [selectedItems, setSelectedItems] = useState([]);
     const [selectedGiftId, setSelectedGiftId] = useState(null);
     const [clickedOnce, setClickedOnce] = useState(false);
-    const [searchValue, setSearchValue] = useState("");
     const [reloadInterval, setReloadInterval] = useState(null);
 
     const [queryParams, setQueryParams] = useState({
@@ -103,7 +102,6 @@ const Promotion = () => {
         // Khởi tạo interval khi component được tạo
         const intervalId = setInterval(() => {
             fetchData();
-            console.log("test");
         }, 1000);
 
         // Lưu intervalId vào state để sau này có thể xóa interval
@@ -112,7 +110,7 @@ const Promotion = () => {
         return () => {
             clearInterval(intervalId);
         };
-    }, [queryParams, queryParams2]);
+    }, [queryParams, queryParams2, searchTerm]);
 
     const handlePageChange = ({ selected }) => {
         setQueryParams(prevParams => ({ ...prevParams, page: selected }));
@@ -144,6 +142,21 @@ const Promotion = () => {
     };
 
     //Lọc
+    const [searchTerm, setSearchTerm] = useState('');
+    const filterDiscount = discounts.filter((discount) => {
+        if (searchTerm === '') {
+            return true;
+        } else {
+            return discount.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                discount.name.toLowerCase().includes(searchTerm.toLowerCase());
+        }
+    });
+    const handleSearch = (term) => {
+        setSearchTerm(term);
+        setQueryParams(prevParams => ({ ...prevParams, page: 0, searchTerm: term }));
+    };
+
+
     const handleFilter = () => {
         // Extract values from modal form fields
         const typePeriod = document.getElementById("typePeriod").value;
@@ -516,8 +529,8 @@ const Promotion = () => {
                                                 <InputGroup size="sm">
                                                     <Input type="search"
                                                         placeholder="Tìm kiếm mã, tên voucher..."
-                                                        value={searchValue}
-                                                        onChange={(e) => setSearchValue(e.target.value)}
+                                                        value={searchTerm}
+                                                        onChange={(e) => handleSearch(e.target.value)}
                                                     />
                                                     <InputGroupAddon addonType="append">
                                                         <InputGroupText>
@@ -620,75 +633,68 @@ const Promotion = () => {
                                             </tr>
                                         </thead>
                                         <tbody style={{ color: "black" }}>
-                                            {Array.isArray(discounts) &&
-                                                discounts
-                                                    .filter(
-                                                        (discount) =>
-                                                            discount.code.toLowerCase().includes(searchValue.toLowerCase()) ||
-                                                            discount.name.toLowerCase().includes(searchValue.toLowerCase())
-                                                    )
-                                                    .map((discount, index) => (
-                                                        <tr key={discount.id}>
-                                                            <td>
-                                                                <FormGroup check className="pb-4">
-                                                                    <Input
-                                                                        type="checkbox"
-                                                                        checked={selectedItems.includes(discount.id)}
-                                                                        onChange={() => handleCheckboxChange(discount.id)}
-                                                                    />
+                                            {Array.isArray(filterDiscount) && filterDiscount.map((discount, index) => (
+                                                <tr key={discount.id}>
+                                                    <td>
+                                                        <FormGroup check className="pb-4">
+                                                            <Input
+                                                                type="checkbox"
+                                                                checked={selectedItems.includes(discount.id)}
+                                                                onChange={() => handleCheckboxChange(discount.id)}
+                                                            />
 
-                                                                </FormGroup>
-                                                            </td>
-                                                            <td>{calculateIndex(index)}</td>
-                                                            <td style={{ position: "sticky", zIndex: '1', left: '0', background: "#fff", textAlign: "center" }}>
-                                                                <Badge color={statusMapping[discount.status]?.color || statusMapping.default.color}>
-                                                                    {statusMapping[discount.status]?.label || statusMapping.default.label}
-                                                                </Badge>
-                                                            </td>
+                                                        </FormGroup>
+                                                    </td>
+                                                    <td>{calculateIndex(index)}</td>
+                                                    <td style={{ position: "sticky", zIndex: '1', left: '0', background: "#fff", textAlign: "center" }}>
+                                                        <Badge color={statusMapping[discount.status]?.color || statusMapping.default.color}>
+                                                            {statusMapping[discount.status]?.label || statusMapping.default.label}
+                                                        </Badge>
+                                                    </td>
 
-                                                            <td>{discount.code}</td>
-                                                            <td>{discount.typePeriod === 0 ? "Order" : "FreeShip"}</td>
-                                                            <td>{discount.name}</td>
-                                                            <td style={{ textAlign: "right" }}>
-                                                                {discount.typePeriod === 0 ? `${formatter.format(discount.minPrice)}` : ""}
-                                                            </td>
-                                                            <td style={{ textAlign: "right" }}>
-                                                                {discount.typePeriod === 0 ? `${discount.salePercent}%` : ""}
-                                                            </td>
-                                                            <td>{discount.nameImage}</td>
-                                                            <td style={{ textAlign: "center" }}>{discount.startDate}</td>
-                                                            <td style={{ textAlign: "center" }}>{discount.endDate}</td>
+                                                    <td>{discount.code}</td>
+                                                    <td>{discount.typePeriod === 0 ? "Order" : "FreeShip"}</td>
+                                                    <td>{discount.name}</td>
+                                                    <td style={{ textAlign: "right" }}>
+                                                        {discount.typePeriod === 0 ? `${formatter.format(discount.minPrice)}` : ""}
+                                                    </td>
+                                                    <td style={{ textAlign: "right" }}>
+                                                        {discount.typePeriod === 0 ? `${discount.salePercent}%` : ""}
+                                                    </td>
+                                                    <td>{discount.nameImage}</td>
+                                                    <td style={{ textAlign: "center" }}>{discount.startDate}</td>
+                                                    <td style={{ textAlign: "center" }}>{discount.endDate}</td>
 
-                                                            <td style={{ position: "sticky", zIndex: '1', right: '0', background: "#fff" }}>
-                                                                {discount.status === 0 &&
-                                                                    <Tooltip title="Ngừng kích hoạt">
-                                                                        <Button color="link" size="sm" ><FaLockOpen onClick={() => lock(discount.id)} /></Button>
-                                                                    </Tooltip>
-                                                                }
-                                                                {(discount.status === 1 || discount.status === 2) &&
-                                                                    <Tooltip title="Kích hoạt">
-                                                                        <Button color="link" size="sm" ><FaLock onClick={() => openlock(discount.id)} /></Button>
-                                                                    </Tooltip>
-                                                                }
+                                                    <td style={{ position: "sticky", zIndex: '1', right: '0', background: "#fff" }}>
+                                                        {discount.status === 0 &&
+                                                            <Tooltip title="Ngừng kích hoạt">
+                                                                <Button color="link" size="sm" ><FaLockOpen onClick={() => lock(discount.id)} /></Button>
+                                                            </Tooltip>
+                                                        }
+                                                        {(discount.status === 1 || discount.status === 2) &&
+                                                            <Tooltip title="Kích hoạt">
+                                                                <Button color="link" size="sm" ><FaLock onClick={() => openlock(discount.id)} /></Button>
+                                                            </Tooltip>
+                                                        }
 
-                                                                <Tooltip title="Chỉnh sửa">
-                                                                    <Button color="link" size="sm" onClick={() => handleRowClick(discount)}><FaEdit /></Button>
-                                                                </Tooltip>
+                                                        <Tooltip title="Chỉnh sửa">
+                                                            <Button color="link" size="sm" onClick={() => handleRowClick(discount)}><FaEdit /></Button>
+                                                        </Tooltip>
 
-                                                                <Popconfirm
-                                                                    title="Bạn có chắc muốn xóa?"
-                                                                    onConfirm={() => deleteDiscount(discount.id)}
-                                                                    okText="Xóa"
-                                                                    cancelText="Hủy"
-                                                                >
-                                                                    <Tooltip title="Xóa">
-                                                                        <Button color="link" size="sm"><FaTrash /></Button>
-                                                                    </Tooltip>
-                                                                </Popconfirm>
-                                                            </td>
+                                                        <Popconfirm
+                                                            title="Bạn có chắc muốn xóa?"
+                                                            onConfirm={() => deleteDiscount(discount.id)}
+                                                            okText="Xóa"
+                                                            cancelText="Hủy"
+                                                        >
+                                                            <Tooltip title="Xóa">
+                                                                <Button color="link" size="sm"><FaTrash /></Button>
+                                                            </Tooltip>
+                                                        </Popconfirm>
+                                                    </td>
 
-                                                        </tr>
-                                                    ))}
+                                                </tr>
+                                            ))}
                                         </tbody>
                                     </Table>
                                     {/* Hiển thị thanh phân trang */}
