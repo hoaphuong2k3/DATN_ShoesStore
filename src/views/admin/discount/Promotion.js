@@ -128,9 +128,9 @@ const Promotion = () => {
     };
 
     const statusMapping = {
-        0: { color: 'danger', label: 'Kích hoạt' },
-        1: { color: 'success', label: 'Chờ kích hoạt' },
-        2: { color: 'warning', label: 'Ngừng kích hoạt' }
+        0: { color: 'success', label: 'Kích hoạt' },
+        1: { color: 'warning', label: 'Chờ kích hoạt' },
+        2: { color: 'danger', label: 'Ngừng kích hoạt' }
     };
 
     //sắp xếp

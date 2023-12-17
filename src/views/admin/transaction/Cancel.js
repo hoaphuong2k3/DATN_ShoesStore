@@ -11,7 +11,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import ReactPaginate from 'react-paginate';
 import { Badge, Row, Col, Button, Table, Input, FormGroup, InputGroup, InputGroupAddon, InputGroupText, Modal, ModalBody, ModalFooter, ModalHeader, Label, Form } from "reactstrap";
 import { FaRegEdit, FaSearch } from 'react-icons/fa';
-import { DatePicker, Popconfirm} from 'antd';
+import { DatePicker, Popconfirm } from 'antd';
 
 const Shipping = () => {
 
@@ -26,7 +26,6 @@ const Shipping = () => {
         currency: "VND",
     });
 
-    const storedUserId = localStorage.getItem("userId");
     const [confirm, setConfirm] = useState([]);
     const [selectedOrderId, setSelectedOrderId] = useState(null);
     const [orderData, setOrderData] = useState({});
@@ -42,7 +41,20 @@ const Shipping = () => {
     const [detailedAddress, setDetailedAddress] = useState('');
 
     const [selectAllChecked, setSelectAllChecked] = useState(false);
+
+    //search
     const [searchTerm, setSearchTerm] = useState('');
+    const filterConfirm = confirm.filter((admin) => {
+        if (searchTerm === '') {
+            return true;
+        } else {
+            return admin.code.toLowerCase().includes(searchTerm.toLowerCase());
+        }
+    });
+    const handleSearch = (term) => {
+        setSearchTerm(term);
+        setQueryParams(prevParams => ({ ...prevParams, page: 0, code: term }));
+    };
 
     const fetchDataFromAPI = async (url, stateSetter) => {
         try {
@@ -94,7 +106,7 @@ const Shipping = () => {
 
     useEffect(() => {
         fetchData();
-    }, [selectedProvince, selectedDistrict]);
+    }, [selectedProvince, selectedDistrict, queryParams, searchTerm]);
 
     const handlePageChange = ({ selected }) => {
         setQueryParams(prevParams => ({ ...prevParams, page: selected }));
@@ -209,46 +221,46 @@ const Shipping = () => {
         }
     };
 
-     //Export
-     const [selectedDate, setSelectedDate] = useState(null);
+    //Export
+    const [selectedDate, setSelectedDate] = useState(null);
 
-     const handleExport = async () => {
-         try {
-           
-             let requestData = {
-                 status: 7,
-             };
-     
-             if (selectedDate) {
-                 requestData.date = selectedDate.format('YYYY-MM-DD');
-             }
-     
-             const response = await axiosInstance.get('/order/admin/export', {
-                 params: requestData,
-                 responseType: 'blob',
-                 headers: {
-                     'Content-Type': 'application/json',
-                 },
-             });
-     
-             const blob = new Blob([response], { type: 'application/excel' });
-     
-             const url = window.URL.createObjectURL(blob);
-             const a = document.createElement('a');
-             a.style.display = 'none';
-             a.href = url;
-             a.download = 'duong.xlsx';
-             document.body.appendChild(a);
-             a.click();
-     
-             window.URL.revokeObjectURL(url);
-             toast.success('Xuất dữ liệu thành công!');
-             setSelectedDate(null);
-         } catch (error) {
-             console.error('Lỗi khi xuất dữ liệu:', error);
-             toast.error('Có lỗi xảy ra khi xuất dữ liệu.');
-         }
-     };
+    const handleExport = async () => {
+        try {
+
+            let requestData = {
+                status: 7,
+            };
+
+            if (selectedDate) {
+                requestData.date = selectedDate.format('YYYY-MM-DD');
+            }
+
+            const response = await axiosInstance.get('/order/admin/export', {
+                params: requestData,
+                responseType: 'blob',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            const blob = new Blob([response], { type: 'application/excel' });
+
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.style.display = 'none';
+            a.href = url;
+            a.download = 'duong.xlsx';
+            document.body.appendChild(a);
+            a.click();
+
+            window.URL.revokeObjectURL(url);
+            toast.success('Xuất dữ liệu thành công!');
+            setSelectedDate(null);
+        } catch (error) {
+            console.error('Lỗi khi xuất dữ liệu:', error);
+            toast.error('Có lỗi xảy ra khi xuất dữ liệu.');
+        }
+    };
 
     return (
         <>
@@ -260,7 +272,7 @@ const Shipping = () => {
                                 <Input type="search"
                                     placeholder="Tìm kiếm hóa đơn"
                                     value={searchTerm}
-                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                    onChange={(e) => handleSearch(e.target.value)}
                                 />
                                 <InputGroupAddon addonType="append">
                                     <InputGroupText>
@@ -310,40 +322,34 @@ const Shipping = () => {
                             </tr>
                         </thead>
                         <tbody style={{ color: "black" }}>
-                            {Array.isArray(confirm) &&
-                                confirm
-                                    .filter(
-                                        (confirm) =>
-                                            confirm.code.toLowerCase().includes(searchTerm.toLowerCase())
-                                    )
-                                    .map((confirm, index) => (
-                                        <tr key={confirm.id}>
-                                            <td className="text-center pt-0">
-                                                <FormGroup check>
-                                                    <Input type="checkbox"
-                                                        onChange={() => handleCheckboxChange(confirm.id)}
-                                                        checked={selectedIds.includes(confirm.id)} />
-                                                </FormGroup>
-                                            </td>
-                                            <td className="text-center">{calculateIndex(index)}</td>
-                                            <td>{confirm.code}</td>
-                                            <td>{confirm.fullnameClient}</td>
-                                            <td>{confirm.phoneNumber}</td>
-                                            <td className="text-right">{formatter.format(confirm.totalPayment)}</td>
-                                            <td className="text-center">
-                                                <Badge color={paymentMethodColors[confirm.paymentMethod]?.color || "secondary"}>
-                                                    {paymentMethodColors[confirm.paymentMethod]?.label || "Không xác định"}
-                                                </Badge>
-                                            </td>
+                            {Array.isArray(filterConfirm) && filterConfirm.map((confirm, index) => (
+                                <tr key={confirm.id}>
+                                    <td className="text-center pt-0">
+                                        <FormGroup check>
+                                            <Input type="checkbox"
+                                                onChange={() => handleCheckboxChange(confirm.id)}
+                                                checked={selectedIds.includes(confirm.id)} />
+                                        </FormGroup>
+                                    </td>
+                                    <td className="text-center">{calculateIndex(index)}</td>
+                                    <td>{confirm.code}</td>
+                                    <td>{confirm.fullnameClient}</td>
+                                    <td>{confirm.phoneNumber}</td>
+                                    <td className="text-right">{formatter.format(confirm.totalPayment)}</td>
+                                    <td className="text-center">
+                                        <Badge color={paymentMethodColors[confirm.paymentMethod]?.color || "secondary"}>
+                                            {paymentMethodColors[confirm.paymentMethod]?.label || "Không xác định"}
+                                        </Badge>
+                                    </td>
 
-                                            <td>{confirm.fullnameStaff}</td>
-                                            <td>{format(new Date(confirm.createdTime), 'dd-MM-yyyy HH:mm', { locale: vi })}</td>
-                                            <td>{format(new Date(confirm.updatedTime), 'dd-MM-yyyy HH:mm', { locale: vi })}</td>
-                                            <td className="text-center d-flex" style={{ position: "sticky", zIndex: '1', right: '0', background: "#fff" }}>
-                                                <Button color="link" size="sm" onClick={() => handleRowClick(confirm.id, confirm)}><FaRegEdit /></Button>
-                                            </td>
-                                        </tr>
-                                    ))}
+                                    <td>{confirm.fullnameStaff}</td>
+                                    <td>{format(new Date(confirm.createdTime), 'dd-MM-yyyy HH:mm', { locale: vi })}</td>
+                                    <td>{format(new Date(confirm.updatedTime), 'dd-MM-yyyy HH:mm', { locale: vi })}</td>
+                                    <td className="text-center d-flex" style={{ position: "sticky", zIndex: '1', right: '0', background: "#fff" }}>
+                                        <Button color="link" size="sm" onClick={() => handleRowClick(confirm.id, confirm)}><FaRegEdit /></Button>
+                                    </td>
+                                </tr>
+                            ))}
                         </tbody>
                     </Table>
 
@@ -674,7 +680,7 @@ const Shipping = () => {
                                                 </Col>
                                             </Row>
                                         )}
-                                        
+
                                         <FormGroup>
                                             <Label>
                                                 Thành tiền
