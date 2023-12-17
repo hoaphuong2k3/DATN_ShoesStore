@@ -608,7 +608,7 @@ const ListShoesDetail = () => {
             setSelectedImages([]);
         }
     }, [modalEdit]);
-    
+
     useEffect(() => {
         console.log(addone);
     }, [addone]);
@@ -1291,8 +1291,6 @@ const ListShoesDetail = () => {
                                                                             alt=""
                                                                             style={{ width: "80px" }}
                                                                         />
-
-
                                                                     </td>
                                                                     <td style={{ position: "sticky", zIndex: '1', right: '0', background: "#fff" }}>
                                                                         {/* <Button color="danger" to={`/admin/product/edit/${item.id}`} tag={Link} size="sm" disabled={item.status === 0 ? true : false}>
@@ -1535,7 +1533,7 @@ const ListShoesDetail = () => {
                                                                 ))}
                                                             </Table >
 
-                                                            <Col>
+                                                            <Col className="mb-5">
                                                                 <div className="d-flex justify-content-center">
                                                                     {selectedImages.length > 0 && selectedImages.filter((itemA) => itemA.i === itemColor.id).map((itemA, x) => (
                                                                         <div className="mr-4"
@@ -1599,7 +1597,7 @@ const ListShoesDetail = () => {
                                                         </>
                                                     ))}
 
-                                                    <Row className="text-center mt-5">
+                                                    <Row className="text-center">
                                                         <Col>
                                                             <Button onClick={onClickAddMany} color="primary">Thêm</Button>
                                                         </Col>

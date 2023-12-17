@@ -1,8 +1,8 @@
 import Home from "views/user/Home.js";
 import Product from "views/user/ListProduct.js";
-import News from "views/user/News.js";
+// import News from "views/user/News.js";
 import Introduce from "views/user/Introduce.js";
-import Contact from "views/user/Contact.js";
+import Contact from "views/user/Contacts";
 import Cart from "views/user/Cart";
 import Account from "views/user/Account.js";
 import ProductDetail from "views/user/ProductDetail.js";
@@ -34,12 +34,12 @@ var routes = [
     component: <Contact />,
     layout: "/shoes",
   },
-  {
-    path: "/news",
-    name: "TIN TỨC",
-    component: <News />,
-    layout: "/shoes",
-  },
+  // {
+  //   path: "/news",
+  //   name: "TIN TỨC",
+  //   component: <News />,
+  //   layout: "/shoes",
+  // },
   {
     path: "/cart",
     name: "GIỎ HÀNG",

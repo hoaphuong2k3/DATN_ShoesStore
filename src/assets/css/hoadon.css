@@ -29,7 +29,6 @@
   content: '\f111';
   font-family: "Font Awesome 5 Free";
   color: #fff;
-  font-size: 24px;
   width: 37px;
 }
 
@@ -37,7 +36,6 @@
 #progressbar-2 #step3:before {
   content: '\f111';
   font-family: "Font Awesome 5 Free";
-  font-size: 24px;
   color: #fff;
   width: 37px;
   margin-right: 0;

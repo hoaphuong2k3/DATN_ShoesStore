@@ -110,8 +110,8 @@ const UserNavbar = () => {
           <NavbarBrand to="/shoes/home" tag={Link}>
             <img
               alt="..."
-              src={require("../../assets/img/brand/logo.png")}
-              width={130} style={{height:80}}
+              src={require("../../assets/img/brand/Leather_Gent.png")}
+              width={130} style={{height:50}}
             />
           </NavbarBrand>
           <button className="navbar-toggler" id="navbar-collapse-main">
@@ -169,11 +169,11 @@ const UserNavbar = () => {
                   <span className="nav-link-inner-text">LIÊN HỆ</span>
                 </NavLink>
               </NavItem>
-              <NavItem>
+              {/* <NavItem>
                 <NavLink className="nav-link-icon" to="/shoes/news" tag={Link}>
                   <span className="nav-link-inner-text">TIN TỨC</span>
                 </NavLink>
-              </NavItem>
+              </NavItem> */}
             </Nav>
             <Nav className="align-items-lg-center ml-lg-auto" navbar>
               <Form className="navbar-search navbar-search-dark form-inline mr-3 d-none d-md-flex ml-lg-auto">

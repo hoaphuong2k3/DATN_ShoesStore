@@ -11,8 +11,6 @@ import Select from "react-select";
 import ReactPaginate from 'react-paginate';
 import { getAllClient, postNewClient, detailClient, updateClient, deleteClient } from "services/ClientService";
 import { FaEdit, FaTrash, FaSearch, FaFileAlt, FaCamera, FaLockOpen, FaLock, FaFilter, FaTimes } from 'react-icons/fa';
-import Header from "components/Headers/Header.js";
-import Switch from 'react-input-switch';
 import { toast } from 'react-toastify';
 import axiosInstance from "services/custommize-axios";
 
@@ -20,11 +18,8 @@ import axiosInstance from "services/custommize-axios";
 const Client = () => {
   const [totalPages, setTotalPages] = useState(0);
   const [totalElements, setTotalElenments] = useState(0);
-  const [page, setPage] = useState(0);
-  const [size, setSize] = useState(5);
   const [modalAdd, setModalAdd] = useState(false);
   const toggle = () => setModalAdd(!modalAdd);
-  const [value, setValue] = useState('no');
 
   const [listClient, setListClient] = useState([]);
 
@@ -52,60 +47,46 @@ const Client = () => {
       dateOfBirth: ""
     });
   };
-  useEffect(() => {
-    { value === 'no' && setSearch({ ...search, email: "", gender: "" }) }
-  }, [value]);
-  const [search, setSearch] = useState({
-    fullname: null,
-    gender: null,
-    dateOfBirth: null,
-    email: null,
-    phonenumber: null,
-  })
-
-  const resetSearch = () => {
-    setSearch({
-      fullname: "",
-      gender: "",
-      dateOfBirth: "",
-      email: "",
-      phonenumber: "",
-    });
-  };
-  const onInputChangeSearch = (e) => {
-    setSearch({ ...search, [e.target.name]: e.target.value });
-  }
-
-  useEffect(() => {
-    console.log(search)
-    getAll();
-  }, [search]);
-  //Page, Size
-  const handlePageClick = (event) => {
-    setPage(+event.selected);
-    getAll(+event.selected + 1);
-  }
-  const onChangeSize = (e) => {
-    setSize(+e.target.value);
-  }
-  //
-
   const onInputChange = (e) => {
     setClient({ ...client, [e.target.name]: e.target.value });
   };
+  const [queryParams, setQueryParams] = useState({
+    page: 0,
+    size: 5,
+    input: "",
+    createdTime: "",
+    gender: ""
+  });
+  const onInputChangeSearch = (e) => {
+    setQueryParams({ ...queryParams, [e.target.name]: e.target.value });
+  }
 
-  // const fetchData = async () => {
-  //   try {
-  //     const provincesResponse = await axios.get("https://provinces.open-api.vn/api/?depth=3");
-  //     setProvinces(provincesResponse.data);
-  //   } catch (error) {
-  //     console.error("Error fetching data: ", error);
-  //   }
-  // };
+  useEffect(() => {
+    getAll();
+  }, [queryParams.input]);
+  const handlePageChange = ({ selected }) => {
+    setQueryParams((prevParams) => ({ ...prevParams, page: selected }));
+  };
+
+  const handleSizeChange = (e) => {
+    const newSize = parseInt(e.target.value);
+    setQueryParams({ ...queryParams, size: newSize, page: 0 });
+  };
+  const resetFilters = () => {
+    document.getElementById("createdTime").value = "";
+    document.getElementById("genderMale").checked = false;
+    document.getElementById("genderFemale").checked = false;
+    setQueryParams({
+      page: 0,
+      size: 5,
+      input: "",
+      createdTime: "",
+      gender: ""
+    });
+  };
   const getAll = async () => {
     try {
-      const res = await getAllClient(page, size, search);
-      console.log(res);
+      const res = await getAllClient(queryParams);
       setListClient(res.content);
       setTotalElenments(res.totalElements);
       setTotalPages(res.totalPages);
@@ -115,21 +96,53 @@ const Client = () => {
   }
   useEffect(() => {
     getAll();
-  }, [size, page]);
-  useEffect(() => {
-    // fetchData();
-    getAll();
   }, []);
+  useEffect(() => {
+    getAll();
+  }, [queryParams.size, queryParams.page]);
 
   useEffect(() => {
     console.log(client);
   }, [client]);
 
-  // bắt đầu Client
-  const onClickDeleteClient = async (id) => {
+  // bắt đầu delete Client
+  // const filterAdmins = listClient.filter((admin) => {
+  //   if (selectedStatus === '') {
+  //     return true;
+  //   } else {
+  //     return admin.status.toString() === selectedStatus;
+  //   }
+  // });
+  // Select checkbox
+  const [isCheckedAll, setIsCheckedAll] = useState(false);
+  const [selectedId, setSelectedId] = useState([]);
+  const [showActions, setShowActions] = useState(false);
+
+
+  const handleSelectAll = () => {
+    if (isCheckedAll) {
+      setSelectedId([]);
+      setShowActions(false);
+    } else {
+      setSelectedId(listClient.map(staff => staff.id));
+      setShowActions(true);
+    }
+    setIsCheckedAll(!isCheckedAll);
+  };
+
+  const handleCheckboxChange = (idStaff) => {
+    if (selectedId.includes(idStaff)) {
+      setSelectedId(selectedId.filter((id) => id !== idStaff));
+      setShowActions(selectedId.length - 1 > 0);
+    } else {
+      setSelectedId([...selectedId, idStaff]);
+      setShowActions(true);
+    }
+  };
+  const onClickDeleteClient = async (x) => {
     if (window.confirm(`Bạn có chắc chắn muốn xóa khách hàng này không?`)) {
       try {
-        const res = await deleteClient(id);
+        await deleteClient({ id: [x] });
         getAll();
         toast.success("Xóa thành công");
       } catch (error) {
@@ -142,7 +155,26 @@ const Client = () => {
       }
     }
   };
-  //Kết thúc client
+  const handleDeleteButtonClick = async () => {
+    if (selectedId.length > 0) {
+      if (window.confirm("Bạn có chắc chắn muốn xóa khách hàng đã chọn không?")) {
+        try {
+          console.log(selectedId);
+          await deleteClient({ id: selectedId });
+          setSelectedId([]);
+          toast.success("Xóa thành công ");
+        } catch (error) {
+          let errorMessage = "Lỗi từ máy chủ";
+          if (error.response && error.response.data && error.response.data.message) {
+            errorMessage = error.response.data.message;
+          }
+          toast.error(errorMessage);
+        }
+
+      }
+    }
+  };
+  //Kết thúc delete client
   //Hàm add client
   const onAddClient = async (e) => {
     e.preventDefault();
@@ -254,7 +286,6 @@ const Client = () => {
       if (file) {
         image.append('file', file);
       }
-
       if (file) {
         await axiosInstance.put(`/user/${editClient.id}/multipart-file`, image, {
           headers: {
@@ -272,7 +303,18 @@ const Client = () => {
     setFile(null);
   };
 
-
+  const getDefaultAvatar = (gender, avatar) => {
+    if (avatar) {
+      return `data:image/jpeg;base64,${avatar}`;
+    } else if (gender === true) {
+      return "https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSbAVI8wgtBGopfLggnV-HvwW-_NYYvGxwAGRUBdHKwdSoPRjEX";
+    } else if (gender === false) {
+      return "https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcTu-uhxThn7kpatyW-egV5DpMNflanGQ_oeqUqmgEMx7KUkhyzF";
+    } else {
+      // Null
+      return "https://thumbs.dreamstime.com/b/default-businessman-avatar-icon-vector-business-people-profile-concept-279597784.jpg";
+    }
+  };
 
   const onInputChangeDataUpdate = (e) => {
     setEditClient({ ...editClient, [e.target.name]: e.target.value });
@@ -300,11 +342,16 @@ const Client = () => {
   //Hàm khóa khách hàng
   const updateStatus = async (id, status) => {
     try {
-      await axios.put(`http://localhost:33321/api/client/admin/update-status/${id}?status=${status}`);
+      await axiosInstance.put(`/client/admin/update-status/${id}?status=${status}`);
       getAll();
       toast.success("Cập nhật trạng thái thành công!");
     } catch (error) {
       console.error("Error updating staff status:", error);
+      let errorMessage = "Lỗi từ máy chủ";
+      if (error.response && error.response.data && error.response.data.message) {
+        errorMessage = error.response.data.message;
+      }
+      toast.error(errorMessage);
     }
   };
   const statusMapping = {
@@ -502,14 +549,32 @@ const Client = () => {
   };
   //Kết thúc xử lý địa chỉ
   const [selectedStatus, setSelectedStatus] = useState('');
-
-  const filterAdmins = listClient.filter((admin) => {
-    if (selectedStatus === '') {
-      return true;
-    } else {
-      return admin.status.toString() === selectedStatus;
+  const handleFilter = () => {
+    // const fullname = document.getElementById("fullname").value;
+    const genderMale = document.getElementById("genderMale");
+    const genderFemale = document.getElementById("genderFemale");
+    const createTime = document.getElementById("createTime");
+    let gender = "";
+    if (genderMale.checked) {
+      gender = "false";
+    } else if (genderFemale.checked) {
+      gender = "true";
     }
-  });
+
+    setQueryParams({
+      ...queryParams,
+      gender: gender || "",
+      createdTime: createTime || ""
+    });
+    getAll({
+      ...queryParams,
+      page: 0,
+      gender: gender || "",
+      createdTime: createTime || ""
+    });
+    toggleFilter(); // Đóng modal lọc
+  };
+
   return (
     <>
       {/* <Header /> */}
@@ -554,7 +619,7 @@ const Client = () => {
                         color="warning"
                         outline
                         size="sm"
-                        onClick={resetSearch}
+                        onClick={resetFilters}
                       >
                         <FaTimes size="16px" className="mr-1" />
                         Xóa bộ lọc
@@ -564,7 +629,7 @@ const Client = () => {
                           <Input
                             type="search"
                             placeholder="Tìm kiếm theo tên, số điện thoại, email"
-                            name="fullname"
+                            name="input"
                             onChange={(e) => onInputChangeSearch(e)}
                           />
                           <InputGroupAddon addonType="append">
@@ -595,41 +660,40 @@ const Client = () => {
                           <option value="1">Đang hoạt động</option>
                         </Input>
                       </Col>
-                      {/* {showActions && (
-                        <Input
-                          type="select"
-                          className="ml-3"
-                          name="action"
-                          style={{ width: "150px" }}
+                      {showActions && (
+                        <Button
+                          color="danger" outline
                           size="sm"
-                          onChange={(e) => handleActionSelect(e.target.value)}
+                          onClick={handleDeleteButtonClick}
                         >
-                          <option value={""}>Chọn thao tác</option>
-                          <option value="deleteAll">Xóa tất cả</option>
-                          <option value="disableAll">Ngừng hoạt động</option>
-                        </Input>
-                      )} */}
+                          Xóa tất cả
+                        </Button>
+                      )}
                     </div>
                   </Row>
 
                   <Table className="align-items-center table-flush" responsive>
                     <thead className="thead-light">
                       <tr>
-                        <th className="text-center pb-4" >
+                        <th className="text-center" >
                           <FormGroup check>
-                            <Input type="checkbox" />
+                            <Input
+                              type="checkbox"
+                              checked={isCheckedAll}
+                              onChange={handleSelectAll}
+                            />
                           </FormGroup>
 
                         </th>
-                        <th scope="col">STT</th>
-                        <th scope="col">Trạng thái</th>
-                        <th scope="col">Ảnh</th>
-                        <th scope="col">Họ tên <i class="fa-solid fa-arrow-up"></i><i class="fa-solid fa-arrow-down"></i></th>
-                        <th scope="col">Email <i class="fa-solid fa-arrow-up"></i><i class="fa-solid fa-arrow-down"></i></th>
-                        <th scope="col">Số điện thoại <i class="fa-solid fa-arrow-up"></i><i class="fa-solid fa-arrow-down"></i></th>
-                        <th scope="col">Giới tính</th>
-                        <th scope="col">Ngày sinh <i class="fa-solid fa-arrow-up"></i><i class="fa-solid fa-arrow-down"></i></th>
-                        <th scope="col" style={{ position: "sticky", zIndex: '1', right: '0' }}>Thao tác</th>
+                        <th scope="col" style={{ color: "black" }}>STT</th>
+                        <th scope="col" style={{ color: "black" }}>Trạng thái</th>
+                        <th scope="col" style={{ color: "black" }}>Ảnh</th>
+                        <th scope="col" style={{ color: "black" }}>Họ tên <i class="fa-solid fa-arrow-up"></i><i class="fa-solid fa-arrow-down"></i></th>
+                        <th scope="col" style={{ color: "black" }}>Email <i class="fa-solid fa-arrow-up"></i><i class="fa-solid fa-arrow-down"></i></th>
+                        <th scope="col" style={{ color: "black" }}>Số điện thoại <i class="fa-solid fa-arrow-up"></i><i class="fa-solid fa-arrow-down"></i></th>
+                        <th scope="col" style={{ color: "black" }}>Giới tính</th>
+                        <th scope="col" style={{ color: "black" }}>Ngày sinh <i class="fa-solid fa-arrow-up"></i><i class="fa-solid fa-arrow-down"></i></th>
+                        <th scope="col" style={{ position: "sticky", zIndex: '1', right: '0', color: "black" }}>Thao tác</th>
 
                       </tr>
                     </thead>
@@ -639,12 +703,18 @@ const Client = () => {
                           Không có dữ liệu
                         </th>
                       }
-                      {filterAdmins && filterAdmins.length > 0 && filterAdmins.map((item, index) => (
+                      {listClient && listClient.length > 0 && listClient.map((item, index) => (
 
                         <tr key={item.id}>
                           <th className="text-center pb-4" >
                             <FormGroup check>
-                              <Input type="checkbox" />
+                              <Input
+                                type="checkbox"
+                                checked={selectedId.includes(item.id)}
+                                onChange={() =>
+                                  handleCheckboxChange(item.id)
+                                }
+                              />
                             </FormGroup>
 
                           </th>
@@ -656,7 +726,13 @@ const Client = () => {
                           </td>
                           <td>
                             <span className="avatar avatar-sm rounded-circle">
-                              <img src={`data:image/jpeg;base64,${item.avatar}`} alt="" />
+                              <img
+                                src={getDefaultAvatar(
+                                  item.gender,
+                                  item.avatar
+                                )}
+                                alt={item.username}
+                              />
                             </span>
                           </td>
                           <td>
@@ -676,13 +752,13 @@ const Client = () => {
                             <Button color="link" size="sm" onClick={() => handleRowClick(item.id)} >
                               <FaEdit />
                             </Button>
-                            {item.status === 0 &&
-                              <Button color="link" size="sm" onClick={() => updateStatus(item.id, 1)}>
+                            {item.status === 1 &&
+                              <Button color="link" size="sm" onClick={() => updateStatus(item.id, 0)}>
                                 <FaLock />
                               </Button>
                             }
-                            {item.status === 1 &&
-                              <Button color="link" size="sm" onClick={() => updateStatus(item.id, 0)} >
+                            {item.status === 0 &&
+                              <Button color="link" size="sm" onClick={() => updateStatus(item.id, 1)} >
                                 <FaLockOpen />
                               </Button>
                             }
@@ -700,14 +776,14 @@ const Client = () => {
                   <Row className="mt-4">
                     <Col lg={6}>
                       <div style={{ fontSize: 14 }}>
-                        Đang xem <b>1</b> đến <b>{totalElements < size ? totalElements : size}</b> trong tổng số <b>{totalElements}</b> mục
+                        Đang xem <b>1</b> đến <b>{totalElements < queryParams.size ? totalElements : queryParams.size}</b> trong tổng số <b>{totalElements}</b> mục
                       </div>
                     </Col>
                     <Col style={{ fontSize: 14 }} lg={2}>
                       <Row>
                         <span>Xem </span>&nbsp;
                         <span>
-                          <Input type="select" name="status" style={{ width: "60px", fontSize: 14 }} size="sm" onChange={(e) => onChangeSize(e)} className="mt--1">
+                          <Input type="select" name="status" style={{ width: "60px", fontSize: 14 }} size="sm" onChange={handleSizeChange} className="mt--1">
                             <option value="5">5</option>
                             <option value="10">10</option>
                             <option value="25">25</option>
@@ -726,7 +802,7 @@ const Client = () => {
                         pageRangeDisplayed={1} // Number of pages to display on each side of the selected page
                         pageCount={totalPages} // Total number of pages
                         previousLabel="<"
-                        onPageChange={handlePageClick}
+                        onPageChange={handlePageChange}
                         renderOnZeroPageCount={null}
                         pageClassName="page-item"
                         pageLinkClassName="page-link"
@@ -1285,30 +1361,28 @@ const Client = () => {
                 <div className="custom-control custom-radio">
                   <Input
                     className="custom-control-alternative"
-                    id="nam"
+                    id="genderMale"
                     name="gender"
                     type="radio"
                     value={false}
-                    checked={search.gender === false || search.gender === 'false'}
-                    onClick={(e) => onInputChangeSearch(e)}
-                  />Nữ
+                  />
+                  Nam
                 </div>
                 <div className="custom-control custom-radio">
                   <Input
                     className="custom-control-alternative"
-                    id="nu"
+                    id="genderFemale"
                     name="gender"
                     type="radio"
                     value={true}
-                    checked={search.gender === true || search.gender === 'true'}
-                    onClick={(e) => onInputChangeSearch(e)}
-                  />Nam
+                  />
+                  Nữ
                 </div>
               </div>
             </FormGroup>
 
             {/* Địa Chỉ */}
-            <FormGroup>
+            {/* <FormGroup>
               <label
                 style={{ fontSize: 13 }}
                 className="form-control-label"
@@ -1320,7 +1394,7 @@ const Client = () => {
                 type="text"
                 size="sm"
               />
-            </FormGroup>
+            </FormGroup> */}
 
             {/* Ngày tạo */}
             <FormGroup>
@@ -1331,21 +1405,7 @@ const Client = () => {
                 Ngày tạo
               </label>
               <Input
-                className="form-control-alternative"
-                type="date"
-                size="sm"
-              />
-            </FormGroup>
-
-            {/* Ngày cập nhật */}
-            <FormGroup>
-              <label
-                style={{ fontSize: 13 }}
-                className="form-control-label"
-              >
-                Ngày cập nhật
-              </label>
-              <Input
+                id="createTime"
                 className="form-control-alternative"
                 type="date"
                 size="sm"
@@ -1356,12 +1416,12 @@ const Client = () => {
         <ModalFooter>
           <div className="row w-100">
             <div className="col-4">
-              <Button color="primary" outline size="sm" block onClick={() => { resetSearch(); }}>
+              <Button color="primary" outline size="sm" block onClick={resetFilters}>
                 Làm mới
               </Button>
             </div>
             <div className="col-4">
-              <Button color="primary" outline size="sm" block onClick={toggleFilter}>
+              <Button color="primary" outline size="sm" block onClick={handleFilter}>
                 Lọc
               </Button>
             </div>

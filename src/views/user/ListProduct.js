@@ -12,6 +12,10 @@ import {
   FormGroup,
 } from "reactstrap";
 import Header from "components/Headers/UserHeader2.js";
+import ReactPaginate from "react-paginate";
+
+// import "sweetpagination/dist/style.css";
+
 import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
 import { Slider } from "antd";
@@ -161,6 +165,7 @@ const Product = () => {
       [propertyName]: prevSearch[propertyName] === value ? null : value,
     }));
   };
+
   const onPriceChange = (e) => {
     setSearch({ ...search, [e.target.name]: e.target.value });
   };
@@ -189,6 +194,13 @@ const Product = () => {
 
   const handleSliderChange = (value) => {
     setSliderValue(value);
+  };
+
+  const handlePageClick = (event) => {
+    setPage(+event.selected);
+  };
+  const onChangeSize = (e) => {
+    setSize(+e.target.value);
   };
 
   return (
@@ -711,6 +723,34 @@ const Product = () => {
                         <p>Không có dữ liệu.</p>
                       )}
                     </div>
+                  </div>
+
+                  <div className="col-md-12 phanTrang">
+                    <Col
+                      style={{ fontSize: 11 }}
+                      className="mt--1 d-flex justify-content-center"
+                    >
+                      <ReactPaginate
+                        breakLabel="..."
+                        nextLabel=">"
+                        pageRangeDisplayed={1} // Number of pages to display on each side of the selected page
+                        pageCount={totalPages} // Total number of pages
+                        previousLabel="<"
+                        onPageChange={handlePageClick}
+                        renderOnZeroPageCount={null}
+                        pageClassName="page-item"
+                        pageLinkClassName="page-link"
+                        previousClassName="page-item"
+                        previousLinkClassName="page-link"
+                        nextClassName="page-item"
+                        nextLinkClassName="page-link"
+                        breakClassName="page-item"
+                        breakLinkClassName="page-link"
+                        containerClassName="pagination circular-pagination" // Add "circular-pagination" class here
+                        activeClassName="active"
+                        marginPagesDisplayed={1}
+                      />
+                    </Col>
                   </div>
                 </Row>
               </CardBody>
