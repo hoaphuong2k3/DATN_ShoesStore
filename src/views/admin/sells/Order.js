@@ -413,7 +413,7 @@ const Order = () => {
         selectedProvince: yup.string().required('Vui lòng chọn tỉnh/thành phố.'),
         selectedDistrict: yup.string().required('Vui lòng chọn quận/huyện.'),
         selectedWard: yup.string().required('Vui lòng chọn xã/phường.'),
-        detailedAddress: yup.string().required('Vui lòng nhập địa chỉ chi tiết.'),
+        detailedAddress: yup.string().required('Vui lòng nhập địa chỉ chi tiết.')
     });
 
 
@@ -421,7 +421,10 @@ const Order = () => {
 
         try {
 
-            // Nếu dữ liệu hợp lệ, tiếp tục thực hiện createOrder
+            if (selectedProducts.length === 0) {
+                toast.error("Chọn sản phẩm để hoàn thành đơn hàng");
+            }
+
             const idClient = selectedClient ? selectedClient.id : null;
             let deliveryOrderDTO = null;
 
@@ -475,12 +478,13 @@ const Order = () => {
 
         } catch (validationError) {
             const errors = {};
-            validationError.inner.forEach(error => {
-                errors[error.path] = error.message;
-            });
+            if (validationError.inner && Array.isArray(validationError.inner)) {
+                validationError.inner.forEach(error => {
+                    errors[error.path] = error.message;
+                });
+            }
             setValidationErrors(errors);
         }
-
     };
 
     //Tính toán
@@ -865,7 +869,7 @@ const Order = () => {
                                                         rows="2"
                                                         type="textarea"
                                                         size="sm"
-                                                        value={detailedAddress} 
+                                                        value={detailedAddress}
                                                         onChange={(e) => setDetailedAddress(e.target.value)}
                                                         placeholder="Địa chỉ chi tiết..."
                                                         invalid={!!validationErrors.detailedAddress}
