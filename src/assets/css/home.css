@@ -193,7 +193,7 @@
 
 .sidebar_single_post {
   background: url("https://laforce.vn/wp-content/themes/banhang/images/bg_free.png");
-  margin: 8em 0px 0px 0px;
+  margin: 6em 0px 0px 0px;
   overflow: auto;
   background-size: cover;
 }
@@ -209,7 +209,7 @@
 .sidebar_single_post .textwidget ul {
   overflow: auto;
   margin: 0px auto;
-  padding: 51px 0px 52px 0px;
+  padding: 0px 0px 0px 0px;
   display: table;
   list-style: none;
 }
