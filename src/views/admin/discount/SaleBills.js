@@ -71,6 +71,7 @@ const SaleBills = () => {
         }
     };
     useEffect(() => {
+        console.log(queryParams);
         fetchData();
         const intervalId = setInterval(() => {
             fetchData();

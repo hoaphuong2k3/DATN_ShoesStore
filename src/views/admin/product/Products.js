@@ -187,27 +187,12 @@ const Products = () => {
     }
   }
   //Start Delete
-  const [deleteshoes, setDeleteShoes] = useState([]);
-  const [iddeleteshoes, setIdDeleteShoes] = useState([]);
-  const [modalConfirmDelete, setModalConfirmDelete] = useState(false);
-  const toggle = () => setModalConfirmDelete(!modalConfirmDelete);
-  const handleConfirmDelete = (shoes) => {
-    setDeleteShoes(shoes);
-    setIdDeleteShoes([...iddeleteshoes, shoes.id])
-    toggle();
-  }
-
-  const handleDelete = async () => {
+  const handleDelete = async (id) => {
     try {
-      console.log(iddeleteshoes);
-      await deleteShoes({ data: iddeleteshoes });
+      await deleteShoes({ data: [id] });
       getAll();
-      setIdDeleteShoes([]);
-      toggle();
       toast.success("Xóa thành công ");
     } catch (error) {
-      setIdDeleteShoes([]);
-      toggle();
       let errorMessage = "Lỗi từ máy chủ";
       if (error.response && error.response.data && error.response.data.message) {
         errorMessage = error.response.data.message;
@@ -477,82 +462,85 @@ const Products = () => {
                           </FormGroup>
 
                         </th>
-                        <th>STT</th>
-                        <th>Ảnh</th>
-                        <th>Mã <FaSort
+                        <th style={{ color: "black" }}>STT</th>
+                        <th style={{ color: "black" }}>Ảnh</th>
+                        <th style={{ color: "black" }}>Mã <FaSort
                           style={{ cursor: "pointer" }}
                           className="text-muted"
                           onClick={() => onClickSort("code")} />
                         </th>
-                        <th>Tên <FaSort
+                        <th style={{ color: "black" }}>Tên <FaSort
                           style={{ cursor: "pointer" }}
                           className="text-muted"
                           onClick={() => onClickSort("name")} />
                         </th>
-                        <th>Hãng <FaSort
+                        <th style={{ color: "black" }}>Hãng <FaSort
                           style={{ cursor: "pointer" }}
                           className="text-muted"
                           onClick={() => onClickSort("brand")} />
                         </th>
-                        <th>Xuất xứ <FaSort
+                        <th style={{ color: "black" }}>Xuất xứ <FaSort
                           style={{ cursor: "pointer" }}
                           className="text-muted"
                           onClick={() => onClickSort("origin")} />
                         </th>
-                        <th>Thiết kế <FaSort
+                        <th style={{ color: "black" }}>Thiết kế <FaSort
                           style={{ cursor: "pointer" }}
                           className="text-muted"
                           onClick={() => onClickSort("designStyle")} />
                         </th>
-                        <th>Loại da <FaSort
+                        <th style={{ color: "black" }}>Loại da <FaSort
                           style={{ cursor: "pointer" }}
                           className="text-muted"
                           onClick={() => onClickSort("skinType")} />
                         </th>
-                        <th>Mũi giày <FaSort
+                        <th style={{ color: "black" }}>Mũi giày <FaSort
                           style={{ cursor: "pointer" }}
                           className="text-muted"
                           onClick={() => onClickSort("toe")} />
                         </th>
-                        <th>Đế giày <FaSort
+                        <th style={{ color: "black" }}>Đế giày <FaSort
                           style={{ cursor: "pointer" }}
                           className="text-muted"
                           onClick={() => onClickSort("sole")} />
                         </th>
-                        <th>Lót giày <FaSort
+                        <th style={{ color: "black" }}>Lót giày <FaSort
                           style={{ cursor: "pointer" }}
                           className="text-muted"
                           onClick={() => onClickSort("lining")} />
                         </th>
-                        <th>Đệm giày <FaSort
+                        <th style={{ color: "black" }}>Đệm giày <FaSort
                           style={{ cursor: "pointer" }}
                           className="text-muted"
                           onClick={() => onClickSort("cushion")} />
                         </th>
-                        <th>Số lượng <FaSort
+                        <th style={{ color: "black" }}>Số lượng <FaSort
                           style={{ cursor: "pointer" }}
                           className="text-muted"
                           onClick={() => onClickSort("totalQuantity")} />
                         </th>
-                        <th>Số CTSP <FaSort
+                        <th style={{ color: "black" }}>Số CTSP <FaSort
                           style={{ cursor: "pointer" }}
                           className="text-muted"
                           onClick={() => onClickSort("totalRecord")} />
                         </th>
-                        <th>Giá Min <FaSort
+                        <th style={{ color: "black" }}>Giá Min <FaSort
                           style={{ cursor: "pointer" }}
                           className="text-muted"
                           onClick={() => onClickSort("priceMin")} />
                         </th>
-                        <th>Giá Max <FaSort
+                        <th style={{ color: "black" }}>Giá Max <FaSort
                           style={{ cursor: "pointer" }}
                           className="text-muted"
                           onClick={() => onClickSort("priceMax")} />
                         </th>
-                        <th colSpan={3} style={{ position: "sticky", zIndex: '1', right: '0' }} className="text-center">Thao tác</th>
+                        <th colSpan={3} style={{ position: "sticky", zIndex: '1', right: '0', color: "black" }}
+                          className="text-center"
+                        >
+                          Thao tác</th>
                       </tr>
                     </thead>
-                    <tbody>
+                    <tbody className="text-center">
                       {listShoes.length <= 0 &&
                         <th className="text-center" colSpan={17}>
                           Không có dữ liệu
@@ -579,7 +567,7 @@ const Products = () => {
                                 <img
                                   src={`https://s3-ap-southeast-1.amazonaws.com/imageshoestore/${item.imgURI}`}
                                   alt=""
-                                  style={{ width: "80px" }}
+                                  style={{ width: "80px", height: "80px" }}
                                 />
                               </td>
                               <td>{item.code}</td>
@@ -610,9 +598,18 @@ const Products = () => {
                                     <FaEdit color="primary" />
                                   </Button>
                                 </Tooltip>
-                                <Button color="link" size="sm" onClick={() => handleConfirmDelete(item)}>
-                                  <FaTrash color="primary" />
-                                </Button>
+                                <Popconfirm
+                                  title={`Bạn có chắc muốn xóa giày mã ${item.code} này không?`}
+                                  onConfirm={() => handleDelete(item.id)}
+                                  okText="Xóa"
+                                  cancelText="Hủy"
+                                >
+                                  <Tooltip title="Xóa">
+                                    <Button color="link" size="sm">
+                                      <FaTrash color="primary" />
+                                    </Button>
+                                  </Tooltip>
+                                </Popconfirm>
                               </td>
                             </tr>
                           )
@@ -674,29 +671,7 @@ const Products = () => {
           </div>
         </Row>
       </Container >
-      <Modal
-        isOpen={modalConfirmDelete}
-        toggle={toggle}
-        backdrop={'static'}
-        keyboard={false}
-      >
-        <ModalHeader>
-          Thông báo
-        </ModalHeader>
-        <ModalBody>
-          <h3>Bạn có muốn xóa giày mã {deleteshoes.code} giày này không ?</h3>
-        </ModalBody>
-        <ModalFooter>
-          <div className="text-center">
-            <Button color="danger" onClick={() => handleDelete()}>
-              Xóa
-            </Button>{' '}
-            <Button color="danger" onClick={toggle}>
-              Không
-            </Button>{' '}
-          </div>
-        </ModalFooter>
-      </Modal>
+
       <Modal
         isOpen={thirdModal}
         toggle={toggleThirdModal}
