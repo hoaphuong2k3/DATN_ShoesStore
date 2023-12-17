@@ -47,11 +47,10 @@ const Footer = () => {
                 <a href="/shoes/home" itemprop="url" aria-label="ShoesStore">
                   {" "}
                   <img
-                    alt="..."
-                    src={require("../../assets/img/brand/Leather_Gent.png")}
-                    width={150}
-                    style={{ height: 70 }}
-                  />
+              alt="..."
+              src={require("../../assets/img/brand/LeatherGent.png")}
+              width={120} style={{height:70}}
+            />
                 </a>
               </div>
               <div className="text-f-wrapper">

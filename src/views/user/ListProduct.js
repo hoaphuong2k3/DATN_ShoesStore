@@ -6,10 +6,13 @@ import {
   CardBody,
   Button,
   Col,
-  Input,
   Label,
   CustomInput,
   FormGroup,
+  Input,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupText,
 } from "reactstrap";
 import Header from "components/Headers/UserHeader2.js";
 import ReactPaginate from "react-paginate";
@@ -47,7 +50,7 @@ const Product = () => {
   const [totalPages, setTotalPages] = useState(0);
   const [totalElements, setTotalElenments] = useState(0);
   const [page, setPage] = useState(0);
-  const [size, setSize] = useState(10);
+  const [size, setSize] = useState(4);
   const [search, setSearch] = useState({
     name: "",
     brandId: null,
@@ -203,6 +206,43 @@ const Product = () => {
     setSize(+e.target.value);
   };
 
+  const [sortOption, setSortOption] = useState("default");
+  const sortProducts = () => {
+    let sortedProducts = [...products];
+
+    switch (sortOption) {
+      case "az":
+        sortedProducts.sort((a, b) => a.name.localeCompare(b.name));
+        break;
+      case "za":
+        sortedProducts.sort((a, b) => b.name.localeCompare(a.name));
+        break;
+      case "lowToHigh":
+        sortedProducts.sort((a, b) => a.priceMin - b.priceMin);
+        break;
+      case "highToLow":
+        sortedProducts.sort((a, b) => b.priceMin - a.priceMin);
+        break;
+      default:
+        return sortedProducts;
+    }
+
+    return sortedProducts;
+  };
+
+  const calculateStartIndex = () => {
+    return page * size + 1;
+  };
+
+  const calculateEndIndex = () => {
+    const endIndex = page * size + size;
+    return totalElements < endIndex ? totalElements : endIndex;
+  };
+
+  const setTotalElements = (elements) => {
+    setTotalElenments(elements);
+    setTotalPages(Math.ceil(elements / size));
+  };
   return (
     <>
       <Header />
@@ -634,14 +674,34 @@ const Product = () => {
                       </div>
                     </div>
                   </div>
+
                   <div className="col-md-9 mt-5">
-                    <div className="selectItem">
-                      {errorMessage && <p>{errorMessage}</p>}
-                      <ul></ul>
+                    <div className="d-flex justify-content-between">
+                      <div style={{ fontSize: 14 }} className="mt-4">
+                        <b style={{color: "black"}}>
+                          
+                          Hiển thị {calculateStartIndex()} - {calculateEndIndex()} của {totalElements} kết quả{" "}
+                        </b>
+                      </div>
+                      <div className="ml-auto mt-3">
+                        <Input
+                          type="select"
+                          value={sortOption}
+                          onChange={(e) => setSortOption(e.target.value)}
+                        >
+                          <option value="default">Sắp xếp theo</option>
+                          <option value="az">A-Z</option>
+                          <option value="za">Z-A</option>
+                          <option value="lowToHigh">Giá thấp - cao</option>
+                          <option value="highToLow">Giá cao - thấp</option>
+                        </Input>
+                      </div>
                     </div>
-                    <div className="row product-blocks clearfix ">
+                    {errorMessage && <p>{errorMessage}</p>}
+                    <ul></ul>
+                    <div className="row product-blocks clearfix">
                       {Array.isArray(products) ? (
-                        products.map((product) => (
+                        sortProducts().map((product) => (
                           <div className="col-3 mb-3">
                             <Card
                               className="product-card"
