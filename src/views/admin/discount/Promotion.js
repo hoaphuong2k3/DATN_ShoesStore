@@ -5,7 +5,6 @@ import ReactPaginate from "react-paginate";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import axiosInstance from "services/custommize-axios";
-import { isToday } from 'date-fns';
 import "assets/css/pagination.css";
 // reactstrap components
 import Carousel from 'react-bootstrap/Carousel';
@@ -72,6 +71,21 @@ const Promotion = () => {
         size: 10,
     });
 
+    //search
+    const [searchTerm, setSearchTerm] = useState('');
+    const filterDiscount = discounts.filter((admin) => {
+        if (searchTerm === '') {
+            return true;
+        } else {
+            return admin.code.toLowerCase().includes(searchTerm.toLowerCase());
+        }
+    });
+    const handleSearch = (term) => {
+        setSearchTerm(term);
+        setQueryParams(prevParams => ({ ...prevParams, page: 0, code: term }));
+    };
+
+
     //loads table
     const fetchData = async () => {
         try {
@@ -99,14 +113,11 @@ const Promotion = () => {
     };
     useEffect(() => {
         fetchData();
-        // Khởi tạo interval khi component được tạo
         const intervalId = setInterval(() => {
             fetchData();
         }, 1000);
 
-        // Lưu intervalId vào state để sau này có thể xóa interval
         setReloadInterval(intervalId);
-
         return () => {
             clearInterval(intervalId);
         };
@@ -142,20 +153,6 @@ const Promotion = () => {
     };
 
     //Lọc
-    const [searchTerm, setSearchTerm] = useState('');
-    const filterDiscount = discounts.filter((discount) => {
-        if (searchTerm === '') {
-            return true;
-        } else {
-            return discount.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                discount.name.toLowerCase().includes(searchTerm.toLowerCase());
-        }
-    });
-    const handleSearch = (term) => {
-        setSearchTerm(term);
-        setQueryParams(prevParams => ({ ...prevParams, page: 0, searchTerm: term }));
-    };
-
 
     const handleFilter = () => {
         // Extract values from modal form fields
