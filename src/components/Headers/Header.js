@@ -6,7 +6,7 @@ const Header = () => {
       <div
         className="header pb-8 pt-5 pt-lg-8 d-flex align-items-center"
         style={{
-          minHeight: "370px",
+          minHeight: "390px",
           backgroundImage:
             "url(" + require("../../assets/img/theme/bannerShoes9.jpg") + ")",
           backgroundSize: "cover",
