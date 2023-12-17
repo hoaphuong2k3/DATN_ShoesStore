@@ -810,7 +810,7 @@ const SaleProduct = () => {
                 <Row className="mt-4">
                     <Col lg={6}>
                         <div style={{ fontSize: 14 }}>
-                            Đang xem <b>{queryParams.page * queryParams.size + 1}</b>  đến <b>{queryParams.page * queryParams.size + discounts.length}</b> trong tổng số <b>{totalElements}</b> mục
+                            Đang xem <b>{queryParams.page * queryParams.size + 1}</b>  đến <b>{queryParams.page * queryParams.size + discounts.length}</b> trong tổng số mục
                         </div>
                     </Col>
                     <Col style={{ fontSize: 14 }} lg={2}>
