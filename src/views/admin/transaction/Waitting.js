@@ -52,7 +52,20 @@ const Waitting = () => {
     const [hasShippingData, setHasShippingData] = useState(false);
 
     const [selectAllChecked, setSelectAllChecked] = useState(false);
+
+    //search
     const [searchTerm, setSearchTerm] = useState('');
+    const filterConfirm = confirm.filter((admin) => {
+        if (searchTerm === '') {
+            return true;
+        } else {
+            return admin.code.toLowerCase().includes(searchTerm.toLowerCase());
+        }
+    });
+    const handleSearch = (term) => {
+        setSearchTerm(term);
+        setQueryParams(prevParams => ({ ...prevParams, page: 0, code: term }));
+    };
 
     const fetchDataFromAPI = async (url, stateSetter) => {
         try {
@@ -104,7 +117,7 @@ const Waitting = () => {
 
     useEffect(() => {
         fetchData();
-    }, [selectedProvince, selectedDistrict]);
+    }, [selectedProvince, selectedDistrict, queryParams, searchTerm]);
 
     const handlePageChange = ({ selected }) => {
         setQueryParams(prevParams => ({ ...prevParams, page: selected }));
@@ -153,7 +166,7 @@ const Waitting = () => {
             } else {
                 totalMoney = totalMoney + Math.floor(deliveryCost);
             }
-            
+
         } else {
             if (priceVoucher !== null) {
                 totalMoney = productPrice - priceVoucher;
@@ -164,7 +177,7 @@ const Waitting = () => {
             }
         }
 
-       
+
 
         return totalMoney;
     };
@@ -570,7 +583,7 @@ const Waitting = () => {
                                 <Input type="search"
                                     placeholder="Tìm kiếm hóa đơn"
                                     value={searchTerm}
-                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                    onChange={(e) => handleSearch(e.target.value)}
                                 />
                                 <InputGroupAddon addonType="append">
                                     <InputGroupText>
@@ -620,52 +633,46 @@ const Waitting = () => {
                             </tr>
                         </thead>
                         <tbody style={{ color: "black" }}>
-                            {Array.isArray(confirm) &&
-                                confirm
-                                    .filter(
-                                        (confirm) =>
-                                            confirm.code.toLowerCase().includes(searchTerm.toLowerCase())
-                                    )
-                                    .map((confirm, index) => (
-                                        <tr key={confirm.id}>
-                                            <td className="text-center pt-0">
-                                                <FormGroup check>
-                                                    <Input type="checkbox"
-                                                        onChange={() => handleCheckboxChange(confirm.id)}
-                                                        checked={selectedIds.includes(confirm.id)} />
-                                                </FormGroup>
-                                            </td>
-                                            <td className="text-center">{calculateIndex(index)}</td>
-                                            <td>{confirm.code}</td>
-                                            <td>{confirm.fullnameClient}</td>
-                                            <td>{confirm.phoneNumber}</td>
-                                            <td className="text-right">{formatter.format(confirm.totalPayment)}</td>
-                                            <td className="text-center">
-                                                <Badge color={paymentMethodColors[confirm.paymentMethod]?.color || "secondary"}>
-                                                    {paymentMethodColors[confirm.paymentMethod]?.label || "Không xác định"}
-                                                </Badge>
-                                            </td>
+                            {Array.isArray(filterConfirm) && filterConfirm.map((confirm, index) => (
+                                <tr key={confirm.id}>
+                                    <td className="text-center pt-0">
+                                        <FormGroup check>
+                                            <Input type="checkbox"
+                                                onChange={() => handleCheckboxChange(confirm.id)}
+                                                checked={selectedIds.includes(confirm.id)} />
+                                        </FormGroup>
+                                    </td>
+                                    <td className="text-center">{calculateIndex(index)}</td>
+                                    <td>{confirm.code}</td>
+                                    <td>{confirm.fullnameClient}</td>
+                                    <td>{confirm.phoneNumber}</td>
+                                    <td className="text-right">{formatter.format(confirm.totalPayment)}</td>
+                                    <td className="text-center">
+                                        <Badge color={paymentMethodColors[confirm.paymentMethod]?.color || "secondary"}>
+                                            {paymentMethodColors[confirm.paymentMethod]?.label || "Không xác định"}
+                                        </Badge>
+                                    </td>
 
-                                            <td>{confirm.fullnameStaff}</td>
-                                            <td>{format(new Date(confirm.createdTime), 'dd-MM-yyyy HH:mm', { locale: vi })}</td>
-                                            <td>{format(new Date(confirm.updatedTime), 'dd-MM-yyyy HH:mm', { locale: vi })}</td>
-                                            <td className="text-center d-flex" style={{ position: "sticky", zIndex: '1', right: '0', background: "#fff" }}>
-                                                <Tooltip title="Xác nhận">
-                                                    <Popconfirm
-                                                        title="Xác nhận đơn hàng?"
-                                                        onConfirm={() => handleConfirmDetail(confirm.id)}
-                                                        okText="Xác nhận"
-                                                        cancelText="Hủy"
-                                                    >
-                                                        <Button color="link" size="sm">
-                                                            <FaRegHandPointLeft />
-                                                        </Button>
-                                                    </Popconfirm>
-                                                </Tooltip>
-                                                <Button color="link" size="sm" onClick={() => handleRowClick(confirm.id, confirm)}><FaRegEdit /></Button>
-                                            </td>
-                                        </tr>
-                                    ))}
+                                    <td>{confirm.fullnameStaff}</td>
+                                    <td>{format(new Date(confirm.createdTime), 'dd-MM-yyyy HH:mm', { locale: vi })}</td>
+                                    <td>{format(new Date(confirm.updatedTime), 'dd-MM-yyyy HH:mm', { locale: vi })}</td>
+                                    <td className="text-center d-flex" style={{ position: "sticky", zIndex: '1', right: '0', background: "#fff" }}>
+                                        <Tooltip title="Xác nhận">
+                                            <Popconfirm
+                                                title="Xác nhận đơn hàng?"
+                                                onConfirm={() => handleConfirmDetail(confirm.id)}
+                                                okText="Xác nhận"
+                                                cancelText="Hủy"
+                                            >
+                                                <Button color="link" size="sm">
+                                                    <FaRegHandPointLeft />
+                                                </Button>
+                                            </Popconfirm>
+                                        </Tooltip>
+                                        <Button color="link" size="sm" onClick={() => handleRowClick(confirm.id, confirm)}><FaRegEdit /></Button>
+                                    </td>
+                                </tr>
+                            ))}
                         </tbody>
                     </Table>
 

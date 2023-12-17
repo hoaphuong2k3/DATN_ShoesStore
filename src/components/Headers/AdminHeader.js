@@ -79,9 +79,7 @@ const Header = () => {
                         <CardTitle tag="h5" className="text-uppercase text-muted mb-0">
                           Khách hàng mới
                         </CardTitle>
-                        <span className="h2 font-weight-bold mb-0">
-                          0
-                        </span>
+                        <h1 className="font-weight-bold mb-0">{client}</h1>
                       </div>
                       <Col className="col-auto position-absolute right-0 bottom-6">
                         <div className="p-3 bg-gradient-info text-white rounded">
@@ -91,9 +89,9 @@ const Header = () => {
                     </Row>
                     <p className="mt-3 mb-0 text-muted text-sm">
                       <span className="text-success mr-2">
-                        <i className="fa fa-arrow-up" /> 0%
+                        {/* <i className="fa fa-arrow-up" /> 0% */}
                       </span>{" "}
-                      <span className="text-nowrap">Hôm qua</span>
+                      {/* <span className="text-nowrap">Hôm qua</span> */}
                     </p>
                   </CardBody>
                 </Card>

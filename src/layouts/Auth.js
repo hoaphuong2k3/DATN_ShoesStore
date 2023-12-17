@@ -4,7 +4,7 @@ import { useLocation, Route, Routes, Navigate } from "react-router-dom";
 import { Container, Row, Col } from "reactstrap";
 
 // core components
-import AuthNavbar from "components/Navbars/AuthNavbar.js";
+// import AuthNavbar from "components/Navbars/AuthNavbar.js";
 import AuthFooter from "components/Footers/AuthFooter.js";
 
 import routes from "routes-auth.js";
@@ -25,8 +25,9 @@ const Auth = (props) => {
 
   return (
     <>
-      <div className="main-content" style={{ backgroundImage: "url('https://designs.vn/wp-content/images/22-08-2019/6-phoi-canh-de-anh-chup-bai-bien-tro-nen-thu-vi-hon-1.jpg')", backgroundSize: "cover", backgroundPosition: "center center", height: "auto" }}>
-        <AuthNavbar />
+    {/* style={{ backgroundImage: "url('https://designs.vn/wp-content/images/22-08-2019/6-phoi-canh-de-anh-chup-bai-bien-tro-nen-thu-vi-hon-1.jpg')", backgroundSize: "cover", backgroundPosition: "center center", height: "auto" }} */}
+      <div className="main-content">
+        {/* <AuthNavbar /> */}
         {/* <div className="header py-7 py-lg-8">
           <Container>
             <div className="header-body text-center mb-7">
@@ -42,8 +43,8 @@ const Auth = (props) => {
           </Container>
         </div> */}
         {/* Page content */}
-        <Container className="pt-9">
-          <Row className="justify-content-center">
+        <Container fluid className="">
+          <Row >
             <Routes>
               {getRoutes(routes)}
               <Route path="*" element={<Navigate to="/login" replace />} />
@@ -51,7 +52,7 @@ const Auth = (props) => {
           </Row>
         </Container>
 
-        <AuthFooter />
+        {/* <AuthFooter /> */}
       </div>
       
     </>

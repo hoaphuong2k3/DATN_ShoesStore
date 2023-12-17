@@ -110,8 +110,8 @@ const UserNavbar = () => {
           <NavbarBrand to="/shoes/home" tag={Link}>
             <img
               alt="..."
-              src={require("../../assets/img/brand/logo.png")}
-              width={130} style={{height:80}}
+              src={require("../../assets/img/brand/LeatherGent.png")}
+              width={120} style={{height:70}}
             />
           </NavbarBrand>
           <button className="navbar-toggler" id="navbar-collapse-main">

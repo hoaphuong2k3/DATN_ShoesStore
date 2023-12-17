@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import {
@@ -14,6 +14,7 @@ import {
   InputGroupText,
   InputGroup,
   Col,
+  Row,
 } from "reactstrap";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import axios from "axios";
@@ -157,10 +158,58 @@ const Register = () => {
   };
 
   return (
-    <Col lg="6" md="8">
-      <Card className="bg-secondary shadow border-0">
-        <CardHeader className="bg-transparent pb-5">
-          <div className="text-muted text-center mt-2 mb-4">
+    <Col className="">
+      <style>
+        {
+          `
+          .evo-button {
+            position: relative;
+            display: inline-block;
+            padding: 14px 28px;
+            line-height: normal;
+            border: 1px solid #1c1c1c;
+            text-transform: uppercase;
+            font-size: 11px;
+            text-align: center;
+            letter-spacing: 1.5px;
+            font-weight: 400;
+            font-style: normal;
+            background-color: #000; /* Màu nền trắng */
+            -webkit-transition: color 0.45s cubic-bezier(0.785, 0.135, 0.15, 0.86),
+              border 0.45s cubic-bezier(0.785, 0.135, 0.15, 0.86);
+            transition: color 0.45s cubic-bezier(0.785, 0.135, 0.15, 0.86),
+              border 0.45s cubic-bezier(0.785, 0.135, 0.15, 0.86);
+            z-index: 1;
+            -webkit-tap-highlight-color: initial;
+            color: #fff; /* Màu chữ đen */
+          }
+          
+          .evo-button:hover {
+            background-color: #fff; /* Màu nền đen khi hover */
+            color: #000; /* Màu chữ trắng khi hover */
+            border: 1px solid #1c1c1c;
+          }
+          `
+        }
+      </style>
+     <Row className="" style={{ backgroundColor: "#47270F" }}>
+     
+     {/* Image */}
+     <Col lg="6" className="bg-light" style={{ backgroundImage: "url('https://laforce.vn/wp-content/uploads/2020/06/giay-nam-khong-day-2.jpg')", backgroundSize: "cover", backgroundPosition: "center center", height: "auto" }}>
+      </Col>
+
+      {/* Register */}
+      <Col lg="6" className="px-7 py-3">
+      <div className="text-center">
+            <img              
+              alt="..."
+              src={require("../../assets/img/brand/Leather_Gent.png")}
+              style={{ width: '223px',margin: "auto", display: "block" }}
+            />
+            </div>
+      {/* <Card className="border-0"> */}
+        <CardHeader className="bg-transparent">
+          <div className="text-light text-center mt-2 mb-3">
             <small>Đăng ký với</small>
           </div>
           <div className="text-center">
@@ -178,8 +227,8 @@ const Register = () => {
             </Button>
           </div>
         </CardHeader>
-        <CardBody className="px-lg-5 py-lg-5">
-          <div className="text-center text-muted mb-4">
+        <CardBody className="px-lg-5">
+          <div className="text-center text-light mb-3">
             <small>Hoặc đăng kí bằng thông tin xác thực</small>
           </div>
           <Form role="form" onSubmit={onSubmit}>
@@ -296,14 +345,26 @@ const Register = () => {
             </FormGroup>
 
             <div className="text-center">
-              <Button className="mt-4" color="primary" type="submit">
+              <Button className="mt-2  evo-button mobile-viewmore" type="submit">
                 Đăng ký
               </Button>
             </div>
             <ToastContainer />
           </Form>
         </CardBody>
-      </Card>
+      {/* </Card> */}
+
+      <Row className="mb-3">
+          
+          <Col className="" xs="6">
+            <Link className="text-light" to="/login" tag={Link}>
+              <small>Đăng nhập</small>
+            </Link>
+          </Col>
+        </Row>
+
+      </Col>
+      </Row>
     </Col>
   );
 };

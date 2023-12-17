@@ -30,7 +30,6 @@ const Received = ({ updateData }) => {
     const [deliveryData, setDeliveryData] = useState({});
     const [hasDeliveryData, setHasDeliveryData] = useState(false);
     const [selectedIds, setSelectedIds] = useState([]);
-    const [totalProductPrice, setTotalProductPrice] = useState(0);
 
     const [provinces, setProvinces] = useState([]);
     const [districts, setDistricts] = useState([]);
@@ -41,9 +40,20 @@ const Received = ({ updateData }) => {
     const [detailedAddress, setDetailedAddress] = useState('');
 
     const [selectAllChecked, setSelectAllChecked] = useState(false);
+
+    //search
     const [searchTerm, setSearchTerm] = useState('');
-
-
+    const filterConfirm  = confirm.filter((admin) => {
+      if (searchTerm === '') {
+        return true;
+      } else {
+        return admin.code.toLowerCase().includes(searchTerm.toLowerCase());
+      }
+    });
+    const handleSearch = (term) => {
+        setSearchTerm(term);
+        setQueryParams(prevParams => ({ ...prevParams, page: 0, code: term }));
+    };
 
     const fetchDataFromAPI = async (url, stateSetter) => {
         try {
@@ -62,6 +72,7 @@ const Received = ({ updateData }) => {
         page: 0,
         size: 10,
         status: 6,
+        code: "",
     });
 
     const fetchData = async () => {
@@ -83,7 +94,8 @@ const Received = ({ updateData }) => {
         try {
 
             const response = await axiosInstance.get("/order/admin", {
-                params: queryParams
+                params: queryParams,
+                
             });
             setConfirm(response.content);
             setTotalElements(response.totalElements);
@@ -95,15 +107,16 @@ const Received = ({ updateData }) => {
 
     useEffect(() => {
         fetchData();
-    }, [selectedProvince, selectedDistrict, queryParams]);
+    }, [selectedProvince, selectedDistrict, queryParams, searchTerm]);
 
     const handlePageChange = ({ selected }) => {
         setQueryParams(prevParams => ({ ...prevParams, page: selected }));
+        
     };
 
     const handleSizeChange = (e) => {
         const newSize = parseInt(e.target.value);
-        setQueryParams({ ...queryParams, size: newSize, page: 0 });
+        setQueryParams({ ...queryParams, size: newSize, page: 0});
     };
 
     const calculateIndex = (index) => {
@@ -268,7 +281,7 @@ const Received = ({ updateData }) => {
                                 <Input type="search"
                                     placeholder="Tìm kiếm hóa đơn"
                                     value={searchTerm}
-                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                    onChange={(e) => handleSearch(e.target.value)}
                                 />
                                 <InputGroupAddon addonType="append">
                                     <InputGroupText>
@@ -318,13 +331,7 @@ const Received = ({ updateData }) => {
                             </tr>
                         </thead>
                         <tbody style={{ color: "black" }}>
-                            {Array.isArray(confirm) &&
-                                confirm
-                                    .filter(
-                                        (confirm) =>
-                                            confirm.code.toLowerCase().includes(searchTerm.toLowerCase())
-                                    )
-                                    .map((confirm, index) => (
+                            {Array.isArray(filterConfirm) && filterConfirm.map((confirm, index) => (
                                         <tr key={confirm.id}>
                                             <td className="text-center pt-0">
                                                 <FormGroup check>

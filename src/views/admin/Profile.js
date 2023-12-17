@@ -2,9 +2,6 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import {
   Button,
-  Card,
-  CardHeader,
-  CardBody,
   FormGroup,
   InputGroupAddon,
   InputGroupText,
@@ -16,14 +13,9 @@ import {
   Label,
   Col,
 } from "reactstrap";
-import Select from "react-select";
 import axiosInstance from "services/custommize-axios";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import {
-  FaEdit,
-  FaTrash,
-  FaSearch,
-  FaFileAlt,
   FaCamera,
   FaUser,
   FaLock,
