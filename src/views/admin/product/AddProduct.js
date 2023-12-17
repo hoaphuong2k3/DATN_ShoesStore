@@ -1,6 +1,5 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect} from "react";
 import { useNavigate } from "react-router-dom";
-import ReactPaginate from 'react-paginate';
 import { FaCamera } from 'react-icons/fa';
 import { postNewShoes } from "services/Product2Service";
 import { getAllBrand, getAllOrigin, getAllDesignStyle, getAllSkinType, getAllToe, getAllSole, getAllLining, getAllCushion } from "services/ProductAttributeService";
@@ -9,12 +8,8 @@ import {
     Card, CardHeader, CardBody, Container, Row, Col, FormGroup, Input, Button, Form, Label
 } from "reactstrap";
 import { toast } from 'react-toastify';
-import Header from "components/Headers/Header.js";
 
 const AddProduct = () => {
-
-    const formData = new FormData();
-
     let navigate = useNavigate();
     const [listBrand, setListBrand] = useState([]);
     const [listorigin, setListOrigin] = useState([]);
@@ -39,9 +34,7 @@ const AddProduct = () => {
     });
 
     const onInputChange = (e) => {
-
         setShoes({ ...shoes, [e.target.name]: e.target.value });
-
     };
     // upload image
     const [file, setFile] = useState(new File([""], { type: "text/plain" }));
@@ -80,7 +73,7 @@ const AddProduct = () => {
     //Img
 
     const onSubmit = async (e) => {
-
+        const formData = new FormData();
         e.preventDefault();
         const shoesDataJson = JSON.stringify(shoes);
         if (file) {
@@ -88,8 +81,9 @@ const AddProduct = () => {
         }
         formData.append('data', shoesDataJson);
         try {
-            const response = await postNewShoes(formData);
+            await postNewShoes(formData);
             navigate("/admin/product");
+            toast.succes("Thêm mới sản phẩm thành công");
         } catch (error) {
             let errorMessage = "Lỗi từ máy chủ";
             if (error.response && error.response.data && error.response.data.message) {

@@ -249,26 +249,6 @@ const SaleBills = () => {
             const formattedStartDate = formatDateTime(formData.startDate);
             const formattedEndDate = formatDateTime(formData.endDate);
 
-            if (!formattedStartDate || !formattedEndDate) {
-                toast.error("Ngày bắt đầu và ngày kết thúc không được để trống");
-                return;
-            }
-
-            // Kiểm tra ngày bắt đầu có phải từ ngày hôm nay không
-            const startDateTime = new Date(formattedStartDate);
-            const today = new Date();
-            if (!isToday(startDateTime)) {
-                toast.error("Ngày bắt đầu phải từ ngày hôm nay hoặc sau ngày hôm nay");
-                return;
-            }
-
-            // Kiểm tra ngày kết thúc có lớn hơn ngày bắt đầu không
-            const endDateTime = new Date(formattedEndDate);
-            if (endDateTime <= startDateTime) {
-                toast.error("Ngày kết thúc phải lớn hơn ngày bắt đầu");
-                return;
-            }
-
 
             if (formData.id) {
                 await axiosInstance.put(`/vouchers/updateVoucher`, {

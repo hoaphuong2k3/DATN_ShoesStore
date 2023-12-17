@@ -2,7 +2,7 @@ import { React, useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { getAllShoes, deleteShoes } from "services/Product2Service";
 import ReactPaginate from 'react-paginate';
-import { FaEdit, FaTrash, FaSearch, FaFileAlt, FaFilter } from 'react-icons/fa';
+import { FaEdit, FaTrash, FaSearch, FaFileAlt, FaFilter, FaSort } from 'react-icons/fa';
 import { getAllBrand, getAllOrigin, getAllDesignStyle, getAllSkinType, getAllToe, getAllSole, getAllLining, getAllCushion } from "services/ProductAttributeService";
 // reactstrap components
 import {
@@ -15,6 +15,7 @@ import {
 } from "reactstrap";
 import { toast } from 'react-toastify';
 import axios from "axios";
+import { Tooltip, Popconfirm } from 'antd';
 
 
 const Products = () => {
@@ -162,9 +163,10 @@ const Products = () => {
   //Sort
   const [sort, setSort] = useState('');
   const [sortStyle, setSortStyle] = useState('');
-  const onClickSort = (a, b) => {
+  const onClickSort = (a) => {
+    const newSortOrder = sort === a && sortStyle === 'asc' ? 'desc' : 'asc';
     setSort(a);
-    setSortStyle(b);
+    setSortStyle(newSortOrder);
   }
   useEffect(() => {
     getAll();
@@ -476,62 +478,77 @@ const Products = () => {
 
                         </th>
                         <th>STT</th>
-                        <th>Mã <i class="fa-solid fa-arrow-up" onClick={() => onClickSort('code', 'asc')} />
-                          <i class="fa-solid fa-arrow-down" onClick={() => onClickSort('code', 'desc')} />
+                        <th>Ảnh</th>
+                        <th>Mã <FaSort
+                          style={{ cursor: "pointer" }}
+                          className="text-muted"
+                          onClick={() => onClickSort("code")} />
                         </th>
-                        <th>Tên
-                          <i class="fa-solid fa-arrow-up" onClick={() => onClickSort('name', 'asc')} />
-                          <i class="fa-solid fa-arrow-down" onClick={() => onClickSort('name', 'desc')} />
+                        <th>Tên <FaSort
+                          style={{ cursor: "pointer" }}
+                          className="text-muted"
+                          onClick={() => onClickSort("name")} />
                         </th>
-                        <th>Hãng
-                          <i class="fa-solid fa-arrow-up" onClick={() => onClickSort('brand', 'asc')} />
-                          <i class="fa-solid fa-arrow-down" onClick={() => onClickSort('brand', 'desc')} />
+                        <th>Hãng <FaSort
+                          style={{ cursor: "pointer" }}
+                          className="text-muted"
+                          onClick={() => onClickSort("brand")} />
                         </th>
-                        <th>Xuất xứ
-                          <i class="fa-solid fa-arrow-up" onClick={() => onClickSort('origin', 'asc')} />
-                          <i class="fa-solid fa-arrow-down" onClick={() => onClickSort('origin', 'desc')} />
+                        <th>Xuất xứ <FaSort
+                          style={{ cursor: "pointer" }}
+                          className="text-muted"
+                          onClick={() => onClickSort("origin")} />
                         </th>
-                        <th>Thiết kế
-                          <i class="fa-solid fa-arrow-up" onClick={() => onClickSort('designStyle', 'asc')} />
-                          <i class="fa-solid fa-arrow-down" onClick={() => onClickSort('designStyle', 'desc')} />
+                        <th>Thiết kế <FaSort
+                          style={{ cursor: "pointer" }}
+                          className="text-muted"
+                          onClick={() => onClickSort("designStyle")} />
                         </th>
-                        <th>Loại da
-                          <i class="fa-solid fa-arrow-up" onClick={() => onClickSort('skinType', 'asc')} />
-                          <i class="fa-solid fa-arrow-down" onClick={() => onClickSort('skinType', 'desc')} />
+                        <th>Loại da <FaSort
+                          style={{ cursor: "pointer" }}
+                          className="text-muted"
+                          onClick={() => onClickSort("skinType")} />
                         </th>
-                        <th>Mũi giày
-                          <i class="fa-solid fa-arrow-up" onClick={() => onClickSort('toe', 'asc')} />
-                          <i class="fa-solid fa-arrow-down" onClick={() => onClickSort('toe', 'desc')} />
+                        <th>Mũi giày <FaSort
+                          style={{ cursor: "pointer" }}
+                          className="text-muted"
+                          onClick={() => onClickSort("toe")} />
                         </th>
-                        <th>Đế giày
-                          <i class="fa-solid fa-arrow-up" onClick={() => onClickSort('sole', 'asc')} />
-                          <i class="fa-solid fa-arrow-down" onClick={() => onClickSort('sole', 'desc')} />
+                        <th>Đế giày <FaSort
+                          style={{ cursor: "pointer" }}
+                          className="text-muted"
+                          onClick={() => onClickSort("sole")} />
                         </th>
-                        <th>Lót giày
-                          <i class="fa-solid fa-arrow-up" onClick={() => onClickSort('lining', 'asc')} />
-                          <i class="fa-solid fa-arrow-down" onClick={() => onClickSort('lining', 'desc')} />
+                        <th>Lót giày <FaSort
+                          style={{ cursor: "pointer" }}
+                          className="text-muted"
+                          onClick={() => onClickSort("lining")} />
                         </th>
-                        <th>Đệm giày
-                          <i class="fa-solid fa-arrow-up" onClick={() => onClickSort('cushion', 'asc')} />
-                          <i class="fa-solid fa-arrow-down" onClick={() => onClickSort('cushion', 'desc')} />
+                        <th>Đệm giày <FaSort
+                          style={{ cursor: "pointer" }}
+                          className="text-muted"
+                          onClick={() => onClickSort("cushion")} />
                         </th>
-                        <th>Số lượng
-                          <i class="fa-solid fa-arrow-up" onClick={() => onClickSort('totalQuantity', 'asc')} />
-                          <i class="fa-solid fa-arrow-down" onClick={() => onClickSort('totalQuantity', 'desc')} />
+                        <th>Số lượng <FaSort
+                          style={{ cursor: "pointer" }}
+                          className="text-muted"
+                          onClick={() => onClickSort("totalQuantity")} />
                         </th>
-                        <th>Số CTSP
-                          <i class="fa-solid fa-arrow-up" onClick={() => onClickSort('totalRecord', 'asc')} />
-                          <i class="fa-solid fa-arrow-down" onClick={() => onClickSort('totalRecord', 'desc')} />
+                        <th>Số CTSP <FaSort
+                          style={{ cursor: "pointer" }}
+                          className="text-muted"
+                          onClick={() => onClickSort("totalRecord")} />
                         </th>
-                        <th>Giá Min
-                          <i class="fa-solid fa-arrow-up" onClick={() => onClickSort('priceMin', 'asc')} />
-                          <i class="fa-solid fa-arrow-down" onClick={() => onClickSort('priceMin', 'desc')} />
+                        <th>Giá Min <FaSort
+                          style={{ cursor: "pointer" }}
+                          className="text-muted"
+                          onClick={() => onClickSort("priceMin")} />
                         </th>
-                        <th>Giá Max
-                          <i class="fa-solid fa-arrow-up" onClick={() => onClickSort('priceMax', 'asc')} />
-                          <i class="fa-solid fa-arrow-down" onClick={() => onClickSort('priceMax', 'desc')} />
+                        <th>Giá Max <FaSort
+                          style={{ cursor: "pointer" }}
+                          className="text-muted"
+                          onClick={() => onClickSort("priceMax")} />
                         </th>
-
                         <th colSpan={3} style={{ position: "sticky", zIndex: '1', right: '0' }} className="text-center">Thao tác</th>
                       </tr>
                     </thead>
@@ -558,6 +575,13 @@ const Products = () => {
 
                               </td>
                               <th scope="row"> {index + 1}</th>
+                              <td>
+                                <img
+                                  src={`https://s3-ap-southeast-1.amazonaws.com/imageshoestore/${item.imgURI}`}
+                                  alt=""
+                                  style={{ width: "80px" }}
+                                />
+                              </td>
                               <td>{item.code}</td>
                               <td>{item.name}</td>
                               <td>{item.brand}</td>
@@ -573,15 +597,19 @@ const Products = () => {
                               <td>{item.totalRecord > 0 ? formatter.format(item.priceMin) : ""}</td>
                               <td>{item.totalRecord > 0 ? formatter.format(item.priceMax) : ""}</td>
                               <td style={{ position: "sticky", zIndex: '1', right: '0', background: "#fff" }}>
-                                <Button color="link" to={`/admin/shoesdetail/${item.id}`} tag={Link} size="sm">
-                                  <i class="fa-solid fa-eye" color="primary" />
-                                </Button>
+                                <Tooltip title="Quản lý CTSP">
+                                  <Button color="link" to={`/admin/shoesdetail/${item.id}`} tag={Link} size="sm">
+                                    <i class="fa-solid fa-eye" color="primary" />
+                                  </Button>
+                                </Tooltip>
                                 {/* <Button color="link" to={`/admin/product/detail/${item.id}`} tag={Link} size="sm">
                                   <i class="fa-solid fa-eye"></i>
                                 </Button> */}
-                                <Button color="link" to={`/admin/product/edit/${item.id}`} tag={Link} size="sm">
-                                  <FaEdit color="primary" />
-                                </Button>
+                                <Tooltip title="Chỉnh sửa">
+                                  <Button color="link" to={`/admin/product/edit/${item.id}`} tag={Link} size="sm">
+                                    <FaEdit color="primary" />
+                                  </Button>
+                                </Tooltip>
                                 <Button color="link" size="sm" onClick={() => handleConfirmDelete(item)}>
                                   <FaTrash color="primary" />
                                 </Button>

@@ -583,6 +583,15 @@ const ListShoesDetail = () => {
     };
     //End Báo cáo
     // Thêm mới 1 ctsp
+    const [addone, setAddOne] = useState({
+        id: "",
+        sizeId: "",
+        colorId: "",
+        quantity: "",
+        price: "",
+        status: "1"
+    });
+
     const [modalAdd, setModalAdd] = useState(false);
     const toggle = () => setModalAdd(!modalAdd);
     const [modalEdit, setModalEdit] = useState(false);
@@ -599,17 +608,11 @@ const ListShoesDetail = () => {
             setSelectedImages([]);
         }
     }, [modalEdit]);
+
     useEffect(() => {
         console.log(addone);
     }, [addone]);
-    const [addone, setAddOne] = useState({
-        id: "",
-        sizeId: "",
-        colorId: "",
-        quantity: "",
-        price: "",
-        status: "1"
-    });
+
     const resetAddOne = () => {
         setAddOne({
             id: "",
@@ -1288,8 +1291,6 @@ const ListShoesDetail = () => {
                                                                             alt=""
                                                                             style={{ width: "80px" }}
                                                                         />
-
-
                                                                     </td>
                                                                     <td style={{ position: "sticky", zIndex: '1', right: '0', background: "#fff" }}>
                                                                         {/* <Button color="danger" to={`/admin/product/edit/${item.id}`} tag={Link} size="sm" disabled={item.status === 0 ? true : false}>

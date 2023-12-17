@@ -16,8 +16,6 @@ const EditProduct = () => {
     const { id } = useParams();
 
 
-    const formData = new FormData();
-
     let navigate = useNavigate();
     const [listBrand, setListBrand] = useState([]);
     const [listorigin, setListOrigin] = useState([]);
@@ -27,7 +25,18 @@ const EditProduct = () => {
     const [listSole, setListSole] = useState([]);
     const [listLining, setListLining] = useState([]);
     const [listCushion, setListCushion] = useState([]);
-
+    const [shoes, setShoes] = useState({
+        name: "",
+        brandId: null,
+        originId: null,
+        designStyleId: null,
+        skinTypeId: null,
+        soleId: null,
+        liningId: null,
+        toeId: null,
+        cushionId: null,
+        description: ""
+    });
     const [dataEdit, setDataEdit] = useState([])
     //getData
     const [imageUrl, setimageUrl] = useState();
@@ -37,13 +46,23 @@ const EditProduct = () => {
             let res = await findShoes(id);
             if (res && res.data) {
                 setDataEdit(res.data);
+                setShoes({
+                    name: res.data.name,
+                    brandId: res.data.brandId,
+                    originId: res.data.originId,
+                    designStyleId: res.data.designStyleId,
+                    skinTypeId: res.data.skinTypeId,
+                    soleId: res.data.soleId,
+                    liningId: res.data.liningId,
+                    toeId: res.data.toeId,
+                    cushionId: res.data.cushionId,
+                    description: res.data.description
+                })
                 if (res.data.imgURI) {
                     setimageUrl(`https://s3-ap-southeast-1.amazonaws.com/imageshoestore/${res.data.imgURI}`);
                     setisChange("")
                 }
             }
-
-
         } catch (error) {
             let errorMessage = "Lỗi từ máy chủ";
             if (error.response && error.response.data && error.response.data.message) {
@@ -64,37 +83,9 @@ const EditProduct = () => {
         getListCushion();
         getData();
     }, []);
-    const [shoes, setShoes] = useState({
-        name: "",
-        brandId: null,
-        originId: null,
-        designStyleId: null,
-        skinTypeId: null,
-        soleId: null,
-        liningId: null,
-        toeId: null,
-        cushionId: null,
-        description: ""
-    });
-
     const onInputChange = (e) => {
-
         setDataEdit({ ...dataEdit, [e.target.name]: e.target.value });
-        setShoes({
-            name: dataEdit.name,
-            brandId: dataEdit.brandId,
-            originId: dataEdit.originId,
-            designStyleId: dataEdit.designStyleId,
-            skinTypeId: dataEdit.skinTypeId,
-            soleId: dataEdit.soleId,
-            liningId: dataEdit.liningId,
-            toeId: dataEdit.toeId,
-            cushionId: dataEdit.cushionId,
-            description: dataEdit.description
-        }
-        );
-        console.log(shoes);
-
+        setShoes({ ...shoes, [e.target.name]: e.target.value });
     };
 
     // upload image
@@ -137,7 +128,7 @@ const EditProduct = () => {
     };
     //Img
     const onSubmit = async (e) => {
-
+        const formData = new FormData();
         e.preventDefault();
 
         const shoesDataJson = JSON.stringify(shoes);
@@ -151,6 +142,7 @@ const EditProduct = () => {
         try {
             await updateShoes(id, formData);
             navigate("/admin/product");
+            toast.success("Cập nhật sản phẩm thành công");
         } catch (error) {
             let errorMessage = "Lỗi từ máy chủ";
             if (error.response && error.response.data && error.response.data.message) {
