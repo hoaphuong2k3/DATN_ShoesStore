@@ -121,7 +121,7 @@ const Promotion = () => {
         return () => {
             clearInterval(intervalId);
         };
-    }, [queryParams, queryParams2, searchTerm]);
+    }, [queryParams, queryParams2]);
 
     const handlePageChange = ({ selected }) => {
         setQueryParams(prevParams => ({ ...prevParams, page: selected }));
