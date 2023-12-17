@@ -16,6 +16,7 @@ import { toast } from 'react-toastify';
 import Header from "components/Headers/Header.js";
 import axios from "axios";
 import axiosInstance from "services/custommize-axios";
+import { Tooltip, Popconfirm } from 'antd';
 
 
 const ProductAttributes = () => {
@@ -942,7 +943,7 @@ const ProductAttributes = () => {
                 <Table responsive className="align-items-center table-flush">
                   <thead className="thead-light">
                     <tr>
-                      <th className="text-center pb-4" >
+                      <th className="text-center" >
                         <FormGroup check className="pb-4">
                           <Input
                             type="checkbox"
@@ -952,10 +953,10 @@ const ProductAttributes = () => {
                         </FormGroup>
 
                       </th>
-                      <th>STT</th>
-                      <th>Mã</th>
-                      <th>Tên</th>
-                      <th colSpan={2}>Thao tác</th>
+                      <th style={{ color: "black" }}>STT</th>
+                      <th style={{ color: "black" }}>Mã</th>
+                      <th style={{ color: "black" }}>Tên</th>
+                      <th colSpan={2} style={{ color: "black" }}>Thao tác</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -982,12 +983,16 @@ const ProductAttributes = () => {
                             <td>{item.code}</td>
                             <td>{item.name}</td>
                             <td>
-                              <Button color="link" onClick={() => handleEdit(item)} size="sm">
-                                <FaEdit color="primary" />
-                              </Button>
-                              <Button color="link" size="sm" onClick={() => handleDelete(item.id)}>
-                                <FaTrash color="primary" />
-                              </Button>
+                              <Tooltip title="Chỉnh sửa">
+                                <Button color="link" onClick={() => handleEdit(item)} size="sm">
+                                  <FaEdit color="primary" />
+                                </Button>
+                              </Tooltip>
+                              <Tooltip title="Xóa">
+                                <Button color="link" size="sm" onClick={() => handleDelete(item.id)}>
+                                  <FaTrash color="primary" />
+                                </Button>
+                              </Tooltip>
 
                             </td>
                           </tr>

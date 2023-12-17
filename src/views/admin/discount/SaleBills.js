@@ -71,6 +71,7 @@ const SaleBills = () => {
         }
     };
     useEffect(() => {
+        console.log(queryParams);
         fetchData();
         // Khởi tạo interval khi component được tạo
         const intervalId = setInterval(() => {
