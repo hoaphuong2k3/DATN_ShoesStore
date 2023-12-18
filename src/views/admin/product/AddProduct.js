@@ -1,6 +1,6 @@
-import React, { useState, useEffect} from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { FaCamera } from 'react-icons/fa';
+import { FaCamera, FaPlus, FaPlusCircle } from 'react-icons/fa';
 import { postNewShoes } from "services/Product2Service";
 import { getAllBrand, getAllOrigin, getAllDesignStyle, getAllSkinType, getAllToe, getAllSole, getAllLining, getAllCushion } from "services/ProductAttributeService";
 // reactstrap components
@@ -193,12 +193,15 @@ const AddProduct = () => {
                                         <Row>
                                             <Col lg="4">
                                                 <FormGroup>
-                                                    <label
-                                                        className="form-control-label"
-                                                        htmlFor="input-city"
-                                                    >
-                                                        Hãng
-                                                    </label>
+                                                    <Row>
+                                                        <label
+                                                            className="form-control-label col-9"
+                                                            htmlFor="input-city"
+                                                        >
+                                                            Hãng
+                                                        </label>
+                                                        <FaPlusCircle className="col-2" />
+                                                    </Row>
                                                     <Input id="btn_select_tt" type="select" name="brandId"
                                                         onChange={(e) => onInputChange(e)}>
                                                         <option value="" > -- Chọn --  </option>
