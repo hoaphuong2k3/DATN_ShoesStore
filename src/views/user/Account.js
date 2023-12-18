@@ -1017,7 +1017,7 @@ const Account = ({ tab }) => {
                 {activeTab === "bill" && (
                   <Bill />
                 )}
-                {activeTab === "Rate" && (
+                {activeTab === "rate" && (
                   <Rate />
                 )}
               </div>

@@ -207,7 +207,6 @@ const DetailProduct = () => {
             "Có lỗi xảy ra khi thực hiện thanh toán. Vui lòng thử lại sau."
           );
         }
-
         const responseData = await response.json();
         console.log(responseData);
         // Chuyển hướng
