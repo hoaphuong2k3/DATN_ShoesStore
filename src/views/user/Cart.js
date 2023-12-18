@@ -158,7 +158,7 @@ const Cart = () => {
       if (window.confirm("Bạn có chắc chắn muốn xóa khách hàng đã chọn không?")) {
         try {
           console.log(selectedId);
-          axios.patch(`http://localhost:33321/api/cart/delete/${idAccount}`, { id: selectedId });
+          axios.delete(`http://localhost:33321/api/cart/delete/${storedUserId}`, { id: selectedId });
           setSelectedId([]);
           toast.success("Xóa thành công ");
         } catch (error) {
