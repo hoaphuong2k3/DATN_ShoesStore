@@ -433,7 +433,7 @@ const Staff = () => {
   const handleDelete = (id) => {
     if (window.confirm("Bạn có chắc chắn muốn xóa không?")) {
       axiosInstance
-        .patch("/staff/delete", { ids: id })
+        .patch("/staff/delete", { ids: [id] })
         .then((response) => {
           fetchData();
           toast.success("Xóa thành công");
