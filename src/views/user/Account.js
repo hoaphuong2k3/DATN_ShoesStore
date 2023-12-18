@@ -17,6 +17,7 @@ import { toast } from 'react-toastify';
 import axiosInstance from "services/custommize-axios";
 import axios from "axios";
 import Bill from "views/user/hoadon/Bills.js";
+import Rate from "views/user/Rate.js";
 const Menu = ({ setActiveTab, activeTab, avatar, username }) => {
   return (
     <div className="col-2">
@@ -107,10 +108,12 @@ const Menu = ({ setActiveTab, activeTab, avatar, username }) => {
           <FaBook /> Đơn mua
         </span>
         <span
-          className="menu-link ml--4"
+          onClick={() => setActiveTab("rate")}
+          className={`menu-link  ${activeTab === "rate" ? "active" : ""} ml--4`}
 
         >
-          <FaDollarSign /> Điểm tích lũy
+          {/* <FaDollarSign /> */}
+          <FaBook /> Lịch sử đánh giá
         </span>
       </div>
       {/* </Card> */}
@@ -471,14 +474,14 @@ const Account = ({ tab }) => {
     }
   };
   const formatCurrency = (value) => {
-  const formatter = new Intl.NumberFormat("vi-VN", {
-    style: "currency",
-    currency: "VND",
-  });
+    const formatter = new Intl.NumberFormat("vi-VN", {
+      style: "currency",
+      currency: "VND",
+    });
 
-  const formattedValue = formatter.format(value);
-  return formattedValue.replace("₫", "");
-};
+    const formattedValue = formatter.format(value);
+    return formattedValue.replace("₫", "");
+  };
 
   return (
     <>
@@ -514,10 +517,10 @@ const Account = ({ tab }) => {
                                   <FormGroup>
                                     <Row>
                                       <label className="form-control-label col-3">
-                                        Điểm tích lũy:
+                                        Xu tích lũy:
                                       </label>
                                       <div className="col-9">
-                                      { formatCurrency(client.totalPoints)}
+                                        {formatCurrency(client.totalPoints)}
                                       </div>
                                     </Row>
                                   </FormGroup>
@@ -549,7 +552,6 @@ const Account = ({ tab }) => {
                                           onChange={onInputChange}
                                         />
                                       </div>
-
                                     </Row>
                                   </FormGroup>
                                 </Col>
@@ -1014,6 +1016,9 @@ const Account = ({ tab }) => {
                 {/* Password */}
                 {activeTab === "bill" && (
                   <Bill />
+                )}
+                {activeTab === "Rate" && (
+                  <Rate />
                 )}
               </div>
             </>

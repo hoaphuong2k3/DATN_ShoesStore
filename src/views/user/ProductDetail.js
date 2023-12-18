@@ -147,6 +147,10 @@ const DetailProduct = () => {
 
   const handleAddCart = async () => {
     if (storedUserId) {
+      if (quantity > 15) {
+        toast.error("Số lượng tối đa là 15");
+        return;
+      }
       try {
         const response = await fetch("http://localhost:33321/api/cart/add", {
           method: "POST",
@@ -181,6 +185,10 @@ const DetailProduct = () => {
 
   const handleCheckout = async () => {
     if (storedUserId) {
+      if (quantity > 15) {
+        toast.error("Số lượng tối đa là 15");
+        return;
+      }
       try {
         const response = await fetch("http://localhost:33321/api/cart/byNow", {
           method: "POST",
@@ -436,7 +444,7 @@ const DetailProduct = () => {
                     {/* ===========================cart box */}
                     <div className='card-box'>
                       <div className='row'>
-                        <div className='col-9'>
+                        <div className='col-12'>
                           <div>
                             <h3 className='mt-3 mb-2'>
                               MÔ TẢ SẢN PHẨM
@@ -551,13 +559,13 @@ const DetailProduct = () => {
                             </Row>
                           }
                         </div>
-                        <div className='col-3'>
+                        {/* <div className='col-3'>
                           <div>
                             <div className='text-muted'>
                               Top sản phẩm nổi bật
                             </div>
                           </div>
-                        </div>
+                        </div> */}
                       </div>
                     </div>
                   </div>

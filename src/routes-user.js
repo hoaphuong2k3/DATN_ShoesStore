@@ -60,6 +60,13 @@ var routes = [
     component: <Account tab="bill" />,
   },
   {
+    path: "/rate",
+    name: "TÀI KHOẢN",
+    layout: "/shoes",
+
+    component: <Account tab="rate" />,
+  },
+  {
     path: "/productdetail/:id",
     component: <ProductDetail />,
     layout: "/shoes",

@@ -111,7 +111,7 @@ const UserNavbar = () => {
             <img
               alt="..."
               src={require("../../assets/img/brand/LeatherGent.png")}
-              width={120} style={{height:70}}
+              width={120} style={{ height: 70 }}
             />
           </NavbarBrand>
           <button className="navbar-toggler" id="navbar-collapse-main">
@@ -217,10 +217,10 @@ const UserNavbar = () => {
                         <i className="ni ni-single-02" />
                         <span>Đơn mua</span>
                       </DropdownItem>
-                      <DropdownItem to="/" tag={Link}>
+                      {/* <DropdownItem>
                         <i className="ni ni-favourite-28" />
                         <span>Yêu thích</span>
-                      </DropdownItem>
+                      </DropdownItem> */}
                       <DropdownItem divider />
                       <DropdownItem onClick={handleLogout}>
                         <i className="ni ni-user-run" />
