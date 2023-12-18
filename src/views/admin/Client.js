@@ -62,7 +62,7 @@ const Client = () => {
       .matches(
         /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+{}\[\]:;<>,.?~\\/-]).{8,20}$/,
         'Mật khẩu từ 8-20 ký tự, phải chứa ít nhất 1 chữ hoa, 1 chữ thường, 1 số, và 1 ký tự đặc biệt')
-        .required('Vui lòng nhập mật khẩu'),
+      .required('Vui lòng nhập mật khẩu'),
     confirmPassword: yup.string().oneOf([yup.ref('password'), null], 'Mật khẩu xác nhận không khớp').required('Vui lòng xác nhận mật khẩu'),
   });
 
@@ -110,15 +110,6 @@ const Client = () => {
     setQueryParams({ ...queryParams, size: newSize, page: 0 });
   };
   const resetFilters = () => {
-    setQueryParams({
-      page: 0,
-      size: 5,
-      input: "",
-      createdTime: "",
-      gender: "",
-      status: "",
-      dateOfBirth: ""
-    });
     getAll({
       page: 0,
       size: 5,
@@ -128,6 +119,15 @@ const Client = () => {
       status: "",
       dateOfBirth: ""
     })
+    setQueryParams({
+      page: 0,
+      size: 5,
+      input: "",
+      createdTime: "",
+      gender: "",
+      status: "",
+      dateOfBirth: ""
+    });
   };
   const getAll = async () => {
     try {
@@ -207,6 +207,9 @@ const Client = () => {
           console.log(selectedId);
           await deleteClient({ id: selectedId });
           setSelectedId([]);
+          setIsCheckedAll(false);
+          setShowActions(false);
+          getAll();
           toast.success("Xóa thành công ");
         } catch (error) {
           let errorMessage = "Lỗi từ máy chủ";
