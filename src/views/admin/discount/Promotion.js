@@ -20,6 +20,7 @@ const Promotion = () => {
     const toggle = () => setModal(!modal);
     const handleModal = () => {
         resetForm();
+        setEditMode(false);
         setModal(true);
     }
     const [secondModal, setSecondModal] = useState(false);
@@ -50,6 +51,9 @@ const Promotion = () => {
     const [selectedGiftId, setSelectedGiftId] = useState(null);
     const [clickedOnce, setClickedOnce] = useState(false);
     const [reloadInterval, setReloadInterval] = useState(null);
+    const [selectedTypePeriod, setSelectedTypePeriod] = useState(null);
+    const [editMode, setEditMode] = useState(false);
+
 
     const [queryParams, setQueryParams] = useState({
         page: 0,
@@ -236,6 +240,8 @@ const Promotion = () => {
             typePeriod: discount.typePeriod,
         });
         setSelectedGiftId(discount.giftId);
+        setSelectedTypePeriod(discount.typePeriod);
+        setEditMode(true);
         setModal(true);
     };
 
@@ -317,7 +323,6 @@ const Promotion = () => {
         try {
             const selectedDiscount = discounts.find(discount => discount.id === id);
 
-            const today = new Date();
             const startDate = new Date(selectedDiscount.startDate);
             const endDate = new Date(selectedDiscount.endDate);
 
@@ -525,7 +530,7 @@ const Promotion = () => {
                                             <Col>
                                                 <InputGroup size="sm">
                                                     <Input type="search"
-                                                        placeholder="Tìm kiếm mã, tên voucher..."
+                                                        placeholder="Tìm kiếm theo mã đợt giảm giá..."
                                                         value={searchTerm}
                                                         onChange={(e) => handleSearch(e.target.value)}
                                                     />
@@ -664,14 +669,28 @@ const Promotion = () => {
 
                                                     <td style={{ position: "sticky", zIndex: '1', right: '0', background: "#fff" }}>
                                                         {discount.status === 0 &&
-                                                            <Tooltip title="Ngừng kích hoạt">
-                                                                <Button color="link" size="sm" ><FaLockOpen onClick={() => lock(discount.id)} /></Button>
-                                                            </Tooltip>
+                                                            <Popconfirm
+                                                                title="Ngừng kích hoạt đợt giảm giá?"
+                                                                onConfirm={() => lock(discount.id)}
+                                                                okText="Ngừng kích hoạt"
+                                                                cancelText="Hủy"
+                                                            >
+                                                                <Tooltip title="Ngừng kích hoạt">
+                                                                    <Button color="link" size="sm" ><FaLockOpen /></Button>
+                                                                </Tooltip>
+                                                            </Popconfirm>
                                                         }
                                                         {(discount.status === 1 || discount.status === 2) &&
-                                                            <Tooltip title="Kích hoạt">
-                                                                <Button color="link" size="sm" ><FaLock onClick={() => openlock(discount.id)} /></Button>
-                                                            </Tooltip>
+                                                            <Popconfirm
+                                                                title="Kích hoạt đợt giảm giá?"
+                                                                onConfirm={() => openlock(discount.id)}
+                                                                okText="Kích hoạt"
+                                                                cancelText="Hủy"
+                                                            >
+                                                                <Tooltip title="Kích hoạt">
+                                                                    <Button color="link" size="sm" ><FaLock /></Button>
+                                                                </Tooltip>
+                                                            </Popconfirm>
                                                         }
 
                                                         <Tooltip title="Chỉnh sửa">
@@ -774,6 +793,7 @@ const Promotion = () => {
                                                                         type="radio"
                                                                         checked={formData.typePeriod === 0}
                                                                         onChange={() => setFormData({ ...formData, typePeriod: 0 })}
+                                                                        disabled={editMode === true && selectedTypePeriod === 1}
                                                                     />Order
                                                                 </div>
                                                                 <div className="custom-control custom-radio">
@@ -782,6 +802,7 @@ const Promotion = () => {
                                                                         type="radio"
                                                                         checked={formData.typePeriod === 1}
                                                                         onChange={() => setFormData({ ...formData, typePeriod: 1 })}
+                                                                        disabled={editMode === true && selectedTypePeriod === 0}
                                                                     />FreeShip
                                                                 </div>
 

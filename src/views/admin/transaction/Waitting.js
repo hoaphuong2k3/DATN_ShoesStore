@@ -167,7 +167,7 @@ const Waitting = () => {
                 totalMoney = totalMoney + Math.floor(deliveryCost);
             }
 
-        } else {
+        } else if (percentPeriod === -1) {
             if (priceVoucher !== null) {
                 totalMoney = productPrice - priceVoucher;
             } else if (percentVoucher !== null) {
@@ -175,9 +175,21 @@ const Waitting = () => {
             } else {
                 totalMoney = productPrice;
             }
+
+        } else if (percentPeriod === null) {
+            if (priceVoucher !== null) {
+                totalMoney = productPrice - priceVoucher;
+            } else if (percentVoucher !== null) {
+                totalMoney = productPrice - (productPrice * percentVoucher / 100);
+            } else {
+                totalMoney = productPrice;
+            }
+            if (hasShipping === true) {
+                totalMoney = totalMoney + Math.floor(shippingTotal);
+            } else {
+                totalMoney = totalMoney + Math.floor(deliveryCost);
+            }
         }
-
-
 
         return totalMoney;
     };
@@ -200,7 +212,7 @@ const Waitting = () => {
 
                 const totalPayment = calculateTotalMoney(
                     productPrice,
-                    deliveryResponse.data.deliveryCost,
+                    deliveryResponse?.data?.deliveryCost || 0,
                     confirm.percentPeriod,
                     confirm.percentVoucher,
                     confirm.priceVoucher
@@ -237,6 +249,7 @@ const Waitting = () => {
                 setSelectedWard(selectedWard);
                 setSelectedDistrict(selectedDistrict);
                 setSelectedProvince(selectedProvince);
+
             } else {
                 setDeliveryData(null);
                 setHasDeliveryData(false);
@@ -510,6 +523,7 @@ const Waitting = () => {
         }
     }, [isProductDeleted]);
 
+    //method
     const paymentMethodColors = {
         1: { color: "success", label: "COD" },
         2: { color: "primary", label: "Ví điện tử" },
@@ -789,128 +803,132 @@ const Waitting = () => {
                                                 </Col>
                                             )}
                                         </Row>
-                                        <Row>
-                                            <Col md={12}>
-                                                <h3 className="heading-small text-dark">Thông tin phiếu giao</h3>
-                                            </Col>
-                                        </Row>
-                                        <Row >
-                                            <Col md={6}>
-                                                <FormGroup>
-                                                    <Label>
-                                                        Người nhận
-                                                    </Label>
-                                                    <Input
-                                                        size="sm"
-                                                        type="text"
-                                                        value={deliveryData.recipientName}
-                                                        onChange={(e) => setDeliveryData({ ...deliveryData, recipientName: e.target.value })}
-                                                    />
-                                                </FormGroup>
-                                            </Col>
-                                            <Col md={6}>
-                                                <FormGroup>
-                                                    <Label>
-                                                        Số điện thoại
-                                                    </Label>
-                                                    <Input
-                                                        size="sm"
-                                                        type="tel"
-                                                        value={deliveryData.recipientPhone}
-                                                        onChange={(e) => setDeliveryData({ ...deliveryData, recipientPhone: e.target.value })}
-                                                    />
-                                                </FormGroup>
-                                            </Col>
-                                        </Row>
-                                        <Row >
-                                            <Col md={6}>
-                                                <FormGroup>
-                                                    <Label>
-                                                        Địa chỉ
-                                                    </Label>
-                                                    <Input
-                                                        className="mb-2"
-                                                        size="sm"
-                                                        type="select"
-                                                        style={{ fontSize: 13 }}
-                                                        value={selectedProvince}
-                                                        onChange={(e) => {
-                                                            setSelectedProvince(e.target.value);
-                                                            setSelectedDistrict("");
-                                                            setSelectedWard("");
-                                                        }}
-                                                    >
-                                                        <option value="">Chọn tỉnh/thành phố</option>
-                                                        {provinces.map((province) => (
-                                                            <option key={province.ProvinceID} value={province.ProvinceID}>
-                                                                {province.ProvinceName}
-                                                            </option>
-                                                        ))}
-                                                    </Input>
+                                        {hasDeliveryData && (
+                                            <>
+                                                <Row>
+                                                    <Col md={12}>
+                                                        <h3 className="heading-small text-dark">Thông tin phiếu giao</h3>
+                                                    </Col>
+                                                </Row>
+                                                <Row >
+                                                    <Col md={6}>
+                                                        <FormGroup>
+                                                            <Label>
+                                                                Người nhận
+                                                            </Label>
+                                                            <Input
+                                                                size="sm"
+                                                                type="text"
+                                                                value={deliveryData.recipientName}
+                                                                onChange={(e) => setDeliveryData({ ...deliveryData, recipientName: e.target.value })}
+                                                            />
+                                                        </FormGroup>
+                                                    </Col>
+                                                    <Col md={6}>
+                                                        <FormGroup>
+                                                            <Label>
+                                                                Số điện thoại
+                                                            </Label>
+                                                            <Input
+                                                                size="sm"
+                                                                type="tel"
+                                                                value={deliveryData.recipientPhone}
+                                                                onChange={(e) => setDeliveryData({ ...deliveryData, recipientPhone: e.target.value })}
+                                                            />
+                                                        </FormGroup>
+                                                    </Col>
+                                                </Row>
+                                                <Row >
+                                                    <Col md={6}>
+                                                        <FormGroup>
+                                                            <Label>
+                                                                Địa chỉ
+                                                            </Label>
+                                                            <Input
+                                                                className="mb-2"
+                                                                size="sm"
+                                                                type="select"
+                                                                style={{ fontSize: 13 }}
+                                                                value={selectedProvince}
+                                                                onChange={(e) => {
+                                                                    setSelectedProvince(e.target.value);
+                                                                    setSelectedDistrict("");
+                                                                    setSelectedWard("");
+                                                                }}
+                                                            >
+                                                                <option value="">Chọn tỉnh/thành phố</option>
+                                                                {provinces.map((province) => (
+                                                                    <option key={province.ProvinceID} value={province.ProvinceID}>
+                                                                        {province.ProvinceName}
+                                                                    </option>
+                                                                ))}
+                                                            </Input>
 
 
-                                                    <Input
-                                                        className="mb-2"
-                                                        size="sm"
-                                                        type="select"
-                                                        style={{ fontSize: 13 }}
-                                                        value={selectedDistrict}
-                                                        onChange={(e) => {
-                                                            setSelectedDistrict(e.target.value);
-                                                            setSelectedWard("");
-                                                            setSelectedToDistrictID(e.target.value);
-                                                        }}
-                                                        disabled={!selectedProvince}
-                                                    >
-                                                        <option value="">Chọn quận/huyện</option>
-                                                        {selectedProvince &&
-                                                            districts.map((district) => (
-                                                                <option key={district.DistrictID} value={district.DistrictID}>
-                                                                    {district.DistrictName}
-                                                                </option>
-                                                            ))}
-                                                    </Input>
+                                                            <Input
+                                                                className="mb-2"
+                                                                size="sm"
+                                                                type="select"
+                                                                style={{ fontSize: 13 }}
+                                                                value={selectedDistrict}
+                                                                onChange={(e) => {
+                                                                    setSelectedDistrict(e.target.value);
+                                                                    setSelectedWard("");
+                                                                    setSelectedToDistrictID(e.target.value);
+                                                                }}
+                                                                disabled={!selectedProvince}
+                                                            >
+                                                                <option value="">Chọn quận/huyện</option>
+                                                                {selectedProvince &&
+                                                                    districts.map((district) => (
+                                                                        <option key={district.DistrictID} value={district.DistrictID}>
+                                                                            {district.DistrictName}
+                                                                        </option>
+                                                                    ))}
+                                                            </Input>
 
-                                                    <Input
-                                                        className="mb-2"
-                                                        size="sm"
-                                                        type="select"
-                                                        style={{ fontSize: 13 }}
-                                                        value={selectedWard}
-                                                        onChange={(e) => {
-                                                            setSelectedWard(e.target.value);
-                                                            setSelectedToWardCode(e.target.value.toString());
-                                                            handleApiCall();
-                                                        }}
-                                                        disabled={!selectedDistrict}
-                                                    >
-                                                        <option value="">Chọn xã/phường</option>
-                                                        {selectedDistrict &&
-                                                            wards.map((ward) => (
-                                                                <option key={ward.WardCode} value={ward.WardCode}>
-                                                                    {ward.WardName}
-                                                                </option>
-                                                            ))}
-                                                    </Input>
+                                                            <Input
+                                                                className="mb-2"
+                                                                size="sm"
+                                                                type="select"
+                                                                style={{ fontSize: 13 }}
+                                                                value={selectedWard}
+                                                                onChange={(e) => {
+                                                                    setSelectedWard(e.target.value);
+                                                                    setSelectedToWardCode(e.target.value.toString());
+                                                                    handleApiCall();
+                                                                }}
+                                                                disabled={!selectedDistrict}
+                                                            >
+                                                                <option value="">Chọn xã/phường</option>
+                                                                {selectedDistrict &&
+                                                                    wards.map((ward) => (
+                                                                        <option key={ward.WardCode} value={ward.WardCode}>
+                                                                            {ward.WardName}
+                                                                        </option>
+                                                                    ))}
+                                                            </Input>
 
-                                                </FormGroup>
+                                                        </FormGroup>
 
-                                            </Col>
-                                            <Col md={6}>
-                                                <FormGroup>
-                                                    <Input className="mt-4"
-                                                        style={{ fontSize: 13 }}
-                                                        size="sm"
-                                                        rows="5"
-                                                        type="textarea"
-                                                        placeholder="Địa chỉ chi tiết..."
-                                                        id="detailedAddress"
-                                                        value={detailedAddress}
-                                                        onChange={(e) => setDetailedAddress(e.target.value)}
-                                                    />
-                                                </FormGroup>
-                                            </Col>
-                                        </Row>
+                                                    </Col>
+                                                    <Col md={6}>
+                                                        <FormGroup>
+                                                            <Input className="mt-4"
+                                                                style={{ fontSize: 13 }}
+                                                                size="sm"
+                                                                rows="5"
+                                                                type="textarea"
+                                                                placeholder="Địa chỉ chi tiết..."
+                                                                id="detailedAddress"
+                                                                value={detailedAddress}
+                                                                onChange={(e) => setDetailedAddress(e.target.value)}
+                                                            />
+                                                        </FormGroup>
+                                                    </Col>
+                                                </Row>
+                                            </>
+                                        )}
                                         <Row>
                                             <Col md={12}>
                                                 <h3 className="heading-small text-dark">Thanh toán</h3>
@@ -975,39 +993,42 @@ const Waitting = () => {
                                             )}
                                         </Row>
 
-                                        <Row >
-                                            <Col md={6}>
-                                                <FormGroup>
-                                                    <Label>
-                                                        Phí vận chuyển
-                                                    </Label>
-                                                    <InputGroup size="sm">
-                                                        <Input
-                                                            size="sm"
-                                                            type="number"
-                                                            value={hasShippingData ? Math.floor(shippingTotal) : Math.floor(deliveryData.deliveryCost)}
-                                                            onChange={(e) => setDeliveryData({ ...deliveryData, deliveryCost: e.target.value })}
-                                                            readOnly style={{ backgroundColor: "#fff" }}
-                                                        />
-                                                        <InputGroupAddon addonType="append">
-                                                            <InputGroupText>VND</InputGroupText>
-                                                        </InputGroupAddon>
-                                                    </InputGroup>
-                                                </FormGroup>
+                                        {hasDeliveryData && (
+                                            <>
+                                                <Row >
+                                                    <Col md={6}>
+                                                        <FormGroup>
+                                                            <Label>
+                                                                Phí vận chuyển
+                                                            </Label>
+                                                            <InputGroup size="sm">
+                                                                <Input
+                                                                    size="sm"
+                                                                    type="number"
+                                                                    value={hasShippingData ? Math.floor(shippingTotal) : Math.floor(deliveryData.deliveryCost)}
+                                                                    onChange={(e) => setDeliveryData({ ...deliveryData, deliveryCost: e.target.value })}
+                                                                    readOnly style={{ backgroundColor: "#fff" }}
+                                                                />
+                                                                <InputGroupAddon addonType="append">
+                                                                    <InputGroupText>VND</InputGroupText>
+                                                                </InputGroupAddon>
+                                                            </InputGroup>
+                                                        </FormGroup>
 
-                                            </Col>
-                                            <Col md={6}>
-                                                <FormGroup>
-                                                    <img className="my-3 ml-3"
-                                                        width={"80%"}
-                                                        alt="..."
-                                                        src={require("../../../assets/img/theme/giaohangnhanh.webp")}
-                                                    />
-                                                </FormGroup>
-                                            </Col>
-                                        </Row>
-
-                                        {formData.percentPeriod && formData.percentPeriod === -1 && (
+                                                    </Col>
+                                                    <Col md={6}>
+                                                        <FormGroup>
+                                                            <img className="my-3 ml-3"
+                                                                width={"80%"}
+                                                                alt="..."
+                                                                src={require("../../../assets/img/theme/giaohangnhanh.webp")}
+                                                            />
+                                                        </FormGroup>
+                                                    </Col>
+                                                </Row>
+                                            </>
+                                        )}
+                                        {hasDeliveryData && formData.percentPeriod && formData.percentPeriod === -1 && (
                                             <Row>
                                                 <Col md={6}>
                                                     <FormGroup>

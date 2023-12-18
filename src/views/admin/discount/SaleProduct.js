@@ -46,17 +46,27 @@ const SaleProduct = () => {
 
     const [fiveModal, setFiveModal] = useState(false);
     const toggleFiveModal = () => setFiveModal(!fiveModal);
-   
+
     const [discounts, setDiscounts] = useState([]);
     const [totalElements, setTotalElements] = useState(0);
     const [totalPages, setTotalPages] = useState(0);
+
+    const [page, setPage] = useState(0);
+    const [size, setSize] = useState(5);
+    const [totalPages2, setTotalPages2] = useState(0);
+    const [totalElements2, setTotalElenments2] = useState(0);
+
+    const [page3, setPage3] = useState(0);
+    const [size3, setSize3] = useState(5);
+    const [totalPages3, setTotalPages3] = useState(0);
+    const [totalElements3, setTotalElenments3] = useState(0);
+
 
     const [listShoes, setListShoes] = useState([]);
     const [selectAll, setSelectAll] = useState(false);
     const [selectedShoesIds, setSelectedShoesIds] = useState([]);
     const [selectedDetailIds, setSelectedDetailIds] = useState([]);
-    const [page, setPage] = useState(0);
-    const [size, setSize] = useState(10);
+
     const [selectAll2, setSelectAll2] = useState(false);
     const [selectedItems, setSelectedItems] = useState([]);
     const [searchValue, setSearchValue] = useState("");
@@ -176,6 +186,8 @@ const SaleProduct = () => {
             let res = await getAllShoesUser(page, size, search);
             if (res && res.data && res.data.content) {
                 setListShoes(res.data.content);
+                setTotalPages2(res.data.totalPages2);
+                setTotalElenments2(res.data.totalElements2);
             }
         } catch (error) {
             setListShoes([]);
@@ -195,13 +207,16 @@ const SaleProduct = () => {
     }, []);
 
     useEffect(() => {
-        getAll1(page, size);
-    }, [search]);
+        getAll1();
+    }, [search, page, size]);
 
     const onInputChange = (e) => {
         setSearch({ ...search, [e.target.name]: e.target.value });
     };
 
+    const handlePageClick = (event) => {
+        setPage(+event.selected);
+    };
 
     //loads productDetail
     const handleEditButtonClick = async (shoesId) => {
@@ -210,11 +225,10 @@ const SaleProduct = () => {
             if (response) {
 
                 setSelectedShoesDetails(response.data.content);
-                console.log(response.data.content);
                 const mapping = { ...shoesDetailMapping };
                 mapping[shoesId] = response.data.content.map(detail => detail.shoesDetailSearchResponse.id);
                 setShoesDetailMapping(mapping);
-                console.log(mapping);
+
             }
             setSecondModal(true);
 
@@ -230,12 +244,17 @@ const SaleProduct = () => {
             const response = await axiosInstance.get(`/promos/detailPromo/${discount}`);
             const products = response.data;
             setSelectedProduct(products);
+            setTotalPages3(response.data.totalPages3);
+            setTotalElenments3(response.data.totalElements3);
             toggleFourModal();
         } catch (error) {
             console.error("Error fetching product details:", error);
         }
     };
 
+    const handlePageClick3 = (event) => {
+        setPage3(+event.selected);
+    };
 
     //loads voucher
     const [queryParams, setQueryParams] = useState({
@@ -296,7 +315,7 @@ const SaleProduct = () => {
     //status
     const statusMapping = {
         0: { color: 'success', label: 'Kích hoạt' },
-        1: { color: 'warning', label: 'Chờ kích hoạt' },
+        1: { color: 'yellow', label: 'Chờ kích hoạt' },
         2: { color: 'danger', label: 'Ngừng kích hoạt' }
     };
 
@@ -772,14 +791,28 @@ const SaleProduct = () => {
                                         <td>{discount.description}</td>
                                         <td style={{ position: "sticky", zIndex: '1', right: '0', background: "#fff" }}>
                                             {discount.status === 0 &&
-                                                <Tooltip title="Ngừng kích hoạt">
-                                                    <Button color="link" size="sm" ><FaLockOpen onClick={() => lock(discount.id)} /></Button>
-                                                </Tooltip>
+                                                <Popconfirm
+                                                    title="Ngừng kích hoạt đợt giảm giá?"
+                                                    onConfirm={() => lock(discount.id)}
+                                                    okText="Ngừng kích hoạt"
+                                                    cancelText="Hủy"
+                                                >
+                                                    <Tooltip title="Ngừng kích hoạt">
+                                                        <Button color="link" size="sm" ><FaLockOpen /></Button>
+                                                    </Tooltip>
+                                                </Popconfirm>
                                             }
                                             {(discount.status === 1 || discount.status === 2) &&
-                                                <Tooltip title="Kích hoạt">
-                                                    <Button color="link" size="sm" ><FaLock onClick={() => openlock(discount.id)} /></Button>
-                                                </Tooltip>
+                                                <Popconfirm
+                                                    title="Kích hoạt đợt giảm giá?"
+                                                    onConfirm={() => openlock(discount.id)}
+                                                    okText="Kích hoạt"
+                                                    cancelText="Hủy"
+                                                >
+                                                    <Tooltip title="Kích hoạt">
+                                                        <Button color="link" size="sm" ><FaLock /></Button>
+                                                    </Tooltip>
+                                                </Popconfirm>
                                             }
 
                                             <Tooltip title="Chỉnh sửa">
@@ -1128,6 +1161,35 @@ const SaleProduct = () => {
                             </tbody>
                         </Table>
 
+                        <Row className="col-md-12 mt-2">
+                            <Col
+                                style={{ fontSize: 11 }}
+                                className="mt--1 d-flex justify-content-center"
+                            >
+                                <ReactPaginate
+                                    breakLabel="..."
+                                    nextLabel=">"
+                                    pageRangeDisplayed={1} // Number of pages to display on each side of the selected page
+                                    pageCount={totalPages2} // Total number of pages
+                                    previousLabel="<"
+                                    onPageChange={handlePageClick}
+                                    renderOnZeroPageCount={null}
+                                    pageClassName="page-item"
+                                    pageLinkClassName="page-link"
+                                    previousClassName="page-item"
+                                    previousLinkClassName="page-link"
+                                    nextClassName="page-item"
+                                    nextLinkClassName="page-link"
+                                    breakClassName="page-item"
+                                    breakLinkClassName="page-link"
+                                    containerClassName="pagination circular-pagination" // Add "circular-pagination" class here
+                                    activeClassName="active"
+                                    marginPagesDisplayed={1}
+                                />
+
+                            </Col>
+                        </Row>
+
                     </div>
                 </ModalBody >
                 <ModalFooter>
@@ -1243,6 +1305,34 @@ const SaleProduct = () => {
                                 </tr>
                             ))}
                     </Table>
+
+                    <Row className="col-md-12 mt-2">
+                        <Col
+                            style={{ fontSize: 11 }}
+                            className="mt--1 d-flex justify-content-center"
+                        >
+                            <ReactPaginate
+                                breakLabel="..."
+                                nextLabel=">"
+                                pageRangeDisplayed={1}
+                                pageCount={totalPages3}
+                                previousLabel="<"
+                                onPageChange={handlePageClick3}
+                                renderOnZeroPageCount={null}
+                                pageClassName="page-item"
+                                pageLinkClassName="page-link"
+                                previousClassName="page-item"
+                                previousLinkClassName="page-link"
+                                nextClassName="page-item"
+                                nextLinkClassName="page-link"
+                                breakClassName="page-item"
+                                breakLinkClassName="page-link"
+                                containerClassName="pagination circular-pagination"
+                                activeClassName="active"
+                                marginPagesDisplayed={1}
+                            />
+                        </Col>
+                    </Row>
 
                 </ModalBody>
                 <ModalFooter>
