@@ -69,13 +69,13 @@ const Staff = () => {
   const [searchValue, setSearchValue] = useState("");
   const [queryParams, setQueryParams] = useState({
     page: 0,
-    size: 5,
+    size: 10,
     fullname: "",
     phonenumber: "",
     email: "",
     gender: "",
-    createdTime: "",
-    updatedTime: "",
+    // createdTime: "",
+    // updatedTime: "",
   });
 
   // validate
@@ -117,8 +117,8 @@ const Staff = () => {
           ...queryParams,
           fullname: queryParams.fullname || null,
           phonenumber: queryParams.phonenumber || null,
-          createdTime: queryParams.createdTime || null,
-          updatedTime: queryParams.updatedTime || null,
+          // createdTime: queryParams.createdTime || null,
+          // updatedTime: queryParams.updatedTime || null,
           email: queryParams.email || null,
           gender: queryParams.gender === "" ? null : queryParams.gender,
         },
@@ -225,7 +225,7 @@ const Staff = () => {
   const resetFilters = () => {
     setQueryParams({
       page: 0,
-      size: 5,
+      size: 10,
       fullname: "",
       phonenumber: "",
       email: "",
@@ -314,7 +314,7 @@ const Staff = () => {
 
   //Add
   const saveAdmin = async () => {
-    if (await validateInput()) {
+    // if (await validateInput()) {
       try {
         if (formData.id) {
           await axiosInstance.put(`/staff/update`, formData);
@@ -354,9 +354,9 @@ const Staff = () => {
           toast.error("Đã có lỗi xảy ra.");
         }
       }
-    } else {
-      toast.error("Vui lòng kiểm tra lại thông tin đăng ký");
-    }
+    // } else {
+    //   toast.error("Vui lòng kiểm tra lại thông tin đăng ký");
+    // }
   };
 
   // upload image
@@ -433,7 +433,7 @@ const Staff = () => {
   const handleDelete = (id) => {
     if (window.confirm("Bạn có chắc chắn muốn xóa không?")) {
       axiosInstance
-        .patch("/staff/delete", { ids: id })
+        .patch("/staff/delete", { ids: [id] })
         .then((response) => {
           fetchData();
           toast.success("Xóa thành công");
@@ -451,7 +451,7 @@ const Staff = () => {
       ) {
         try {
           console.log(selectedId);
-          axiosInstance.patch("/staff/delete", { ids: [selectedId] });
+          axiosInstance.patch("/staff/delete", { ids: selectedId });
           fetchData();
           setSelectedId([]);
           toast.success("Xóa thành công ");

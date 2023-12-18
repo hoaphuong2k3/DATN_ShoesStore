@@ -1,4 +1,5 @@
 import React, { useContext, useState, useEffect } from "react";
+import axios from "axios";
 import {
   Card,
   CardBody,
@@ -74,7 +75,7 @@ const Cart = () => {
       return;
     }
     if (quantity > 15) {
-      toast.error("Số lượng tối đa là 15");
+      toast.error("Số lượng tối đa là 30");
       return;
     }
     try {
@@ -110,6 +111,14 @@ const Cart = () => {
 
   // select list product
   const handleCheckboxChange = (id) => {
+    if (selectedId.includes(id)) {
+      setSelectedId(selectedId.filter((x) => x !== id));
+      setShowActions(selectedId.length - 1 > 0);
+    } else {
+      setSelectedId([...selectedId, id]);
+      setShowActions(true);
+    }
+
     setSelectedItems((prevSelectedItems) => {
       if (prevSelectedItems.includes(id)) {
         // Nếu đã chọn, loại bỏ khỏi danh sách
@@ -123,19 +132,47 @@ const Cart = () => {
       }
     });
   };
-  const [selectAll, setSelectAll] = useState(false);
-  const handleSelectAllChange = () => {
-    setSelectAll(!selectAll);
 
-    if (!selectAll) {
+  const [isCheckedAll, setIsCheckedAll] = useState(false);
+  const [selectAll, setSelectAll] = useState(false);
+  const [showActions, setShowActions] = useState(false);
+  const [selectedId, setSelectedId] = useState([]);
+
+  const handleSelectAllChange = () => {
+    if (selectAll) {
+      setSelectedId([]);
+      setShowActions(false);
+      setSelectedItems([]);
+    } else {
+      setSelectedId(cartData.map(x => x.id));
+      setShowActions(true);
+
       // Nếu chưa chọn, chọn tất cả
       const allItemIds = cartData.map((item) => item.id);
       setSelectedItems(allItemIds);
-    } else {
-      // Nếu đã chọn, bỏ chọn tất cả
-      setSelectedItems([]);
+    }
+    setIsCheckedAll(!selectAll);
+  };
+  const handleDeleteButtonClick = async () => {
+    if (selectedId.length > 0) {
+      if (window.confirm("Bạn có chắc chắn muốn xóa khách hàng đã chọn không?")) {
+        try {
+          console.log(selectedId);
+          axios.patch("http://localhost:33321/api/cart/delete", { ids: selectedId });
+          setSelectedId([]);
+          toast.success("Xóa thành công ");
+        } catch (error) {
+          let errorMessage = "Lỗi từ máy chủ";
+          if (error.response && error.response.data && error.response.data.message) {
+            errorMessage = error.response.data.message;
+          }
+          toast.error(errorMessage);
+        }
+
+      }
     }
   };
+  
 
   useEffect(() => {
     if (cartData) {
@@ -166,7 +203,6 @@ const Cart = () => {
       alert("Vui lòng chọn sản phẩm trước khi thanh toán!");
       return;
     }
-
     try {
       const response = await fetch("http://localhost:33321/api/cart/checkout", {
         method: "POST",
@@ -233,6 +269,18 @@ const Cart = () => {
                                     onChange={handleSelectAllChange}
                                   />
                                   {/* ... */}
+                                </div>
+                                <div className="col-3">
+                                  {showActions && (
+                                    <Button
+                                      color="danger"
+                                      outline
+                                      size="sm"
+                                      onClick={handleDeleteButtonClick}
+                                    >
+                                      Xóa tất cả
+                                    </Button>
+                                  )}
                                 </div>
                                 {/* ... */}
                               </div>

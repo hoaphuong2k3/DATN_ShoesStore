@@ -186,7 +186,7 @@ const SaleProduct = () => {
             let res = await getAllShoesUser(page, size, search);
             if (res && res.data && res.data.content) {
                 setListShoes(res.data.content);
-                setTotalPages2(res.data.totalPages2);
+                setTotalPages2(res.data.totalPages);
                 setTotalElenments2(res.data.totalElements2);
             }
         } catch (error) {
@@ -221,7 +221,7 @@ const SaleProduct = () => {
     //loads productDetail
     const handleEditButtonClick = async (shoesId) => {
         try {
-            const response = await getAllShoesDetail2(shoesId, page, size, search2);
+            const response = await getAllShoesDetail2(shoesId, 0, 5, search2);
             if (response) {
 
                 setSelectedShoesDetails(response.data.content);
@@ -244,7 +244,7 @@ const SaleProduct = () => {
             const response = await axiosInstance.get(`/promos/detailPromo/${discount}`);
             const products = response.data;
             setSelectedProduct(products);
-            setTotalPages3(response.data.totalPages3);
+            setTotalPages3(response.data.totalPages);
             setTotalElenments3(response.data.totalElements3);
             toggleFourModal();
         } catch (error) {
