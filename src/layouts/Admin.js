@@ -21,9 +21,12 @@ const Admin = (props) => {
   }, [location]);
 
   const getRoutes = (routes) => {
-    const allowedPaths = hasAdminRole
-      ? routes.map((prop) => prop.path)
-      : [
+    console.log(hasAdminRole);
+    let allowedPaths;
+    if (hasAdminRole === "true") {
+      allowedPaths = routes.map((prop) => prop.path);
+    } else {
+      allowedPaths = [
         "/index",
         "/product",
         "/bills",
@@ -35,7 +38,8 @@ const Admin = (props) => {
         "/product/detail/:id",
         "/shoesdetail/:id",
       ];
-
+    }
+    console.log(allowedPaths);
     return routes.map((prop, key) => {
       if (prop.layout === "/admin" && allowedPaths.includes(prop.path)) {
         return <Route path={prop.path} element={prop.component} key={key} exact />;
