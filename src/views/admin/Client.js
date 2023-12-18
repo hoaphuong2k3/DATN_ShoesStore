@@ -14,6 +14,7 @@ import { FaEdit, FaTrash, FaSearch, FaFileAlt, FaCamera, FaLockOpen, FaLock, FaF
 import { toast } from 'react-toastify';
 import axiosInstance from "services/custommize-axios";
 import { Tooltip, Popconfirm } from 'antd';
+import * as yup from 'yup';
 
 
 const Client = () => {
@@ -47,6 +48,37 @@ const Client = () => {
       gender: 'false',
       dateOfBirth: ""
     });
+  };
+  const [errors, setErrors] = useState({});
+
+  const schema = yup.object().shape({
+    fullname: yup.string().required('Vui lòng nhập họ và tên'),
+    phoneNumber: yup.string().matches(/^(84|0[3|5|7|8|9])+([0-9]{8})\b/, 'Số điện thoại không hợp lệ').required('Vui lòng nhập số điện thoại'),
+    email: yup.string().email('Địa chỉ email không hợp lệ').required('Vui lòng nhập địa chỉ email'),
+    username: yup.string().required('Vui lòng nhập tên đăng nhập'),
+    password: yup.string()
+      .min(8, 'Mật khẩu phải có ít nhất 8 ký tự')
+      .max(20, 'Mật khẩu không được quá 20 ký tự')
+      .matches(
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+{}\[\]:;<>,.?~\\/-]).{8,20}$/,
+        'Mật khẩu từ 8-20 ký tự, phải chứa ít nhất 1 chữ hoa, 1 chữ thường, 1 số, và 1 ký tự đặc biệt')
+        .required('Vui lòng nhập mật khẩu'),
+    confirmPassword: yup.string().oneOf([yup.ref('password'), null], 'Mật khẩu xác nhận không khớp').required('Vui lòng xác nhận mật khẩu'),
+  });
+
+  const validateInput = async () => {
+    try {
+      await schema.validate(client, { abortEarly: false });
+      setErrors({});
+      return true;
+    } catch (error) {
+      const validationErrors = {};
+      error.inner.forEach(err => {
+        validationErrors[err.path] = err.message;
+      });
+      setErrors(validationErrors);
+      return false;
+    }
   };
   const onInputChange = (e) => {
     setClient({ ...client, [e.target.name]: e.target.value });
@@ -786,7 +818,7 @@ const Client = () => {
                               >
                                 <Tooltip title="Khóa">
                                   <Button color="link" size="sm">
-                                    <FaLock />
+                                    <FaLockOpen />
                                   </Button>
                                 </Tooltip>
                               </Popconfirm>
@@ -800,7 +832,7 @@ const Client = () => {
                               >
                                 <Tooltip title="Mở khóa">
                                   <Button color="link" size="sm">
-                                    <FaLockOpen />
+                                    <FaLock />
                                   </Button>
                                 </Tooltip>
                               </Popconfirm>

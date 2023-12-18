@@ -215,7 +215,7 @@ const Account = ({ tab }) => {
   }
   const onUpdateClient = async (e) => {
     try {
-      await axiosInstance.put(`/client/admin/update`, formData1);
+      await axiosInstance.patch(`/user/update`, formData1);
       changeAvatar();
       fetchData();
       toast.success("Cập nhật thành công!");
@@ -470,6 +470,15 @@ const Account = ({ tab }) => {
       }
     }
   };
+  const formatCurrency = (value) => {
+  const formatter = new Intl.NumberFormat("vi-VN", {
+    style: "currency",
+    currency: "VND",
+  });
+
+  const formattedValue = formatter.format(value);
+  return formattedValue.replace("₫", "");
+};
 
   return (
     <>
@@ -501,6 +510,18 @@ const Account = ({ tab }) => {
                           <div className="pl-lg-4">
                             <Row>
                               <Col lg="8">
+                                <Col lg="12">
+                                  <FormGroup>
+                                    <Row>
+                                      <label className="form-control-label col-3">
+                                        Điểm tích lũy:
+                                      </label>
+                                      <div className="col-9">
+                                      { formatCurrency(client.totalPoints)}
+                                      </div>
+                                    </Row>
+                                  </FormGroup>
+                                </Col>
                                 <Col lg="12">
                                   <FormGroup>
                                     <Row>

@@ -1,17 +1,11 @@
 import React, { useState, useEffect } from "react";
 import axios from 'axios';
 import axiosInstance from "services/custommize-axios";
-import { format } from 'date-fns';
-import { vi } from 'date-fns/locale';
-import { connect } from 'react-redux';
-import { updateData } from './actions';
 import 'assets/css/hoadon.css';
 // reactstrap components
 import { Badge, Row, Col, Button, Table, Input, FormGroup, CardBody, CardFooter, InputGroup, InputGroupAddon, Card, InputGroupText, Modal, ModalBody, ModalFooter, ModalHeader, Label, Form, CardHeader } from "reactstrap";
 import { FaRegEdit, FaSearch, FaMinus, FaPlus, FaTrash } from 'react-icons/fa';
-import {
-    MDBCard, MDBCardBody, MDBCol, MDBContainer, MDBIcon, MDBRow, MDBTypography,
-} from "mdb-react-ui-kit";
+import { useNavigate } from "react-router-dom";
 import { toast } from 'react-toastify';
 
 const Cancle = (props) => {
@@ -120,7 +114,10 @@ const Cancle = (props) => {
             }
         }
     }
-
+    let navigate = useNavigate();
+    const chuyenHuong = (idShoes) => {
+        navigate(`/shoes/productdetail/${idShoes}`);
+    }
     return (
         <>
             <Row >
@@ -161,7 +158,7 @@ const Cancle = (props) => {
                                 </Row>
                             </CardHeader>
                             <CardBody onClick={() => handleDetail(item.id)}>
-                                {item.listCart && item.listCart.length > 0 && item.listCart.map((itemC, i) => (
+                                {item.listCart && item.listCart.length > 0 && item.listCart.slice(0, 2).map((itemC, i) => (
                                     <>
                                         <Row key={itemC.id} className="">
                                             <Col lg="2">
@@ -210,15 +207,13 @@ const Cancle = (props) => {
                                                 }
                                             </Col>
                                         </Row>
-                                        {(i + 1) < item.listCart.length && <hr />}
+                                        {item.listCart.length > 2 ?
+                                            <>{(i + 1) < 2 && <hr />}</>
+                                            : <> {(i + 1) < item.listCart.length && <hr />}</>
+                                        }
+
                                     </>
                                 ))}
-                                <Row>
-                                    <Col lg="12" className="d-flex justify-content-end">
-                                        <span style={{ fontSize: "13px" }} className="mt-2">Thành tiền:&nbsp;</span>
-                                        <span style={{ color: "red", fontSize: "24px" }}>{formatter.format(item.totalPayment)}</span>
-                                    </Col>
-                                </Row>
                             </CardBody>
                             <CardFooter>
                                 <Row>
@@ -226,12 +221,8 @@ const Cancle = (props) => {
                                         <b> Ngày mua: </b> {formatDate(item.createTime)}
                                     </Col>
                                     <Col lg="8" className="d-flex justify-content-end">
-                                        <button class="evo-button mobile-viewmore" aria-label="35" aria-disabled="false"
-                                            style={{ backgroundColor: '#cccccc' }}
-                                            onClick={() => huyDonHang(item.id)}
-                                        >
-                                            Hủy đơn hàng
-                                        </button>
+                                        <span style={{ fontSize: "13px" }} className="mt-2">Thành tiền:&nbsp;</span>
+                                        <span style={{ color: "red", fontSize: "24px" }}>{formatter.format(item.totalPayment)}</span>
                                     </Col>
                                 </Row>
 
@@ -254,7 +245,7 @@ const Cancle = (props) => {
                 </ModalHeader>
                 <ModalBody>
                     <>
-                        <MDBContainer className="mt--5 mb-5">
+                        {/* <MDBContainer className="mt--5 mb-5">
                             <MDBRow className="justify-content-center align-items-center">
                                 <MDBCol size="12">
                                     <MDBCard
@@ -298,8 +289,8 @@ const Cancle = (props) => {
                                     </MDBCard>
                                 </MDBCol>
                             </MDBRow>
-                        </MDBContainer>
-                        <Card className="shadow mt--5">
+                        </MDBContainer> */}
+                        <Card className="shadow mt-1">
                             <CardHeader>
                                 <b>THÔNG TIN ĐƠN HÀNG</b>
                             </CardHeader>
@@ -311,8 +302,8 @@ const Cancle = (props) => {
                                     <Col lg={1}></Col>
                                     <Col lg={2}><b>Trạng thái:</b></Col>
                                     <Col lg={3}>
-                                        <Badge color={'success'}>
-                                            Chờ xác nhận
+                                        <Badge color={'danger'}>
+                                            Hủy
                                         </Badge>
                                     </Col>
                                 </Row>
@@ -336,7 +327,7 @@ const Cancle = (props) => {
                             <CardBody>
                                 {itemDetail.listCart && itemDetail.listCart.length > 0 && itemDetail.listCart.map((itemC, i) => (
                                     <>
-                                        <Row key={itemC.id} className="">
+                                        <Row key={itemC.id} className="" onClick={() => chuyenHuong(itemC.idShoes)} >
                                             <Col lg={1} className="text-center">
                                                 {i + 1}
                                             </Col>
@@ -439,8 +430,8 @@ const Cancle = (props) => {
     );
 };
 
-const mapDispatchToProps = (dispatch) => ({
-    updateData: (tabId, newData) => dispatch(updateData(tabId, newData)),
-});
+// const mapDispatchToProps = (dispatch) => ({
+//     updateData: (tabId, newData) => dispatch(updateData(tabId, newData)),
+// });
 
-export default connect(null, mapDispatchToProps)(Cancle);
+export default Cancle;

@@ -463,8 +463,11 @@ const DetailProduct = () => {
 
                                 <Card body>
                                   <Row className='col'>
-                                    <Col lg={4} className='text-center mt-3'>
-                                      <Rate allowHalf defaultValue={4.5} style={{ color: '#ee4d2d', fontSize: '24px' }} />
+                                    <Col lg={4} className='text-center'>
+                                      <Row className='text-center ml-6'>
+                                        <h2 style={{ color: '#ee4d2d' }}>{averageVote} trên 5 </h2>
+                                      </Row>
+                                      <Rate allowHalf defaultValue={averageVote} style={{ color: '#ee4d2d', fontSize: '24px' }} />
                                     </Col>
                                     <Col lg={8}>
 
