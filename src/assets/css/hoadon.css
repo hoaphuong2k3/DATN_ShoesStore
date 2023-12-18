@@ -59,6 +59,44 @@
   margin-right: 0;
   text-align: center;
 }
+#progressbar-2 #step22:before {
+  content: '\f058';
+  font-family: "Font Awesome 5 Free";
+  color: #fff;
+  width: 37px;
+  font-size: 20px;
+}
+
+
+#progressbar-2 #step32:before {
+  content: '\f058';
+  font-family: "Font Awesome 5 Free";
+  color: #fff;
+  width: 37px;
+  font-size: 20px;
+  margin-right: 0;
+  text-align: center;
+}
+
+#progressbar-2 #step42:before {
+  content: '\f058';
+  font-family: "Font Awesome 5 Free";
+  color: #fff;
+  width: 37px;
+  font-size: 20px;
+  margin-right: 0;
+  text-align: center;
+}
+
+#progressbar-2 #step52:before {
+  content: '\f058';
+  font-family: "Font Awesome 5 Free";
+  color: #fff;
+  width: 37px;
+  font-size: 20px;
+  margin-right: 0;
+  text-align: center;
+}
 
 #progressbar-2 li:before {
   line-height: 37px;

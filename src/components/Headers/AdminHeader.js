@@ -35,33 +35,48 @@ const Header = () => {
   const [saleMonthBefore, setSaleMonthBefore] = useState([]);
   const [saleYearBefore, setSaleYearBefore] = useState([]);
   const [client, setClient] = useState([]);
+
   const fetchData = async () => {
     try {
-
-      const week = await axiosInstance.get("/statistics/week");
-      setSaleWeek(week.data);
-      const month = await axiosInstance.get("/statistics/month");
-      setSaleMonth(month.data);
-      const year = await axiosInstance.get("/statistics/year");
-      setSaleYear(year.data);
-      const client = await axiosInstance.get("/statistics/client");
-      setClient(client.data);
-
-      //before
-      const weekBefore = await axiosInstance.get("/statistics/week-before");
-      setSaleWeekBefore(weekBefore.data);
-      const monthBefore = await axiosInstance.get("/statistics/month-before");
-      setSaleMonthBefore(monthBefore.data);
-      const yearBefore = await axiosInstance.get("/statistics/year-before");
-      setSaleYearBefore(yearBefore.data);
-
+      const apiEndpoints = [
+        "/statistics/week",
+        "/statistics/month",
+        "/statistics/year",
+        "/statistics/client",
+        "/statistics/week-before",
+        "/statistics/month-before",
+        "/statistics/year-before",
+      ];
+  
+      const responses = await Promise.all(apiEndpoints.map(endpoint => axiosInstance.get(endpoint)));
+  
+      const [
+        saleWeekData,
+        saleMonthData,
+        saleYearData,
+        clientData,
+        saleWeekBeforeData,
+        saleMonthBeforeData,
+        saleYearBeforeData,
+      ] = responses;
+  
+      setSaleWeek(saleWeekData.data);
+      setSaleMonth(saleMonthData.data);
+      setSaleYear(saleYearData.data);
+      setClient(clientData.data);
+      setSaleWeekBefore(saleWeekBeforeData.data);
+      setSaleMonthBefore(saleMonthBeforeData.data);
+      setSaleYearBefore(saleYearBeforeData.data);
+  
     } catch (error) {
       console.error("Lỗi khi lấy dữ liệu:", error);
     }
   };
+  
   useEffect(() => {
     fetchData();
   }, []);
+  
 
 
   return (
@@ -77,9 +92,9 @@ const Header = () => {
                     <Row>
                       <div className="col">
                         <CardTitle tag="h5" className="text-uppercase text-muted mb-0">
-                          Khách hàng mới
+                          Khách hàng mới <br /> hôm nay
                         </CardTitle>
-                        <h1 className="font-weight-bold mb-0">{client}</h1>
+                        <div className="font-weight-bold mb-1 mt-3" style={{fontSize: 15}}>{client}</div>
                       </div>
                       <Col className="col-auto position-absolute right-0 bottom-6">
                         <div className="p-3 bg-gradient-info text-white rounded">
@@ -87,12 +102,7 @@ const Header = () => {
                         </div>
                       </Col>
                     </Row>
-                    <p className="mt-3 mb-0 text-muted text-sm">
-                      <span className="text-success mr-2">
-                        {/* <i className="fa fa-arrow-up" /> 0% */}
-                      </span>{" "}
-                      {/* <span className="text-nowrap">Hôm qua</span> */}
-                    </p>
+                    
                   </CardBody>
                 </Card>
 
@@ -176,7 +186,13 @@ const Header = () => {
                         <span className={`text-${saleMonth.totalPayment >= saleMonthBefore.totalPayment ? 'success' : 'danger'} mr-2`}>
                           <i className={`fas fa-arrow-${saleMonth.totalPayment >= saleMonthBefore.totalPayment ? 'up' : 'down'}`} />{' '}
                           {saleMonthBefore.totalPayment != null && saleMonthBefore.totalPayment !== 0 ? (
-                            <>{Math.round((saleMonth.totalPayment - saleMonthBefore.totalPayment) / saleMonthBefore.totalPayment * 100)}%</>
+                            <>
+                              {Math.abs(saleMonth.totalPayment - saleMonthBefore.totalPayment) <= 100 ? (
+                                <>{Math.round((saleMonth.totalPayment - saleMonthBefore.totalPayment) / saleMonthBefore.totalPayment * 100)}%</>
+                              ) : (
+                                <>{Math.abs(saleMonth.totalPayment / saleMonthBefore.totalPayment).toFixed(1)} lần</>
+                              )}
+                            </>
                           ) : (
                             <></>
                           )}
@@ -219,7 +235,13 @@ const Header = () => {
                         <span className={`text-${saleYear.totalPayment >= saleYearBefore.totalPayment ? 'success' : 'danger'} mr-2`}>
                           <i className={`fas fa-arrow-${saleYear.totalPayment >= saleYearBefore.totalPayment ? 'up' : 'down'}`} />{' '}
                           {saleYearBefore.totalPayment != null && saleYearBefore.totalPayment !== 0 ? (
-                            <>{Math.round((saleYear.totalPayment - saleYearBefore.totalPayment) / saleYearBefore.totalPayment * 100)}%</>
+                            <>
+                              {Math.abs(saleYear.totalPayment - saleMonthBefore.totalPayment) <= 100 ? (
+                                <>{Math.round((saleYear.totalPayment - saleYearBefore.totalPayment) / saleYearBefore.totalPayment * 100)}%</>
+                              ) : (
+                                <>{Math.abs(saleYear.totalPayment / saleYearBefore.totalPayment).toFixed(1)} lần</>
+                              )}
+                            </>
                           ) : (
                             <></>
                           )}

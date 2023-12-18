@@ -4,7 +4,7 @@ import { FaSort } from "react-icons/fa6";
 import ReactPaginate from "react-paginate";
 import { toast } from "react-toastify";
 import axiosInstance from "services/custommize-axios";
-import { format, parseISO, startOfToday } from 'date-fns';
+import { format, parseISO } from 'date-fns';
 import { vi } from 'date-fns/locale';
 import * as yup from 'yup';
 // reactstrap components
@@ -255,32 +255,44 @@ const SaleBills = () => {
 
     const [validationErrors, setValidationErrors] = useState({});
     const discountSchema = yup.object().shape({
-        name: yup.string().required('Tên khuyến mãi không được bỏ trống'),
-        minPrice: yup.string().required('Hóa đơn tối thiểu không được bỏ trống'),
-        startDate: yup
-            .string()
-            .min(startOfToday().toISOString(), 'Ngày bắt đầu phải từ hôm nay trở đi.')
-            .nullable()
-            .required('Ngày bắt đầu không được để trống.'),
-        endDate: yup
-            .string()
-            .min(yup.ref('startDate'), 'Ngày kết thúc phải sau ngày bắt đầu.')
-            .nullable()
-            .required('Ngày kết thúc không được để trống.'),
-        // sale: yup.boolean(),
-        // salePrice: yup.string().when('sale', {
-        //   is: false,
-        //   then: yup.string().required('Trị giá không được bỏ trống').matches(/^\d+$/, 'Trị giá phải là số'),
-        // }),
-        // salePercent: yup.string().when('sale', {
-        //   is: true,
-        //   then: yup.string().required('Phần trăm không được bỏ trống').matches(/^\d+$/, 'Phần trăm phải là số'),
-        // }),
-
-        quantity: yup
+        name: yup.string().required('Vui lòng nhập tên khuyến mãi'),
+        minPrice: yup
             .number()
-            .required('Số lượng không được để trống.'),
-        description: yup.string().required('Mô tả không được để trống.'),
+            .typeError('Vui lòng nhập giá trị hóa đơn tối thiểu')
+            .min(1, 'Hóa đơn tối thiểu từ 1₫'),
+        startDate: yup.date()
+            .typeError('Vui lòng chọn một ngày hợp lệ')
+            .test('is-future', 'Ngày bắt đầu phải là một ngày tương lai', (value) => {
+                const now = new Date();
+                return value && value > now;
+            }),
+        endDate: yup.date()
+            .typeError('Vui lòng chọn một ngày hợp lệ')
+            .min(yup.ref('startDate'), 'Ngày kết thúc phải sau Ngày bắt đầu'),
+        sale: yup.boolean().required('Vui lòng chọn Hình thức'),
+        // salePercent: yup.number()
+        //     .when('sale', {
+        //         is: true,
+        //         then: yup.number()
+        //         .typeError('Vui lòng nhập một số')
+        //             .min(1, 'Phần trăm phải lớn hơn hoặc bằng 0')
+        //             .max(100, 'Phần trăm phải nhỏ hơn hoặc bằng 100')
+        //             .required('Vui lòng nhập Phần trăm'),
+        //     }),
+        // salePrice: yup.number()
+        //     .when('sale', {
+        //         is: false,
+        //         then: yup.number()
+        //             .typeError('Vui lòng nhập một số')
+        //             .min(1, 'Trị giá phải lớn hơn hoặc bằng 0')
+        //             .required('Vui lòng nhập Trị giá'),
+        //     }),
+        quantity: yup.number()
+            .typeError('Vui lòng nhập số lượng')
+            .min(1, '1 <= Số lượng <= 200')
+            .max(200, '1 <= Số lượng <= 200')
+            .required('Vui lòng nhập số lượng'),
+        description: yup.string().required('Vui lòng nhập mô tả'),
     });
 
     const saveDiscount = async () => {
@@ -330,12 +342,16 @@ const SaleBills = () => {
             resetForm();
             setValidationErrors({});
         } catch (validationError) {
-            const errors = {};
-            validationError.inner.forEach(error => {
-                errors[error.path] = error.message;
-            });
-            setValidationErrors(errors);
-            console.log(errors);
+            if (validationError.inner) {
+                const errors = {};
+                validationError.inner.forEach(error => {
+                    errors[error.path] = error.message;
+                });
+                setValidationErrors(errors);
+                console.log(errors);
+            } else {
+                console.error(validationError.message);
+            }
         }
 
     };
@@ -571,16 +587,28 @@ const SaleBills = () => {
                                         <td>{discount.description}</td>
                                         <td style={{ position: "sticky", zIndex: '1', right: '0', background: "#fff" }}>
                                             {discount.status === 0 &&
-                                                <Tooltip title="Ngừng kích hoạt">
-                                                    <Button color="link" size="sm" ><FaLockOpen onClick={() => lock(discount.id)} /></Button>
-                                                </Tooltip>
-
+                                                <Popconfirm
+                                                    title="Ngừng kích hoạt đợt giảm giá?"
+                                                    onConfirm={() => lock(discount.id)}
+                                                    okText="Ngừng kích hoạt"
+                                                    cancelText="Hủy"
+                                                >
+                                                    <Tooltip title="Ngừng kích hoạt">
+                                                        <Button color="link" size="sm" ><FaLockOpen /></Button>
+                                                    </Tooltip>
+                                                </Popconfirm>
                                             }
                                             {(discount.status === 1 || discount.status === 2) &&
-                                                <Tooltip title="Kích hoạt">
-                                                    <Button color="link" size="sm" ><FaLock onClick={() => openlock(discount.id)} /></Button>
-                                                </Tooltip>
-
+                                                <Popconfirm
+                                                    title="Kích hoạt đợt giảm giá?"
+                                                    onConfirm={() => openlock(discount.id)}
+                                                    okText="Kích hoạt"
+                                                    cancelText="Hủy"
+                                                >
+                                                    <Tooltip title="Kích hoạt">
+                                                        <Button color="link" size="sm" ><FaLock /></Button>
+                                                    </Tooltip>
+                                                </Popconfirm>
                                             }
 
                                             <Tooltip title="Chỉnh sửa">
@@ -699,7 +727,7 @@ const SaleBills = () => {
                                         </label>
                                         <Input
                                             className="form-control-alternative"
-                                            type="text"
+                                            type="number"
                                             value={formData.minPrice}
                                             onChange={(e) => setFormData({ ...formData, minPrice: e.target.value })}
                                             invalid={!!validationErrors.minPrice}
@@ -750,11 +778,7 @@ const SaleBills = () => {
 
                                 <Col lg="6">
                                     <FormGroup>
-                                        <label
-                                            className="form-control-label"
-                                            htmlFor="input-price">
-                                            Hình thức
-                                        </label>
+                                        <label className="form-control-label">Hình thức</label>
                                         <div style={{ display: "flex" }}>
                                             <div className="custom-control custom-radio">
                                                 <Input
@@ -762,8 +786,9 @@ const SaleBills = () => {
                                                     name="sale"
                                                     type="radio"
                                                     checked={!formData.sale}
-                                                    onChange={() => setFormData({ ...formData, sale: false })}
-                                                />Tiền
+                                                    onChange={() => setFormData({ ...formData, sale: false, salePercent: null })}
+                                                />
+                                                Tiền
                                             </div>
                                             <div className="custom-control custom-radio">
                                                 <Input
@@ -771,31 +796,27 @@ const SaleBills = () => {
                                                     name="sale"
                                                     type="radio"
                                                     checked={formData.sale}
-                                                    onChange={(e) => setFormData({ ...formData, sale: true })}
-                                                />Phần trăm
+                                                    onChange={() => setFormData({ ...formData, sale: true, salePrice: null })}
+                                                />
+                                                Phần trăm
                                             </div>
-
                                         </div>
                                     </FormGroup>
                                 </Col>
 
+
                                 {formData.sale && (
                                     <Col lg="6">
                                         <FormGroup>
-                                            <label
-                                                className="form-control-label"
-                                            >
-                                                Phần trăm:
-                                            </label>
+                                            <label className="form-control-label">Phần trăm:</label>
                                             <Input
                                                 className="form-control-alternative"
-                                                type="text"
+                                                type="number"
                                                 value={formData.salePercent}
-                                                onChange={(e) => setFormData({ ...formData, salePercent: e.target.value })}
+                                                onChange={(e) => setFormData({ ...formData, salePercent: e.target.value, salePrice: null })}
                                                 invalid={!!validationErrors.salePercent}
                                             />
                                             {validationErrors.salePercent && <FormFeedback>{validationErrors.salePercent}</FormFeedback>}
-
                                         </FormGroup>
                                     </Col>
                                 )}
@@ -803,16 +824,12 @@ const SaleBills = () => {
                                 {!formData.sale && (
                                     <Col lg="6">
                                         <FormGroup>
-                                            <label
-                                                className="form-control-label"
-                                            >
-                                                Trị giá (tiền):
-                                            </label>
+                                            <label className="form-control-label">Trị giá (tiền):</label>
                                             <Input
                                                 className="form-control-alternative"
-                                                type="text"
+                                                type="number"
                                                 value={formData.salePrice}
-                                                onChange={(e) => setFormData({ ...formData, salePrice: e.target.value })}
+                                                onChange={(e) => setFormData({ ...formData, salePrice: e.target.value, salePercent: null })}
                                                 invalid={!!validationErrors.salePrice}
                                             />
                                             {validationErrors.salePrice && <FormFeedback>{validationErrors.salePrice}</FormFeedback>}
@@ -850,8 +867,8 @@ const SaleBills = () => {
                                         </label>
                                         <Input
                                             className="form-control-alternative"
-                                            placeholder="Sản phẩm ....."
-                                            rows="4"
+                                            placeholder="Giảm giá ....."
+                                            rows="1"
                                             type="textarea"
                                             value={formData.description}
                                             onChange={(e) => setFormData({ ...formData, description: e.target.value })}
@@ -864,8 +881,6 @@ const SaleBills = () => {
 
 
                         </div>
-
-
                     </Form >
                 </ModalBody >
                 <ModalFooter>

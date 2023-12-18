@@ -12,7 +12,7 @@ import routes from "routes-admin.js";
 const Admin = (props) => {
   const mainContent = React.useRef(null);
   const location = useLocation();
-  const { hasAdminRole } = useAuth();
+  const hasAdminRole = localStorage.getItem("hasAdminRole");
 
   React.useEffect(() => {
     document.documentElement.scrollTop = 0;
@@ -21,21 +21,25 @@ const Admin = (props) => {
   }, [location]);
 
   const getRoutes = (routes) => {
-    const allowedPaths = hasAdminRole()
-      ? routes.map((prop) => prop.path)
-      : [
-          "/index",
-          "/product",
-          "/bills",
-          "/product-attributes",
-          "/user-profile",
-          "/client",
-          "/product/add",
-          "/product/edit/:id",
-          "/product/detail/:id",
-          "/shoesdetail/:id",
-        ];
-  
+    console.log(hasAdminRole);
+    let allowedPaths;
+    if (hasAdminRole === "true") {
+      allowedPaths = routes.map((prop) => prop.path);
+    } else {
+      allowedPaths = [
+        "/index",
+        "/product",
+        "/bills",
+        "/product-attributes",
+        "/user-profile",
+        "/client",
+        "/product/add",
+        "/product/edit/:id",
+        "/product/detail/:id",
+        "/shoesdetail/:id",
+      ];
+    }
+    console.log(allowedPaths);
     return routes.map((prop, key) => {
       if (prop.layout === "/admin" && allowedPaths.includes(prop.path)) {
         return <Route path={prop.path} element={prop.component} key={key} exact />;
@@ -43,7 +47,7 @@ const Admin = (props) => {
       return null;
     });
   };
-  
+
 
   const getBrandText = (path) => {
     for (let i = 0; i < routes.length; i++) {

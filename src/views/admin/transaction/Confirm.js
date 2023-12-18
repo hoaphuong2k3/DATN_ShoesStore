@@ -42,6 +42,7 @@ const Confirm = () => {
     const [selectedToWardCode, setSelectedToWardCode] = useState("");
     const [shippingTotal, setShippingTotal] = useState(0);
     const [hasShippingData, setHasShippingData] = useState(false);
+    const [hasDeliveryData, setHasDeliveryData] = useState(false);
 
     const [selectAllChecked, setSelectAllChecked] = useState(false);
 
@@ -157,13 +158,13 @@ const Confirm = () => {
                 totalMoney = productPrice - (productPrice * percentPeriod / 100);
             }
 
-            if (hasShipping) {
+            if (hasShipping === true) {
                 totalMoney = totalMoney + Math.floor(shippingTotal);
             } else {
                 totalMoney = totalMoney + Math.floor(deliveryCost);
             }
 
-        } else {
+        } else if (percentPeriod === -1) {
             if (priceVoucher !== null) {
                 totalMoney = productPrice - priceVoucher;
             } else if (percentVoucher !== null) {
@@ -171,9 +172,21 @@ const Confirm = () => {
             } else {
                 totalMoney = productPrice;
             }
+
+        } else if (percentPeriod === null) {
+            if (priceVoucher !== null) {
+                totalMoney = productPrice - priceVoucher;
+            } else if (percentVoucher !== null) {
+                totalMoney = productPrice - (productPrice * percentVoucher / 100);
+            } else {
+                totalMoney = productPrice;
+            }
+            if (hasShipping === true) {
+                totalMoney = totalMoney + Math.floor(shippingTotal);
+            } else {
+                totalMoney = totalMoney + Math.floor(deliveryCost);
+            }
         }
-
-
 
         return totalMoney;
     };
@@ -182,50 +195,63 @@ const Confirm = () => {
     //detail
     const handleRowClick = async (id, confirm) => {
         setSelectedOrderId(id);
+
         try {
             const [orderResponse, deliveryResponse] = await Promise.all([
                 axiosInstance.get(`/order/admin/cart/get-all/${id}`),
                 axiosInstance.get(`/order/admin/delivery/${id}`),
             ]);
 
+            // Kiểm tra nếu có dữ liệu từ API đơn hàng
+            if (orderResponse && orderResponse.length > 0) {
+                const productPrice = orderResponse.reduce((total, product) => {
+                    return total + product.totalPrice;
+                }, 0);
 
-            const productPrice = orderResponse.reduce((total, product) => {
-                return total + product.totalPrice;
-            }, 0);
+                const totalPayment = calculateTotalMoney(
+                    productPrice,
+                    deliveryResponse?.data?.deliveryCost || 0,
+                    confirm.percentPeriod,
+                    confirm.percentVoucher,
+                    confirm.priceVoucher
+                );
 
-            const totalMoney = calculateTotalMoney(
-                productPrice,
-                deliveryResponse.data.deliveryCost,
-                confirm.percentPeriod,
-                confirm.percentVoucher,
-                confirm.priceVoucher
-            );
+                setFormData({
+                    id: confirm.id,
+                    code: confirm.code,
+                    fullnameClient: confirm.fullnameClient,
+                    phoneNumber: confirm.phoneNumber,
+                    totalMoney: productPrice,
+                    totalPayment: totalPayment,
+                    paymentMethod: confirm.paymentMethod,
+                    percentVoucher: confirm.percentVoucher,
+                    priceVoucher: confirm.priceVoucher,
+                    percentPeriod: confirm.percentPeriod,
+                    nameFreeGift: confirm.nameFreeGift,
+                    imageFreeGift: confirm.imageFreeGift
+                });
 
-            setFormData({
-                id: confirm.id,
-                code: confirm.code,
-                fullnameClient: confirm.fullnameClient,
-                phoneNumber: confirm.phoneNumber,
-                totalMoney: productPrice,
-                totalPayment: totalMoney,
-                paymentMethod: confirm.paymentMethod,
-                percentVoucher: confirm.percentVoucher,
-                priceVoucher: confirm.priceVoucher,
-                percentPeriod: confirm.percentPeriod,
-                nameFreeGift: confirm.nameFreeGift,
-                imageFreeGift: confirm.imageFreeGift
-            });
-            setOrderData(orderResponse);
-            setDeliveryData(deliveryResponse.data);
+                setOrderData(orderResponse);
+            }
 
-            const deliveryAddress = deliveryResponse.data.deliveryAddress;
-            // Phân tách chuỗi địa chỉ thành các thành phần
-            const addressParts = deliveryAddress.split(', ');
-            const [selectedProvince, selectedDistrict, selectedWard, detailedAddress] = addressParts.reverse();
-            setDetailedAddress(detailedAddress);
-            setSelectedWard(selectedWard);
-            setSelectedDistrict(selectedDistrict);
-            setSelectedProvince(selectedProvince);
+            // Kiểm tra nếu có dữ liệu từ API vận chuyển
+            if (deliveryResponse && deliveryResponse.data) {
+                setHasDeliveryData(true);
+                setDeliveryData(deliveryResponse.data);
+
+                const deliveryAddress = deliveryResponse.data.deliveryAddress;
+                // Phân tách chuỗi địa chỉ thành các thành phần
+                const addressParts = deliveryAddress.split(', ');
+                const [selectedProvince, selectedDistrict, selectedWard, detailedAddress] = addressParts.reverse();
+                setDetailedAddress(detailedAddress);
+                setSelectedWard(selectedWard);
+                setSelectedDistrict(selectedDistrict);
+                setSelectedProvince(selectedProvince);
+
+            } else {
+                setDeliveryData(null);
+                setHasDeliveryData(false);
+            }
 
             setModal(true);
         } catch (error) {
@@ -501,9 +527,31 @@ const Confirm = () => {
         }
     }, [isProductDeleted]);
 
+    //method
+    const paymentMethodColors = {
+        1: { color: "success", label: "COD" },
+        2: { color: "primary", label: "Ví điện tử" },
+        3: { color: "info", label: "Chuyển khoản" },
+        4: { color: "warning", label: "Tiền mặt" },
+    };
+
+    const getPaymentMethodText = (method) => {
+        switch (method) {
+            case 1:
+                return "Thanh toán sau khi nhận hàng";
+            case 2:
+                return "Ví điện tử";
+            case 3:
+                return "Chuyển khoản";
+            case 4:
+                return "Tiền mặt";
+            default:
+                return "";
+        }
+    };
+
     //Export
     const [selectedDate, setSelectedDate] = useState(null);
-
     const handleExport = async () => {
         try {
 
@@ -616,8 +664,8 @@ const Confirm = () => {
                                     <td>{confirm.phoneNumber}</td>
                                     <td className="text-right">{formatter.format(confirm.totalPayment)}</td>
                                     <td className="text-center">
-                                        <Badge color={confirm.paymentMethod === 1 ? "success" : confirm.paymentMethod === 2 ? "primary" : "secondary"}>
-                                            {confirm.paymentMethod === 1 ? "COD" : confirm.paymentMethod === 2 ? "Ví điện tử" : "Không xác định"}
+                                        <Badge color={paymentMethodColors[confirm.paymentMethod]?.color || "secondary"}>
+                                            {paymentMethodColors[confirm.paymentMethod]?.label || "Không xác định"}
                                         </Badge>
                                     </td>
 
@@ -753,128 +801,135 @@ const Confirm = () => {
                                                 </FormGroup>
                                             </Col>
                                         </Row>
-                                        <Row>
-                                            <Col md={12}>
-                                                <h3 className="heading-small text-dark">Thông tin phiếu giao</h3>
-                                            </Col>
-                                        </Row>
-                                        <Row >
-                                            <Col md={6}>
-                                                <FormGroup>
-                                                    <Label>
-                                                        Người nhận
-                                                    </Label>
-                                                    <Input
-                                                        size="sm"
-                                                        type="text"
-                                                        value={deliveryData.recipientName}
-                                                        onChange={(e) => setDeliveryData({ ...deliveryData, recipientName: e.target.value })}
-                                                    />
-                                                </FormGroup>
-                                            </Col>
-                                            <Col md={6}>
-                                                <FormGroup>
-                                                    <Label>
-                                                        Số điện thoại
-                                                    </Label>
-                                                    <Input
-                                                        size="sm"
-                                                        type="tel"
-                                                        value={deliveryData.recipientPhone}
-                                                        onChange={(e) => setDeliveryData({ ...deliveryData, recipientPhone: e.target.value })}
-                                                    />
-                                                </FormGroup>
-                                            </Col>
-                                        </Row>
-                                        <Row >
-                                            <Col md={6}>
-                                                <FormGroup>
-                                                    <Label>
-                                                        Địa chỉ
-                                                    </Label>
-                                                    <Input
-                                                        className="mb-2"
-                                                        size="sm"
-                                                        type="select"
-                                                        style={{ fontSize: 13 }}
-                                                        value={selectedProvince}
-                                                        onChange={(e) => {
-                                                            setSelectedProvince(e.target.value);
-                                                            setSelectedDistrict("");
-                                                            setSelectedWard("");
-                                                        }}
-                                                    >
-                                                        <option value="">Chọn tỉnh/thành phố</option>
-                                                        {provinces.map((province) => (
-                                                            <option key={province.ProvinceID} value={province.ProvinceID}>
-                                                                {province.ProvinceName}
-                                                            </option>
-                                                        ))}
-                                                    </Input>
+
+                                        {hasDeliveryData && (
+                                            <>
+                                                <Row>
+                                                    <Col md={12}>
+                                                        <h3 className="heading-small text-dark">Thông tin phiếu giao</h3>
+                                                    </Col>
+                                                </Row>
+
+                                                <Row >
+                                                    <Col md={6}>
+                                                        <FormGroup>
+                                                            <Label>
+                                                                Người nhận
+                                                            </Label>
+                                                            <Input
+                                                                size="sm"
+                                                                type="text"
+                                                                value={deliveryData.recipientName}
+                                                                onChange={(e) => setDeliveryData({ ...deliveryData, recipientName: e.target.value })}
+                                                            />
+                                                        </FormGroup>
+                                                    </Col>
+                                                    <Col md={6}>
+                                                        <FormGroup>
+                                                            <Label>
+                                                                Số điện thoại
+                                                            </Label>
+                                                            <Input
+                                                                size="sm"
+                                                                type="tel"
+                                                                value={deliveryData.recipientPhone}
+                                                                onChange={(e) => setDeliveryData({ ...deliveryData, recipientPhone: e.target.value })}
+                                                            />
+                                                        </FormGroup>
+                                                    </Col>
+                                                </Row>
+                                                <Row >
+                                                    <Col md={6}>
+                                                        <FormGroup>
+                                                            <Label>
+                                                                Địa chỉ
+                                                            </Label>
+                                                            <Input
+                                                                className="mb-2"
+                                                                size="sm"
+                                                                type="select"
+                                                                style={{ fontSize: 13 }}
+                                                                value={selectedProvince}
+                                                                onChange={(e) => {
+                                                                    setSelectedProvince(e.target.value);
+                                                                    setSelectedDistrict("");
+                                                                    setSelectedWard("");
+                                                                }}
+                                                            >
+                                                                <option value="">Chọn tỉnh/thành phố</option>
+                                                                {provinces.map((province) => (
+                                                                    <option key={province.ProvinceID} value={province.ProvinceID}>
+                                                                        {province.ProvinceName}
+                                                                    </option>
+                                                                ))}
+                                                            </Input>
 
 
-                                                    <Input
-                                                        className="mb-2"
-                                                        size="sm"
-                                                        type="select"
-                                                        style={{ fontSize: 13 }}
-                                                        value={selectedDistrict}
-                                                        onChange={(e) => {
-                                                            setSelectedDistrict(e.target.value);
-                                                            setSelectedWard("");
-                                                            setSelectedToDistrictID(e.target.value);
-                                                        }}
-                                                        disabled={!selectedProvince}
-                                                    >
-                                                        <option value="">Chọn quận/huyện</option>
-                                                        {selectedProvince &&
-                                                            districts.map((district) => (
-                                                                <option key={district.DistrictID} value={district.DistrictID}>
-                                                                    {district.DistrictName}
-                                                                </option>
-                                                            ))}
-                                                    </Input>
+                                                            <Input
+                                                                className="mb-2"
+                                                                size="sm"
+                                                                type="select"
+                                                                style={{ fontSize: 13 }}
+                                                                value={selectedDistrict}
+                                                                onChange={(e) => {
+                                                                    setSelectedDistrict(e.target.value);
+                                                                    setSelectedWard("");
+                                                                    setSelectedToDistrictID(e.target.value);
+                                                                }}
+                                                                disabled={!selectedProvince}
+                                                            >
+                                                                <option value="">Chọn quận/huyện</option>
+                                                                {selectedProvince &&
+                                                                    districts.map((district) => (
+                                                                        <option key={district.DistrictID} value={district.DistrictID}>
+                                                                            {district.DistrictName}
+                                                                        </option>
+                                                                    ))}
+                                                            </Input>
 
-                                                    <Input
-                                                        className="mb-2"
-                                                        size="sm"
-                                                        type="select"
-                                                        style={{ fontSize: 13 }}
-                                                        value={selectedWard}
-                                                        onChange={(e) => {
-                                                            setSelectedWard(e.target.value);
-                                                            setSelectedToWardCode(e.target.value.toString());
-                                                            handleApiCall();
-                                                        }}
-                                                        disabled={!selectedDistrict}
-                                                    >
-                                                        <option value="">Chọn xã/phường</option>
-                                                        {selectedDistrict &&
-                                                            wards.map((ward) => (
-                                                                <option key={ward.WardCode} value={ward.WardCode}>
-                                                                    {ward.WardName}
-                                                                </option>
-                                                            ))}
-                                                    </Input>
+                                                            <Input
+                                                                className="mb-2"
+                                                                size="sm"
+                                                                type="select"
+                                                                style={{ fontSize: 13 }}
+                                                                value={selectedWard}
+                                                                onChange={(e) => {
+                                                                    setSelectedWard(e.target.value);
+                                                                    setSelectedToWardCode(e.target.value.toString());
+                                                                    handleApiCall();
+                                                                }}
+                                                                disabled={!selectedDistrict}
+                                                            >
+                                                                <option value="">Chọn xã/phường</option>
+                                                                {selectedDistrict &&
+                                                                    wards.map((ward) => (
+                                                                        <option key={ward.WardCode} value={ward.WardCode}>
+                                                                            {ward.WardName}
+                                                                        </option>
+                                                                    ))}
+                                                            </Input>
 
-                                                </FormGroup>
+                                                        </FormGroup>
 
-                                            </Col>
-                                            <Col md={6}>
-                                                <FormGroup>
-                                                    <Input className="mt-4"
-                                                        style={{ fontSize: 13 }}
-                                                        size="sm"
-                                                        rows="5"
-                                                        type="textarea"
-                                                        placeholder="Địa chỉ chi tiết..."
-                                                        id="detailedAddress"
-                                                        value={detailedAddress}
-                                                        onChange={(e) => setDetailedAddress(e.target.value)}
-                                                    />
-                                                </FormGroup>
-                                            </Col>
-                                        </Row>
+                                                    </Col>
+                                                    <Col md={6}>
+                                                        <FormGroup>
+                                                            <Input className="mt-4"
+                                                                style={{ fontSize: 13 }}
+                                                                size="sm"
+                                                                rows="5"
+                                                                type="textarea"
+                                                                placeholder="Địa chỉ chi tiết..."
+                                                                id="detailedAddress"
+                                                                value={detailedAddress}
+                                                                onChange={(e) => setDetailedAddress(e.target.value)}
+                                                            />
+                                                        </FormGroup>
+                                                    </Col>
+                                                </Row>
+                                            </>
+                                        )}
+
                                         <Row>
                                             <Col md={12}>
                                                 <h3 className="heading-small text-dark">Thanh toán</h3>
@@ -939,40 +994,42 @@ const Confirm = () => {
                                             )}
                                         </Row>
 
-                                        <Row >
-                                            <Col md={6}>
-                                                <FormGroup>
-                                                    <Label>
-                                                        Phí vận chuyển
-                                                    </Label>
-                                                    <InputGroup size="sm">
-                                                        <Input
-                                                            size="sm"
-                                                            type="number"
-                                                            value={hasShippingData ? Math.floor(shippingTotal) : Math.floor(deliveryData.deliveryCost)}
-                                                            onChange={(e) => setDeliveryData({ ...deliveryData, deliveryCost: e.target.value })}
-                                                            readOnly style={{ backgroundColor: "#fff" }}
-                                                        />
-                                                        <InputGroupAddon addonType="append">
-                                                            <InputGroupText>VND</InputGroupText>
-                                                        </InputGroupAddon>
-                                                    </InputGroup>
-                                                </FormGroup>
+                                        {hasDeliveryData && (
+                                            <>
+                                                <Row >
+                                                    <Col md={6}>
+                                                        <FormGroup>
+                                                            <Label>
+                                                                Phí vận chuyển
+                                                            </Label>
+                                                            <InputGroup size="sm">
+                                                                <Input
+                                                                    size="sm"
+                                                                    type="number"
+                                                                    value={hasShippingData ? Math.floor(shippingTotal) : Math.floor(deliveryData.deliveryCost)}
+                                                                    onChange={(e) => setDeliveryData({ ...deliveryData, deliveryCost: e.target.value })}
+                                                                    readOnly style={{ backgroundColor: "#fff" }}
+                                                                />
+                                                                <InputGroupAddon addonType="append">
+                                                                    <InputGroupText>VND</InputGroupText>
+                                                                </InputGroupAddon>
+                                                            </InputGroup>
+                                                        </FormGroup>
 
-                                            </Col>
-                                            <Col md={6}>
-                                                <FormGroup>
-                                                    <img className="my-3 ml-3"
-                                                        width={"80%"}
-                                                        alt="..."
-                                                        src={require("../../../assets/img/theme/giaohangnhanh.webp")}
-                                                    />
-                                                </FormGroup>
-                                            </Col>
-                                        </Row>
-
-
-                                        {formData.percentPeriod && formData.percentPeriod === -1 && (
+                                                    </Col>
+                                                    <Col md={6}>
+                                                        <FormGroup>
+                                                            <img className="my-3 ml-3"
+                                                                width={"80%"}
+                                                                alt="..."
+                                                                src={require("../../../assets/img/theme/giaohangnhanh.webp")}
+                                                            />
+                                                        </FormGroup>
+                                                    </Col>
+                                                </Row>
+                                            </>
+                                        )}
+                                        {hasDeliveryData && formData.percentPeriod && formData.percentPeriod === -1 && (
                                             <Row>
                                                 <Col md={6}>
                                                     <FormGroup>
@@ -1019,7 +1076,7 @@ const Confirm = () => {
                                                 Phương thức thanh toán:
                                             </Label>
                                             <span className="border-0" style={{ fontWeight: "bold" }}>
-                                                {formData.paymentMethod === 1 ? "Thanh toán sau khi nhận hàng" : formData.paymentMethod === 2 ? "Ví điện tử" : ""}
+                                                {getPaymentMethodText(formData.paymentMethod)}
                                             </span>
                                         </FormGroup>
 

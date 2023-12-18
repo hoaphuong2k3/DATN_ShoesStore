@@ -1,16 +1,13 @@
 import React, { useState, useEffect } from "react";
 import axios from 'axios';
 import axiosInstance from "services/custommize-axios";
-import { format } from 'date-fns';
-import { vi } from 'date-fns/locale';
-import { connect } from 'react-redux';
-import { updateData } from './actions';
 import 'assets/css/hoadon.css';
+import { useNavigate } from "react-router-dom";
 // reactstrap components
 import { Badge, Row, Col, Button, Table, Input, FormGroup, CardBody, CardFooter, InputGroup, InputGroupAddon, Card, InputGroupText, Modal, ModalBody, ModalFooter, ModalHeader, Label, Form, CardHeader } from "reactstrap";
 import { FaRegEdit, FaSearch, FaMinus, FaPlus, FaTrash } from 'react-icons/fa';
 import {
-    MDBCard,MDBCardBody,MDBCol,MDBContainer,MDBIcon,MDBRow,MDBTypography,
+    MDBCard, MDBCardBody, MDBCol, MDBContainer, MDBIcon, MDBRow, MDBTypography,
 } from "mdb-react-ui-kit";
 import { toast } from 'react-toastify';
 
@@ -97,6 +94,7 @@ const Confirm = (props) => {
             console.error("Response data:", error.response.data);
         }
     }
+
     const handleDetail = (id) => {
         getOneOrder(id);
         setModalDetail(true);
@@ -119,6 +117,10 @@ const Confirm = (props) => {
                 toast.error(errorMessage);
             }
         }
+    }
+    let navigate = useNavigate();
+    const chuyenHuong = (idShoes) => {
+        navigate(`/shoes/productdetail/${idShoes}`);
     }
 
     return (
@@ -161,7 +163,7 @@ const Confirm = (props) => {
                                 </Row>
                             </CardHeader>
                             <CardBody onClick={() => handleDetail(item.id)}>
-                                {item.listCart && item.listCart.length > 0 && item.listCart.map((itemC, i) => (
+                                {item.listCart && item.listCart.length > 0 && item.listCart.slice(0, 2).map((itemC, i) => (
                                     <>
                                         <Row key={itemC.id} className="">
                                             <Col lg="2">
@@ -210,7 +212,10 @@ const Confirm = (props) => {
                                                 }
                                             </Col>
                                         </Row>
-                                        {(i + 1) < item.listCart.length && <hr />}
+                                        {item.listCart.length > 2 ?
+                                            <>{(i + 1) < 2 && <hr />}</>
+                                            : <> {(i + 1) < item.listCart.length && <hr />}</>
+                                        }
                                     </>
                                 ))}
                                 <Row>
@@ -336,7 +341,7 @@ const Confirm = (props) => {
                             <CardBody>
                                 {itemDetail.listCart && itemDetail.listCart.length > 0 && itemDetail.listCart.map((itemC, i) => (
                                     <>
-                                        <Row key={itemC.id} className="">
+                                        <Row key={itemC.id} className="" onClick={() => chuyenHuong(itemC.idShoes)}>
                                             <Col lg={1} className="text-center">
                                                 {i + 1}
                                             </Col>
@@ -439,8 +444,5 @@ const Confirm = (props) => {
     );
 };
 
-const mapDispatchToProps = (dispatch) => ({
-    updateData: (tabId, newData) => dispatch(updateData(tabId, newData)),
-});
 
-export default connect(null, mapDispatchToProps)(Confirm);
+export default Confirm;

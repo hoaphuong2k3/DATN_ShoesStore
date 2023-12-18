@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 import axios from 'axios';
 const AuthContext = createContext();
 
@@ -13,10 +13,25 @@ export const AuthProvider = ({ children }) => {
     setUser({ id, ...userData });
     setToken(token);
     setAuthorities(authorities);
+    console.log(authorities);
     localStorage.setItem('token', token);
     localStorage.setItem('userId', userId);
-   
   };
+  useEffect(() => {
+    if (authorities.length > 0) {
+      const hasAdminOrStaffRoleValue = hasAdminOrStaffRole();
+      localStorage.setItem('hasAdminOrStaffRole', hasAdminOrStaffRoleValue);
+
+      const hasAdminRoleValue = hasAdminRole();
+      localStorage.setItem('hasAdminRole', hasAdminRoleValue);
+
+      const hasStaffRoleValue = hasStaffRole();
+      localStorage.setItem('hasStaffRole', hasStaffRoleValue);
+
+      const hasUserRoleValue = hasUserRole();
+      localStorage.setItem('hasUserRole', hasUserRoleValue);
+    }
+  }, [authorities]);
 
   const logout = () => {
     setUser(null);
@@ -24,6 +39,10 @@ export const AuthProvider = ({ children }) => {
     setAuthorities([]);
     localStorage.removeItem('token');
     localStorage.removeItem('userId');
+    localStorage.removeItem('hasAdminOrStaffRole');
+    localStorage.removeItem('hasAdminRole');
+    localStorage.removeItem('hasStaffRole');
+    localStorage.removeItem('hasUserRole');
     delete axios.defaults.headers.common['Authorization'];
   };
 
@@ -52,7 +71,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, login, logout, hasAdminOrStaffRole, hasAdminRole, hasStaffRole, hasUserRole}}>
+    <AuthContext.Provider value={{ user, token, login, logout, hasAdminOrStaffRole, hasAdminRole, hasStaffRole, hasUserRole }}>
       {children}
     </AuthContext.Provider>
   );

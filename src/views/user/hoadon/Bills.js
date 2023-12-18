@@ -1,9 +1,6 @@
 import React from 'react';
-import { Link } from 'react-router-dom'
 import classnames from "classnames";
-import { Card, CardBody, Container, TabContent, TabPane, Nav, NavItem, NavLink, Row } from "reactstrap";
-import { connect } from 'react-redux';
-import { updateData } from './actions';
+import { TabContent, TabPane, Nav, NavItem, NavLink, Row } from "reactstrap";
 // core components
 import Confirm from "views/user/hoadon/Confirm.js";
 import Waitting from "views/user/hoadon/Waitting.js";
@@ -129,8 +126,5 @@ class Bills extends React.Component {
   }
 }
 
-const mapDispatchToProps = (dispatch) => ({
-  updateData: (tabId, newData) => dispatch(updateData(tabId, newData)),
-});
 
-export default connect(null, mapDispatchToProps)(Bills);
+export default Bills;
