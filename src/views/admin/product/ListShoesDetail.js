@@ -1167,6 +1167,9 @@ const ListShoesDetail = () => {
                                                     <InputGroup size="sm">
                                                         <Input type="search"
                                                             placeholder="Tìm kiếm theo mã..."
+                                                            value={search.code}
+                                                            name="code"
+                                                            onChange={(e) => onInputChange(e)}
                                                         />
                                                         <InputGroupAddon addonType="append">
                                                             <InputGroupText>

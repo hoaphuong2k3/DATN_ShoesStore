@@ -37,8 +37,7 @@ const Products = () => {
   const [page, setPage] = useState(0);
   const [size, setSize] = useState(5);
   const [search, setSearch] = useState({
-    code: "",
-    name: "",
+    codeOrName: "",
     brandId: null,
     originId: null,
     designStyleId: null,
@@ -425,8 +424,9 @@ const Products = () => {
                         <InputGroup size="sm">
                           <Input type="search"
                             placeholder="Tìm kiếm mã, tên sản phẩm..."
-                          // value={searchValue}
-                          // onChange={(e) => setSearchValue(e.target.value)}
+                            value={search.codeOrName}
+                            name="codeOrName"
+                            onChange={(e) => onInputChange(e)}
                           />
                           <InputGroupAddon addonType="append">
                             <InputGroupText>
