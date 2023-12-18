@@ -74,7 +74,7 @@ const Cart = () => {
       return;
     }
     if (quantity > 15) {
-      toast.error("Số lượng tối đa là 15");
+      toast.error("Số lượng tối đa là 30");
       return;
     }
     try {
