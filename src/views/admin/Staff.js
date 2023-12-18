@@ -451,7 +451,7 @@ const Staff = () => {
       ) {
         try {
           console.log(selectedId);
-          axiosInstance.patch("/staff/delete", { ids: [selectedId] });
+          axiosInstance.patch("/staff/delete", { ids: selectedId });
           fetchData();
           setSelectedId([]);
           toast.success("Xóa thành công ");
