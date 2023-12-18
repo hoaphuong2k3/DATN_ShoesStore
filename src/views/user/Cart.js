@@ -106,7 +106,7 @@ const Cart = () => {
           });
         });
       }
-    } catch (error) {}
+    } catch (error) { }
   };
 
   // select list product
@@ -158,7 +158,7 @@ const Cart = () => {
       if (window.confirm("Bạn có chắc chắn muốn xóa khách hàng đã chọn không?")) {
         try {
           console.log(selectedId);
-          axios.patch("http://localhost:33321/api/cart/delete", { ids: selectedId });
+          axios.patch(`http://localhost:33321/api/cart/delete/${idAccount}`, { id: selectedId });
           setSelectedId([]);
           toast.success("Xóa thành công ");
         } catch (error) {
@@ -172,7 +172,7 @@ const Cart = () => {
       }
     }
   };
-  
+
 
   useEffect(() => {
     if (cartData) {
@@ -250,8 +250,8 @@ const Cart = () => {
                   <div className="col-9 cart-col-1">
                     <div className="inner cart-tbody">
                       {cartData &&
-                      Array.isArray(cartData) &&
-                      cartData.length === 0 ? (
+                        Array.isArray(cartData) &&
+                        cartData.length === 0 ? (
                         <div id="zero-product-container">
                           <h4>Bạn không có sản phẩm nào trong giỏ hàng!</h4>
                           <ImSad id="sad-icon" />
@@ -297,7 +297,7 @@ const Cart = () => {
                                     />
                                     <p className="">
                                       <Link
-                                        to={`/shoes/productdetail/${item.id}`}
+                                        to={`/ shoes / productdetail / ${item.id} `}
                                       >
                                         <img
                                           src={`https://s3-ap-southeast-1.amazonaws.com/imageshoestore/${item.image}`}
@@ -307,13 +307,14 @@ const Cart = () => {
                                             marginRight: "6px",
                                             marginTop: "20px",
                                             borderRadius: "20%",
-                                          }}
+                                          }
+                                          }
                                           width={"60%"}
-                                          // height={"90px"}
+                                        // height={"90px"}
                                         />
-                                      </Link>
-                                    </p>
-                                  </div>
+                                      </Link >
+                                    </p >
+                                  </div >
                                   <div className="col-right col-9">
                                     <div className="box-product">
                                       <p className="name">
@@ -399,14 +400,14 @@ const Cart = () => {
                                       </p>
                                     </div>
                                   </div>
-                                </div>
+                                </div >
                               ))}
-                            </div>
-                          </tbody>
-                        </Table>
+                            </div >
+                          </tbody >
+                        </Table >
                       )}
-                    </div>
-                  </div>
+                    </div >
+                  </div >
                   <div className="col-3 mt-4 cart-col-1">
                     <div className="each-row">
                       <div className="box-style fee mb-4">
@@ -450,12 +451,12 @@ const Cart = () => {
                       </div>
                     </div>
                   </div>
-                </div>
-              </CardBody>
-            </Card>
-          </div>
-        </div>
-      </Container>
+                </div >
+              </CardBody >
+            </Card >
+          </div >
+        </div >
+      </Container >
     </>
   );
 };
