@@ -40,6 +40,7 @@ const Checkout = () => {
   const storedUserId = localStorage.getItem("userId");
   const [voucher, setVoucher] = useState([]);
   const [checkout, setCheckout] = useState([]);
+  const [shippingTotal, setShippingTotal] = useState(0);
 
   const formatter = new Intl.NumberFormat("vi-VN", {
     style: "currency",
@@ -161,7 +162,6 @@ const Checkout = () => {
   }, []);
 
   const calculatePayment = () => {
-    // let shippingTotal = 0;
     return checkout.totalMoney +
       (checkout.periodType === 0
         ? -(checkout.totalMoney - checkout.totalPayment)
@@ -411,7 +411,6 @@ const Checkout = () => {
       addressDetail: "",
     });
   };
-  const [shippingTotal, setShippingTotal] = useState(0);
   const [selectedAddress, setSelectedAddress] = useState("");
 
   const handleApiCall = async (selectedAddress) => {
