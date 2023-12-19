@@ -158,8 +158,9 @@ const Cart = () => {
       if (window.confirm("Bạn có chắc chắn muốn xóa sản phẩm đã chọn không?")) {
         try {
           console.log(selectedId);
-          axios.delete(`http://localhost:33321/api/cart/delete/${storedUserId}`, { id: selectedId });
+          await axios.delete(`http://localhost:33321/api/cart/delete/${storedUserId}`, {data: { id: selectedId }});
           setSelectedId([]);
+          fetchData();
           toast.success("Xóa thành công ");
         } catch (error) {
           let errorMessage = "Lỗi từ máy chủ";
