@@ -12,6 +12,20 @@ import {
   Form,
   ButtonDropdown,
 } from "reactstrap";
+import {
+  FaEdit,
+  FaTrash,
+  FaSearch,
+  FaCamera,
+  FaLock,
+  FaLockOpen,
+  FaFilter,
+  FaTimesCircle,
+  FaUndoAlt,
+  FaSort,
+  FaTimes,
+  FaQrcode,
+} from "react-icons/fa";
 import { Link } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import Header from "components/Headers/Header";
@@ -106,7 +120,7 @@ const Cart = () => {
           });
         });
       }
-    } catch (error) { }
+    } catch (error) {}
   };
 
   // select list product
@@ -144,7 +158,7 @@ const Cart = () => {
       setShowActions(false);
       setSelectedItems([]);
     } else {
-      setSelectedId(cartData.map(x => x.id));
+      setSelectedId(cartData.map((x) => x.id));
       setShowActions(true);
 
       // Nếu chưa chọn, chọn tất cả
@@ -153,24 +167,30 @@ const Cart = () => {
     }
     setIsCheckedAll(!selectAll);
   };
-  
+
   const handleDeleteButtonClick = async () => {
     if (selectedId.length > 0) {
       if (window.confirm("Bạn có chắc chắn muốn xóa sản phẩm đã chọn không?")) {
         try {
           console.log(selectedId);
-          await axios.delete(`http://localhost:33321/api/cart/delete/${storedUserId}`, {data: { id: selectedId }});
+          await axios.delete(
+            `http://localhost:33321/api/cart/delete/${storedUserId}`,
+            { data: { id: selectedId } }
+          );
           setSelectedId([]);
           fetchData();
           toast.success("Xóa thành công ");
         } catch (error) {
           let errorMessage = "Lỗi từ máy chủ";
-          if (error.response && error.response.data && error.response.data.message) {
+          if (
+            error.response &&
+            error.response.data &&
+            error.response.data.message
+          ) {
             errorMessage = error.response.data.message;
           }
           toast.error(errorMessage);
         }
-
       }
     }
   };
@@ -251,8 +271,8 @@ const Cart = () => {
                   <div className="col-9 cart-col-1">
                     <div className="inner cart-tbody">
                       {cartData &&
-                        Array.isArray(cartData) &&
-                        cartData.length === 0 ? (
+                      Array.isArray(cartData) &&
+                      cartData.length === 0 ? (
                         <div id="zero-product-container">
                           <h4>Bạn không có sản phẩm nào trong giỏ hàng!</h4>
                           <ImSad id="sad-icon" />
@@ -261,7 +281,7 @@ const Cart = () => {
                         <Table className="cart-table full table--responsive">
                           <tbody>
                             <div className="cart-item">
-                              <div className="row">
+                              <Row className="row">
                                 <div className="col-3">
                                   <Input
                                     type="checkbox"
@@ -274,17 +294,17 @@ const Cart = () => {
                                 <div className="col-3">
                                   {showActions && (
                                     <Button
-                                      color="danger"
                                       outline
+                                      color="danger"
                                       size="sm"
                                       onClick={handleDeleteButtonClick}
                                     >
-                                      Xóa tất cả
+                                      <FaTrash />
                                     </Button>
                                   )}
                                 </div>
                                 {/* ... */}
-                              </div>
+                              </Row>
                               {(cartData || []).map((item, index) => (
                                 <div key={index} className="row">
                                   <div className="col-3 img">
@@ -308,14 +328,13 @@ const Cart = () => {
                                             marginRight: "6px",
                                             marginTop: "20px",
                                             borderRadius: "20%",
-                                          }
-                                          }
+                                          }}
                                           width={"60%"}
-                                        // height={"90px"}
+                                          // height={"90px"}
                                         />
-                                      </Link >
-                                    </p >
-                                  </div >
+                                      </Link>
+                                    </p>
+                                  </div>
                                   <div className="col-right col-9">
                                     <div className="box-product">
                                       <p className="name">
@@ -401,14 +420,14 @@ const Cart = () => {
                                       </p>
                                     </div>
                                   </div>
-                                </div >
+                                </div>
                               ))}
-                            </div >
-                          </tbody >
-                        </Table >
+                            </div>
+                          </tbody>
+                        </Table>
                       )}
-                    </div >
-                  </div >
+                    </div>
+                  </div>
                   <div className="col-3 mt-4 cart-col-1">
                     <div className="each-row">
                       <div className="box-style fee mb-4">
@@ -452,12 +471,12 @@ const Cart = () => {
                       </div>
                     </div>
                   </div>
-                </div >
-              </CardBody >
-            </Card >
-          </div >
-        </div >
-      </Container >
+                </div>
+              </CardBody>
+            </Card>
+          </div>
+        </div>
+      </Container>
     </>
   );
 };

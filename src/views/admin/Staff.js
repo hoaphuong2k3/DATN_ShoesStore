@@ -853,7 +853,7 @@ const Staff = () => {
                               {admin.status === 0 && (
                                 <Tooltip title="Xác nhận">
                                 <Popconfirm
-                                  title="Xác nhận xóa tài khoản?"
+                                  title="Xác nhận mở khóa tài khoản?"
                                   onConfirm={() =>
                                     updateStatus(admin.id, 1)
                                   }
@@ -869,7 +869,7 @@ const Staff = () => {
                               {admin.status === 1 && (
                                 <Tooltip title="Xác nhận">
                                 <Popconfirm
-                                  title="Xác nhận xóa tài khoản?"
+                                  title="Xác nhận khóa tài khoản?"
                                   onConfirm={() =>
                                     updateStatus(admin.id, 0)
                                   }
