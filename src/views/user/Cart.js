@@ -74,8 +74,8 @@ const Cart = () => {
       toast.error("Vui lòng chọn số lượng tối thiểu là 1");
       return;
     }
-    if (quantity > 30) {
-      toast.error("Số lượng tối đa là 30");
+    if (quantity > 15) {
+      toast.error("Số lượng tối đa là 15");
       return;
     }
     try {
@@ -153,6 +153,7 @@ const Cart = () => {
     }
     setIsCheckedAll(!selectAll);
   };
+  
   const handleDeleteButtonClick = async () => {
     if (selectedId.length > 0) {
       if (window.confirm("Bạn có chắc chắn muốn xóa sản phẩm đã chọn không?")) {
@@ -173,7 +174,6 @@ const Cart = () => {
       }
     }
   };
-
 
   useEffect(() => {
     if (cartData) {
