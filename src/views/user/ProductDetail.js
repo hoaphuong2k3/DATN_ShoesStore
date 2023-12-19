@@ -10,11 +10,13 @@ import { getAllColorId, getAllSizeId } from "services/ProductAttributeService";
 import { findShoes } from "services/Product2Service";
 import { toast } from 'react-toastify';
 import { Rate } from 'antd';
+import axios from "axios";
 
 const DetailProduct = () => {
   const storedUserId = localStorage.getItem("userId");
   const [productDetail, setProductDetail] = useState([]);
-  const { id } = useParams();
+  const { idShoesDetail } = useParams();
+  const [id, setId] = useState(null);
   const [listSizeById, setListSizeById] = useState([]);
   const [listColorById, setListColorById] = useState([]);
   const [idColor, setIdColor] = useState("");
@@ -26,10 +28,31 @@ const DetailProduct = () => {
     currency: "VND",
   });
   useEffect(() => {
+    getOneShoesDetail();
+  }, []);
+  useEffect(() => {
     getDetail();
     getlistColorById();
     getlistSizeById();
-  }, []);
+  }, [id]);
+  const getOneShoesDetail = async () => {
+    try {
+      let res = await axios.get(`/users/comment/getAll/${idShoesDetail}`);
+      console.log(res);
+      if (res && res.data) {
+        setId(res.data);
+        getAll(id, idSize, idColor);
+        setIdColor(res.data)
+        setIdSize(res.data)
+      }
+    } catch (error) {
+      let errorMessage = "Lỗi từ máy chủ";
+      if (error.response && error.response.data && error.response.data.message) {
+        errorMessage = error.response.data.message;
+        console.error(errorMessage);
+      }
+    }
+  }
   //Xử lý btn tắng giảm
   const [quantity, setQuantity] = useState(1);
 
@@ -53,60 +76,58 @@ const DetailProduct = () => {
   const [list, setList] = useState([]);
   const [averageVote, setAverageVote] = useState(null);
   useEffect(() => {
-    const getAll = async () => {
-      console.log("colorId:sizeId:", idColor, idSize)
-      try {
-        let res = await getOneShoesDetailUsers({ "shoesId": id, "sizeId": idSize, "colorId": idColor });
-        if (res && res.data) {
-          setshoesdetail(res.data);
-          if (res.data.detailResponse.quantity > 0) {
-            setSL(false);
-          } else {
-            setSL(true);
-          }
-          try {
-            const response = await axiosInstance.get(`/users/comment/getAll/${res.data.detailResponse.id}`);
-            console.log(response)
-            if (response && response.data) {
-              setList(response.data);
-              if (Array.isArray(response.data)) {
-                // Tính tổng các phần tử trong mảng vote
-                const totalVotes = response.data.reduce((accumulator, item) => accumulator + item.vote, 0);
-
-                // Tính giá trị trung bình với 1 chữ số sau thập phân
-                const averageVote = totalVotes / response.data.length;
-                const roundedAverageVote = averageVote.toFixed(1);
-
-                setAverageVote(roundedAverageVote);
-              } else {
-                console.error('response.data is not an array:', response.data);
-              }
-            }
-          } catch (error) {
-            console.error("Error:", error);
-            console.error("Response data:", error.response.data);
-          }
-        }
-      } catch (error) {
-        console.error(error);
-        setshoesdetail({});
-        setSL(true);
-      }
-    }
-    getAll();
+    getAll(id, idSize, idColor);
   }, [idColor, idSize]);
+  const getAll = async (idShoes, idS, idC) => {
+    console.log("colorId:sizeId:", idColor, idSize)
+    try {
+      let res = await getOneShoesDetailUsers({ "shoesId": idShoes, "sizeId": idS, "colorId": idC });
+      if (res && res.data) {
+        setshoesdetail(res.data);
+        if (res.data.detailResponse.quantity > 0) {
+          setSL(false);
+        } else {
+          setSL(true);
+        }
+        try {
+          const response = await axiosInstance.get(`/users/comment/getAll/${res.data.detailResponse.id}`);
+          console.log(response)
+          if (response && response.data) {
+            setList(response.data);
+            if (Array.isArray(response.data)) {
+              // Tính tổng các phần tử trong mảng vote
+              const totalVotes = response.data.reduce((accumulator, item) => accumulator + item.vote, 0);
+
+              // Tính giá trị trung bình với 1 chữ số sau thập phân
+              const averageVote = totalVotes / response.data.length;
+              const roundedAverageVote = averageVote.toFixed(1);
+
+              setAverageVote(roundedAverageVote);
+            } else {
+              console.error('response.data is not an array:', response.data);
+            }
+          }
+        } catch (error) {
+          console.error("Error:", error);
+          console.error("Response data:", error.response.data);
+        }
+      }
+    } catch (error) {
+      console.error(error);
+      setshoesdetail({});
+      setSL(true);
+    }
+  }
   const getlistColorById = async () => {
     let res = await getAllColorId(id);
     if (res && res.data) {
       setListColorById(res.data);
-      setIdColor(res.data[0].id);
     }
   }
   const getlistSizeById = async () => {
     let res = await getAllSizeId(id);
     if (res && res.data) {
       setListSizeById(res.data);
-      setIdSize(res.data[0].id);
     }
   }
   const getDetail = async () => {
@@ -163,11 +184,11 @@ const DetailProduct = () => {
             "id": shoesdetail.detailResponse.id,
             "quantity": quantity
           }),
-        });      
+        });
         const responseData = await response.json();
         console.log(responseData);
         // Chuyển hướng
-       window.location.href = window.location.href;
+        window.location.href = window.location.href;
       } catch (error) {
         let errorMessage = "Lỗi từ máy chủ";
         if (error.response && error.response.data && error.response.data.message) {
@@ -433,11 +454,11 @@ const DetailProduct = () => {
 
                           <div className='text-center btnInDetailSP'>
                             {/* <CartContext.Consumer> */}
-                              {/* {({ addToCart }) => ( */}
-                                <button className='btn btn-primary' onClick={() => handleAddCart()} disabled={sl === false ? false : true}>
-                                  Thêm vào giỏ hàng
-                                </button>
-                              {/* )}
+                            {/* {({ addToCart }) => ( */}
+                            <button className='btn btn-primary' onClick={() => handleAddCart()} disabled={sl === false ? false : true}>
+                              Thêm vào giỏ hàng
+                            </button>
+                            {/* )}
                              </CartContext.Consumer> */}
                             <button className='btn btn-warning' onClick={() => handleCheckout()} disabled={sl === false ? false : true}>Mua ngay</button>
                           </div>
