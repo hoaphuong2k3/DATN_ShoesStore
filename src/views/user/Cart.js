@@ -155,7 +155,7 @@ const Cart = () => {
   };
   const handleDeleteButtonClick = async () => {
     if (selectedId.length > 0) {
-      if (window.confirm("Bạn có chắc chắn muốn xóa khách hàng đã chọn không?")) {
+      if (window.confirm("Bạn có chắc chắn muốn xóa sản phẩm đã chọn không?")) {
         try {
           console.log(selectedId);
           axios.delete(`http://localhost:33321/api/cart/delete/${storedUserId}`, { id: selectedId });
