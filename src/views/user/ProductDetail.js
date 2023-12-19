@@ -40,8 +40,8 @@ const DetailProduct = () => {
   };
 
   const handleIncrease = () => {
-    if (quantity === 30) {
-      toast.error("Số lượng tối đa là 30");
+    if (quantity === 15) {
+      toast.error("Số lượng tối đa là 15");
     } else {
       setQuantity(quantity + 1);
     }
