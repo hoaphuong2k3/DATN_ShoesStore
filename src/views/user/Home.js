@@ -36,6 +36,8 @@ const Home = () => {
     autoplaySpeed: 2000, // Tốc độ trượt (ms)
   };
   const [products, setProducts] = useState([]);
+  const [top4Products, setTop4Products] = useState([]);
+  const [top4LotProducts, setTop4LotProducts] = useState([]);
   const [totalPages, setTotalPages] = useState(0);
   const [totalElements, setTotalElenments] = useState(0);
   const [page, setPage] = useState(0);
@@ -59,6 +61,11 @@ const Home = () => {
   }, [search]);
 
   useEffect(() => {
+    getTop4Sell();
+    getTop4SellLot();
+  }, []);
+
+  useEffect(() => {
     getListShoes(page, size, search);
   }, [page, size, search]);
 
@@ -68,6 +75,7 @@ const Home = () => {
       if (res && res.data && res.data.content) {
         setProducts(res.data.content);
         console.log(res.data);
+        console.log("????")
         setTotalElenments(res.data.totalElements);
         setTotalPages(res.data.totalPages);
       }
@@ -82,6 +90,47 @@ const Home = () => {
       }
       // toast.error(errorMessage);
       setProducts([]);
+    }
+  };
+
+  const getTop4Sell = async () => {
+    try {
+      let res = await axios.get("http://localhost:33321/api/user/shoes/get-top4/selling");
+      if (res && res.data.data) {
+        setTop4Products(res.data.data);
+      }
+    } catch (error) {
+      let errorMessage = "Lỗi từ máy chủ";
+      if (
+          error.response &&
+          error.response.data &&
+          error.response.data.message
+      ) {
+        errorMessage = error.response.data.message;
+      }
+      // toast.error(errorMessage);
+      setTop4Products([]);
+    }
+  };
+
+  const getTop4SellLot = async () => {
+    try {
+      let res = await axios.get("http://localhost:33321/api/user/shoes/get-top4/sell-lot");
+      if (res && res.data.data) {
+        setTop4LotProducts(res.data.data);
+        console.log(res.data.data);
+      }
+    } catch (error) {
+      let errorMessage = "Lỗi từ máy chủ";
+      if (
+          error.response &&
+          error.response.data &&
+          error.response.data.message
+      ) {
+        errorMessage = error.response.data.message;
+      }
+      // toast.error(errorMessage);
+      setTop4LotProducts([]);
     }
   };
 
@@ -175,15 +224,15 @@ const Home = () => {
                             title="NEW ARRIVALS"
                             className="text-dark"
                           >
-                            NEW ARRIVALS
+                            TOP 4 SẢN PHẨM BÁN CHẠY
                           </a>
                         </h2>
                       </section>
                       <div className="viewallcat hidden-xs"></div>
                     </div>
                     <div className="product-blocks clearfix row">
-                      {Array.isArray(products) ? (
-                        products.map((product) => (
+                      {Array.isArray(top4Products) ? (
+                          top4Products.map((product) => (
                           <div className="col-3">
                             <Card
                               className="product-card"
@@ -453,15 +502,15 @@ const Home = () => {
                             title="Espadrilles"
                             className="text-dark"
                           >
-                            Espadrilles
+                            TOP 4 SẢN PHẨM ĐƯỢC MUA NHIỀU NHẤT
                           </a>
                         </h2>
                       </section>
                       <div className="viewallcat hidden-xs"></div>
                     </div>
                     <div className="product-blocks clearfix row">
-                      {Array.isArray(products) ? (
-                        products.map((product) => (
+                      {Array.isArray(top4LotProducts) ? (
+                          top4LotProducts.map((product) => (
                           <div className="col-3">
                             <Card
                               className="product-card"
