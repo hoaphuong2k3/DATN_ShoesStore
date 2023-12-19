@@ -281,17 +281,17 @@ const Cart = () => {
                         <Table className="cart-table full table--responsive">
                           <tbody>
                             <div className="cart-item">
-                              <Row className="row">
-                                <div className="col-3">
+                            <Row className="align-items-center pb-4">
+                                <Col className="col-md-3">
                                   <Input
                                     type="checkbox"
-                                    className="checkbox_input_1"
+                                    style={{transform: "scale(1.4)"}}
                                     checked={selectAll}
                                     onChange={handleSelectAllChange}
                                   />
                                   {/* ... */}
-                                </div>
-                                <div className="col-3">
+                                </Col>
+                                <Col>
                                   {showActions && (
                                     <Button
                                       outline
@@ -302,7 +302,7 @@ const Cart = () => {
                                       <FaTrash />
                                     </Button>
                                   )}
-                                </div>
+                                </Col>
                                 {/* ... */}
                               </Row>
                               {(cartData || []).map((item, index) => (

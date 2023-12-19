@@ -1179,6 +1179,22 @@ const Confirm = () => {
                                             </div>
                                         </div>
                                     )}
+
+                                    {formData.fullnameClient && (
+                                        <>
+                                            <div className="d-flex" style={{ padding: "15px 0 5px 20px", boxShadow: "0 0 10px rgba(0, 0, 0, 0.1)" }}>
+                                                <h5 className="text-warning mr-2">Nhận hàng hoàn xu: </h5>
+                                                <h5>
+                                                    ({formData.totalMoney >= 10000000
+                                                        ? `${Math.floor(formData.totalMoney * 0.02)}`
+                                                        : `${Math.floor(formData.totalMoney * 0.01)}`
+                                                    })
+
+
+                                                </h5>
+                                            </div>
+                                        </>
+                                    )}
                                 </Col>
                             </Row>
 

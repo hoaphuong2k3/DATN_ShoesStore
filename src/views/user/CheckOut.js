@@ -41,7 +41,7 @@ const Checkout = () => {
   const [voucher, setVoucher] = useState([]);
   const [checkout, setCheckout] = useState([]);
   const [shippingTotal, setShippingTotal] = useState(0);
-
+  
   const formatter = new Intl.NumberFormat("vi-VN", {
     style: "currency",
     currency: "VND",
@@ -70,7 +70,23 @@ const Checkout = () => {
     setUsingPoints(!usingPoints);
   };
 
+  //Voucher
+  const fetchPromo = async () => {
+    try {
+      const res = await axiosInstance.get(`/vouchers/getAllIsActive?id=${storedUserId}`);
+      setVoucher(res.data);
+      console.log("Promo:", res.data);
+    } catch (error) {
+      console.error('Lỗi khi tải lại dữ liệu khách hàng:', error);
+    }
+  };
+  useEffect(() => {
+    fetchPromo();
+  }, []);
 
+  const getSelectedVoucherId = () => {
+    return selectedVoucherDetails ? selectedVoucherDetails.id : null;
+  };
   //Voucher
   const toggle = () => {
     setModal(!modal);
@@ -80,6 +96,7 @@ const Checkout = () => {
     setSelectedVoucherCode(code);
     setSearchValue(code);
   };
+
 
   const handleUseVoucherClick = () => {
     if (!selectedVoucherCode) {
@@ -122,24 +139,6 @@ const Checkout = () => {
     }
   }, [searchValue, voucher]);
 
-
-  //Voucher
-  const fetchPromo = async () => {
-    try {
-      const res = await axiosInstance.get(`/vouchers/getAllIsActive?id=${storedUserId}`);
-      setVoucher(res.data);
-      console.log("Promo:", res.data);
-    } catch (error) {
-      console.error('Lỗi khi tải lại dữ liệu khách hàng:', error);
-    }
-  };
-  useEffect(() => {
-    fetchPromo();
-  }, []);
-
-  const getSelectedVoucherId = () => {
-    return selectedVoucherDetails ? selectedVoucherDetails.id : null;
-  };
 
   //Checkout
   const fetchCheckout = async () => {
@@ -696,8 +695,8 @@ const Checkout = () => {
                       </Button>
 
 
-                      {checkout.totalPoints !== 0  && (
-                        
+                      {checkout.totalPoints !== 0 && (
+
                         <>
                           <div className="mt-2" style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
                             <small className="mr-1">Xu tích lũy: {displayedPoints}</small>

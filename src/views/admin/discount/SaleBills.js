@@ -58,18 +58,6 @@ const SaleBills = () => {
     });
 
     const [searchTerm, setSearchTerm] = useState('');
-    const filterDiscount = discounts.filter((discount) => {
-        if (searchTerm === '') {
-            return true;
-        } else {
-            return discount.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                discount.name.toLowerCase().includes(searchTerm.toLowerCase());
-        }
-    });
-    const handleSearch = (term) => {
-        setSearchTerm(term);
-        setQueryParams(prevParams => ({ ...prevParams, page: 0, searchTerm: term }));
-    };
 
     //loads table
     const fetchData = async () => {
@@ -85,7 +73,6 @@ const SaleBills = () => {
         }
     };
     useEffect(() => {
-        console.log(queryParams);
         fetchData();
         const intervalId = setInterval(() => {
             fetchData();
@@ -694,7 +681,7 @@ const SaleBills = () => {
                 style={{ maxWidth: '800px' }}
             >
                 <ModalHeader toggle={toggle}>
-                    <h3 className="heading-small text-muted mb-0">{formData.id ? 'Cập Nhật Khuyến mại' : 'Thêm Mới Khuyến mại'}</h3>
+                    <h3 className="heading-small text-muted mb-0">{formData.id ? 'Cập Nhật Khuyến mãi' : 'Thêm Mới Khuyến mãi'}</h3>
 
                 </ModalHeader>
                 <ModalBody>

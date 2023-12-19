@@ -87,6 +87,7 @@ const Products = ({ onSelectProducts }) => {
         })
     };
 
+    //get thuoctinh
     const getlistBrand = async () => {
         let res = await getAllBrand();
         console.log(res);
@@ -140,18 +141,6 @@ const Products = ({ onSelectProducts }) => {
         setSearch({ ...search, [e.target.name]: e.target.value });
     };
 
-    useEffect(() => {
-        getAll(page, size);
-        getlistBrand();
-        getListOrigin();
-        getListDesignStyle();
-        getListSkinType();
-        getListToe();
-        getListSole();
-        getListLining();
-        getListCushion();
-    }, []);
-
     //getListShoes
     const getAll = async () => {
         try {
@@ -166,12 +155,29 @@ const Products = ({ onSelectProducts }) => {
             setListShoes([]);
         }
     }
+
     useEffect(() => {
         getAll(page, size);
+        getlistBrand();
+        getListOrigin();
+        getListDesignStyle();
+        getListSkinType();
+        getListToe();
+        getListSole();
+        getListLining();
+        getListCushion();
     }, [search]);
+
+    useEffect(() => {
+        getAll(page, size, search);
+    }, [page, size, search]);
 
     const handlePageChange = ({ selected }) => {
         setSearch(prevSearch => ({ ...prevSearch, page: selected }));
+    };
+
+    const handlePageClick = (event) => {
+        setPage(+event.selected);
     };
 
     //getShoesDetail
@@ -404,19 +410,33 @@ const Products = ({ onSelectProducts }) => {
                     </Row>
                 ))}
             {/* Phân trang */}
-            <Row className="col" style={{ justifyContent: "center" }}>
-                <ReactPaginate
-                    pageCount={totalPages}
-                    pageRangeDisplayed={5}
-                    marginPagesDisplayed={2}
-                    previousLabel={'<'}
-                    nextLabel={'>'}
-                    breakLabel={'...'}
-                    onPageChange={handlePageChange}
-                    containerClassName={'pagination'}
-                    activeClassName={'active'}
-                />
-            </Row>
+            <div className="col-md-12">
+                <Col
+                    style={{ fontSize: 11 }}
+                    className="mt--1 d-flex justify-content-center"
+                >
+                    <ReactPaginate
+                        breakLabel="..."
+                        nextLabel=">"
+                        pageRangeDisplayed={1}
+                        pageCount={totalPages}
+                        previousLabel="<"
+                        onPageChange={handlePageClick}
+                        renderOnZeroPageCount={null}
+                        pageClassName="page-item"
+                        pageLinkClassName="page-link"
+                        previousClassName="page-item"
+                        previousLinkClassName="page-link"
+                        nextClassName="page-item"
+                        nextLinkClassName="page-link"
+                        breakClassName="page-item"
+                        breakLinkClassName="page-link"
+                        containerClassName="pagination circular-pagination"
+                        activeClassName="active"
+                        marginPagesDisplayed={1}
+                    />
+                </Col>
+            </div>
 
 
             <Modal
@@ -510,34 +530,37 @@ const Products = ({ onSelectProducts }) => {
 
                             </div>
 
-
                             <div className='row p-2'>
-                                <span className='col-3'>Số lượng :  </span>
-                                <span className='col-9 d-flex'>
-                                    <Input
-                                        className="text-center mr-2 ml-2"
-                                        type="number"
-                                        size="sm"
-                                        min={1}
-                                        style={{ width: "50px" }}
-                                        value={inputQuantity}
-                                        onChange={(e) => setInputQuantity(parseInt(e.target.value, 10) || 1)}
-                                    /> sản phẩm
-
-                                    {/* &nbsp;&nbsp;
-                                    {sl === false
-                                        ? <span> {shoesdetail.shoesDetailSearchResponse.quantity} &nbsp;sản phẩm có sẵn</span>
-                                        : <span style={{ color: "red" }}>Sản phẩm này đã hết hàng</span>
-                                    } */}
-                                </span>
+                                <span className='col-3'>Số lượng: </span>
+                                {shoesdetail.shoesDetailSearchResponse && sl === false && (
+                                    <span className='col-9 d-flex'>
+                                        <Input
+                                            className="text-center mr-2 ml-2"
+                                            type="number"
+                                            size="sm"
+                                            min={1}
+                                            max={shoesdetail.shoesDetailSearchResponse.quantity <= 15 ? shoesdetail.shoesDetailSearchResponse.quantity : 15}
+                                            style={{ width: "50px" }}
+                                            value={inputQuantity}
+                                            onChange={(e) => setInputQuantity(parseInt(e.target.value, 10) || 1)}
+                                        />
+                                        &nbsp;&nbsp;
+                                        {sl === false && (
+                                            <span> {shoesdetail.shoesDetailSearchResponse.quantity} &nbsp;sản phẩm có sẵn</span>
+                                        )}
+                                    </span>
+                                )}
+                                {sl === true && <span style={{ color: "red" }}> &nbsp; &nbsp; Sản phẩm này đã hết hàng</span>}
                             </div>
+
+
                         </Col>
                     </Row>
 
                 </ModalBody >
                 <ModalFooter>
                     <div className="text-center">
-                        <Button color="primary" outline size="sm" onClick={handleConfirmation}>
+                        <Button color="primary" outline size="sm" onClick={handleConfirmation} disabled={sl === true}>
                             Xác nhận
                         </Button>
                         <Button color="danger" outline onClick={toggle} size="sm">
@@ -548,10 +571,11 @@ const Products = ({ onSelectProducts }) => {
             </Modal >
 
             {/* Lọc */}
-            <Modal
+            <Modal Modal
                 isOpen={thirdModal}
                 toggle={toggleThirdModal}
-                style={{ maxWidth: '400px', right: 'unset', left: 0, position: 'fixed', marginLeft: '252px', marginRight: 0 }}
+                style={{ maxWidth: '400px', right: 'unset', left: 0, position: 'fixed', marginLeft: '252px', marginRight: 0 }
+                }
                 backdrop={false}
             >
                 <ModalHeader toggle={toggleThirdModal}>
@@ -801,7 +825,7 @@ const Products = ({ onSelectProducts }) => {
                     </Button>
                 </ModalFooter>
 
-            </Modal>
+            </Modal >
         </>
     );
 };

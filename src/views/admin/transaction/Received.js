@@ -43,12 +43,12 @@ const Received = ({ updateData }) => {
 
     //search
     const [searchTerm, setSearchTerm] = useState('');
-    const filterConfirm  = confirm.filter((admin) => {
-      if (searchTerm === '') {
-        return true;
-      } else {
-        return admin.code.toLowerCase().includes(searchTerm.toLowerCase());
-      }
+    const filterConfirm = confirm.filter((admin) => {
+        if (searchTerm === '') {
+            return true;
+        } else {
+            return admin.code.toLowerCase().includes(searchTerm.toLowerCase());
+        }
     });
     const handleSearch = (term) => {
         setSearchTerm(term);
@@ -95,7 +95,7 @@ const Received = ({ updateData }) => {
 
             const response = await axiosInstance.get("/order/admin", {
                 params: queryParams,
-                
+
             });
             setConfirm(response.content);
             setTotalElements(response.totalElements);
@@ -111,12 +111,12 @@ const Received = ({ updateData }) => {
 
     const handlePageChange = ({ selected }) => {
         setQueryParams(prevParams => ({ ...prevParams, page: selected }));
-        
+
     };
 
     const handleSizeChange = (e) => {
         const newSize = parseInt(e.target.value);
-        setQueryParams({ ...queryParams, size: newSize, page: 0});
+        setQueryParams({ ...queryParams, size: newSize, page: 0 });
     };
 
     const calculateIndex = (index) => {
@@ -332,33 +332,33 @@ const Received = ({ updateData }) => {
                         </thead>
                         <tbody style={{ color: "black" }}>
                             {Array.isArray(filterConfirm) && filterConfirm.map((confirm, index) => (
-                                        <tr key={confirm.id}>
-                                            <td className="text-center pt-0">
-                                                <FormGroup check>
-                                                    <Input type="checkbox"
-                                                        onChange={() => handleCheckboxChange(confirm.id)}
-                                                        checked={selectedIds.includes(confirm.id)} />
-                                                </FormGroup>
-                                            </td>
-                                            <td className="text-center">{calculateIndex(index)}</td>
-                                            <td>{confirm.code}</td>
-                                            <td>{confirm.fullnameClient}</td>
-                                            <td>{confirm.phoneNumber}</td>
-                                            <td className="text-right">{formatter.format(confirm.totalPayment)}</td>
-                                            <td className="text-center">
-                                                <Badge color={paymentMethodColors[confirm.paymentMethod]?.color || "secondary"}>
-                                                    {paymentMethodColors[confirm.paymentMethod]?.label || "Không xác định"}
-                                                </Badge>
-                                            </td>
+                                <tr key={confirm.id}>
+                                    <td className="text-center pt-0">
+                                        <FormGroup check>
+                                            <Input type="checkbox"
+                                                onChange={() => handleCheckboxChange(confirm.id)}
+                                                checked={selectedIds.includes(confirm.id)} />
+                                        </FormGroup>
+                                    </td>
+                                    <td className="text-center">{calculateIndex(index)}</td>
+                                    <td>{confirm.code}</td>
+                                    <td>{confirm.fullnameClient}</td>
+                                    <td>{confirm.phoneNumber}</td>
+                                    <td className="text-right">{formatter.format(confirm.totalPayment)}</td>
+                                    <td className="text-center">
+                                        <Badge color={paymentMethodColors[confirm.paymentMethod]?.color || "secondary"}>
+                                            {paymentMethodColors[confirm.paymentMethod]?.label || "Không xác định"}
+                                        </Badge>
+                                    </td>
 
-                                            <td>{confirm.fullnameStaff}</td>
-                                            <td>{format(new Date(confirm.createdTime), 'dd-MM-yyyy HH:mm', { locale: vi })}</td>
-                                            <td>{format(new Date(confirm.updatedTime), 'dd-MM-yyyy HH:mm', { locale: vi })}</td>
-                                            <td className="text-center" style={{ position: "sticky", zIndex: '1', right: '0', background: "#fff" }}>
-                                                <Button color="link" size="sm" onClick={() => handleRowClick(confirm.id, confirm)}><FaRegEdit /></Button>
-                                            </td>
-                                        </tr>
-                                    ))}
+                                    <td>{confirm.fullnameStaff}</td>
+                                    <td>{format(new Date(confirm.createdTime), 'dd-MM-yyyy HH:mm', { locale: vi })}</td>
+                                    <td>{format(new Date(confirm.updatedTime), 'dd-MM-yyyy HH:mm', { locale: vi })}</td>
+                                    <td className="text-center" style={{ position: "sticky", zIndex: '1', right: '0', background: "#fff" }}>
+                                        <Button color="link" size="sm" onClick={() => handleRowClick(confirm.id, confirm)}><FaRegEdit /></Button>
+                                    </td>
+                                </tr>
+                            ))}
                         </tbody>
                     </Table>
 
@@ -790,6 +790,22 @@ const Received = ({ updateData }) => {
                                                 </div>
                                             </div>
                                         </div>
+                                    )}
+
+                                    {formData.fullnameClient && (
+                                        <>
+                                            <div className="d-flex" style={{ padding: "15px 0 5px 20px", boxShadow: "0 0 10px rgba(0, 0, 0, 0.1)" }}>
+                                                <h5 className="text-warning mr-2">Nhận hàng hoàn xu: </h5>
+                                                <h5>
+                                                    ({formData.totalMoney >= 10000000
+                                                        ? `${Math.floor(formData.totalMoney * 0.02)}`
+                                                        : `${Math.floor(formData.totalMoney * 0.01)}`
+                                                    })
+
+
+                                                </h5>
+                                            </div>
+                                        </>
                                     )}
                                 </Col>
                             </Row>

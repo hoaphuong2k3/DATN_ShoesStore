@@ -16,7 +16,7 @@ class Bills extends React.Component {
 
     this.toggle = this.toggle.bind(this);
     this.state = {
-      activeTab: '1',
+      activeTab: '0',
       counts: {
         '0': 0,
         '1': 0,

@@ -326,7 +326,7 @@ const SaleProduct = () => {
     //status
     const statusMapping = {
         0: { color: 'success', label: 'Kích hoạt' },
-        1: { color: 'yellow', label: 'Chờ kích hoạt' },
+        1: { color: 'warning', label: 'Chờ kích hoạt' },
         2: { color: 'danger', label: 'Ngừng kích hoạt' }
     };
 

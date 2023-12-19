@@ -48,6 +48,7 @@ const Order = () => {
     const [searchTerm, setSearchTerm] = useState("");
     const [searchResults, setSearchResults] = useState([]);
     const [selectedClient, setSelectedClient] = useState(null);
+    const [reloadInterval, setReloadInterval] = useState(null);
 
     const [client, setClient] = useState({
         id: null,
@@ -61,15 +62,32 @@ const Order = () => {
         try {
             const response = await axiosInstance.get('/client/admin');
             setClients(response.content);
-            const res = await axiosInstance.get('/store/find-discount_period');
-            setPromo(res.data);
-
         } catch (error) {
             console.error('Lỗi khi tải lại dữ liệu khách hàng:', error);
         }
     };
+
+    const fetchDiscount = async () => {
+        try {
+            const res = await axiosInstance.get('/store/find-discount_period');
+            setPromo(res.data);
+            console.log(res.data);
+        } catch (error) {
+            console.error('Lỗi khi tải lại dữ liệu khách hàng:', error);
+        }
+    };
+
     useEffect(() => {
         fetchClients();
+        fetchDiscount();
+        const intervalId = setInterval(() => {
+            fetchClients();
+        }, 1000);
+        setReloadInterval(intervalId);
+
+        return () => {
+            clearInterval(intervalId);
+        };
     }, []);
 
     //search Client
@@ -229,6 +247,16 @@ const Order = () => {
         }
     };
 
+    useEffect(() => {
+        if (showShippingForm && selectedClient) {
+            setRecipientName(selectedClient.fullname);
+            setRecipientPhone(selectedClient.phoneNumber);
+        } else {
+            setRecipientName('');
+            setRecipientPhone('');
+        }
+    }, [showShippingForm, selectedClient]);
+
     //Product
     const [result, setResult] = useState("");
     const [shoesDetail, setShoesDetail] = useState(null);
@@ -292,7 +320,7 @@ const Order = () => {
     const handleQuantityChange = (e, index) => {
         const newQuantity = parseInt(e.target.value, 10) || 0;
 
-        if (newQuantity <= 30) {
+        if (newQuantity <= 15) {
 
             const updatedProducts = [...selectedProducts];
             updatedProducts[index].quantity = newQuantity;
@@ -574,7 +602,7 @@ const Order = () => {
                                                 <td>
                                                     <Input className="text-center m-auto"
                                                         type="number"
-                                                        size="sm" min={1}
+                                                        size="sm" min={1} max={15}
                                                         style={{ width: "50px" }}
                                                         value={detail.quantity}
                                                         onChange={(e) => handleQuantityChange(e, index)}
@@ -639,11 +667,11 @@ const Order = () => {
                     <Col lg="12">
                         <Card style={{ boxShadow: "0 0 10px rgba(0, 0, 0, 0.2)" }}>
                             <CardHeader>
-                                <Row>
-                                    <Col md={7} >
+                                <Row className="align-items-center">
+                                    <div className="col">
                                         <h4>Khách hàng</h4>
-                                    </Col>
-                                    <Col md={5} className="pr-0">
+                                    </div>
+                                    <div className="col text-right">
                                         <Row>
                                             <InputGroup size="sm" style={{ width: 200 }}>
                                                 <Input
@@ -659,9 +687,8 @@ const Order = () => {
                                                         }
                                                     }}
                                                 />
-
                                             </InputGroup>
-                                            <FaUserPlus className="m-2" style={{ cursor: "pointer" }} onClick={toggle2} />
+                                            <FaUserPlus className="mt-2 ml-3" style={{ cursor: "pointer" }} onClick={toggle2} />
                                         </Row>
                                         <Row>
                                             <Form style={{ position: "absolute", zIndex: 1, background: "#fff" }}>
@@ -683,7 +710,7 @@ const Order = () => {
                                                 )}
                                             </Form>
                                         </Row>
-                                    </Col>
+                                    </div>
 
 
                                 </Row>
@@ -919,7 +946,7 @@ const Order = () => {
                                 </Row>
                                 {promo && promo.minPrice !== null && totalAmount >= promo.minPrice && promo.typePeriod === 0 && (
                                     <Row className="mb-1">
-                                        <Label className="col">Voucher của shop:</Label>
+                                        <Label className="col">Voucher của shop: <small className="text-danger">({promo.salePercent}%)</small></Label>
                                         <Col className="text-right">
                                             <h5>{formatter.format(-(promo.salePercent / 100) * totalAmount)}</h5>
                                         </Col>
@@ -1177,11 +1204,11 @@ const Order = () => {
                 </ModalBody >
                 <ModalFooter>
                     <div className="text-center">
-                        <Button color="primary" outline size="sm" onClick={resetClient}>
-                            Làm mới
-                        </Button>
                         <Button color="primary" outline size="sm" onClick={onAddClient}>
                             Thêm
+                        </Button>
+                        <Button color="primary" outline size="sm" onClick={resetClient}>
+                            Làm mới
                         </Button>
                         <Button color="danger" outline onClick={toggle2} size="sm">
                             Đóng
