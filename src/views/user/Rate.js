@@ -27,7 +27,6 @@ const Rate = (props) => {
                         <Row>
                             <span className="col-9">
                                 <h3>Lịch sử đánh giá</h3>
-                                <div>Quản lý thông tin địa chỉ</div>
                             </span>
                         </Row>
                     </CardTitle>
