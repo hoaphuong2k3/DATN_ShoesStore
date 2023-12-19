@@ -40,7 +40,11 @@ const DetailProduct = () => {
   };
 
   const handleIncrease = () => {
-    setQuantity(quantity + 1);
+    if (quantity === 30) {
+      toast.error("Số lượng tối đa là 30");
+    } else {
+      setQuantity(quantity + 1);
+    }
   };
 
   //End Xử lý btn tắng giảm
@@ -148,10 +152,6 @@ const DetailProduct = () => {
 
   const handleAddCart = async () => {
     if (storedUserId) {
-      if (quantity > 15) {
-        toast.error("Số lượng tối đa là 15");
-        return;
-      }
       try {
         const response = await fetch("http://localhost:33321/api/cart/add", {
           method: "POST",
@@ -186,10 +186,6 @@ const DetailProduct = () => {
 
   const handleCheckout = async () => {
     if (storedUserId) {
-      if (quantity > 15) {
-        toast.error("Số lượng tối đa là 15");
-        return;
-      }
       try {
         const response = await fetch("http://localhost:33321/api/cart/byNow", {
           method: "POST",

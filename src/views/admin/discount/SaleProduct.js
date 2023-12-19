@@ -25,6 +25,7 @@ const SaleProduct = () => {
     const [modal, setModal] = useState(false);
     const toggle = () => setModal(!modal);
     const handleModal = () => {
+        setPage(0);
         resetForm();
         resetSearch();
         setModal(true);
@@ -36,7 +37,10 @@ const SaleProduct = () => {
     });
 
     const [secondModal, setSecondModal] = useState(false);
-    const toggleSecondModal = () => setSecondModal(!secondModal);
+    const toggleSecondModal = () => {
+        setPage4(0);
+        setSecondModal(!secondModal);
+    }
 
     const [thirdModal, setThirdModal] = useState(false);
     const toggleThirdModal = () => setThirdModal(!thirdModal);
@@ -52,7 +56,6 @@ const SaleProduct = () => {
     const [totalPages, setTotalPages] = useState(0);
 
     const [page, setPage] = useState(0);
-    const [size, setSize] = useState(5);
     const [totalPages2, setTotalPages2] = useState(0);
     const [totalElements2, setTotalElenments2] = useState(0);
 
@@ -183,7 +186,7 @@ const SaleProduct = () => {
 
     const getAll1 = async () => {
         try {
-            let res = await getAllShoesUser(page, size, search);
+            let res = await getAllShoesUser(page, 5, search);
             if (res && res.data && res.data.content) {
                 setListShoes(res.data.content);
                 setTotalPages2(res.data.totalPages);
@@ -195,7 +198,7 @@ const SaleProduct = () => {
     }
 
     useEffect(() => {
-        getAll1(page, size);
+        getAll1();
         getlistBrand();
         getListOrigin();
         getListDesignStyle();
@@ -208,7 +211,7 @@ const SaleProduct = () => {
 
     useEffect(() => {
         getAll1();
-    }, [search, page, size]);
+    }, [search, page]);
 
     const onInputChange = (e) => {
         setSearch({ ...search, [e.target.name]: e.target.value });
@@ -219,24 +222,32 @@ const SaleProduct = () => {
     };
 
     //loads productDetail
+    const [totalPages4, setTotalPages4] = useState(0);
+    const [page4, setPage4] = useState(0);
+    const handlePageClick4 = (event) => {
+        setPage4(+event.selected);
+    };
+    const [shoesDetailId, setShoesDetailId] = useState(null);
     const handleEditButtonClick = async (shoesId) => {
         try {
-            const response = await getAllShoesDetail2(shoesId, 0, 5, search2);
+            setShoesDetailId(shoesId);
+            const response = await getAllShoesDetail2(shoesId, page4, 5, search2);
             if (response) {
-
                 setSelectedShoesDetails(response.data.content);
                 const mapping = { ...shoesDetailMapping };
                 mapping[shoesId] = response.data.content.map(detail => detail.shoesDetailSearchResponse.id);
                 setShoesDetailMapping(mapping);
-
+                setTotalPages4(response.data.totalPages);
             }
             setSecondModal(true);
 
         } catch (error) {
             setSelectedShoesDetails([]);
-
         }
     };
+    useEffect(() => {
+        handleEditButtonClick(shoesDetailId);
+    }, [page4]);
 
     //load productPromo
     const getProductPromo = async (discount) => {
@@ -1260,6 +1271,33 @@ const SaleProduct = () => {
                             ))}
                         </tbody>
                     </Table>
+                    <Row className="col-md-12 mt-2">
+                        <Col
+                            style={{ fontSize: 11 }}
+                            className="mt--1 d-flex justify-content-center"
+                        >
+                            <ReactPaginate
+                                breakLabel="..."
+                                nextLabel=">"
+                                pageRangeDisplayed={1}
+                                pageCount={totalPages4}
+                                previousLabel="<"
+                                onPageChange={handlePageClick4}
+                                renderOnZeroPageCount={null}
+                                pageClassName="page-item"
+                                pageLinkClassName="page-link"
+                                previousClassName="page-item"
+                                previousLinkClassName="page-link"
+                                nextClassName="page-item"
+                                nextLinkClassName="page-link"
+                                breakClassName="page-item"
+                                breakLinkClassName="page-link"
+                                containerClassName="pagination circular-pagination"
+                                activeClassName="active"
+                                marginPagesDisplayed={1}
+                            />
+                        </Col>
+                    </Row>
 
                 </ModalBody>
                 <ModalFooter>
