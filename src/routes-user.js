@@ -67,7 +67,7 @@ var routes = [
     component: <Account tab="rate" />,
   },
   {
-    path: "/productdetail/:id",
+    path: "/productdetail/:idShoesDetail",
     component: <ProductDetail />,
     layout: "/shoes",
   },
