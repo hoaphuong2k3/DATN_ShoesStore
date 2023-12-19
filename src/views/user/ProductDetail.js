@@ -162,20 +162,17 @@ const DetailProduct = () => {
             "id": shoesdetail.detailResponse.id,
             "quantity": quantity
           }),
-        });
-
-        if (!response.ok) {
-          throw new Error(
-            "Có lỗi xảy ra khi thực hiện thanh toán. Vui lòng thử lại sau."
-          );
-        }
-
+        });      
         const responseData = await response.json();
         console.log(responseData);
         // Chuyển hướng
         // window.location.href = "/shoes/cart";
       } catch (error) {
-        console.error("Lỗi trong quá trình thanh toán:", error);
+        let errorMessage = "Lỗi từ máy chủ";
+        if (error.response && error.response.data && error.response.data.message) {
+          errorMessage = error.response.data.message;
+        }
+        toast.error(errorMessage);
       }
     } else {
       toast.success("Bạn cần đăng nhập để có thể tiếp tục !!!!")
@@ -230,6 +227,15 @@ const DetailProduct = () => {
     const formattedDate = `${dateObject.getFullYear()}/${(dateObject.getMonth() + 1).toString().padStart(2, '0')}/${dateObject.getDate().toString().padStart(2, '0')} ${dateObject.getHours().toString().padStart(2, '0')}:${dateObject.getMinutes().toString().padStart(2, '0')}:${dateObject.getSeconds().toString().padStart(2, '0')}`;
     return formattedDate;
   }
+  const handleInputChange = (e) => {
+    const inputValue = e.target.value;
+
+    if (inputValue === '' || !/^\d+$/.test(inputValue)) {
+      setQuantity(1);
+    } else {
+      setQuantity(Math.min(inputValue, 15));
+    }
+  };
 
   return (
     <>
@@ -404,12 +410,14 @@ const DetailProduct = () => {
                                   <button className='btntanggiam' onClick={handleDecrease}>-</button>
                                   <input
                                     className="soluong"
-                                    type="text"
+                                    type="number"
                                     role="spinbutton"
                                     aria-live="assertive"
                                     aria-valuenow={quantity}
                                     value={quantity}
-                                    readOnly
+                                    min={1}
+                                    max={15}
+                                    onChange={handleInputChange}
                                   />
                                   <button className='btntanggiam' onClick={handleIncrease} disabled={quantity === shoesdetail.detailResponse.quantity ? true : false}>+</button>
                                   &nbsp;&nbsp;
