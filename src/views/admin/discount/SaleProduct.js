@@ -537,8 +537,21 @@ const SaleProduct = () => {
 
     const saveDiscount = async () => {
         try {
-            const formattedStartDate = formatDateTime(formData.startDate);
-            const formattedEndDate = formatDateTime(formData.endDate);
+
+            let formattedStartDate = "";
+            let formattedEndDate = "";
+            
+            if (formData.startDate === "") {
+                formattedStartDate = "";
+            } else {
+                formattedStartDate = formatDateTime(formData.startDate);
+            }
+            
+            if (formData.endDate === "") {
+                formattedEndDate = "";
+            } else {
+                formattedEndDate = formatDateTime(formData.endDate);
+            }
 
             if (formData.id) {
                 await axiosInstance.put(`/promos/updatePromos`, {

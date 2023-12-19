@@ -298,11 +298,20 @@ const SaleBills = () => {
     const saveDiscount = async () => {
         try {
 
-            await discountSchema.validate(formData, { abortEarly: false });
-
-            const formattedStartDate = formatDateTime(formData.startDate);
-            const formattedEndDate = formatDateTime(formData.endDate);
-
+            let formattedStartDate = "";
+            let formattedEndDate = "";
+            
+            if (formData.startDate === "") {
+                formattedStartDate = "";
+            } else {
+                formattedStartDate = formatDateTime(formData.startDate);
+            }
+            
+            if (formData.endDate === "") {
+                formattedEndDate = "";
+            } else {
+                formattedEndDate = formatDateTime(formData.endDate);
+            }
             if (formData.id) {
                 await axiosInstance.put(`/vouchers/updateVoucher`, {
                     id: formData.id,
@@ -341,19 +350,15 @@ const SaleBills = () => {
             setModal(false);
             resetForm();
             setValidationErrors({});
-        } catch (validationError) {
-            if (validationError.inner) {
-                const errors = {};
-                validationError.inner.forEach(error => {
-                    errors[error.path] = error.message;
-                });
-                setValidationErrors(errors);
-                console.log(errors);
+        } catch (error) {
+            console.error("Error:", error);
+            if (error.response) {
+                console.error("Response data:", error.response.data);
+                toast.error(error.response.data.message);
             } else {
-                console.error(validationError.message);
+                toast.error("Đã có lỗi xảy ra.");
             }
         }
-
     };
 
     //Update status
