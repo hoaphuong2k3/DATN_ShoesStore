@@ -42,6 +42,7 @@ const DetailProduct = () => {
   const handleIncrease = () => {
     setQuantity(quantity + 1);
   };
+
   //End Xử lý btn tắng giảm
 
   const [sl, setSL] = useState(false);
@@ -173,7 +174,7 @@ const DetailProduct = () => {
         const responseData = await response.json();
         console.log(responseData);
         // Chuyển hướng
-        // window.location.href = "/shoes/cart";
+       window.location.href = window.location.href;
       } catch (error) {
         console.error("Lỗi trong quá trình thanh toán:", error);
       }
@@ -427,13 +428,13 @@ const DetailProduct = () => {
                           </div>
 
                           <div className='text-center btnInDetailSP'>
-                            <CartContext.Consumer>
-                              {({ addToCart }) => (
+                            {/* <CartContext.Consumer> */}
+                              {/* {({ addToCart }) => ( */}
                                 <button className='btn btn-primary' onClick={() => handleAddCart()} disabled={sl === false ? false : true}>
                                   Thêm vào giỏ hàng
                                 </button>
-                              )}
-                            </CartContext.Consumer>
+                              {/* )}
+                             </CartContext.Consumer> */}
                             <button className='btn btn-warning' onClick={() => handleCheckout()} disabled={sl === false ? false : true}>Mua ngay</button>
                           </div>
                         </div>

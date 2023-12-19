@@ -264,7 +264,7 @@ const Cart = () => {
                                 <div className="col-3">
                                   <Input
                                     type="checkbox"
-                                    className="checkbox_input_1 mb-5"
+                                    className="checkbox_input_1"
                                     checked={selectAll}
                                     onChange={handleSelectAllChange}
                                   />
