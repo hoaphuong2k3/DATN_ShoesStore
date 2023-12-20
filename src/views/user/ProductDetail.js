@@ -330,7 +330,7 @@ const DetailProduct = () => {
                                     {/* Giá  giảm */}
                                     <span className='giagiam'>{shoesdetail.detailResponse.discountPrice === null ? "0 đ" : formatter.format(shoesdetail.detailResponse.discountPrice)}</span>
                                     {
-                                      shoesdetail.detailResponse.type === 1 && <span className='sokhuyenmai'> Giảm {shoesdetail.detailResponse.discountPrice === null ? 100 : (shoesdetail.detailResponse.discountPrice / shoesdetail.detailResponse.price) * 100}%</span>
+                                      shoesdetail.detailResponse.type === 1 && <span className='sokhuyenmai'> Giảm {shoesdetail.detailResponse.discountPrice === null ? 100 : ((shoesdetail.detailResponse.price-shoesdetail.detailResponse.discountPrice) / shoesdetail.detailResponse.price) * 100}%</span>
                                     }
                                     {
                                       shoesdetail.detailResponse.type === 2 && <span className='sokhuyenmai'> Giảm {shoesdetail.detailResponse.discountPrice === null ? shoesdetail.detailResponse.price : (shoesdetail.detailResponse.price - shoesdetail.detailResponse.discountPrice)}đ</span>
