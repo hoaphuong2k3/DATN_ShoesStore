@@ -1237,7 +1237,7 @@ const ListShoesDetail = () => {
                                                             style={{ cursor: "pointer" }}
                                                             className="text-muted"
                                                             onClick={() => onClickSort("price")} /></th>
-                                                        <th style={{ color: "black" }}>Giá giảm <FaSort
+                                                        <th style={{ color: "black" }}>Giá KM <FaSort
                                                             style={{ cursor: "pointer" }}
                                                             className="text-muted"
                                                             onClick={() => onClickSort("discountPrice")} /></th>

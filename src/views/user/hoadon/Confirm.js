@@ -341,7 +341,7 @@ const Confirm = (props) => {
                             <CardBody>
                                 {itemDetail.listCart && itemDetail.listCart.length > 0 && itemDetail.listCart.map((itemC, i) => (
                                     <>
-                                        <Row key={itemC.id} className="" onClick={() => chuyenHuong(itemC.idShoes)}>
+                                        <Row key={itemC.id} className="" onClick={() => chuyenHuong(itemC.idShoesDetail)}>
                                             <Col lg={1} className="text-center">
                                                 {i + 1}
                                             </Col>
