@@ -954,7 +954,7 @@ const SaleProduct = () => {
                                         </label>
                                         <Input
                                             className="form-control-alternative"
-                                            type="number"
+                                            type="number" min={1}
                                             value={formData.minPrice}
                                             onChange={(e) => setFormData({ ...formData, minPrice: e.target.value })}
                                         />
@@ -1006,7 +1006,7 @@ const SaleProduct = () => {
                                             </label>
                                             <Input
                                                 className="form-control-alternative"
-                                                type="number"
+                                                type="number" min={1} max={100}
                                                 value={formData.salePercent}
                                                 onChange={(e) => setFormData({ ...formData, salePercent: e.target.value })}
                                             />
@@ -1026,7 +1026,7 @@ const SaleProduct = () => {
                                             </label>
                                             <Input
                                                 className="form-control-alternative"
-                                                type="number"
+                                                type="number" min={1}
                                                 value={formData.salePrice}
                                                 onChange={(e) => setFormData({ ...formData, salePrice: e.target.value })}
                                             />

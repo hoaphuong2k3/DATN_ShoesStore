@@ -719,7 +719,7 @@ const SaleBills = () => {
                                         </label>
                                         <Input
                                             className="form-control-alternative"
-                                            type="number"
+                                            type="number" min={1}
                                             value={formData.minPrice}
                                             onChange={(e) => setFormData({ ...formData, minPrice: e.target.value })}
                                             invalid={!!validationErrors.minPrice}
@@ -803,7 +803,7 @@ const SaleBills = () => {
                                             <label className="form-control-label">Phần trăm:</label>
                                             <Input
                                                 className="form-control-alternative"
-                                                type="number"
+                                                type="number" min={1} max={100}
                                                 value={formData.salePercent}
                                                 onChange={(e) => setFormData({ ...formData, salePercent: e.target.value, salePrice: null })}
                                                 invalid={!!validationErrors.salePercent}
@@ -819,7 +819,7 @@ const SaleBills = () => {
                                             <label className="form-control-label">Trị giá (tiền):</label>
                                             <Input
                                                 className="form-control-alternative"
-                                                type="number"
+                                                type="number" min={1}
                                                 value={formData.salePrice}
                                                 onChange={(e) => setFormData({ ...formData, salePrice: e.target.value, salePercent: null })}
                                                 invalid={!!validationErrors.salePrice}
@@ -840,7 +840,7 @@ const SaleBills = () => {
                                         </label>
                                         <Input
                                             className="form-control-alternative"
-                                            type="number"
+                                            type="number" min={1}
                                             value={formData.quantity}
                                             onChange={(e) => setFormData({ ...formData, quantity: e.target.value })}
                                             invalid={!!validationErrors.quantity}

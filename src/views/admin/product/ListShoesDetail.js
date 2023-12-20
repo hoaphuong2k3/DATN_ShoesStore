@@ -467,12 +467,13 @@ const ListShoesDetail = () => {
     const handleFileSelect = () => {
         fileInputRef.current.click();
     };
-    const formData = new FormData();
+    
 
     const handleFileChange = async (event) => {
         const selectedFile = event.target.files[0];
-
+     
         if (selectedFile) {
+            const formData = new FormData();
             formData.append('file', selectedFile);
             try {
                 console.log(formData)
@@ -480,7 +481,22 @@ const ListShoesDetail = () => {
                     headers: {
                         'Content-Type': 'multipart/form-data',
                     },
+                    responseType: 'blob'
                 });
+                const blob = new Blob([response], { type: 'application/excel' });
+
+                // Tạo một URL cho Blob và tạo một thẻ a để download
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = url;
+                a.download = 'Template_addShoesDetail.xlsx';
+                document.body.appendChild(a);
+                a.click();
+    
+                // Giải phóng tài nguyên
+                window.URL.revokeObjectURL(url);
+
                 console.log(response);
                 getAll();
                 toast.success("Nhập excel thành công");

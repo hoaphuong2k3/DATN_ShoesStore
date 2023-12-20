@@ -277,13 +277,6 @@ const Promotion = () => {
                                                 </InputGroupAddon>
                                             </InputGroup>
                                         </Col>
-                                        <Col lg={2}>
-                                            <Input type="select" size="sm" style={{width:150}}>
-                                                <option value="">Tất cả</option>
-                                                <option value="1">Kích hoạt</option>
-                                                <option value="0">Ngừng kích hoạt</option>
-                                            </Input>
-                                        </Col>
 
 
                                         <div className="col text-right">
