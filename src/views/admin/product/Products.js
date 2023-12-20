@@ -16,6 +16,7 @@ import {
 import { toast } from 'react-toastify';
 import axios from "axios";
 import { Tooltip, Popconfirm } from 'antd';
+import axiosInstance from "services/custommize-axios";
 
 
 const Products = () => {
@@ -258,7 +259,7 @@ const Products = () => {
       formData.append('file', selectedFile);
       try {
         console.log(formData)
-        const response = await axios.post(`http://localhost:33321/api/admin/shoes/import-excel`, formData, {
+        const response = await axiosInstance.post(`/admin/shoes/import-excel`, formData, {
           headers: {
             'Content-Type': 'multipart/form-data',
           },
@@ -282,7 +283,7 @@ const Products = () => {
 
   const taiMau = async () => {
     try {
-      const res = await axios.get(`http://localhost:33321/api/admin/shoes/export/pattern`, {
+      const res = await axiosInstance.get(`/admin/shoes/export/pattern`, {
         responseType: 'blob'
       });
 
@@ -309,7 +310,7 @@ const Products = () => {
   const xuatExcel = async () => {
     try {
       const requestData = listShoes;
-      const res = await axios.post(`http://localhost:33321/api/admin/shoes/export/excel`, requestData, {
+      const res = await axiosInstance.post(`/admin/shoes/export/excel`, requestData, {
         responseType: 'blob',
         headers: {
           'Content-Type': 'application/json',
@@ -338,7 +339,7 @@ const Products = () => {
   const token = localStorage.token;
   const baoCaoExcel = async () => {
     try {
-      await axios.post(`http://localhost:33321/api/admin/shoesdetail/report`, {
+      await axiosInstance.post(`/admin/shoesdetail/report`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }

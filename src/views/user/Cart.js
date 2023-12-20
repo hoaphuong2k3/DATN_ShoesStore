@@ -85,7 +85,7 @@ const Cart = () => {
   // update quantity
   const handleQuantityChange = async (idAccount, idShoes, quantity) => {
     if (quantity < 1) {
-      toast.error("Vui lòng chọn số lượng tối thiểu là 1");
+      // toast.error("Vui lòng chọn số lượng tối thiểu là 1");
       return;
     }
     if (quantity > 15) {

@@ -83,7 +83,7 @@ const AddProduct = () => {
         try {
             await postNewShoes(formData);
             navigate("/admin/product");
-            toast.succes("Thêm mới sản phẩm thành công");
+            toast.success("Thêm mới sản phẩm thành công");
         } catch (error) {
             let errorMessage = "Lỗi từ máy chủ";
             if (error.response && error.response.data && error.response.data.message) {
@@ -193,15 +193,12 @@ const AddProduct = () => {
                                         <Row>
                                             <Col lg="4">
                                                 <FormGroup>
-                                                    <Row>
-                                                        <label
-                                                            className="form-control-label col-9"
-                                                            htmlFor="input-city"
-                                                        >
-                                                            Hãng
-                                                        </label>
-                                                        <FaPlusCircle className="col-2" />
-                                                    </Row>
+                                                    <label
+                                                        className="form-control-label"
+                                                        htmlFor="input-city"
+                                                    >
+                                                        Hãng
+                                                    </label>
                                                     <Input id="btn_select_tt" type="select" name="brandId"
                                                         onChange={(e) => onInputChange(e)}>
                                                         <option value="" > -- Chọn --  </option>

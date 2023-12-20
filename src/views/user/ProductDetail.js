@@ -37,13 +37,15 @@ const DetailProduct = () => {
   }, [id]);
   const getOneShoesDetail = async () => {
     try {
-      let res = await axios.get(`/users/comment/getAll/${idShoesDetail}`);
-      console.log(res);
+      console.log(idShoesDetail)
+      let res = await axios.get(`http://localhost:33321/api/user/shoesdetail/find-one/${idShoesDetail}`);
       if (res && res.data) {
-        setId(res.data);
-        getAll(id, idSize, idColor);
-        setIdColor(res.data)
-        setIdSize(res.data)
+        console.log(res.data.data);
+        getAll(res.data.data.shoesId, res.data.data.sizeId, res.data.data.colorId);
+        setId(res.data.data.shoesId);
+        setIdColor(res.data.data.colorId)
+        setIdSize(res.data.data.sizeId)
+        console.log(res.data.data.sizeId)
       }
     } catch (error) {
       let errorMessage = "Lỗi từ máy chủ";
@@ -119,16 +121,36 @@ const DetailProduct = () => {
     }
   }
   const getlistColorById = async () => {
-    let res = await getAllColorId(id);
-    if (res && res.data) {
-      setListColorById(res.data);
+
+    try {
+      let res = await getAllColorId(id);
+      if (res && res.data) {
+        setListColorById(res.data);
+      }
+    } catch (error) {
+      let errorMessage = "Lỗi từ máy chủ";
+      if (error.response && error.response.data && error.response.data.message) {
+        errorMessage = error.response.data.message;
+        console.error(errorMessage);
+      }
     }
+
   }
   const getlistSizeById = async () => {
-    let res = await getAllSizeId(id);
-    if (res && res.data) {
-      setListSizeById(res.data);
+
+    try {
+      let res = await getAllSizeId(id);
+      if (res && res.data) {
+        setListSizeById(res.data);
+      }
+    } catch (error) {
+      let errorMessage = "Lỗi từ máy chủ";
+      if (error.response && error.response.data && error.response.data.message) {
+        errorMessage = error.response.data.message;
+        console.error(errorMessage);
+      }
     }
+
   }
   const getDetail = async () => {
     try {

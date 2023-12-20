@@ -249,8 +249,8 @@ const Product = () => {
   const detaiCTSP = async (idShoes) => {
     try {
       let res = await axios.get(`http://localhost:33321/api/user/shoes/get-one/shoes/${idShoes}`);
-      console.log(res);
-      navigate(`/shoes/productdetail/${res.data.id}`);
+      console.log(res.data.data.id);
+      navigate(`/shoes/productdetail/${res.data.data.id}`);
     } catch (error) {
       let errorMessage = "Lỗi từ máy chủ";
       if (error.response && error.response.data && error.response.data.message) {
