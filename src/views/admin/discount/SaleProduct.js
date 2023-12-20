@@ -540,13 +540,13 @@ const SaleProduct = () => {
 
             let formattedStartDate = "";
             let formattedEndDate = "";
-            
+
             if (formData.startDate === "") {
                 formattedStartDate = "";
             } else {
                 formattedStartDate = formatDateTime(formData.startDate);
             }
-            
+
             if (formData.endDate === "") {
                 formattedEndDate = "";
             } else {
@@ -611,17 +611,16 @@ const SaleProduct = () => {
 
     const openlock = async (id) => {
         try {
-            const selectedDiscount = discounts.find(discount => discount.id === id);
+            await axiosInstance.patch(`/promos/setPromoRun/${id}`);
+            toast.success("Cập nhật thành công");
+            fetchData();
 
-            if (new Date(selectedDiscount.endDate) >= new Date(selectedDiscount.startDate)) {
-                await axiosInstance.patch(`/promos/setPromoRun/${id}`);
-                toast.success("Cập nhật thành công");
-                fetchData();
-            } else {
-                toast.error("Ngày kết thúc phải >= ngày bắt đầu");
-            }
         } catch (error) {
             console.error("Lỗi khi cập nhật trạng thái:", error);
+            if (error.response) {
+                console.error("Response data:", error.response.data);
+                toast.error(error.response.data.message);
+            }
         }
     };
 

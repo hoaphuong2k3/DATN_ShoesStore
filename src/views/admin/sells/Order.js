@@ -492,7 +492,50 @@ const Order = () => {
                 deliveryOrderDTO: deliveryOrderDTO,
             });
 
-            console.log('Kết quả từ API tạo hóa đơn:', orderResponse.data);
+            const orderId = orderResponse.data.id;
+
+            // Tính toán các giá trị cần truyền vào API in hóa đơn
+            const coinRefund = totalAmount >= 10000000 ? totalAmount * 0.02 : totalAmount * 0.01;
+            const accumulatedCoins = usingPoints;
+            const nameClient = selectedClient ? selectedClient.fullname : "";
+            const phoneClient = selectedClient ? selectedClient.phoneNumber : "";
+            const newDeliveryAddress = buildDeliveryAddress();
+            const addressDelivery = newDeliveryAddress;
+            let priceDiscountPeriod = 0;
+
+            if (promo && promo.minPrice !== null && totalAmount >= promo.minPrice && promo.typePeriod === 0) {
+                priceDiscountPeriod = -(promo.salePercent / 100) * totalAmount;
+            }
+
+            // Gọi API in hóa đơn
+            const res = await axiosInstance.post(`/order/order-detail/print/${orderId}`,{
+                coinRefund,
+                accumulatedCoins,
+                nameClient,
+                phoneClient,
+                addressDelivery,
+                priceDiscountPeriod,
+            }, {
+                headers: {
+                    'Content-Type': 'text/plain',
+                },
+                
+                responseType: 'blob',
+            });
+
+            const blob = new Blob([res.data], { type: 'application/pdf' });
+
+            // Tạo một URL cho Blob và tạo một thẻ a để download
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.style.display = 'none';
+            a.href = url;
+            a.download = 'Export_Hóa đơn.pdf';
+            document.body.appendChild(a);
+            a.click();
+
+            // Giải phóng tài nguyên
+            window.URL.revokeObjectURL(url);
 
             toast.success("Tạo đơn hàng thành công");
             resetSelectedProducts();
