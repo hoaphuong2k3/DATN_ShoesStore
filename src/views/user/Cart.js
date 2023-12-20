@@ -83,44 +83,53 @@ const Cart = () => {
   };
 
   // update quantity
-  const handleQuantityChange = async (idAccount, idShoes, quantity) => {
-    if (quantity < 1) {
-      // toast.error("Vui lòng chọn số lượng tối thiểu là 1");
-      return;
-    }
-    if (quantity > 15) {
-      toast.error("Số lượng tối đa là 15");
-      return;
-    }
-    try {
-      const response = await fetch(`http://localhost:33321/api/cart/update`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          key: idAccount,
-          id: idShoes,
-          quantity: quantity,
-        }),
-      });
-      console.log(response);
-      if (response.ok) {
-        setCartData((prevCartData) => {
-          // Tạo mảng mới với số lượng được cập nhật cho mục có idShoes
-          return prevCartData.map((item) => {
-            if (item.id === idShoes) {
-              return {
-                ...item,
-                quantity: quantity,
-                totalPrice: item.price * quantity,
-              };
-            }
-            return item;
-          });
+  const handleDecrease = async (idAccount,idShoes,quantity) => {
+    if (quantity >= 1) {
+      try {
+        const response = await fetch(`http://localhost:33321/api/cart/update`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            key: idAccount,
+            id: idShoes,
+            quantity: -1,
+          }),
         });
-      }
-    } catch (error) {}
+        console.log(response);
+        fetchData();
+      } catch (error) {}
+
+    }else{
+      toast.error("Sản phẩm phải lớn hơn hoặc bằng 1")
+    }
+  };
+
+  const handleIncrease = async(idAccount,idShoes,quantity) => {
+    if (quantity <= 15) {
+      try {
+        const response = await fetch(`http://localhost:33321/api/cart/update`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            key: idAccount,
+            id: idShoes,
+            quantity: 1,
+          }),
+        });
+        console.log(response);
+        fetchData();
+      } catch (error) {}
+
+    }else{
+      toast.error("Sản phẩm phải nhỏ hơn hoặc bằng 15")
+    }
+  };
+  const handleQuantityChange = async (idAccount, idShoes) => {
+
   };
 
   // select list product
@@ -381,10 +390,10 @@ const Cart = () => {
                                         <Button
                                           className="quantity-input__modifier quantity-input__modifier--left"
                                           onClick={() =>
-                                            handleQuantityChange(
+                                              handleDecrease(
                                               storedUserId,
                                               item.id,
-                                              item.quantity - 1
+                                                  item.quantity -1
                                             )
                                           }
                                         >
@@ -400,7 +409,7 @@ const Cart = () => {
                                         <Button
                                           className="quantity-input__modifier quantity-input__modifier--right"
                                           onClick={() =>
-                                            handleQuantityChange(
+                                              handleIncrease(
                                               storedUserId,
                                               item.id,
                                               item.quantity + 1

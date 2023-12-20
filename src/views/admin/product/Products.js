@@ -350,13 +350,17 @@ const Products = () => {
   const token = localStorage.token;
   const baoCaoExcel = async () => {
     try {
-      await axiosInstance.post(`/admin/shoesdetail/report`, {
+      await axiosInstance.post(`/admin/shoesdetail/report`, null,{
         headers: {
           'Authorization': `Bearer ${token}`
         }
       });
     } catch (error) {
-      console.error(error);
+      let errorMessage = "Lỗi từ máy chủ";
+      if (error.response && error.response.data && error.response.data.message) {
+        errorMessage = error.response.data.message;
+      }
+      toast.error(errorMessage);
     }
   };
   //End Báo cáo
