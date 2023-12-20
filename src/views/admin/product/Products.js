@@ -254,19 +254,30 @@ const Products = () => {
   const formData = new FormData();
   const handleFileChange = async (event) => {
     const selectedFile = event.target.files[0];
-
+    const formData = new FormData();
     if (selectedFile) {
       formData.append('file', selectedFile);
       try {
-        console.log(formData)
         const response = await axiosInstance.post(`/admin/shoes/import-excel`, formData, {
           headers: {
             'Content-Type': 'multipart/form-data',
-          },
+          },responseType: 'blob'
         });
         console.log(response);
         getAll();
         toast.success("Nhập excel thành công");
+        fileInputRef.current.value = null;
+        const blob = new Blob([response], { type: 'application/excel' });
+
+        // Tạo một URL cho Blob và tạo một thẻ a để download
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.style.display = 'none';
+        a.href = url;
+        a.download = 'ShoesError.xlsx';
+        document.body.appendChild(a);
+        a.click();
+
         // navigate("/admin/product");
       } catch (error) {
         let errorMessage = "Lỗi từ máy chủ";

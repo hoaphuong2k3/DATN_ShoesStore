@@ -821,7 +821,7 @@ const Client = () => {
                               >
                                 <Tooltip title="Khóa">
                                   <Button color="link" size="sm">
-                                    <FaLockOpen />
+                                     <FaLock />
                                   </Button>
                                 </Tooltip>
                               </Popconfirm>
@@ -835,7 +835,7 @@ const Client = () => {
                               >
                                 <Tooltip title="Mở khóa">
                                   <Button color="link" size="sm">
-                                    <FaLock />
+                                    <FaLockOpen />
                                   </Button>
                                 </Tooltip>
                               </Popconfirm>

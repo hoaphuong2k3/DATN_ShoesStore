@@ -443,14 +443,14 @@ const ListShoesDetail = () => {
                     'Content-Type': 'application/json',
                 },
             });
-            const blob = new Blob([res.data], { type: 'application/excel' });
+            const blob = new Blob([res], { type: 'application/excel' });
 
             // Tạo một URL cho Blob và tạo một thẻ a để download
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.style.display = 'none';
             a.href = url;
-            a.download = 'shoesdetail_export.xlsx';
+            a.download = 'Shoesdetail_Export.xlsx';
             document.body.appendChild(a);
             a.click();
 
@@ -467,11 +467,9 @@ const ListShoesDetail = () => {
     const handleFileSelect = () => {
         fileInputRef.current.click();
     };
-    const formData = new FormData();
-
     const handleFileChange = async (event) => {
         const selectedFile = event.target.files[0];
-
+        const formData = new FormData();
         if (selectedFile) {
             formData.append('file', selectedFile);
             try {
@@ -479,11 +477,23 @@ const ListShoesDetail = () => {
                 const response = await axiosInstance.post(`/admin/shoesdetail/import-excel`, formData, {
                     headers: {
                         'Content-Type': 'multipart/form-data',
-                    },
+                    },responseType: 'blob'
                 });
                 console.log(response);
                 getAll();
                 toast.success("Nhập excel thành công");
+                fileInputRef.current.value = null;
+                const blob = new Blob([response], { type: 'application/excel' });
+
+                // Tạo một URL cho Blob và tạo một thẻ a để download
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = url;
+                a.download = 'ShoesError.xlsx';
+                document.body.appendChild(a);
+                a.click();
+
                 // navigate("/admin/product");
             } catch (error) {
                 let errorMessage = "Lỗi từ máy chủ";
@@ -504,14 +514,14 @@ const ListShoesDetail = () => {
                 responseType: 'blob'
             });
 
-            const blob = new Blob([res.data], { type: 'application/excel' });
+            const blob = new Blob([res], { type: 'application/excel' });
 
             // Tạo một URL cho Blob và tạo một thẻ a để download
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.style.display = 'none';
             a.href = url;
-            a.download = 'Template_addShoesDetail.xlsx';
+            a.download = 'Template_AddShoesDetails.xlsx';
             document.body.appendChild(a);
             a.click();
 
@@ -537,14 +547,14 @@ const ListShoesDetail = () => {
                 },
             });
 
-            const blob = new Blob([res.data], { type: 'application/pdf' });
+            const blob = new Blob([res], { type: 'application/pdf' });
 
             // Tạo một URL cho Blob và tạo một thẻ a để download
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.style.display = 'none';
             a.href = url;
-            a.download = 'Export_ShoesDetail.pdf';
+            a.download = 'Export_ShoesDetails.pdf';
             document.body.appendChild(a);
             a.click();
 
