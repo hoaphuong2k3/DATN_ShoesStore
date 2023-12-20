@@ -27,7 +27,7 @@ import Toggle from 'react-toggle';
 import 'react-toggle/style.css';
 import { FaTimes, FaCommentMedical } from "react-icons/fa";
 import "assets/css/checkout.css";
-
+import * as Yup from 'yup';
 const Checkout = () => {
 
   const [modal, setModal] = useState(false);
@@ -208,46 +208,46 @@ const Checkout = () => {
   const [recipientName, setRecipientName] = useState('');
   const [recipientPhone, setRecipientPhone] = useState('');
 
+  const schema = Yup.object().shape({
+    recipientName: Yup.string().required('Vui lòng nhập họ tên người nhận'),
+    recipientPhone: Yup.string().matches(/^(84|0[3|5|7|8|9])+([0-9]{8})\b/, 'Số điện thoại không hợp lệ.').required('Vui lòng nhập số điện thoại'),
+  });
+
   const handleOrder = async () => {
-    if (selectedPaymentMethod === null) {
-      alert("Vui lòng chọn phương thức thanh toán");
-      return;
-    }
-
-    if (recipientName.length === 0 || recipientPhone.length === 0) {
-      alert("Điền hết thông tin phiếu giao");
-      return;
-    }
-
-    let deliveryAddress = {};
-
-    // Kiểm tra xem có địa chỉ được chọn từ danh sách không
-    if (selectedAddress) {
-      const selectedAddressData = listAddress.find(
-        (address) => address.addressDetail === selectedAddress
-      );
-
-      if (selectedAddressData) {
-        // Nếu có, sử dụng địa chỉ từ danh sách
-        deliveryAddress = {
-          address: `${selectedAddressData.addressDetail}, ${selectedAddressData.communeCode}, ${selectedAddressData.districtCode}, ${selectedAddressData.proviceCode}`,
-        };
-      }
-    } else {
-      // Nếu không có địa chỉ, hiển thị modal để thêm địa chỉ mới
-      const newAddress = await toggleAddAdress();
-      if (newAddress) {
-        // Nếu có địa chỉ mới, sử dụng địa chỉ mới
-        deliveryAddress = {
-          address: `${newAddress.addressDetail}, ${newAddress.communeCode}, ${newAddress.districtCode}, ,${newAddress.proviceCode}`,
-        };
-      } else {
-        // Người dùng đã hủy thêm địa chỉ, không thể tiếp tục đặt hàng
-        return;
-      }
-    }
 
     try {
+
+      if (selectedPaymentMethod === null) {
+        toast.error("Vui lòng chọn phương thức thanh toán");
+        return;
+      }
+
+      await schema.validate({ recipientName, recipientPhone }, { abortEarly: false });
+
+      let deliveryAddress = {};
+      // Kiểm tra xem có địa chỉ được chọn từ danh sách không
+      if (selectedAddress) {
+        const selectedAddressData = listAddress.find(
+            (address) => address.addressDetail === selectedAddress
+        );
+
+        if (selectedAddressData) {
+          // Nếu có, sử dụng địa chỉ từ danh sách
+          deliveryAddress = {
+            address: `${selectedAddressData.addressDetail}, ${selectedAddressData.communeCode}, ${selectedAddressData.districtCode}, ${selectedAddressData.proviceCode}`,
+          };
+        }
+      } else {
+        const newAddress = await toggleAddAdress();
+        if (newAddress) {
+          deliveryAddress = {
+            address: `${newAddress.addressDetail}, ${newAddress.communeCode}, ${newAddress.districtCode}, ,${newAddress.proviceCode}`,
+          };
+        } else {
+          return;
+        }
+      }
+
       const data = {
         idClient: storedUserId,
         idStaff: null,
@@ -271,7 +271,16 @@ const Checkout = () => {
       alert("Đặt hàng thành công");
       window.location.href = "/shoes/bill";
     } catch (error) {
-      console.error("Lỗi trong quá trình tạo hóa đơn:", error);
+      // Xử lý lỗi từ Yup và hiển thị thông báo lỗi
+      const errorMessages = {};
+      if (error instanceof Yup.ValidationError) {
+        error.inner.forEach(err => {
+          errorMessages[err.path] = err.message;
+        });
+      }
+      console.error('Lỗi validation:', errorMessages);
+      // Hiển thị thông báo lỗi cho người dùng, ví dụ sử dụng toast.error
+      toast.error('Vui lòng kiểm tra lại thông tin đặt hàng.');
     }
   };
 

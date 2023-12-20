@@ -494,17 +494,24 @@ const Order = () => {
 
             const orderId = orderResponse.data.id;
 
-            // Tính toán các giá trị cần truyền vào API in hóa đơn
-            const coinRefund = totalAmount >= 10000000 ? totalAmount * 0.02 : totalAmount * 0.01;
-            const accumulatedCoins = usingPoints;
-            const nameClient = selectedClient ? selectedClient.fullname : "";
-            const phoneClient = selectedClient ? selectedClient.phoneNumber : "";
-            const newDeliveryAddress = buildDeliveryAddress();
-            const addressDelivery = newDeliveryAddress;
+            let coinRefund = 0;
+            let accumulatedCoins = 0;
+            let nameClient = "Khách lẻ";
+            let phoneClient = "";
+            let addressDelivery = "";
             let priceDiscountPeriod = 0;
-
             if (promo && promo.minPrice !== null && totalAmount >= promo.minPrice && promo.typePeriod === 0) {
-                priceDiscountPeriod = -(promo.salePercent / 100) * totalAmount;
+                priceDiscountPeriod = (promo.salePercent / 100) * totalAmount;
+            }
+
+            if (selectedClient !== null) {
+                coinRefund = totalAmount >= 10000000 ? totalAmount * 0.02 : totalAmount * 0.01;
+                accumulatedCoins = calculateBaseAmount() >= selectedClient.totalPoints
+                    ? Math.abs(-selectedClient.totalPoints)
+                    : Math.abs(-calculateBaseAmount());
+                nameClient = selectedClient.fullname;
+                phoneClient = selectedClient.phoneNumber;
+                addressDelivery = buildDeliveryAddress();
             }
 
             // Gọi API in hóa đơn
@@ -516,15 +523,10 @@ const Order = () => {
                 addressDelivery,
                 priceDiscountPeriod,
             }, {
-                headers: {
-                    'Content-Type': 'text/plain',
-                    // 'Authorization': `Bearer ${token}`,
-                },
-                
                 responseType: 'blob',
             });
 
-            const blob = new Blob([res.data], { type: 'application/pdf' });
+            const blob = new Blob([res], { type: 'application/pdf' });
 
             // Tạo một URL cho Blob và tạo một thẻ a để download
             const url = window.URL.createObjectURL(blob);
