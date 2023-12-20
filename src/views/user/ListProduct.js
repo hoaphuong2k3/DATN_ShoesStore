@@ -14,7 +14,16 @@ import {
   InputGroupAddon,
   InputGroupText,
 } from "reactstrap";
+// import { Input, Space } from 'antd';
 import { useNavigate } from "react-router-dom";
+import {
+  FaEdit,
+  FaTrash,
+  FaSearch,
+  FaFileAlt,
+  FaFilter,
+  FaSort,
+} from "react-icons/fa";
 import Header from "components/Headers/UserHeader2.js";
 import ReactPaginate from "react-paginate";
 import axios from "axios";
@@ -54,8 +63,9 @@ const Product = () => {
   const [totalElements, setTotalElenments] = useState(0);
   const [page, setPage] = useState(0);
   const [size, setSize] = useState(12);
+
   const [search, setSearch] = useState({
-    name: "",
+    dataInput: "",
     brandId: null,
     originId: null,
     designStyleId: null,
@@ -99,6 +109,11 @@ const Product = () => {
       setProducts([]);
     }
   };
+
+  useEffect(() => {
+    getListShoes(page, size);
+  }, [search]);
+
   const getlistBrand = async () => {
     let res = await getAllBrand();
     console.log(res);
@@ -172,7 +187,7 @@ const Product = () => {
     }));
   };
 
-  const onPriceChange = (e) => {
+  const onInputChange = (e) => {
     setSearch({ ...search, [e.target.name]: e.target.value });
   };
 
@@ -248,12 +263,18 @@ const Product = () => {
   };
   const detaiCTSP = async (idShoes) => {
     try {
-      let res = await axios.get(`http://localhost:33321/api/user/shoes/get-one/shoes/${idShoes}`);
+      let res = await axios.get(
+        `http://localhost:33321/api/user/shoes/get-one/shoes/${idShoes}`
+      );
       console.log(res.data.data.id);
       navigate(`/shoes/productdetail/${res.data.data.id}`);
     } catch (error) {
       let errorMessage = "Lỗi từ máy chủ";
-      if (error.response && error.response.data && error.response.data.message) {
+      if (
+        error.response &&
+        error.response.data &&
+        error.response.data.message
+      ) {
         errorMessage = error.response.data.message;
       }
       toast.error(errorMessage);
@@ -676,16 +697,39 @@ const Product = () => {
                   </div>
 
                   <div className="col-md-9 mt-5">
-                    <div className="d-flex justify-content-between">
-                      <div style={{ fontSize: 14 }} className="mt-4">
-                        <b style={{ color: "black" }}>
+                    <div style={{ fontSize: 14 }} className="mt-4">
+                      <b style={{ color: "black" }}>
+                        Hiển thị {calculateStartIndex()} -{" "}
+                        {calculateEndIndex()} của {totalElements} kết quả{" "}
+                      </b>
+                    </div>
+                    <div>
 
-                          Hiển thị {calculateStartIndex()} - {calculateEndIndex()} của {totalElements} kết quả{" "}
-                        </b>
-                      </div>
+
+
+                    </div>
+                    <Row className="justify-content-between">
+                      <Col className="col-md-6">
+                        <InputGroup size="sm" className="rouded mt-3">
+                          <Input
+                            type="search"
+                            placeholder="Tìm kiếm tên sản phẩm..."
+                            value={search.dataInput}
+                            name="dataInput"
+                            onChange={(e) => onInputChange(e)}
+                          />
+                          <InputGroupAddon addonType="append">
+                            <InputGroupText>
+                              <FaSearch rouded />
+                            </InputGroupText>
+                          </InputGroupAddon>
+                        </InputGroup>
+                      </Col>
+
+
                       <div className="ml-auto mt-3">
                         <Input
-                          type="select"
+                          type="select" size='sm'
                           value={sortOption}
                           onChange={(e) => setSortOption(e.target.value)}
                         >
@@ -696,7 +740,8 @@ const Product = () => {
                           <option value="highToLow">Giá cao - thấp</option>
                         </Input>
                       </div>
-                    </div>
+
+                    </Row>
                     {errorMessage && <p>{errorMessage}</p>}
                     <ul></ul>
                     <div className="row product-blocks clearfix">
@@ -707,7 +752,19 @@ const Product = () => {
                               className="product-card"
                               style={{ height: "360px" }}
                             >
-                              <span className="sale-box">- 22% </span>
+                              {product.discountPriceMin !== product.priceMin ||
+                                product.discountPriceMax !== product.priceMax ? (
+                                <span className="sale-box">
+                                  -
+                                  {Math.round(
+                                    ((product.priceMax -
+                                      product.discountPriceMax) /
+                                      product.priceMax) *
+                                    100
+                                  )}
+                                  %
+                                </span>
+                              ) : null}
                               <div
                                 key={product.id}
                                 className="product-card__inner "
@@ -725,9 +782,7 @@ const Product = () => {
                                   <h4 className="product-single__series text-uppercase">
                                     {product.cushion}
                                   </h4>
-                                  <Link
-                                    onClick={(e) => detaiCTSP(product.id)}
-                                  >
+                                  <Link onClick={(e) => detaiCTSP(product.id)}>
                                     <h3 className="product-card__title">
                                       {/* SAVILLE CAPTOE OXFORD - OF32 */}
                                       {`${product.name} ${product.cushion} ${product.designStyle} ${product.brand}`}

@@ -75,7 +75,7 @@ const Home = () => {
       if (res && res.data && res.data.content) {
         setProducts(res.data.content);
         console.log(res.data);
-        console.log("????")
+        console.log("????");
         setTotalElenments(res.data.totalElements);
         setTotalPages(res.data.totalPages);
       }
@@ -95,16 +95,18 @@ const Home = () => {
 
   const getTop4Sell = async () => {
     try {
-      let res = await axios.get("http://localhost:33321/api/user/shoes/get-top4/selling");
+      let res = await axios.get(
+        "http://localhost:33321/api/user/shoes/get-top4/selling"
+      );
       if (res && res.data.data) {
         setTop4Products(res.data.data);
       }
     } catch (error) {
       let errorMessage = "Lỗi từ máy chủ";
       if (
-          error.response &&
-          error.response.data &&
-          error.response.data.message
+        error.response &&
+        error.response.data &&
+        error.response.data.message
       ) {
         errorMessage = error.response.data.message;
       }
@@ -115,7 +117,9 @@ const Home = () => {
 
   const getTop4SellLot = async () => {
     try {
-      let res = await axios.get("http://localhost:33321/api/user/shoes/get-top4/sell-lot");
+      let res = await axios.get(
+        "http://localhost:33321/api/user/shoes/get-top4/sell-lot"
+      );
       if (res && res.data.data) {
         setTop4LotProducts(res.data.data);
         console.log(res.data.data);
@@ -123,9 +127,9 @@ const Home = () => {
     } catch (error) {
       let errorMessage = "Lỗi từ máy chủ";
       if (
-          error.response &&
-          error.response.data &&
-          error.response.data.message
+        error.response &&
+        error.response.data &&
+        error.response.data.message
       ) {
         errorMessage = error.response.data.message;
       }
@@ -232,13 +236,26 @@ const Home = () => {
                     </div>
                     <div className="product-blocks clearfix row">
                       {Array.isArray(top4Products) ? (
-                          top4Products.map((product) => (
+                        top4Products.map((product) => (
                           <div className="col-3">
                             <Card
                               className="product-card"
                               style={{ height: "369px" }}
                             >
-                              <span className="sale-box">- 22% </span>
+                              {product.discountPriceMin !== product.priceMin ||
+                              product.discountPriceMax !== product.priceMax ? (
+                                <span className="sale-box">
+                                  -
+                                  {Math.round(
+                                    ((product.priceMax -
+                                      product.discountPriceMax) /
+                                      product.priceMax) *
+                                      100
+                                  )}
+                                  %
+                                </span>
+                              ) : null}
+
                               <div
                                 key={product.id}
                                 className="product-card__inner "
@@ -334,7 +351,7 @@ const Home = () => {
                       <h2 className="title_blog m-4 mt-5 mb-3">
                         <a href="/shoes/product" title="NEW ARRIVALS">
                           <strong className="text-uppercase text-dark">
-                            Leather Gent
+                            Shoes Store
                           </strong>
                         </a>
                       </h2>
@@ -510,13 +527,25 @@ const Home = () => {
                     </div>
                     <div className="product-blocks clearfix row">
                       {Array.isArray(top4LotProducts) ? (
-                          top4LotProducts.map((product) => (
+                        top4LotProducts.map((product) => (
                           <div className="col-3">
                             <Card
                               className="product-card"
                               style={{ height: "369px" }}
                             >
-                              <span className="sale-box">- 22% </span>
+                              {product.discountPriceMin !== product.priceMin ||
+                              product.discountPriceMax !== product.priceMax ? (
+                                <span className="sale-box">
+                                  -
+                                  {Math.round(
+                                    ((product.priceMax -
+                                      product.discountPriceMax) /
+                                      product.priceMax) *
+                                      100
+                                  )}
+                                  %
+                                </span>
+                              ) : null}
                               <div
                                 key={product.id}
                                 className="product-card__inner "
@@ -642,7 +671,21 @@ const Home = () => {
                             >
                               {products.map((product) => (
                                 <Card className="product-card mr-3">
-                                  <span className="sale-box">- 22% </span>
+                                  {product.discountPriceMin !==
+                                    product.priceMin ||
+                                  product.discountPriceMax !==
+                                    product.priceMax ? (
+                                    <span className="sale-box">
+                                      -
+                                      {Math.round(
+                                        ((product.priceMax -
+                                          product.discountPriceMax) /
+                                          product.priceMax) *
+                                          100
+                                      )}
+                                      %
+                                    </span>
+                                  ) : null}
                                   <div
                                     key={product.id}
                                     className="product-card__inner "
@@ -759,20 +802,20 @@ const Home = () => {
               <h2>Thiết kế độc đáo - sáng tạo</h2>
               <div class="textwidget pr-4 py-3">
                 <p style={{ textAlign: "justify" }}>
-                  Shoes Store mang đến cho người dùng những trải nghiệm tuyệt vời về
-                  các sản phẩm. Thiết kế độc đáo và đầy sáng tạo làm nổi bật
-                  tính cách của sản phẩm khiến bất cứ khách hàng nào cũng muốn
-                  sở hữu. Những ý tưởng thiết kế tuyệt vời được phối hợp nhuần
-                  nhuyễn qua bàn tay của những thợ thủ công có nhiều năm kinh
-                  nghiệm cùng với những chất liệu xa xỉ, cao cấp để tạo ra những
-                  sản phẩm không những chỉ tốt về chất lượng mà còn hợp thời
-                  trang, thẩm mỹ của người dùng.
+                  Shoes Store mang đến cho người dùng những trải nghiệm tuyệt
+                  vời về các sản phẩm. Thiết kế độc đáo và đầy sáng tạo làm nổi
+                  bật tính cách của sản phẩm khiến bất cứ khách hàng nào cũng
+                  muốn sở hữu. Những ý tưởng thiết kế tuyệt vời được phối hợp
+                  nhuần nhuyễn qua bàn tay của những thợ thủ công có nhiều năm
+                  kinh nghiệm cùng với những chất liệu xa xỉ, cao cấp để tạo ra
+                  những sản phẩm không những chỉ tốt về chất lượng mà còn hợp
+                  thời trang, thẩm mỹ của người dùng.
                 </p>
                 <p style={{ textAlign: "justify" }}>
-                Shoes Store luôn cập nhật, phát triển theo xu hướng thời trang thế
-                  giới nhưng vẫn luôn giữ lại những nét đẹp trong thiết kế để
-                  tạo cho khách hàng những sản phẩm không chỉ sang trọng, đẳng
-                  cấp mà còn hợp thời trang, có tính thẩm mỹ.
+                  Shoes Store luôn cập nhật, phát triển theo xu hướng thời trang
+                  thế giới nhưng vẫn luôn giữ lại những nét đẹp trong thiết kế
+                  để tạo cho khách hàng những sản phẩm không chỉ sang trọng,
+                  đẳng cấp mà còn hợp thời trang, có tính thẩm mỹ.
                 </p>
               </div>
             </section>

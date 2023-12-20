@@ -269,7 +269,7 @@ const Checkout = () => {
       };
       await axiosInstance.post("/order/create", data);
       alert("Đặt hàng thành công");
-      window.location.href = "/shoes/home";
+      window.location.href = "/shoes/bill";
     } catch (error) {
       console.error("Lỗi trong quá trình tạo hóa đơn:", error);
     }
