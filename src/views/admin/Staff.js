@@ -74,7 +74,8 @@ const Staff = () => {
     phonenumber: "",
     email: "",
     gender: "",
-    // createdTime: "",
+    dateOfBirth: "",
+    createdTime: "",
     // updatedTime: "",
   });
 
@@ -117,7 +118,7 @@ const Staff = () => {
           ...queryParams,
           fullname: queryParams.fullname || null,
           phonenumber: queryParams.phonenumber || null,
-          // createdTime: queryParams.createdTime || null,
+          createdTime: queryParams.createdTime || null,
           // updatedTime: queryParams.updatedTime || null,
           email: queryParams.email || null,
           gender: queryParams.gender === "" ? null : queryParams.gender,
@@ -536,7 +537,7 @@ const Staff = () => {
   const handleFilter = () => {
     // const fullname = document.getElementById("fullname").value;
     const createdTime = document.getElementById("createdTime").value;
-    const updatedTime = document.getElementById("updatedTime").value;
+    // const updatedTime = document.getElementById("updatedTime").value;
     const phonenumber = document.getElementById("phoneNumber").value;
     const email = document.getElementById("email").value;
     const genderMale = document.getElementById("genderMale");
@@ -552,7 +553,7 @@ const Staff = () => {
       ...queryParams,
       // fullname: fullname || "",
       createdTime: createdTime || "",
-      updatedTime: createdTime || "",
+      // updatedTime: createdTime || "",
       phonenumber: phonenumber || "",
       email: email || "",
       gender: gender || "",
@@ -1333,6 +1334,7 @@ const Staff = () => {
                     <Input
                       className="form-control-alternative"
                       type="date"
+                      id="dateOfBirth"
                       size="sm"
                     />
                   </FormGroup>
@@ -1433,7 +1435,7 @@ const Staff = () => {
                   </FormGroup>
 
                   {/* Ngày cập nhật */}
-                  <FormGroup>
+                  {/* <FormGroup>
                     <label
                       style={{ fontSize: 13 }}
                       className="form-control-label"
@@ -1446,7 +1448,7 @@ const Staff = () => {
                       type="date"
                       size="sm"
                     />
-                  </FormGroup>
+                  </FormGroup> */}
                 </Form>
               </ModalBody>
               <ModalFooter>

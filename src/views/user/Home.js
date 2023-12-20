@@ -145,8 +145,6 @@ const Home = () => {
     "https://bizweb.dktcdn.net/100/292/624/themes/758446/assets/index-evo-icon-2.jpg?1700140225697",
   ];
 
- 
-
   return (
     <>
       <Header />
@@ -244,11 +242,20 @@ const Home = () => {
                               className="product-card"
                               style={{ height: "369px" }}
                             >
-                              
+                              {product.discountPriceMin !== product.priceMin ||
+                              product.discountPriceMax !== product.priceMax ? (
                                 <span className="sale-box">
-                                  - 22%
+                                  -
+                                  {Math.round(
+                                    ((product.priceMax -
+                                      product.discountPriceMax) /
+                                      product.priceMax) *
+                                      100
+                                  )}
+                                  %
                                 </span>
-                              
+                              ) : null}
+
                               <div
                                 key={product.id}
                                 className="product-card__inner "
@@ -344,7 +351,7 @@ const Home = () => {
                       <h2 className="title_blog m-4 mt-5 mb-3">
                         <a href="/shoes/product" title="NEW ARRIVALS">
                           <strong className="text-uppercase text-dark">
-                            Leather Gent
+                            Shoes Store
                           </strong>
                         </a>
                       </h2>
@@ -526,7 +533,19 @@ const Home = () => {
                               className="product-card"
                               style={{ height: "369px" }}
                             >
-                              <span className="sale-box">- 22% </span>
+                              {product.discountPriceMin !== product.priceMin ||
+                              product.discountPriceMax !== product.priceMax ? (
+                                <span className="sale-box">
+                                  -
+                                  {Math.round(
+                                    ((product.priceMax -
+                                      product.discountPriceMax) /
+                                      product.priceMax) *
+                                      100
+                                  )}
+                                  %
+                                </span>
+                              ) : null}
                               <div
                                 key={product.id}
                                 className="product-card__inner "
@@ -652,7 +671,21 @@ const Home = () => {
                             >
                               {products.map((product) => (
                                 <Card className="product-card mr-3">
-                                  <span className="sale-box">- 22% </span>
+                                  {product.discountPriceMin !==
+                                    product.priceMin ||
+                                  product.discountPriceMax !==
+                                    product.priceMax ? (
+                                    <span className="sale-box">
+                                      -
+                                      {Math.round(
+                                        ((product.priceMax -
+                                          product.discountPriceMax) /
+                                          product.priceMax) *
+                                          100
+                                      )}
+                                      %
+                                    </span>
+                                  ) : null}
                                   <div
                                     key={product.id}
                                     className="product-card__inner "
