@@ -287,7 +287,7 @@ const Products = () => {
         responseType: 'blob'
       });
 
-      const blob = new Blob([res.data], { type: 'application/excel' });
+      const blob = new Blob([res], { type: 'application/excel' });
 
       // Tạo một URL cho Blob và tạo một thẻ a để download
       const url = window.URL.createObjectURL(blob);
@@ -317,7 +317,7 @@ const Products = () => {
         },
       });
 
-      const blob = new Blob([res.data], { type: 'application/excel' });
+      const blob = new Blob([res], { type: 'application/excel' });
 
       // Tạo một URL cho Blob và tạo một thẻ a để download
       const url = window.URL.createObjectURL(blob);

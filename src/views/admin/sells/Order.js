@@ -518,6 +518,7 @@ const Order = () => {
             }, {
                 headers: {
                     'Content-Type': 'text/plain',
+                    // 'Authorization': `Bearer ${token}`,
                 },
                 
                 responseType: 'blob',
