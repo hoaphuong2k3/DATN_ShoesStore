@@ -467,18 +467,36 @@ const ListShoesDetail = () => {
     const handleFileSelect = () => {
         fileInputRef.current.click();
     };
+    
+
     const handleFileChange = async (event) => {
         const selectedFile = event.target.files[0];
-        const formData = new FormData();
+     
         if (selectedFile) {
+            const formData = new FormData();
             formData.append('file', selectedFile);
             try {
                 console.log(formData)
                 const response = await axiosInstance.post(`/admin/shoesdetail/import-excel`, formData, {
                     headers: {
                         'Content-Type': 'multipart/form-data',
-                    },responseType: 'blob'
+                    },
+                    responseType: 'blob'
                 });
+                const blob = new Blob([response], { type: 'application/excel' });
+
+                // Tạo một URL cho Blob và tạo một thẻ a để download
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = url;
+                a.download = 'Template_addShoesDetail.xlsx';
+                document.body.appendChild(a);
+                a.click();
+    
+                // Giải phóng tài nguyên
+                window.URL.revokeObjectURL(url);
+
                 console.log(response);
                 getAll();
                 toast.success("Nhập excel thành công");
